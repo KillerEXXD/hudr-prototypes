@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>HUDR Cinema</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Main fullscreen hand replay container -->
+  <div id="app">
+    <!-- Current hand table -->
+    <div id="hand-container" class="hand-container">
+      <div id="poker-table" class="poker-table"></div>
+    </div>
+
+    <!-- Next hand (for transition) -->
+    <div id="hand-container-next" class="hand-container hand-container-next">
+      <div id="poker-table-next" class="poker-table"></div>
+    </div>
+
+    <!-- Top overlay (tournament name, hand #) -->
+    <div id="top-overlay" class="top-overlay">
+      <div class="top-overlay-content">
+        <div class="top-overlay-tournament" id="overlay-tournament"></div>
+        <div class="top-overlay-hand" id="overlay-hand"></div>
+        <div class="top-overlay-blinds" id="overlay-blinds"></div>
+      </div>
+    </div>
+
+    <!-- Bottom overlay (winner, pot) -->
+    <div id="bottom-overlay" class="bottom-overlay">
+      <div class="bottom-overlay-content">
+        <div class="bottom-overlay-highlight" id="overlay-highlight"></div>
+        <div class="bottom-overlay-preview" id="overlay-preview"></div>
+        <div class="bottom-overlay-winner" id="overlay-winner"></div>
+      </div>
+    </div>
+
+    <!-- Street indicator -->
+    <div id="street-indicator" class="street-indicator"></div>
+
+    <!-- Hand dots indicator (right edge) -->
+    <div id="hand-dots" class="hand-dots"></div>
+
+    <!-- Action toast -->
+    <div id="action-toast" class="action-toast"></div>
+
+    <!-- Hand switch toast -->
+    <div id="hand-toast" class="hand-toast"></div>
+
+    <!-- Play/Pause indicator -->
+    <div id="play-pause-indicator" class="play-pause-indicator"></div>
+
+    <!-- Left Panel — Player Stats -->
+    <div id="left-panel-backdrop" class="panel-backdrop"></div>
+    <div id="left-panel" class="left-panel">
+      <div class="panel-header">
+        <span class="panel-title">Player Stats</span>
+        <button class="panel-close" id="left-panel-close">&times;</button>
+      </div>
+      <div id="left-panel-content" class="panel-content"></div>
+    </div>
+
+    <!-- Right Panel — AI Commentary -->
+    <div id="right-panel-backdrop" class="panel-backdrop"></div>
+    <div id="right-panel" class="right-panel">
+      <div class="panel-header">
+        <span class="panel-title">AI Commentary</span>
+        <button class="panel-close" id="right-panel-close">&times;</button>
+      </div>
+      <div id="right-panel-content" class="panel-content"></div>
+    </div>
+
+    <!-- Top Panel — Tournament Picker -->
+    <div id="top-panel-backdrop" class="panel-backdrop"></div>
+    <div id="top-panel" class="top-panel">
+      <div class="panel-header">
+        <span class="panel-title">Select Tournament</span>
+        <button class="panel-close" id="top-panel-close">&times;</button>
+      </div>
+      <div id="top-panel-content" class="panel-content"></div>
+    </div>
+
+    <!-- Bottom Panel — Hand Info -->
+    <div id="bottom-panel-backdrop" class="panel-backdrop"></div>
+    <div id="bottom-panel" class="bottom-panel">
+      <div class="panel-header">
+        <span class="panel-title">Hand Details</span>
+        <button class="panel-close" id="bottom-panel-close">&times;</button>
+      </div>
+      <div id="bottom-panel-content" class="panel-content"></div>
+    </div>
+
+    <!-- Long Press Detail Overlay -->
+    <div id="detail-overlay" class="detail-overlay">
+      <div class="detail-overlay-inner">
+        <button class="detail-overlay-close" id="detail-overlay-close">&times;</button>
+        <div id="detail-overlay-content"></div>
+      </div>
+    </div>
+
+    <!-- Gesture hint on first load -->
+    <div id="gesture-hint" class="gesture-hint">
+      <div class="gesture-hint-inner">
+        <div class="gesture-hint-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            <path d="M12 14v3"/>
+            <path d="M8 18l4 3 4-3"/>
+          </svg>
+        </div>
+        <div class="gesture-hint-text">Swipe to navigate</div>
+        <div class="gesture-hint-sub">Up/Down: hands &middot; Edges: panels &middot; Tap: overlays</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>HUDR - The Stream</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app"></div>
+  <div id="bottom-sheet-backdrop" class="bottom-sheet-backdrop hidden"></div>
+  <div id="bottom-sheet" class="bottom-sheet hidden">
+    <div class="bottom-sheet-handle-area" id="bottom-sheet-drag">
+      <div class="bottom-sheet-handle"></div>
+    </div>
+    <div class="bottom-sheet-content" id="bottom-sheet-content"></div>
+  </div>
+  <div id="search-overlay" class="search-overlay hidden">
+    <div class="search-overlay-inner">
+      <div class="search-header">
+        <div class="search-input-wrap">
+          <span class="search-icon-input">&#128269;</span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search everything..." autocomplete="off">
+        </div>
+        <button class="search-close" data-action="close-search">Cancel</button>
+      </div>
+      <div id="search-results" class="search-results"></div>
+    </div>
+  </div>
+  <nav id="bottom-nav" class="bottom-nav">
+    <button class="nav-item active" data-action="nav" data-id="feed">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Feed</span>
+    </button>
+    <button class="nav-item" data-action="nav" data-id="you">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>You</span>
+    </button>
+  </nav>
+  <script src="../shared/data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

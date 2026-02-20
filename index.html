@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>HUDR Prototypes — Pick a Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+    .hero {
+      text-align: center;
+      padding: 48px 0 32px;
+    }
+    .hero h1 {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #dc2626, #f97316, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: #9ca3af;
+      font-size: 16px;
+      margin-top: 8px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero .badge {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 6px 16px;
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 9999px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 32px;
+    }
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 1024px) {
+      .grid { grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    }
+    .card {
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      border-color: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.15);
+    }
+    .card:active {
+      transform: scale(0.98);
+    }
+    .card-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+    .card-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .card .subtitle {
+      font-size: 13px;
+      color: #f59e0b;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .card p {
+      font-size: 14px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+    .card .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 16px;
+    }
+    .card .tag {
+      padding: 4px 10px;
+      background: #1e1e1e;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    .footer {
+      text-align: center;
+      padding: 32px 0;
+      color: #4b5563;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>HUDR Prototypes</h1>
+      <p>7 radically different UX designs for poker tournament intelligence. Same data, completely different experiences.</p>
+      <span class="badge">Mobile-First PWA • Dark Theme • Mock Data</span>
+    </div>
+
+    <div class="grid">
+      <a href="a-stream/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #ef4444, #f97316)"></div>
+        <div class="card-letter" style="background: rgba(239,68,68,0.15); color: #ef4444;">A</div>
+        <h2>The Stream</h2>
+        <div class="subtitle">Feed-First • Instagram Model</div>
+        <p>Vertical scrolling feed with inline content. Bottom sheets for deep dives. 2 nav items. Zero tabs. Scroll to discover, tap to go deep.</p>
+        <div class="tags">
+          <span class="tag">2 nav items</span>
+          <span class="tag">0 tabs</span>
+          <span class="tag">Bottom sheets</span>
+          <span class="tag">Feed + You</span>
+        </div>
+      </a>
+
+      <a href="b-lens/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #3b82f6, #8b5cf6)"></div>
+        <div class="card-letter" style="background: rgba(59,130,246,0.15); color: #3b82f6;">B</div>
+        <h2>The Lens</h2>
+        <div class="subtitle">Context-First • Slack Model</div>
+        <p>Pick a tournament and everything changes. Persistent context header. Swipe between sections like Stories. Deep focus on one event.</p>
+        <div class="tags">
+          <span class="tag">3 nav items</span>
+          <span class="tag">Swipe panels</span>
+          <span class="tag">Context header</span>
+          <span class="tag">Sidebar drawer</span>
+        </div>
+      </a>
+
+      <a href="c-grid/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #10b981, #06b6d4)"></div>
+        <div class="card-letter" style="background: rgba(16,185,129,0.15); color: #10b981;">C</div>
+        <h2>The Grid</h2>
+        <div class="subtitle">Dashboard-First • Bloomberg Model</div>
+        <p>Widget dashboard with everything at a glance. Tap any widget to expand fullscreen. Dense data layout. Power-user command center.</p>
+        <div class="tags">
+          <span class="tag">3 nav items</span>
+          <span class="tag">Widget grid</span>
+          <span class="tag">Expand/collapse</span>
+          <span class="tag">Data-dense</span>
+        </div>
+      </a>
+
+      <a href="d-cinema/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #dc2626, #7c3aed)"></div>
+        <div class="card-letter" style="background: rgba(220,38,38,0.15); color: #dc2626;">D</div>
+        <h2>The Cinema</h2>
+        <div class="subtitle">Replay-First • TikTok Model</div>
+        <p>Opens to fullscreen hand replay. Swipe up/down for next hand. Edge swipes reveal stats and AI. Immersive, gesture-driven experience.</p>
+        <div class="tags">
+          <span class="tag">No nav bar</span>
+          <span class="tag">Gesture-based</span>
+          <span class="tag">Fullscreen replay</span>
+          <span class="tag">Edge panels</span>
+        </div>
+      </a>
+
+      <a href="e-timeline/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #f59e0b, #ea580c)"></div>
+        <div class="card-letter" style="background: rgba(245,158,11,0.15); color: #f59e0b;">E</div>
+        <h2>The Timeline</h2>
+        <div class="subtitle">Chronological • ESPN Model</div>
+        <p>Horizontal scrollable timeline of the tournament. Chip stack lines per player. Key moments as dots. Tap to explore any moment in detail.</p>
+        <div class="tags">
+          <span class="tag">2 nav items</span>
+          <span class="tag">H-scroll timeline</span>
+          <span class="tag">Chip graph</span>
+          <span class="tag">Moment detail</span>
+        </div>
+      </a>
+
+      <a href="f-conversation/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #8b5cf6, #ec4899)"></div>
+        <div class="card-letter" style="background: rgba(139,92,246,0.15); color: #8b5cf6;">F</div>
+        <h2>The Conversation</h2>
+        <div class="subtitle">AI-First • ChatGPT Model</div>
+        <p>The entire app is a chat. Ask questions, get embedded cards — replays, stats, comparisons. Rich media in every message. AI is the interface.</p>
+        <div class="tags">
+          <span class="tag">No nav bar</span>
+          <span class="tag">Chat interface</span>
+          <span class="tag">Rich embeds</span>
+          <span class="tag">Quick chips</span>
+        </div>
+      </a>
+
+      <a href="g-stack/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #ec4899, #f97316)"></div>
+        <div class="card-letter" style="background: rgba(236,72,153,0.15); color: #ec4899;">G</div>
+        <h2>The Stack</h2>
+        <div class="subtitle">Card-Swiping • Tinder Model</div>
+        <p>Everything is a card you swipe. Right to favorite, left to skip, up for details, tap to flip. Discover tournaments, hands, and players by swiping.</p>
+        <div class="tags">
+          <span class="tag">3 nav items</span>
+          <span class="tag">Swipe cards</span>
+          <span class="tag">Flip animation</span>
+          <span class="tag">Gesture-based</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="footer">
+      HUDR Prototypes • 7 designs • Shared mock data • Mobile-first PWA
+    </div>
+  </div>
+</body>
+</html>
