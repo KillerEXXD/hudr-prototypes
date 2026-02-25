@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HUDR Stories — Final Table Intelligence</title>
+<style>
+/* ===================== */
+/* CSS Reset & Base      */
+/* ===================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.07);
+  --bg-glass: rgba(255, 255, 255, 0.06);
+  --bg-glass-heavy: rgba(255, 255, 255, 0.10);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-light: rgba(255, 255, 255, 0.12);
+  --text-primary: #f0f0f5;
+  --text-secondary: rgba(240, 240, 245, 0.65);
+  --text-muted: rgba(240, 240, 245, 0.4);
+  --accent-purple: #8b5cf6;
+  --accent-indigo: #6366f1;
+  --accent-pink: #ec4899;
+  --accent-teal: #14b8a6;
+  --accent-orange: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-green: #22c55e;
+  --accent-blue: #3b82f6;
+  --gradient-primary: linear-gradient(135deg, #8b5cf6, #6366f1, #ec4899);
+  --gradient-gold: linear-gradient(135deg, #f59e0b, #eab308, #fbbf24);
+  --gradient-silver: linear-gradient(135deg, #94a3b8, #cbd5e1, #94a3b8);
+  --gradient-bronze: linear-gradient(135deg, #d97706, #b45309, #d97706);
+  --gradient-blue: linear-gradient(135deg, #3b82f6, #6366f1);
+  --gradient-teal: linear-gradient(135deg, #14b8a6, #06b6d4);
+  --gradient-orange: linear-gradient(135deg, #f59e0b, #ef4444);
+  --gradient-red: linear-gradient(135deg, #ef4444, #ec4899);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow-purple: 0 0 30px rgba(139, 92, 246, 0.15);
+  --shadow-glow-pink: 0 0 30px rgba(236, 72, 153, 0.15);
+  --font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+  font-family: var(--font-stack);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===================== */
+/* Phone Viewport Frame  */
+/* ===================== */
+.phone-frame {
+  max-width: 390px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+}
+
+@media (min-width: 500px) {
+  body {
+    background: #050508;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px 0;
+  }
+  .phone-frame {
+    border-radius: 32px;
+    border: 2px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 80px rgba(139, 92, 246, 0.08), 0 0 160px rgba(99, 102, 241, 0.04);
+    min-height: calc(100vh - 40px);
+    overflow: hidden;
+  }
+}
+
+/* ===================== */
+/* Back Link             */
+/* ===================== */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  margin: 12px 16px 0;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(10px);
+}
+.back-link:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass-heavy);
+}
+.back-link svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ===================== */
+/* Header                */
+/* ===================== */
+.header {
+  padding: 16px 16px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(to bottom, var(--bg-primary) 60%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tournament-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  max-width: 200px;
+  backdrop-filter: blur(10px);
+}
+.tournament-selector:hover {
+  background: var(--bg-glass-heavy);
+  border-color: var(--border-glass-light);
+}
+.tournament-selector .chevron {
+  font-size: 8px;
+  opacity: 0.5;
+}
+.tournament-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===================== */
+/* Section Titles        */
+/* ===================== */
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  padding: 20px 16px 12px;
+  color: var(--text-primary);
+}
+.section-title .emoji {
+  margin-right: 6px;
+}
+.section-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 0 16px;
+  margin-top: -8px;
+  margin-bottom: 12px;
+}
+
+/* ===================== */
+/* Story Carousel        */
+/* ===================== */
+.story-carousel {
+  display: flex;
+  gap: 14px;
+  padding: 8px 16px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+}
+.story-carousel::-webkit-scrollbar { display: none; }
+
+.story-circle {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: transform var(--transition-fast);
+}
+.story-circle:active {
+  transform: scale(0.92);
+}
+
+.story-ring {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  padding: 3px;
+  background: var(--gradient-primary);
+  position: relative;
+  transition: all var(--transition-normal);
+}
+.story-ring.viewed {
+  background: rgba(255, 255, 255, 0.15);
+}
+.story-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  background: var(--gradient-primary);
+  filter: blur(12px);
+  transition: opacity var(--transition-normal);
+  z-index: -1;
+}
+.story-circle:hover .story-ring:not(.viewed)::after {
+  opacity: 0.4;
+}
+
+.story-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  border: 2px solid var(--bg-primary);
+}
+
+.story-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  max-width: 68px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* Story avatar colors */
+.avatar-purple { background: linear-gradient(135deg, #7c3aed, #4f46e5) !important; }
+.avatar-pink { background: linear-gradient(135deg, #ec4899, #be185d) !important; }
+.avatar-teal { background: linear-gradient(135deg, #14b8a6, #0891b2) !important; }
+.avatar-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
+.avatar-red { background: linear-gradient(135deg, #ef4444, #b91c1c) !important; }
+.avatar-blue { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; }
+
+/* ===================== */
+/* Story Viewer          */
+/* ===================== */
+.story-viewer {
+  margin: 0 16px 24px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 9 / 16;
+  max-height: 580px;
+  background: linear-gradient(160deg, #1a1025 0%, #0f0a1a 40%, #0a0a14 100%);
+  box-shadow: var(--shadow-card), var(--shadow-glow-purple);
+  border: 1px solid var(--border-glass);
+}
+
+.story-bg-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  font-size: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  pointer-events: none;
+  overflow: hidden;
+}
+.story-bg-pattern span {
+  position: absolute;
+  animation: floatSuit 20s ease-in-out infinite;
+}
+.story-bg-pattern span:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; font-size: 80px; }
+.story-bg-pattern span:nth-child(2) { top: 30%; right: 5%; animation-delay: -5s; font-size: 100px; }
+.story-bg-pattern span:nth-child(3) { bottom: 20%; left: 15%; animation-delay: -10s; font-size: 60px; }
+.story-bg-pattern span:nth-child(4) { bottom: 40%; right: 15%; animation-delay: -15s; font-size: 90px; }
+
+@keyframes floatSuit {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-15px) rotate(5deg); }
+  50% { transform: translateY(5px) rotate(-3deg); }
+  75% { transform: translateY(-8px) rotate(2deg); }
+}
+
+.story-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+/* Story progress bar */
+.story-progress {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.story-progress-dot {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  position: relative;
+}
+.story-progress-dot.active::after,
+.story-progress-dot.completed::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background: var(--gradient-primary);
+}
+.story-progress-dot.active::after {
+  animation: progressFill 5s linear forwards;
+}
+.story-progress-dot.completed::after {
+  width: 100%;
+}
+
+@keyframes progressFill {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.story-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: auto;
+}
+.story-hand-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-glass);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-glass);
+}
+.story-timestamp {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Community cards */
+.community-cards {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: auto 0;
+  padding: 20px 0;
+}
+
+.playing-card {
+  width: 56px;
+  height: 80px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #ffffff 0%, #f0f0f5 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+  position: relative;
+  transition: transform var(--transition-normal);
+  animation: cardDeal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.playing-card:nth-child(1) { animation-delay: 0.1s; }
+.playing-card:nth-child(2) { animation-delay: 0.2s; }
+.playing-card:nth-child(3) { animation-delay: 0.3s; }
+.playing-card:nth-child(4) { animation-delay: 0.4s; }
+.playing-card:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes cardDeal {
+  from { transform: translateY(-30px) rotateY(90deg); opacity: 0; }
+  to { transform: translateY(0) rotateY(0); opacity: 1; }
+}
+
+.card-rank {
+  font-size: 18px;
+  line-height: 1;
+}
+.card-suit {
+  font-size: 22px;
+  line-height: 1;
+  margin-top: 2px;
+}
+.card-red { color: #dc2626; }
+.card-black { color: #1a1a2e; }
+
+.card-corner {
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  font-size: 9px;
+  line-height: 1.1;
+  text-align: center;
+}
+.card-corner-bottom {
+  position: absolute;
+  bottom: 4px;
+  right: 5px;
+  font-size: 9px;
+  line-height: 1.1;
+  text-align: center;
+  transform: rotate(180deg);
+}
+
+/* Player spotlight */
+.player-spotlight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-glass-heavy);
+  border: 1px solid var(--border-glass-light);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  backdrop-filter: blur(16px);
+  margin-bottom: 12px;
+}
+
+.spotlight-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.spotlight-info {
+  flex: 1;
+  min-width: 0;
+}
+.spotlight-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.spotlight-stack {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+
+.action-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--accent-red), var(--accent-pink));
+  color: white;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: pulseBadge 2s ease-in-out infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.15); }
+}
+
+/* Quick stats */
+.quick-stats {
+  display: flex;
+  justify-content: space-around;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  margin-bottom: 12px;
+  backdrop-filter: blur(10px);
+}
+.quick-stat {
+  text-align: center;
+}
+.quick-stat-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.quick-stat-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* AI narrative */
+.ai-narrative {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-bottom: 12px;
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+.ai-narrative::before {
+  content: 'AI';
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 0 4px;
+}
+
+/* Story navigation */
+.story-nav {
+  position: absolute;
+  top: 80px;
+  bottom: 200px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  padding: 0 8px;
+}
+.story-viewer:hover .story-nav { opacity: 1; }
+.story-nav-left { left: 0; }
+.story-nav-right { right: 0; }
+.story-nav-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-glass-heavy);
+  border: 1px solid var(--border-glass-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+  transition: all var(--transition-fast);
+}
+.story-nav-arrow:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.story-video-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--gradient-primary);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+.story-video-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+  transform: translateX(-100%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
+}
+.story-video-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3); }
+.story-video-btn:active { transform: scale(0.98); }
+
+.swipe-hint {
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  animation: fadeInUp 1s ease 1s backwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== */
+/* Player Trading Cards  */
+/* ===================== */
+.trading-cards-scroll {
+  display: flex;
+  gap: 14px;
+  padding: 0 16px 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+.trading-cards-scroll::-webkit-scrollbar { display: none; }
+
+.trading-card {
+  flex-shrink: 0;
+  width: 240px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  position: relative;
+  scroll-snap-align: start;
+  transition: transform var(--transition-normal);
+  cursor: pointer;
+}
+.trading-card:hover { transform: translateY(-4px); }
+.trading-card:active { transform: scale(0.97); }
+
+.trading-card-border {
+  padding: 2px;
+  border-radius: var(--radius-xl);
+}
+.border-gold { background: var(--gradient-gold); }
+.border-silver { background: var(--gradient-silver); }
+.border-bronze { background: var(--gradient-bronze); }
+.border-blue { background: var(--gradient-blue); }
+
+.trading-card-inner {
+  background: linear-gradient(170deg, #15121f 0%, #0d0b14 50%, #0a0a12 100%);
+  border-radius: calc(var(--radius-xl) - 2px);
+  padding: 20px 16px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.trading-card-inner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.trading-card-rank {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  opacity: 0.5;
+}
+
+.trading-card-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 auto 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.trading-card-name {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.trading-card-nickname {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  margin: 0 auto 14px;
+  display: flex;
+  width: fit-content;
+}
+.tier-shark {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--accent-purple);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+.tier-whale {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-blue);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+.tier-fish {
+  background: rgba(20, 184, 166, 0.15);
+  color: var(--accent-teal);
+  border: 1px solid rgba(20, 184, 166, 0.25);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.stat-cell {
+  text-align: center;
+  padding: 6px 4px;
+  background: var(--bg-glass);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-glass);
+}
+.stat-cell-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.stat-cell-label {
+  font-size: 8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.playstyle-tag {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-purple);
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: var(--radius-full);
+  padding: 5px 12px;
+  margin-bottom: 12px;
+}
+
+/* Sparkline chart */
+.sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 28px;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+.sparkline-bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  min-height: 4px;
+  transition: height var(--transition-slow);
+}
+.sparkline-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  color: var(--text-muted);
+  padding: 0 4px;
+  margin-bottom: 12px;
+}
+
+.view-profile-link {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-purple);
+  text-decoration: none;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  transition: all var(--transition-fast);
+}
+.view-profile-link:hover {
+  background: rgba(139, 92, 246, 0.12);
+}
+
+/* ===================== */
+/* Tournament Wrapped    */
+/* ===================== */
+.wrapped-scroll {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+.wrapped-scroll::-webkit-scrollbar { display: none; }
+
+.wrapped-card {
+  flex-shrink: 0;
+  width: calc(100% - 48px);
+  min-width: 280px;
+  max-width: 340px;
+  border-radius: var(--radius-xl);
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  scroll-snap-align: center;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform var(--transition-normal);
+}
+.wrapped-card:hover { transform: scale(0.98); }
+.wrapped-card:active { transform: scale(0.96); }
+
+.wrapped-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  filter: blur(0px);
+  z-index: 0;
+}
+.wrapped-card > * { position: relative; z-index: 1; }
+
+.wrapped-purple {
+  background: linear-gradient(155deg, #3b1d8e 0%, #1e0a5c 40%, #150835 100%);
+  box-shadow: 0 8px 32px rgba(59, 29, 142, 0.3);
+}
+.wrapped-teal {
+  background: linear-gradient(155deg, #0a5c5c 0%, #062e3e 40%, #041a25 100%);
+  box-shadow: 0 8px 32px rgba(10, 92, 92, 0.3);
+}
+.wrapped-orange {
+  background: linear-gradient(155deg, #7c3a0a 0%, #4a1e06 40%, #2d1004 100%);
+  box-shadow: 0 8px 32px rgba(124, 58, 10, 0.3);
+}
+.wrapped-red {
+  background: linear-gradient(155deg, #7c0a2e 0%, #4a0618 40%, #2d0410 100%);
+  box-shadow: 0 8px 32px rgba(124, 10, 46, 0.3);
+}
+
+.wrapped-card-number {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.wrapped-card-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.wrapped-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.wrapped-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.wrapped-stat-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.wrapped-stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+}
+.wrapped-stat-value.highlight {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Wrapped rival card */
+.rival-section {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.rival-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.rival-info { flex: 1; }
+.rival-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+}
+.rival-subtitle {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 2px;
+}
+
+.rival-h2h {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+.rival-h2h-stat {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+}
+.rival-h2h-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+}
+.rival-h2h-label {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.rival-h2h-value.win { color: var(--accent-green); }
+.rival-h2h-value.loss { color: var(--accent-red); }
+
+/* Wrapped signature move */
+.signature-move-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.signature-move-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+.signature-move-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+}
+.signature-move-detail {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.signature-move-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent-green);
+}
+.signature-move-success span {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Wrapped moment mini replay */
+.moment-preview {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.moment-hand-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+.moment-cards {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.moment-card {
+  width: 38px;
+  height: 54px;
+  border-radius: 5px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.moment-card .card-rank { font-size: 13px; }
+.moment-card .card-suit { font-size: 15px; margin-top: 1px; }
+.moment-description {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.wrapped-page-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 16px 8px;
+}
+.wrapped-page-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+.wrapped-page-dot.active {
+  background: var(--accent-purple);
+  width: 18px;
+  border-radius: 3px;
+}
+
+/* ===================== */
+/* AI Highlights Feed    */
+/* ===================== */
+.highlights-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 16px 20px;
+}
+
+.highlight-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+.highlight-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-glass-light);
+}
+
+.highlight-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 0;
+}
+
+.highlight-mood {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.mood-fire { background: rgba(239, 68, 68, 0.12); }
+.mood-ice { background: rgba(59, 130, 246, 0.12); }
+.mood-skull { background: rgba(168, 85, 247, 0.12); }
+.mood-target { background: rgba(34, 197, 94, 0.12); }
+
+.highlight-meta {
+  flex: 1;
+  min-width: 0;
+}
+.highlight-hand-info {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.highlight-oneliner {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.highlight-expand-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.highlight-card.expanded .highlight-expand-content {
+  max-height: 300px;
+}
+
+.highlight-narrative {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-glass);
+  margin-top: 12px;
+}
+
+.highlight-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 12px;
+}
+.highlight-btns {
+  display: flex;
+  gap: 6px;
+}
+.highlight-btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-glass-light);
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.highlight-btn:hover {
+  background: var(--bg-glass-heavy);
+  color: var(--text-primary);
+}
+.highlight-btn.primary {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.25);
+  color: var(--accent-purple);
+}
+.highlight-btn.primary:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.highlight-engagement {
+  display: flex;
+  gap: 14px;
+}
+.engagement-icon {
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+.engagement-icon:hover { opacity: 0.8; transform: scale(1.15); }
+.engagement-icon.liked { opacity: 1; }
+
+.highlight-expand-indicator {
+  text-align: center;
+  padding: 8px 14px 12px;
+}
+.expand-text {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+/* ===================== */
+/* Bottom Navigation     */
+/* ===================== */
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid var(--border-glass);
+  padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  position: relative;
+}
+.nav-item:active { transform: scale(0.9); }
+
+.nav-icon {
+  font-size: 20px;
+  opacity: 0.35;
+  transition: all var(--transition-fast);
+}
+.nav-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  transition: all var(--transition-fast);
+}
+.nav-item.active .nav-icon {
+  opacity: 1;
+}
+.nav-item.active .nav-label {
+  color: var(--accent-purple);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 1px;
+}
+
+/* ===================== */
+/* Utility & Animation   */
+/* ===================== */
+.fade-in {
+  animation: fadeIn 0.6s ease backwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+.stagger-7 { animation-delay: 0.35s; }
+.stagger-8 { animation-delay: 0.4s; }
+
+/* Scrollbar hide globally */
+::-webkit-scrollbar { width: 0; height: 0; }
+* { scrollbar-width: none; }
+
+/* Divider */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-glass-light), transparent);
+  margin: 8px 16px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <!-- Back Link -->
+  <a href="index.html" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    Prototypes
+  </a>
+
+  <!-- ===================== -->
+  <!-- Header                -->
+  <!-- ===================== -->
+  <header class="header">
+    <div class="logo">HUDR</div>
+    <div class="tournament-selector" onclick="this.classList.toggle('open')">
+      <span class="tournament-name">2024 PGT Championship - Final Table</span>
+      <span class="chevron">&#9662;</span>
+    </div>
+  </header>
+
+  <!-- ===================== -->
+  <!-- Story Carousel        -->
+  <!-- ===================== -->
+  <div class="story-carousel">
+    <div class="story-circle fade-in stagger-1" onclick="scrollToStory()">
+      <div class="story-ring">
+        <div class="story-avatar avatar-red">AF</div>
+      </div>
+      <span class="story-label">Big Bluff</span>
+    </div>
+    <div class="story-circle fade-in stagger-2" onclick="scrollToStory()">
+      <div class="story-ring">
+        <div class="story-avatar avatar-teal">DN</div>
+      </div>
+      <span class="story-label">Hero Call</span>
+    </div>
+    <div class="story-circle fade-in stagger-3" onclick="scrollToStory()">
+      <div class="story-ring">
+        <div class="story-avatar avatar-blue">PI</div>
+      </div>
+      <span class="story-label">All-In Drama</span>
+    </div>
+    <div class="story-circle fade-in stagger-4" onclick="scrollToStory()">
+      <div class="story-ring viewed">
+        <div class="story-avatar avatar-orange">JB</div>
+      </div>
+      <span class="story-label">Cooler</span>
+    </div>
+    <div class="story-circle fade-in stagger-5" onclick="scrollToStory()">
+      <div class="story-ring viewed">
+        <div class="story-avatar avatar-pink">BK</div>
+      </div>
+      <span class="story-label">Rivered!</span>
+    </div>
+    <div class="story-circle fade-in stagger-6" onclick="scrollToStory()">
+      <div class="story-ring">
+        <div class="story-avatar avatar-purple">SC</div>
+      </div>
+      <span class="story-label">The Nuts</span>
+    </div>
+  </div>
+
+  <!-- ===================== -->
+  <!-- Story Viewer          -->
+  <!-- ===================== -->
+  <div class="story-viewer fade-in stagger-3" id="storyViewer">
+    <!-- Background suit watermark -->
+    <div class="story-bg-pattern">
+      <span>&spades;</span>
+      <span>&hearts;</span>
+      <span>&diams;</span>
+      <span>&clubs;</span>
+    </div>
+
+    <!-- Navigation zones -->
+    <div class="story-nav story-nav-left" onclick="prevStory()">
+      <div class="story-nav-arrow">&lsaquo;</div>
+    </div>
+    <div class="story-nav story-nav-right" onclick="nextStory()">
+      <div class="story-nav-arrow">&rsaquo;</div>
+    </div>
+
+    <div class="story-content">
+      <!-- Progress bar -->
+      <div class="story-progress">
+        <div class="story-progress-dot completed"></div>
+        <div class="story-progress-dot active"></div>
+        <div class="story-progress-dot"></div>
+        <div class="story-progress-dot"></div>
+      </div>
+
+      <!-- Header -->
+      <div class="story-header">
+        <span class="story-hand-label">Hand #47 &middot; Flop</span>
+        <span class="story-timestamp">Level 18 &middot; 15K/30K</span>
+      </div>
+
+      <!-- Community cards -->
+      <div class="community-cards">
+        <div class="playing-card">
+          <div class="card-corner"><span class="card-black">K<br>&spades;</span></div>
+          <span class="card-rank card-black">K</span>
+          <span class="card-suit card-black">&spades;</span>
+          <div class="card-corner-bottom"><span class="card-black">K<br>&spades;</span></div>
+        </div>
+        <div class="playing-card">
+          <div class="card-corner"><span class="card-red">Q<br>&hearts;</span></div>
+          <span class="card-rank card-red">Q</span>
+          <span class="card-suit card-red">&hearts;</span>
+          <div class="card-corner-bottom"><span class="card-red">Q<br>&hearts;</span></div>
+        </div>
+        <div class="playing-card">
+          <div class="card-corner"><span class="card-black">9<br>&spades;</span></div>
+          <span class="card-rank card-black">9</span>
+          <span class="card-suit card-black">&spades;</span>
+          <div class="card-corner-bottom"><span class="card-black">9<br>&spades;</span></div>
+        </div>
+      </div>
+
+      <!-- Player spotlight -->
+      <div class="player-spotlight">
+        <div class="spotlight-avatar avatar-red">AF</div>
+        <div class="spotlight-info">
+          <div class="spotlight-name">Alex Foxen</div>
+          <div class="spotlight-stack">Stack: 2.4M &middot; Pos: CO</div>
+        </div>
+        <div class="action-badge">RAISES 180K</div>
+      </div>
+
+      <!-- Quick stats -->
+      <div class="quick-stats">
+        <div class="quick-stat">
+          <div class="quick-stat-value">520K</div>
+          <div class="quick-stat-label">Pot</div>
+        </div>
+        <div class="quick-stat">
+          <div class="quick-stat-value">2.1</div>
+          <div class="quick-stat-label">SPR</div>
+        </div>
+        <div class="quick-stat">
+          <div class="quick-stat-value">67%</div>
+          <div class="quick-stat-label">Equity</div>
+        </div>
+      </div>
+
+      <!-- AI narrative -->
+      <div class="ai-narrative">
+        Foxen applies maximum pressure with top pair on a wet board. His 3x pot-sized raise signals supreme confidence &mdash; or a masterful bluff. Negreanu faces a defining decision.
+      </div>
+
+      <!-- Watch video button -->
+      <button class="story-video-btn" onclick="void(0)">
+        Watch Video Clip &nbsp;&#127916;
+      </button>
+      <div class="swipe-hint">Tap sides to navigate &middot; Swipe to skip</div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ===================== -->
+  <!-- Player Trading Cards  -->
+  <!-- ===================== -->
+  <div class="section-title fade-in stagger-4">Player Scouting Cards</div>
+  <div class="section-subtitle fade-in stagger-4">Tap a card to view full profile</div>
+
+  <div class="trading-cards-scroll">
+    <!-- Card 1: Alex Foxen (Gold) -->
+    <div class="trading-card fade-in stagger-4">
+      <div class="trading-card-border border-gold">
+        <div class="trading-card-inner">
+          <div class="trading-card-rank">#1</div>
+          <div class="trading-card-avatar avatar-red">AF</div>
+          <div class="trading-card-name">Alex Foxen</div>
+          <div class="trading-card-nickname">"The Ice Man"</div>
+          <div class="tier-badge tier-shark">&#9878; SHARK</div>
+          <div class="stats-grid">
+            <div class="stat-cell">
+              <div class="stat-cell-value">22%</div>
+              <div class="stat-cell-label">VPIP</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">18%</div>
+              <div class="stat-cell-label">PFR</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">3.2</div>
+              <div class="stat-cell-label">AF</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">8%</div>
+              <div class="stat-cell-label">3-Bet</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">55%</div>
+              <div class="stat-cell-label">Fold 3B</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">28%</div>
+              <div class="stat-cell-label">WTSD</div>
+            </div>
+          </div>
+          <div class="playstyle-tag">TAG &mdash; Tight Aggressive</div>
+          <div class="sparkline">
+            <div class="sparkline-bar" style="height:65%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:40%; background: var(--accent-red);"></div>
+            <div class="sparkline-bar" style="height:85%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:100%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:70%; background: var(--accent-green);"></div>
+          </div>
+          <div class="sparkline-label"><span>5 events ago</span><span>Latest</span></div>
+          <a href="#" class="view-profile-link">View Full Profile &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Daniel Negreanu (Silver) -->
+    <div class="trading-card fade-in stagger-5">
+      <div class="trading-card-border border-silver">
+        <div class="trading-card-inner">
+          <div class="trading-card-rank">#2</div>
+          <div class="trading-card-avatar avatar-teal">DN</div>
+          <div class="trading-card-name">Daniel Negreanu</div>
+          <div class="trading-card-nickname">"Kid Poker"</div>
+          <div class="tier-badge tier-whale">&#127744; WHALE</div>
+          <div class="stats-grid">
+            <div class="stat-cell">
+              <div class="stat-cell-value">31%</div>
+              <div class="stat-cell-label">VPIP</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">22%</div>
+              <div class="stat-cell-label">PFR</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">2.8</div>
+              <div class="stat-cell-label">AF</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">11%</div>
+              <div class="stat-cell-label">3-Bet</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">48%</div>
+              <div class="stat-cell-label">Fold 3B</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">33%</div>
+              <div class="stat-cell-label">WTSD</div>
+            </div>
+          </div>
+          <div class="playstyle-tag">LAG &mdash; Loose Aggressive</div>
+          <div class="sparkline">
+            <div class="sparkline-bar" style="height:50%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:75%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:30%; background: var(--accent-red);"></div>
+            <div class="sparkline-bar" style="height:60%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:90%; background: var(--accent-green);"></div>
+          </div>
+          <div class="sparkline-label"><span>5 events ago</span><span>Latest</span></div>
+          <a href="#" class="view-profile-link">View Full Profile &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Phil Ivey (Bronze) -->
+    <div class="trading-card fade-in stagger-6">
+      <div class="trading-card-border border-bronze">
+        <div class="trading-card-inner">
+          <div class="trading-card-rank">#3</div>
+          <div class="trading-card-avatar avatar-blue">PI</div>
+          <div class="trading-card-name">Phil Ivey</div>
+          <div class="trading-card-nickname">"The Tiger"</div>
+          <div class="tier-badge tier-shark">&#9878; SHARK</div>
+          <div class="stats-grid">
+            <div class="stat-cell">
+              <div class="stat-cell-value">25%</div>
+              <div class="stat-cell-label">VPIP</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">20%</div>
+              <div class="stat-cell-label">PFR</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">4.1</div>
+              <div class="stat-cell-label">AF</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">10%</div>
+              <div class="stat-cell-label">3-Bet</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">52%</div>
+              <div class="stat-cell-label">Fold 3B</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">26%</div>
+              <div class="stat-cell-label">WTSD</div>
+            </div>
+          </div>
+          <div class="playstyle-tag">TAG &mdash; Tight Aggressive</div>
+          <div class="sparkline">
+            <div class="sparkline-bar" style="height:90%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:55%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:70%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:35%; background: var(--accent-red);"></div>
+            <div class="sparkline-bar" style="height:80%; background: var(--accent-green);"></div>
+          </div>
+          <div class="sparkline-label"><span>5 events ago</span><span>Latest</span></div>
+          <a href="#" class="view-profile-link">View Full Profile &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Justin Bonomo (Blue) -->
+    <div class="trading-card fade-in stagger-7">
+      <div class="trading-card-border border-blue">
+        <div class="trading-card-inner">
+          <div class="trading-card-rank">#4</div>
+          <div class="trading-card-avatar avatar-orange">JB</div>
+          <div class="trading-card-name">Justin Bonomo</div>
+          <div class="trading-card-nickname">"ZeeJustin"</div>
+          <div class="tier-badge tier-shark">&#9878; SHARK</div>
+          <div class="stats-grid">
+            <div class="stat-cell">
+              <div class="stat-cell-value">24%</div>
+              <div class="stat-cell-label">VPIP</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">19%</div>
+              <div class="stat-cell-label">PFR</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">3.5</div>
+              <div class="stat-cell-label">AF</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">9%</div>
+              <div class="stat-cell-label">3-Bet</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">50%</div>
+              <div class="stat-cell-label">Fold 3B</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value">30%</div>
+              <div class="stat-cell-label">WTSD</div>
+            </div>
+          </div>
+          <div class="playstyle-tag">TAG &mdash; Tight Aggressive</div>
+          <div class="sparkline">
+            <div class="sparkline-bar" style="height:45%; background: var(--accent-red);"></div>
+            <div class="sparkline-bar" style="height:80%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:60%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:95%; background: var(--accent-green);"></div>
+            <div class="sparkline-bar" style="height:50%; background: var(--accent-green);"></div>
+          </div>
+          <div class="sparkline-label"><span>5 events ago</span><span>Latest</span></div>
+          <a href="#" class="view-profile-link">View Full Profile &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ===================== -->
+  <!-- Tournament Wrapped    -->
+  <!-- ===================== -->
+  <div class="section-title fade-in stagger-5">&#127942; Tournament Wrapped</div>
+  <div class="section-subtitle fade-in stagger-5">Your final table journey, visualized</div>
+
+  <div class="wrapped-scroll" id="wrappedScroll">
+    <!-- Card 1: The Numbers -->
+    <div class="wrapped-card wrapped-purple" data-index="0">
+      <div class="wrapped-card-number">01 / 04</div>
+      <div class="wrapped-card-title">The Numbers</div>
+      <div class="wrapped-stats-list">
+        <div class="wrapped-stat-row">
+          <span class="wrapped-stat-label">Total Hands</span>
+          <span class="wrapped-stat-value">127</span>
+        </div>
+        <div class="wrapped-stat-row">
+          <span class="wrapped-stat-label">Pots Won</span>
+          <span class="wrapped-stat-value">34</span>
+        </div>
+        <div class="wrapped-stat-row">
+          <span class="wrapped-stat-label">Biggest Pot</span>
+          <span class="wrapped-stat-value highlight">2.4M</span>
+        </div>
+        <div class="wrapped-stat-row">
+          <span class="wrapped-stat-label">Duration</span>
+          <span class="wrapped-stat-value">4h 23m</span>
+        </div>
+        <div class="wrapped-stat-row">
+          <span class="wrapped-stat-label">Win Rate</span>
+          <span class="wrapped-stat-value" style="color: var(--accent-green);">+38%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Your Rival -->
+    <div class="wrapped-card wrapped-teal" data-index="1">
+      <div class="wrapped-card-number">02 / 04</div>
+      <div class="wrapped-card-title">Your Rival</div>
+      <div class="rival-section">
+        <div class="rival-avatar avatar-teal">DN</div>
+        <div class="rival-info">
+          <div class="rival-name">Daniel Negreanu</div>
+          <div class="rival-subtitle">Most contested opponent</div>
+        </div>
+      </div>
+      <div class="rival-h2h">
+        <div class="rival-h2h-stat">
+          <div class="rival-h2h-value">8</div>
+          <div class="rival-h2h-label">Total Pots</div>
+        </div>
+        <div class="rival-h2h-stat">
+          <div class="rival-h2h-value win">5</div>
+          <div class="rival-h2h-label">You Won</div>
+        </div>
+        <div class="rival-h2h-stat">
+          <div class="rival-h2h-value loss">3</div>
+          <div class="rival-h2h-label">They Won</div>
+        </div>
+      </div>
+      <div style="margin-top:18px; font-size:12px; color:rgba(255,255,255,0.45); line-height:1.6;">
+        Biggest confrontation: Hand #73 &mdash; You 3-bet shoved A&hearts;K&spades; vs his Q&hearts;Q&diams;. The board ran out K&diams;7&clubs;2&spades;4&hearts;9&clubs; for a dramatic victory.
+      </div>
+    </div>
+
+    <!-- Card 3: Signature Move -->
+    <div class="wrapped-card wrapped-orange" data-index="2">
+      <div class="wrapped-card-number">03 / 04</div>
+      <div class="wrapped-card-title">Signature Move</div>
+      <div class="signature-move-card">
+        <div class="signature-move-icon">&#9889;</div>
+        <div class="signature-move-name">Check-Raise on Flop</div>
+        <div class="signature-move-detail">Your most common play this tournament</div>
+        <div class="signature-move-success">
+          75% <span>success rate</span>
+        </div>
+      </div>
+      <div class="wrapped-stats-list" style="gap:12px;">
+        <div class="wrapped-stat-row">
+          <span class="wrapped-stat-label">Times Used</span>
+          <span class="wrapped-stat-value">12</span>
+        </div>
+        <div class="wrapped-stat-row">
+          <span class="wrapped-stat-label">Avg Pot Won</span>
+          <span class="wrapped-stat-value">340K</span>
+        </div>
+        <div class="wrapped-stat-row">
+          <span class="wrapped-stat-label">Fold Equity</span>
+          <span class="wrapped-stat-value" style="color: var(--accent-green);">83%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: The Moment -->
+    <div class="wrapped-card wrapped-red" data-index="3">
+      <div class="wrapped-card-number">04 / 04</div>
+      <div class="wrapped-card-title">The Moment</div>
+      <div class="moment-preview">
+        <div class="moment-hand-label">HAND #89 &middot; ALL-IN ON THE TURN</div>
+        <div class="moment-cards">
+          <div class="moment-card">
+            <span class="card-rank card-red">A</span>
+            <span class="card-suit card-red">&hearts;</span>
+          </div>
+          <div class="moment-card">
+            <span class="card-rank card-black">K</span>
+            <span class="card-suit card-black">&spades;</span>
+          </div>
+          <div style="display:flex; align-items:center; font-size:14px; color:rgba(255,255,255,0.25); padding:0 4px;">vs</div>
+          <div class="moment-card">
+            <span class="card-rank card-black">Q</span>
+            <span class="card-suit card-black">&clubs;</span>
+          </div>
+          <div class="moment-card">
+            <span class="card-rank card-red">Q</span>
+            <span class="card-suit card-red">&diams;</span>
+          </div>
+        </div>
+        <div class="moment-description">
+          The tournament-defining all-in. Your A&hearts;K&spades; dominated the board to secure the chip lead with just 4 players remaining.
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:36px; font-weight:800; color:white; margin-bottom:4px;">3.8M</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.4);">Pot size &mdash; largest of the tournament</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrapped-page-dots">
+    <div class="wrapped-page-dot active" data-index="0"></div>
+    <div class="wrapped-page-dot" data-index="1"></div>
+    <div class="wrapped-page-dot" data-index="2"></div>
+    <div class="wrapped-page-dot" data-index="3"></div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ===================== -->
+  <!-- AI Highlights Feed    -->
+  <!-- ===================== -->
+  <div class="section-title fade-in stagger-6">AI-Powered Highlights</div>
+  <div class="section-subtitle fade-in stagger-6">Key moments analyzed by artificial intelligence</div>
+
+  <div class="highlights-feed">
+    <!-- Highlight 1 -->
+    <div class="highlight-card fade-in stagger-5" onclick="toggleHighlight(this)">
+      <div class="highlight-card-header">
+        <div class="highlight-mood mood-fire">&#128293;</div>
+        <div class="highlight-meta">
+          <div class="highlight-hand-info">Hand #23 &middot; Preflop &middot; 6-handed</div>
+          <div class="highlight-oneliner">Foxen's 4-bet shove forces three folds in a row</div>
+        </div>
+      </div>
+      <div class="highlight-expand-content">
+        <div class="highlight-narrative">
+          With blinds at 15K/30K, Foxen picks up pocket Kings in the hijack. After Chidwick opens to 75K and Ivey 3-bets to 210K, Foxen makes the power move with a 4-bet all-in for 1.8M. The table folds in sequence, giving Foxen a massive pot without showdown. A textbook display of controlled aggression from the chip leader.
+        </div>
+      </div>
+      <div class="highlight-actions">
+        <div class="highlight-btns">
+          <button class="highlight-btn primary">&#9654; Watch Clip</button>
+          <button class="highlight-btn">&#128257; Replay</button>
+        </div>
+        <div class="highlight-engagement">
+          <span class="engagement-icon" onclick="event.stopPropagation(); this.classList.toggle('liked')">&#9825;</span>
+          <span class="engagement-icon" onclick="event.stopPropagation()">&#8599;</span>
+          <span class="engagement-icon" onclick="event.stopPropagation()">&#128278;</span>
+        </div>
+      </div>
+      <div class="highlight-expand-indicator">
+        <span class="expand-text">Tap for AI analysis</span>
+      </div>
+    </div>
+
+    <!-- Highlight 2 -->
+    <div class="highlight-card fade-in stagger-6" onclick="toggleHighlight(this)">
+      <div class="highlight-card-header">
+        <div class="highlight-mood mood-ice">&#10052;&#65039;</div>
+        <div class="highlight-meta">
+          <div class="highlight-hand-info">Hand #56 &middot; River &middot; Heads-up pot</div>
+          <div class="highlight-oneliner">Negreanu's ice-cold river bluff catches Kenney off guard</div>
+        </div>
+      </div>
+      <div class="highlight-expand-content">
+        <div class="highlight-narrative">
+          On a K&spades;7&hearts;3&diams;J&clubs;2&hearts; board, Negreanu fires a 2/3 pot river bet with complete air &mdash; 9&hearts;8&hearts; for a busted flush draw. Kenney tanks for 90 seconds with top pair before making the disciplined fold. A masterclass in storytelling through bet sizing, as Negreanu's line perfectly represents a slow-played set of Kings.
+        </div>
+      </div>
+      <div class="highlight-actions">
+        <div class="highlight-btns">
+          <button class="highlight-btn primary">&#9654; Watch Clip</button>
+          <button class="highlight-btn">&#128257; Replay</button>
+        </div>
+        <div class="highlight-engagement">
+          <span class="engagement-icon" onclick="event.stopPropagation(); this.classList.toggle('liked')">&#9825;</span>
+          <span class="engagement-icon" onclick="event.stopPropagation()">&#8599;</span>
+          <span class="engagement-icon" onclick="event.stopPropagation()">&#128278;</span>
+        </div>
+      </div>
+      <div class="highlight-expand-indicator">
+        <span class="expand-text">Tap for AI analysis</span>
+      </div>
+    </div>
+
+    <!-- Highlight 3 -->
+    <div class="highlight-card fade-in stagger-7" onclick="toggleHighlight(this)">
+      <div class="highlight-card-header">
+        <div class="highlight-mood mood-skull">&#128128;</div>
+        <div class="highlight-meta">
+          <div class="highlight-hand-info">Hand #89 &middot; Turn &middot; All-in confrontation</div>
+          <div class="highlight-oneliner">Brutal cooler eliminates Bonomo in 4th place</div>
+        </div>
+      </div>
+      <div class="highlight-expand-content">
+        <div class="highlight-narrative">
+          The cruelest hand of the tournament. Bonomo flops a set of Queens on Q&clubs;9&diams;4&spades; and slow-plays to the turn. When the A&hearts; hits, he ships it for 1.2M &mdash; only to run into Foxen's turned top set of Aces. An unavoidable situation where both players played optimally, but the deck decided the outcome. Bonomo exits with grace, earning a standing ovation.
+        </div>
+      </div>
+      <div class="highlight-actions">
+        <div class="highlight-btns">
+          <button class="highlight-btn primary">&#9654; Watch Clip</button>
+          <button class="highlight-btn">&#128257; Replay</button>
+        </div>
+        <div class="highlight-engagement">
+          <span class="engagement-icon" onclick="event.stopPropagation(); this.classList.toggle('liked')">&#9825;</span>
+          <span class="engagement-icon" onclick="event.stopPropagation()">&#8599;</span>
+          <span class="engagement-icon" onclick="event.stopPropagation()">&#128278;</span>
+        </div>
+      </div>
+      <div class="highlight-expand-indicator">
+        <span class="expand-text">Tap for AI analysis</span>
+      </div>
+    </div>
+
+    <!-- Highlight 4 -->
+    <div class="highlight-card fade-in stagger-8" onclick="toggleHighlight(this)">
+      <div class="highlight-card-header">
+        <div class="highlight-mood mood-target">&#127919;</div>
+        <div class="highlight-meta">
+          <div class="highlight-hand-info">Hand #112 &middot; Flop &middot; 3-way pot</div>
+          <div class="highlight-oneliner">Ivey's surgical check-raise extracts maximum value</div>
+        </div>
+      </div>
+      <div class="highlight-expand-content">
+        <div class="highlight-narrative">
+          On a A&diams;K&clubs;5&hearts; flop in a 3-way limped pot, Ivey check-raises from the big blind with A&spades;5&spades; for two pair. His sizing &mdash; exactly 2.2x the bet &mdash; is calculated to keep both opponents in while building the pot. Chidwick calls with A&hearts;J&hearts;, and the turn bricks for a clean value extraction. Precision poker from the game's most feared player.
+        </div>
+      </div>
+      <div class="highlight-actions">
+        <div class="highlight-btns">
+          <button class="highlight-btn primary">&#9654; Watch Clip</button>
+          <button class="highlight-btn">&#128257; Replay</button>
+        </div>
+        <div class="highlight-engagement">
+          <span class="engagement-icon" onclick="event.stopPropagation(); this.classList.toggle('liked')">&#9825;</span>
+          <span class="engagement-icon" onclick="event.stopPropagation()">&#8599;</span>
+          <span class="engagement-icon" onclick="event.stopPropagation()">&#128278;</span>
+        </div>
+      </div>
+      <div class="highlight-expand-indicator">
+        <span class="expand-text">Tap for AI analysis</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spacer for bottom nav -->
+  <div style="height: 70px;"></div>
+
+  <!-- ===================== -->
+  <!-- Bottom Navigation     -->
+  <!-- ===================== -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="#">
+      <span class="nav-icon">&#8962;</span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a class="nav-item active" href="#">
+      <span class="nav-icon">&#9673;</span>
+      <span class="nav-label">Stories</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">&#9823;</span>
+      <span class="nav-label">Players</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">&#127942;</span>
+      <span class="nav-label">Wrapped</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">&#9679;</span>
+      <span class="nav-label">Profile</span>
+    </a>
+  </nav>
+
+</div>
+
+<!-- ===================== -->
+<!-- JavaScript            -->
+<!-- ===================== -->
+<script>
+// =====================
+// Story Navigation
+// =====================
+function scrollToStory() {
+  var viewer = document.getElementById('storyViewer');
+  if (viewer) {
+    viewer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+var currentStoryIndex = 1;
+var totalStories = 4;
+
+function updateProgressDots() {
+  var dots = document.querySelectorAll('.story-progress-dot');
+  dots.forEach(function(dot, i) {
+    dot.className = 'story-progress-dot';
+    if (i < currentStoryIndex) {
+      dot.classList.add('completed');
+    } else if (i === currentStoryIndex) {
+      dot.classList.add('active');
+    }
+  });
+}
+
+function nextStory() {
+  if (currentStoryIndex < totalStories - 1) {
+    currentStoryIndex++;
+    updateProgressDots();
+  }
+}
+
+function prevStory() {
+  if (currentStoryIndex > 0) {
+    currentStoryIndex--;
+    updateProgressDots();
+  }
+}
+
+// =====================
+// Highlight Card Toggle
+// =====================
+function toggleHighlight(card) {
+  var wasExpanded = card.classList.contains('expanded');
+  // Close all others
+  document.querySelectorAll('.highlight-card.expanded').forEach(function(c) {
+    c.classList.remove('expanded');
+    var hint = c.querySelector('.expand-text');
+    if (hint) hint.textContent = 'Tap for AI analysis';
+  });
+  // Toggle current
+  if (!wasExpanded) {
+    card.classList.add('expanded');
+    var hint = card.querySelector('.expand-text');
+    if (hint) hint.textContent = 'Tap to collapse';
+  }
+}
+
+// =====================
+// Wrapped Scroll Dots
+// =====================
+(function() {
+  var scroll = document.getElementById('wrappedScroll');
+  var dots = document.querySelectorAll('.wrapped-page-dot');
+  if (!scroll || !dots.length) return;
+
+  function updateDots() {
+    var scrollLeft = scroll.scrollLeft;
+    var cardWidth = scroll.querySelector('.wrapped-card').offsetWidth + 12; // gap
+    var index = Math.round(scrollLeft / cardWidth);
+    dots.forEach(function(dot, i) {
+      dot.classList.toggle('active', i === index);
+    });
+  }
+
+  scroll.addEventListener('scroll', updateDots, { passive: true });
+
+  dots.forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      var index = parseInt(dot.getAttribute('data-index'));
+      var cardWidth = scroll.querySelector('.wrapped-card').offsetWidth + 12;
+      scroll.scrollTo({ left: index * cardWidth, behavior: 'smooth' });
+    });
+  });
+})();
+
+// =====================
+// Intersection Observer for fade-in animations
+// =====================
+(function() {
+  if (!('IntersectionObserver' in window)) return;
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.style.animationPlayState = 'running';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(function(el) {
+    el.style.animationPlayState = 'paused';
+    observer.observe(el);
+  });
+})();
+
+// =====================
+// Bottom Nav Active State
+// =====================
+document.querySelectorAll('.nav-item').forEach(function(item) {
+  item.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+    this.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>

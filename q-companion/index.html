@@ -1,0 +1,2704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUDR Companion — Second-Screen Intelligence</title>
+    <style>
+        /* ===================== */
+        /* RESET & BASE          */
+        /* ===================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-base: #0a0a0f;
+            --bg-surface: #111118;
+            --bg-elevated: #1a1a24;
+            --bg-card: #15151f;
+            --bg-glass: rgba(17, 17, 24, 0.75);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-accent: rgba(16, 185, 129, 0.25);
+            --text-primary: #f0f0f5;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-emerald: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-pink: #f472b6;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-indigo: #818cf8;
+            --gradient-emerald: linear-gradient(135deg, #10b981, #06b6d4);
+            --gradient-brand: linear-gradient(135deg, #06b6d4, #10b981);
+            --gradient-danger: linear-gradient(135deg, #ef4444, #f97316);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 20px;
+            --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.15);
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #050508;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ===================== */
+        /* PHONE FRAME           */
+        /* ===================== */
+        .phone-frame {
+            width: 390px;
+            min-height: 100vh;
+            background: var(--bg-base);
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            box-shadow: -1px 0 0 rgba(255,255,255,0.05), 1px 0 0 rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 420px) {
+            .phone-frame { width: 100%; }
+        }
+
+        /* ===================== */
+        /* BACK LINK             */
+        /* ===================== */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--accent-cyan); }
+        .back-link svg { width: 14px; height: 14px; }
+
+        /* ===================== */
+        /* HEADER                */
+        /* ===================== */
+        .header {
+            background: linear-gradient(180deg, rgba(6, 182, 212, 0.08) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 8px 16px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--gradient-emerald);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: -2px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #ef4444;
+            letter-spacing: 1.5px;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+
+        .tournament-info {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .tournament-info strong { color: var(--text-primary); font-weight: 600; }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            padding: 3px;
+            gap: 2px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 7px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .mode-btn.active {
+            background: var(--gradient-emerald);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .mode-btn:not(.active):hover {
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* ===================== */
+        /* MODE SECTIONS         */
+        /* ===================== */
+        .mode-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .mode-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===================== */
+        /* SECTION HEADERS       */
+        /* ===================== */
+        .section-header {
+            padding: 16px 16px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .section-badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            font-weight: 600;
+        }
+
+        /* ===================== */
+        /* LIVE MODE — TABLE     */
+        /* ===================== */
+        .table-container {
+            padding: 12px 16px;
+            position: relative;
+        }
+
+        .poker-table {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            background: radial-gradient(ellipse at center, #1a3a2a 0%, #0d1f17 60%, #0a1610 100%);
+            border-radius: 110px;
+            border: 2px solid rgba(16, 185, 129, 0.15);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 0 30px rgba(16, 185, 129, 0.05);
+            overflow: visible;
+        }
+
+        .table-felt {
+            position: absolute;
+            inset: 8px;
+            border-radius: 106px;
+            border: 1px solid rgba(16, 185, 129, 0.08);
+            background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.03) 0%, transparent 70%);
+        }
+
+        /* Pot Display */
+        .pot-display {
+            position: absolute;
+            top: 38px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 5;
+        }
+        .pot-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .pot-amount {
+            font-size: 20px;
+            font-weight: 800;
+            background: var(--gradient-emerald);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        /* Community Cards */
+        .community-cards {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 5px;
+            z-index: 5;
+        }
+
+        .card {
+            width: 38px;
+            height: 52px;
+            border-radius: 5px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card .rank { font-size: 15px; font-weight: 800; }
+        .card .suit { font-size: 13px; margin-top: -1px; }
+        .card.red { color: #dc2626; }
+        .card.black { color: #1a1a2e; }
+        .card.face-down {
+            background: linear-gradient(135deg, #1e3a5f, #2d1b69);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        .card.face-down::after {
+            content: "HUDR";
+            font-size: 6px;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 2px;
+            transform: rotate(-30deg);
+        }
+
+        .card-sm {
+            width: 24px;
+            height: 32px;
+            border-radius: 3px;
+            font-size: 10px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
+        }
+        .card-sm .rank { font-size: 10px; font-weight: 800; line-height: 1; }
+        .card-sm .suit { font-size: 8px; margin-top: -2px; }
+        .card-sm.red { color: #dc2626; }
+        .card-sm.black { color: #1a1a2e; }
+
+        /* Player Seats */
+        .seat {
+            position: absolute;
+            width: 90px;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .seat-bubble {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 6px 6px 4px;
+            transition: all 0.3s ease;
+        }
+
+        .seat.active .seat-bubble {
+            border-color: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+        }
+
+        .seat.folded .seat-bubble { opacity: 0.45; }
+
+        .seat-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+        .seat-status-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            flex-shrink: 0;
+        }
+        .seat.folded .seat-status-dot { background: var(--text-muted); }
+        .seat.active .seat-status-dot {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 6px rgba(6, 182, 212, 0.6);
+        }
+
+        .seat-stack {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-emerald);
+            font-family: var(--font-mono);
+        }
+        .seat-stack span {
+            font-size: 8px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .seat-stats {
+            font-size: 9px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-top: 1px;
+        }
+
+        /* Seat positions (6-max) */
+        .seat-1 { top: -18px; left: 50%; transform: translateX(-50%); }
+        .seat-2 { top: 25px; right: -20px; }
+        .seat-3 { bottom: 25px; right: -20px; }
+        .seat-4 { bottom: -18px; left: 50%; transform: translateX(-50%); }
+        .seat-5 { bottom: 25px; left: -20px; }
+        .seat-6 { top: 25px; left: -20px; }
+
+        /* Dealer Button */
+        .dealer-btn {
+            position: absolute;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 900;
+            color: #1a1a2e;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+            z-index: 12;
+        }
+
+        /* ===================== */
+        /* LIVE INSIGHTS         */
+        /* ===================== */
+        .insights-panel {
+            padding: 0 16px 12px;
+        }
+
+        .insight-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: border-color 0.2s;
+        }
+        .insight-card:hover { border-color: var(--border-accent); }
+
+        .insight-text {
+            font-size: 12.5px;
+            line-height: 1.55;
+            color: var(--text-secondary);
+        }
+        .insight-text strong { color: var(--text-primary); font-weight: 600; }
+
+        .insight-confidence {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .confidence-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .confidence-bar {
+            flex: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .confidence-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 1s ease;
+        }
+        .confidence-fill.high { background: var(--accent-emerald); }
+        .confidence-fill.medium { background: var(--accent-amber); }
+        .confidence-fill.low { background: var(--accent-red); }
+
+        .confidence-val {
+            font-size: 10px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            min-width: 28px;
+            text-align: right;
+        }
+        .confidence-val.high { color: var(--accent-emerald); }
+        .confidence-val.medium { color: var(--accent-amber); }
+
+        /* ===================== */
+        /* QUICK STATS DRAWER    */
+        /* ===================== */
+        .stats-drawer {
+            margin: 0 16px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .drawer-header {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .drawer-header:hover { background: rgba(255,255,255,0.02); }
+
+        .drawer-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .drawer-player-name {
+            background: var(--gradient-emerald);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .drawer-chevron {
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: transform 0.3s;
+        }
+        .drawer-chevron.open { transform: rotate(180deg); }
+
+        .drawer-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .drawer-content.open { max-height: 600px; }
+
+        .stat-category-label {
+            padding: 6px 14px 4px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            padding: 4px 10px 8px;
+        }
+
+        .stat-cell {
+            padding: 8px 6px;
+            text-align: center;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .stat-cell:hover { background: rgba(255,255,255,0.03); }
+        .stat-cell.expanded {
+            background: rgba(6, 182, 212, 0.06);
+            border: 1px solid rgba(6, 182, 212, 0.15);
+        }
+
+        .stat-name {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+            margin-bottom: 3px;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            line-height: 1;
+        }
+        .stat-percentile {
+            font-size: 8px;
+            font-weight: 600;
+            margin-top: 3px;
+            padding: 1px 5px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .percentile-elite { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+        .percentile-good { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+        .percentile-avg { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+        .percentile-low { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+
+        .stat-hint {
+            padding: 4px 14px 10px;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* ===================== */
+        /* STAT DRILLDOWN        */
+        /* ===================== */
+        .drilldown-panel {
+            margin: 0 16px 16px;
+            background: var(--bg-card);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .drilldown-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .drilldown-stat-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+        .drilldown-fraction {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+        .drilldown-def {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .drilldown-hand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .drilldown-hand:last-child { border-bottom: none; }
+        .drilldown-hand-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .drilldown-hand-num {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        .drilldown-board {
+            display: flex;
+            gap: 2px;
+        }
+        .drilldown-result {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .result-won { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+        .result-lost { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+        .drilldown-play-btn {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: all 0.2s;
+        }
+        .drilldown-play-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* ===================== */
+        /* STUDY MODE            */
+        /* ===================== */
+        .study-section {
+            padding-bottom: 16px;
+        }
+
+        .study-banner {
+            margin: 0 16px;
+            padding: 14px;
+            background: linear-gradient(135deg, rgba(129, 140, 248, 0.08), rgba(6, 182, 212, 0.08));
+            border: 1px solid rgba(129, 140, 248, 0.15);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .study-banner-icon { font-size: 24px; }
+        .study-banner-text h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .study-banner-text p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Hand Replayer */
+        .replayer-container {
+            margin: 0 16px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .street-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .street-tab {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+        .street-tab.active { color: var(--accent-cyan); }
+        .street-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 20%; right: 20%;
+            height: 2px;
+            background: var(--gradient-emerald);
+            border-radius: 2px;
+        }
+        .street-tab:hover:not(.active) { color: var(--text-secondary); }
+
+        .replayer-board {
+            padding: 20px 16px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.03), transparent);
+        }
+        .replayer-board-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .replayer-cards {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .replayer-card {
+            width: 48px;
+            height: 66px;
+            border-radius: 7px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .replayer-card .rank { font-size: 20px; font-weight: 900; line-height: 1; }
+        .replayer-card .suit { font-size: 18px; margin-top: -2px; }
+        .replayer-card.red { color: #dc2626; }
+        .replayer-card.black { color: #1a1a2e; }
+
+        .player-hands {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 6px;
+        }
+        .player-hand {
+            text-align: center;
+        }
+        .player-hand-name {
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .player-hand-name.cyan { color: var(--accent-cyan); }
+        .player-hand-name.pink { color: var(--accent-pink); }
+        .player-hand-cards {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+        }
+
+        /* Action Timeline */
+        .action-timeline {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .action-timeline-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+        }
+        .action-marker {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .action-marker.check { background: var(--text-muted); }
+        .action-marker.bet { background: var(--accent-red); }
+        .action-marker.raise { background: var(--accent-amber); }
+        .action-marker.call { background: var(--accent-cyan); }
+        .action-marker.fold { background: var(--text-muted); opacity: 0.4; }
+
+        .action-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .action-text strong { color: var(--text-primary); font-weight: 600; }
+        .action-text .amount {
+            font-family: var(--font-mono);
+            font-weight: 700;
+        }
+
+        .action-connector {
+            width: 1px;
+            height: 12px;
+            background: var(--border-subtle);
+            margin-left: 3.5px;
+        }
+
+        /* Pot Tracker */
+        .pot-tracker {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .pot-tracker-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .pot-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            height: 50px;
+        }
+        .pot-bar-group {
+            flex: 1;
+            text-align: center;
+        }
+        .pot-bar {
+            width: 100%;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+        .pot-bar.preflop { background: rgba(16, 185, 129, 0.3); height: 15px; }
+        .pot-bar.flop { background: rgba(6, 182, 212, 0.5); height: 40px; }
+        .pot-bar.turn { background: rgba(129, 140, 248, 0.4); height: 25px; }
+        .pot-bar.river { background: rgba(244, 114, 182, 0.4); height: 10px; }
+        .pot-bar-label {
+            font-size: 8px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            letter-spacing: 0.3px;
+        }
+        .pot-bar-val {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            margin-bottom: 3px;
+        }
+
+        /* Replayer Controls */
+        .replayer-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .replay-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .replay-btn:hover { color: var(--text-primary); }
+        .replay-btn.play-pause {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--gradient-emerald);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+        }
+        .speed-selector {
+            display: flex;
+            gap: 4px;
+        }
+        .speed-btn {
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .speed-btn.active {
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .video-clip-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: calc(100% - 32px);
+            margin: 0 16px 12px;
+            padding: 10px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(129, 140, 248, 0.25);
+            background: rgba(129, 140, 248, 0.06);
+            color: var(--accent-indigo);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .video-clip-btn:hover {
+            background: rgba(129, 140, 248, 0.12);
+            border-color: rgba(129, 140, 248, 0.4);
+        }
+
+        /* ===================== */
+        /* EQUITY GRAPH          */
+        /* ===================== */
+        .equity-container {
+            margin: 0 16px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+        }
+
+        .equity-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .equity-title {
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .equity-current {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+        .eq-player-1 { color: var(--accent-cyan); }
+        .eq-player-2 { color: var(--accent-pink); }
+
+        .equity-chart {
+            position: relative;
+            height: 120px;
+            margin-bottom: 8px;
+        }
+
+        .equity-grid {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .equity-grid-line {
+            height: 1px;
+            background: var(--border-subtle);
+        }
+        .equity-grid-label {
+            position: absolute;
+            right: 0;
+            font-size: 8px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            transform: translateY(-50%);
+        }
+
+        .equity-bars {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 0 10px;
+        }
+
+        .equity-bar-pair {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .equity-stacked-bar {
+            width: 40px;
+            height: 100px;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .equity-segment {
+            width: 100%;
+            transition: height 0.5s ease;
+        }
+        .equity-segment.player1 { background: rgba(6, 182, 212, 0.6); }
+        .equity-segment.player2 { background: rgba(244, 114, 182, 0.5); }
+
+        .equity-flip-marker {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            font-size: 12px;
+            animation: flipBounce 0.5s ease;
+        }
+
+        @keyframes flipBounce {
+            0% { transform: translateX(-50%) translateY(-30px) scale(0.5); opacity: 0; }
+            60% { transform: translateX(-50%) translateY(-16px) scale(1.2); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(-20px) scale(1); opacity: 1; }
+        }
+
+        .equity-street-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .equity-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 6px;
+        }
+        .equity-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+        .equity-legend-dot {
+            width: 8px; height: 8px;
+            border-radius: 2px;
+        }
+
+        /* ===================== */
+        /* AI COACH BOX          */
+        /* ===================== */
+        .ai-coach {
+            margin: 0 16px 16px;
+            background: linear-gradient(135deg, rgba(129, 140, 248, 0.06), rgba(6, 182, 212, 0.06));
+            border: 1px solid rgba(129, 140, 248, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+        }
+        .ai-coach-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .ai-icon {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #818cf8, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .ai-coach-label {
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .ai-badge {
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            background: rgba(129, 140, 248, 0.15);
+            color: var(--accent-indigo);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-coach-text {
+            font-size: 12.5px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        .ai-coach-text p { margin-bottom: 10px; }
+        .ai-coach-text p:last-child { margin-bottom: 0; }
+        .ai-coach-text strong { color: var(--text-primary); }
+
+        .ai-feedback {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .ai-feedback span {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .ai-feedback-btn {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 1px solid var(--border-subtle);
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ai-feedback-btn:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--text-muted);
+        }
+
+        /* ===================== */
+        /* CAREER MODE           */
+        /* ===================== */
+        .career-section { padding-bottom: 90px; }
+
+        /* Player Career Card */
+        .career-card {
+            margin: 0 16px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .career-card-top {
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.06), rgba(16, 185, 129, 0.06));
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .career-avatar {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4, #10b981);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+            flex-shrink: 0;
+        }
+
+        .career-info h3 {
+            font-size: 17px;
+            font-weight: 800;
+        }
+        .career-info p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .career-ft-badge {
+            display: inline-block;
+            margin-top: 4px;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-emerald);
+            font-weight: 600;
+        }
+
+        .career-stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid var(--border-subtle);
+        }
+        .career-stat {
+            padding: 10px 8px;
+            text-align: center;
+            border-right: 1px solid var(--border-subtle);
+        }
+        .career-stat:last-child { border-right: none; }
+        .career-stat-val {
+            font-size: 16px;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+        .career-stat-label {
+            font-size: 8px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Sparkline */
+        .sparkline-container {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .sparkline-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .sparkline-trend {
+            color: var(--accent-emerald);
+            font-weight: 700;
+        }
+
+        .sparkline {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 36px;
+        }
+        .sparkline-bar {
+            flex: 1;
+            border-radius: 3px 3px 0 0;
+            transition: height 0.5s ease;
+            position: relative;
+        }
+        .sparkline-bar::after {
+            content: attr(data-place);
+            position: absolute;
+            bottom: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 7px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* Playstyle Radar (Pentagon using CSS) */
+        .radar-container {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .radar-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .radar-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .radar-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .radar-bar-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            width: 90px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .radar-bar-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .radar-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        .radar-bar-val {
+            font-size: 10px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            width: 28px;
+            text-align: right;
+        }
+
+        /* ===================== */
+        /* LEADERBOARD           */
+        /* ===================== */
+        .leaderboard {
+            margin: 0 16px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .lb-header-row {
+            display: grid;
+            grid-template-columns: 30px 1fr 38px 38px 32px 44px;
+            gap: 4px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            align-items: center;
+        }
+        .lb-col-header {
+            font-size: 8px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.2s;
+            white-space: nowrap;
+        }
+        .lb-col-header:hover { color: var(--text-secondary); }
+        .lb-col-header.sorted { color: var(--accent-cyan); }
+
+        .lb-row {
+            display: grid;
+            grid-template-columns: 30px 1fr 38px 38px 32px 44px;
+            gap: 4px;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .lb-row:last-child { border-bottom: none; }
+        .lb-row:hover { background: rgba(255,255,255,0.02); }
+        .lb-row.highlight {
+            background: rgba(6, 182, 212, 0.05);
+            border-left: 2px solid var(--accent-cyan);
+        }
+
+        .lb-rank {
+            font-size: 12px;
+            font-weight: 800;
+            text-align: center;
+        }
+        .lb-rank.gold { color: #fbbf24; }
+        .lb-rank.silver { color: #94a3b8; }
+        .lb-rank.bronze { color: #d97706; }
+
+        .lb-player {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .lb-player-avatar {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .lb-player-name {
+            font-size: 11px;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .lb-cell {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        .lb-cell.win-rate { color: var(--accent-emerald); }
+
+        /* ===================== */
+        /* H2H MATCHUP           */
+        /* ===================== */
+        .h2h-container {
+            margin: 0 16px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .h2h-header {
+            padding: 14px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(244, 114, 182, 0.05));
+        }
+        .h2h-header h3 {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .h2h-fighters {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 12px 16px 16px;
+        }
+
+        .h2h-fighter {
+            text-align: center;
+            flex: 1;
+        }
+        .h2h-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+            margin: 0 auto 6px;
+        }
+        .h2h-avatar.player1 {
+            background: linear-gradient(135deg, #06b6d4, #10b981);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+        }
+        .h2h-avatar.player2 {
+            background: linear-gradient(135deg, #f472b6, #c084fc);
+            box-shadow: 0 0 12px rgba(244, 114, 182, 0.3);
+        }
+        .h2h-name {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .h2h-vs {
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .h2h-vs-text {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+        }
+        .h2h-record {
+            font-size: 18px;
+            font-weight: 900;
+            margin-top: 2px;
+        }
+        .h2h-record .win { color: var(--accent-cyan); }
+        .h2h-record .loss { color: var(--accent-pink); }
+
+        .h2h-stats {
+            padding: 0 14px 14px;
+        }
+        .h2h-stat-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .h2h-stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            width: 75px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .h2h-bar-container {
+            flex: 1;
+            display: flex;
+            height: 16px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .h2h-bar-left {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.7));
+            display: flex;
+            align-items: center;
+            padding-left: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--font-mono);
+            transition: width 1s ease;
+        }
+        .h2h-bar-right {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(244, 114, 182, 0.7), rgba(244, 114, 182, 0.4));
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--font-mono);
+            transition: width 1s ease;
+        }
+
+        /* ===================== */
+        /* BOTTOM NAV            */
+        /* ===================== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 390px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            z-index: 200;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        @media (max-width: 420px) {
+            .bottom-nav { width: 100%; }
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: color 0.2s;
+            border: none;
+            background: none;
+        }
+        .nav-item.active { color: var(--accent-emerald); }
+        .nav-item:hover:not(.active) { color: var(--text-secondary); }
+        .nav-icon {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        /* ===================== */
+        /* ANIMATIONS            */
+        /* ===================== */
+        .count-up {
+            animation: countPulse 0.6s ease-out;
+        }
+        @keyframes countPulse {
+            0% { opacity: 0; transform: translateY(4px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger-1 { animation-delay: 0.05s; }
+        .stagger-2 { animation-delay: 0.1s; }
+        .stagger-3 { animation-delay: 0.15s; }
+        .stagger-4 { animation-delay: 0.2s; }
+        .stagger-5 { animation-delay: 0.25s; }
+
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        /* Scrollbar styling */
+        .phone-frame::-webkit-scrollbar { width: 3px; }
+        .phone-frame::-webkit-scrollbar-track { background: transparent; }
+        .phone-frame::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .mb-16 { margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame" id="app">
+    <!-- Back Link -->
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        All Prototypes
+    </a>
+
+    <!-- ===================== -->
+    <!-- HEADER                -->
+    <!-- ===================== -->
+    <header class="header">
+        <div class="header-top">
+            <div class="logo">
+                <div class="logo-icon">&#129504;</div>
+                <div>
+                    <div class="logo-text">HUDR</div>
+                    <div class="logo-sub">Companion</div>
+                </div>
+            </div>
+            <div class="live-badge">
+                <div class="live-dot"></div>
+                LIVE
+            </div>
+        </div>
+
+        <div class="tournament-info">
+            <strong>2024 PGT Championship</strong> &mdash; Hand #47 &bull; Flop
+        </div>
+
+        <div class="mode-toggle">
+            <button class="mode-btn active" data-mode="live" onclick="switchMode('live')">
+                &#9898; Live
+            </button>
+            <button class="mode-btn" data-mode="study" onclick="switchMode('study')">
+                &#128218; Study
+            </button>
+            <button class="mode-btn" data-mode="career" onclick="switchMode('career')">
+                &#128200; Career
+            </button>
+        </div>
+    </header>
+
+    <!-- ===================== -->
+    <!-- LIVE MODE             -->
+    <!-- ===================== -->
+    <section class="mode-section active" id="mode-live">
+
+        <!-- 2a: Live Player HUD Overlay -->
+        <div class="section-header">
+            <span class="section-title">Table View</span>
+            <span class="section-badge">6-Max</span>
+        </div>
+
+        <div class="table-container">
+            <div class="poker-table">
+                <div class="table-felt"></div>
+
+                <!-- Pot Display -->
+                <div class="pot-display">
+                    <div class="pot-label">Pot</div>
+                    <div class="pot-amount">480K</div>
+                </div>
+
+                <!-- Community Cards -->
+                <div class="community-cards">
+                    <div class="card red"><span class="rank">K</span><span class="suit">&#9830;</span></div>
+                    <div class="card red"><span class="rank">Q</span><span class="suit">&#9829;</span></div>
+                    <div class="card black"><span class="rank">9</span><span class="suit">&#9824;</span></div>
+                    <div class="card face-down"></div>
+                    <div class="card face-down"></div>
+                </div>
+
+                <!-- Dealer Button -->
+                <div class="dealer-btn" style="top: 28px; right: 72px;">D</div>
+
+                <!-- Seat 1: Ivey (BTN) - top center -->
+                <div class="seat seat-1 folded">
+                    <div class="seat-bubble">
+                        <div class="seat-name"><span class="seat-status-dot"></span>Ivey</div>
+                        <div class="seat-stack">103 <span>BB</span></div>
+                        <div class="seat-stats">28/22</div>
+                    </div>
+                </div>
+
+                <!-- Seat 2: Bonomo (SB) - top right -->
+                <div class="seat seat-2 folded">
+                    <div class="seat-bubble">
+                        <div class="seat-name"><span class="seat-status-dot"></span>Bonomo</div>
+                        <div class="seat-stack">50 <span>BB</span></div>
+                        <div class="seat-stats">19/15</div>
+                    </div>
+                </div>
+
+                <!-- Seat 3: Foxen (BB) - bottom right, ACTIVE -->
+                <div class="seat seat-3 active">
+                    <div class="seat-bubble">
+                        <div class="seat-name"><span class="seat-status-dot"></span>Foxen</div>
+                        <div class="seat-stack">80 <span>BB</span></div>
+                        <div class="seat-stats">23/19</div>
+                    </div>
+                </div>
+
+                <!-- Seat 4: Kenney - bottom center -->
+                <div class="seat seat-4">
+                    <div class="seat-bubble">
+                        <div class="seat-name"><span class="seat-status-dot"></span>Kenney</div>
+                        <div class="seat-stack">73 <span>BB</span></div>
+                        <div class="seat-stats">25/20</div>
+                    </div>
+                </div>
+
+                <!-- Seat 5: Negreanu - bottom left -->
+                <div class="seat seat-5">
+                    <div class="seat-bubble">
+                        <div class="seat-name"><span class="seat-status-dot"></span>Negreanu</div>
+                        <div class="seat-stack">60 <span>BB</span></div>
+                        <div class="seat-stats">26/17</div>
+                    </div>
+                </div>
+
+                <!-- Seat 6: Chidwick - top left -->
+                <div class="seat seat-6 folded">
+                    <div class="seat-bubble">
+                        <div class="seat-name"><span class="seat-status-dot"></span>Chidwick</div>
+                        <div class="seat-stack">63 <span>BB</span></div>
+                        <div class="seat-stats">21/18</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2b: Live Insights Panel -->
+        <div class="section-header">
+            <span class="section-title">Live Insights</span>
+            <span class="section-badge">AI</span>
+        </div>
+
+        <div class="insights-panel">
+            <div class="insight-card shimmer">
+                <div class="insight-text">
+                    &#128161; <strong>Foxen's raise size (3.2x)</strong> is above his average (2.4x) &mdash; suggests strong value hand or polarized bluff targeting Negreanu's wide call range.
+                </div>
+                <div class="insight-confidence">
+                    <span class="confidence-label">Confidence</span>
+                    <div class="confidence-bar"><div class="confidence-fill high" style="width: 88%"></div></div>
+                    <span class="confidence-val high">88%</span>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-text">
+                    &#128202; <strong>Negreanu</strong> has folded to c-bets <strong>68%</strong> of the time this tournament &mdash; Foxen is likely leveraging this tendency with a larger sizing.
+                </div>
+                <div class="insight-confidence">
+                    <span class="confidence-label">Confidence</span>
+                    <div class="confidence-bar"><div class="confidence-fill high" style="width: 79%"></div></div>
+                    <span class="confidence-val high">79%</span>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-text">
+                    &#9889; This pot represents <strong>28% of Foxen's stack</strong> &mdash; significant commitment. If called, the turn SPR will be ~1.2, making river play nearly automatic.
+                </div>
+                <div class="insight-confidence">
+                    <span class="confidence-label">Confidence</span>
+                    <div class="confidence-bar"><div class="confidence-fill medium" style="width: 65%"></div></div>
+                    <span class="confidence-val medium">65%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2c: Quick Stats Drawer -->
+        <div class="stats-drawer">
+            <div class="drawer-header" onclick="toggleDrawer()">
+                <div class="drawer-title">
+                    &#128203; <span class="drawer-player-name">Foxen</span> &mdash; Quick Stats
+                </div>
+                <span class="drawer-chevron" id="drawerChevron">&#9662;</span>
+            </div>
+            <div class="drawer-content" id="drawerContent">
+                <!-- Pre-Flop -->
+                <div class="stat-category-label">Pre-Flop</div>
+                <div class="stat-grid">
+                    <div class="stat-cell" onclick="expandStat(this, 'vpip')">
+                        <div class="stat-name">VPIP</div>
+                        <div class="stat-value count-up" style="color: var(--accent-cyan);">23%</div>
+                        <div class="stat-percentile percentile-good">Top 25%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'pfr')">
+                        <div class="stat-name">PFR</div>
+                        <div class="stat-value count-up" style="color: var(--accent-emerald);">19%</div>
+                        <div class="stat-percentile percentile-elite">Top 10%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, '3bet')">
+                        <div class="stat-name">3-Bet</div>
+                        <div class="stat-value count-up" style="color: var(--accent-cyan);">11%</div>
+                        <div class="stat-percentile percentile-good">Top 20%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'ft3bet')">
+                        <div class="stat-name">Fold to 3B</div>
+                        <div class="stat-value count-up" style="color: var(--accent-amber);">58%</div>
+                        <div class="stat-percentile percentile-avg">Avg</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'limp')">
+                        <div class="stat-name">Limp%</div>
+                        <div class="stat-value count-up" style="color: var(--accent-emerald);">2%</div>
+                        <div class="stat-percentile percentile-elite">Top 5%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'steal')">
+                        <div class="stat-name">Steal%</div>
+                        <div class="stat-value count-up" style="color: var(--accent-cyan);">34%</div>
+                        <div class="stat-percentile percentile-good">Top 15%</div>
+                    </div>
+                </div>
+
+                <!-- Post-Flop -->
+                <div class="stat-category-label">Post-Flop</div>
+                <div class="stat-grid">
+                    <div class="stat-cell expanded" onclick="expandStat(this, 'cbf')">
+                        <div class="stat-name">C-Bet F</div>
+                        <div class="stat-value count-up" style="color: var(--accent-cyan);">72%</div>
+                        <div class="stat-percentile percentile-good">Top 20%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'cbt')">
+                        <div class="stat-name">C-Bet T</div>
+                        <div class="stat-value count-up" style="color: var(--accent-amber);">48%</div>
+                        <div class="stat-percentile percentile-avg">Avg</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'cbr')">
+                        <div class="stat-name">C-Bet R</div>
+                        <div class="stat-value count-up" style="color: var(--accent-amber);">35%</div>
+                        <div class="stat-percentile percentile-avg">Avg</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'xr')">
+                        <div class="stat-name">Check-Raise</div>
+                        <div class="stat-value count-up" style="color: var(--accent-emerald);">14%</div>
+                        <div class="stat-percentile percentile-elite">Top 10%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'fcb')">
+                        <div class="stat-name">Fold to CB</div>
+                        <div class="stat-value count-up" style="color: var(--accent-cyan);">42%</div>
+                        <div class="stat-percentile percentile-good">Top 25%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'donk')">
+                        <div class="stat-name">Donk Bet</div>
+                        <div class="stat-value count-up" style="color: var(--accent-emerald);">5%</div>
+                        <div class="stat-percentile percentile-elite">Top 8%</div>
+                    </div>
+                </div>
+
+                <!-- Aggression -->
+                <div class="stat-category-label">Aggression</div>
+                <div class="stat-grid">
+                    <div class="stat-cell" onclick="expandStat(this, 'af')">
+                        <div class="stat-name">AF</div>
+                        <div class="stat-value count-up" style="color: var(--accent-emerald);">3.1</div>
+                        <div class="stat-percentile percentile-elite">Top 10%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'afq')">
+                        <div class="stat-name">AFq</div>
+                        <div class="stat-value count-up" style="color: var(--accent-cyan);">52%</div>
+                        <div class="stat-percentile percentile-good">Top 20%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'wtsd')">
+                        <div class="stat-name">WTSD</div>
+                        <div class="stat-value count-up" style="color: var(--accent-cyan);">28%</div>
+                        <div class="stat-percentile percentile-good">Top 15%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'wssd')">
+                        <div class="stat-name">W$SD</div>
+                        <div class="stat-value count-up" style="color: var(--accent-emerald);">61%</div>
+                        <div class="stat-percentile percentile-elite">Top 10%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'wwsf')">
+                        <div class="stat-name">WWSF</div>
+                        <div class="stat-value count-up" style="color: var(--accent-cyan);">48%</div>
+                        <div class="stat-percentile percentile-good">Top 20%</div>
+                    </div>
+                    <div class="stat-cell" onclick="expandStat(this, 'wwnai')">
+                        <div class="stat-name">WW@AI</div>
+                        <div class="stat-value count-up" style="color: var(--accent-amber);">55%</div>
+                        <div class="stat-percentile percentile-avg">Avg</div>
+                    </div>
+                </div>
+
+                <div class="stat-hint">Tap any stat to see hands &rarr;</div>
+            </div>
+        </div>
+
+        <!-- 2d: Stat Drilldown Preview -->
+        <div class="drilldown-panel" id="drilldownPanel">
+            <div class="drilldown-header">
+                <div class="drilldown-stat-name">C-Bet Flop: 72%</div>
+                <div class="drilldown-fraction">9 / 12 opps</div>
+            </div>
+            <div class="drilldown-def">
+                Continuation bet on the flop after being the preflop aggressor. A higher % indicates more aggressive post-flop play.
+            </div>
+
+            <div class="drilldown-hand">
+                <div class="drilldown-hand-info">
+                    <span class="drilldown-hand-num">#41</span>
+                    <div class="drilldown-board">
+                        <div class="card-sm red"><span class="rank">A</span><span class="suit">&#9829;</span></div>
+                        <div class="card-sm black"><span class="rank">7</span><span class="suit">&#9827;</span></div>
+                        <div class="card-sm red"><span class="rank">3</span><span class="suit">&#9830;</span></div>
+                    </div>
+                    <span class="drilldown-result result-won">Won +180K</span>
+                </div>
+                <button class="drilldown-play-btn">&#9654;</button>
+            </div>
+
+            <div class="drilldown-hand">
+                <div class="drilldown-hand-info">
+                    <span class="drilldown-hand-num">#36</span>
+                    <div class="drilldown-board">
+                        <div class="card-sm black"><span class="rank">J</span><span class="suit">&#9824;</span></div>
+                        <div class="card-sm red"><span class="rank">T</span><span class="suit">&#9829;</span></div>
+                        <div class="card-sm black"><span class="rank">4</span><span class="suit">&#9827;</span></div>
+                    </div>
+                    <span class="drilldown-result result-lost">Lost -90K</span>
+                </div>
+                <button class="drilldown-play-btn">&#9654;</button>
+            </div>
+
+            <div class="drilldown-hand">
+                <div class="drilldown-hand-info">
+                    <span class="drilldown-hand-num">#28</span>
+                    <div class="drilldown-board">
+                        <div class="card-sm red"><span class="rank">K</span><span class="suit">&#9830;</span></div>
+                        <div class="card-sm black"><span class="rank">8</span><span class="suit">&#9824;</span></div>
+                        <div class="card-sm red"><span class="rank">5</span><span class="suit">&#9829;</span></div>
+                    </div>
+                    <span class="drilldown-result result-won">Won +240K</span>
+                </div>
+                <button class="drilldown-play-btn">&#9654;</button>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ===================== -->
+    <!-- STUDY MODE            -->
+    <!-- ===================== -->
+    <section class="mode-section" id="mode-study">
+        <div class="study-section">
+
+            <div class="study-banner">
+                <div class="study-banner-icon">&#128218;</div>
+                <div class="study-banner-text">
+                    <h3>Study Lab</h3>
+                    <p>Replay hands, analyze equity, get AI coaching</p>
+                </div>
+            </div>
+
+            <!-- 3a: Hand Replayer -->
+            <div class="section-header">
+                <span class="section-title">Hand Replayer</span>
+                <span class="section-badge">Hand #47</span>
+            </div>
+
+            <div class="replayer-container">
+                <!-- Street Tabs -->
+                <div class="street-tabs">
+                    <button class="street-tab" data-street="preflop" onclick="switchStreet('preflop')">Pre-Flop</button>
+                    <button class="street-tab active" data-street="flop" onclick="switchStreet('flop')">Flop</button>
+                    <button class="street-tab" data-street="turn" onclick="switchStreet('turn')">Turn</button>
+                    <button class="street-tab" data-street="river" onclick="switchStreet('river')">River</button>
+                </div>
+
+                <!-- Board Cards -->
+                <div class="replayer-board">
+                    <div class="replayer-board-label">Board</div>
+                    <div class="replayer-cards">
+                        <div class="replayer-card red"><span class="rank">K</span><span class="suit">&#9830;</span></div>
+                        <div class="replayer-card red"><span class="rank">Q</span><span class="suit">&#9829;</span></div>
+                        <div class="replayer-card black"><span class="rank">9</span><span class="suit">&#9824;</span></div>
+                    </div>
+
+                    <!-- Player Hands -->
+                    <div class="player-hands">
+                        <div class="player-hand">
+                            <div class="player-hand-name cyan">Foxen</div>
+                            <div class="player-hand-cards">
+                                <div class="card-sm black"><span class="rank">A</span><span class="suit">&#9824;</span></div>
+                                <div class="card-sm black"><span class="rank">K</span><span class="suit">&#9827;</span></div>
+                            </div>
+                        </div>
+                        <div style="color: var(--text-muted); font-size: 11px; font-weight: 700; align-self: center;">vs</div>
+                        <div class="player-hand">
+                            <div class="player-hand-name pink">Negreanu</div>
+                            <div class="player-hand-cards">
+                                <div class="card-sm red"><span class="rank">Q</span><span class="suit">&#9830;</span></div>
+                                <div class="card-sm black"><span class="rank">Q</span><span class="suit">&#9827;</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Timeline -->
+                <div class="action-timeline">
+                    <div class="action-timeline-label">Flop Action</div>
+
+                    <div class="action-item">
+                        <div class="action-marker check"></div>
+                        <div class="action-text"><strong>Foxen:</strong> Checks</div>
+                    </div>
+                    <div class="action-connector"></div>
+                    <div class="action-item">
+                        <div class="action-marker bet"></div>
+                        <div class="action-text"><strong>Negreanu:</strong> Bets <span class="amount" style="color: var(--accent-red);">120K</span></div>
+                    </div>
+                    <div class="action-connector"></div>
+                    <div class="action-item">
+                        <div class="action-marker raise"></div>
+                        <div class="action-text"><strong>Foxen:</strong> Raises to <span class="amount" style="color: var(--accent-amber);">340K</span></div>
+                    </div>
+                    <div class="action-connector"></div>
+                    <div class="action-item">
+                        <div class="action-marker call"></div>
+                        <div class="action-text"><strong>Negreanu:</strong> Calls <span class="amount" style="color: var(--accent-cyan);">220K</span></div>
+                    </div>
+                </div>
+
+                <!-- Pot Tracker -->
+                <div class="pot-tracker">
+                    <div class="pot-tracker-label">
+                        <span>Pot Growth</span>
+                        <span style="color: var(--text-secondary); font-weight: 700;">Total: 920K</span>
+                    </div>
+                    <div class="pot-bars">
+                        <div class="pot-bar-group">
+                            <div class="pot-bar-val">90K</div>
+                            <div class="pot-bar preflop"></div>
+                            <div class="pot-bar-label">Pre</div>
+                        </div>
+                        <div class="pot-bar-group">
+                            <div class="pot-bar-val">+830K</div>
+                            <div class="pot-bar flop"></div>
+                            <div class="pot-bar-label">Flop</div>
+                        </div>
+                        <div class="pot-bar-group">
+                            <div class="pot-bar-val">&mdash;</div>
+                            <div class="pot-bar turn" style="height: 0; background: rgba(129, 140, 248, 0.15);"></div>
+                            <div class="pot-bar-label">Turn</div>
+                        </div>
+                        <div class="pot-bar-group">
+                            <div class="pot-bar-val">&mdash;</div>
+                            <div class="pot-bar river" style="height: 0; background: rgba(244, 114, 182, 0.15);"></div>
+                            <div class="pot-bar-label">River</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Replayer Controls -->
+                <div class="replayer-controls">
+                    <button class="replay-btn">&#9198;</button>
+                    <button class="replay-btn">&#9194;</button>
+                    <button class="replay-btn play-pause">&#9654;</button>
+                    <button class="replay-btn">&#9193;</button>
+                    <div class="speed-selector">
+                        <button class="speed-btn active">1x</button>
+                        <button class="speed-btn">2x</button>
+                        <button class="speed-btn">4x</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="video-clip-btn">&#127916; Watch Video Clip</button>
+
+            <!-- 3b: Equity Graph -->
+            <div class="section-header">
+                <span class="section-title">Equity Analysis</span>
+                <span class="section-badge">Street-by-Street</span>
+            </div>
+
+            <div class="equity-container">
+                <div class="equity-header">
+                    <div class="equity-title">Equity Tracker</div>
+                    <div class="equity-current">
+                        <span class="eq-player-1">Foxen 67%</span>
+                        <span style="color: var(--text-muted);">&bull;</span>
+                        <span class="eq-player-2">Negreanu 33%</span>
+                    </div>
+                </div>
+
+                <div class="equity-chart">
+                    <!-- Grid Lines -->
+                    <div class="equity-grid">
+                        <div class="equity-grid-line"><span class="equity-grid-label" style="top: 0;">100%</span></div>
+                        <div class="equity-grid-line"><span class="equity-grid-label" style="top: 0;">75%</span></div>
+                        <div class="equity-grid-line"><span class="equity-grid-label" style="top: 0;">50%</span></div>
+                        <div class="equity-grid-line"><span class="equity-grid-label" style="top: 0;">25%</span></div>
+                        <div class="equity-grid-line"><span class="equity-grid-label" style="top: 0;">0%</span></div>
+                    </div>
+
+                    <!-- Stacked Bars -->
+                    <div class="equity-bars">
+                        <!-- Pre-Flop: Foxen 57%, Negreanu 43% -->
+                        <div class="equity-bar-pair">
+                            <div class="equity-stacked-bar">
+                                <div class="equity-segment player1" style="height: 57%;"></div>
+                                <div class="equity-segment player2" style="height: 43%;"></div>
+                            </div>
+                            <div class="equity-street-label">Pre-Flop</div>
+                        </div>
+
+                        <!-- Flop: Foxen 67%, Negreanu 33% (equity flip!) -->
+                        <div class="equity-bar-pair" style="position: relative;">
+                            <div class="equity-flip-marker">&#9889;</div>
+                            <div class="equity-stacked-bar">
+                                <div class="equity-segment player1" style="height: 67%;"></div>
+                                <div class="equity-segment player2" style="height: 33%;"></div>
+                            </div>
+                            <div class="equity-street-label" style="color: var(--accent-cyan); font-weight: 700;">Flop</div>
+                        </div>
+
+                        <!-- Turn (placeholder) -->
+                        <div class="equity-bar-pair">
+                            <div class="equity-stacked-bar" style="opacity: 0.25;">
+                                <div class="equity-segment" style="height: 100%; background: rgba(255,255,255,0.06);"></div>
+                            </div>
+                            <div class="equity-street-label">Turn</div>
+                        </div>
+
+                        <!-- River (placeholder) -->
+                        <div class="equity-bar-pair">
+                            <div class="equity-stacked-bar" style="opacity: 0.25;">
+                                <div class="equity-segment" style="height: 100%; background: rgba(255,255,255,0.06);"></div>
+                            </div>
+                            <div class="equity-street-label">River</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="equity-legend">
+                    <div class="equity-legend-item">
+                        <div class="equity-legend-dot" style="background: rgba(6, 182, 212, 0.7);"></div>
+                        Foxen (A&#9824;K&#9827;)
+                    </div>
+                    <div class="equity-legend-item">
+                        <div class="equity-legend-dot" style="background: rgba(244, 114, 182, 0.6);"></div>
+                        Negreanu (Q&#9830;Q&#9827;)
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3c: AI Coach Box -->
+            <div class="section-header">
+                <span class="section-title">AI Coach</span>
+                <span class="section-badge">Claude</span>
+            </div>
+
+            <div class="ai-coach">
+                <div class="ai-coach-header">
+                    <div class="ai-icon">&#129302;</div>
+                    <div class="ai-coach-label">AI Analysis</div>
+                    <span class="ai-badge">DECISION POINT</span>
+                </div>
+
+                <div class="ai-coach-text">
+                    <p>
+                        <strong>The check-raise on K&#9830;Q&#9829;9&#9824; is a strong play here.</strong> Foxen has top pair top kicker with a backdoor flush draw. His range advantage on this board texture allows for larger check-raise sizing.
+                    </p>
+                    <p>
+                        <strong>Consider:</strong> Negreanu's calling range is partially capped &mdash; he would likely 3-bet QQ+ and AK preflop from most positions. His flat suggests medium pairs (TT-JJ), suited connectors, or suited broadway. This makes Foxen's check-raise especially effective, as Negreanu's continuing range is dominated.
+                    </p>
+                    <p>
+                        <strong>Sizing analysis:</strong> The 2.83x raise (340K into 120K bet + 90K pot) commits ~28% of Foxen's stack and sets up a turn shove of ~1.2 SPR. This geometric sizing is near-optimal for value-heavy range.
+                    </p>
+                </div>
+
+                <div class="ai-feedback">
+                    <span>Was this helpful?</span>
+                    <button class="ai-feedback-btn" title="Helpful">&#128077;</button>
+                    <button class="ai-feedback-btn" title="Not helpful">&#128078;</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===================== -->
+    <!-- CAREER MODE           -->
+    <!-- ===================== -->
+    <section class="mode-section" id="mode-career">
+        <div class="career-section">
+
+            <!-- 4a: Player Career Card -->
+            <div class="section-header">
+                <span class="section-title">Player Profile</span>
+                <span class="section-badge">Career</span>
+            </div>
+
+            <div class="career-card">
+                <div class="career-card-top">
+                    <div class="career-avatar">AF</div>
+                    <div class="career-info">
+                        <h3>Alex Foxen</h3>
+                        <p>GPI #3 Ranked &bull; USA</p>
+                        <span class="career-ft-badge">47 Final Tables Tracked</span>
+                    </div>
+                </div>
+
+                <div class="career-stats-row">
+                    <div class="career-stat">
+                        <div class="career-stat-val" style="color: var(--accent-cyan);">23%</div>
+                        <div class="career-stat-label">VPIP</div>
+                    </div>
+                    <div class="career-stat">
+                        <div class="career-stat-val" style="color: var(--accent-emerald);">19%</div>
+                        <div class="career-stat-label">PFR</div>
+                    </div>
+                    <div class="career-stat">
+                        <div class="career-stat-val" style="color: var(--accent-amber);">3.1</div>
+                        <div class="career-stat-label">AF</div>
+                    </div>
+                    <div class="career-stat">
+                        <div class="career-stat-val" style="color: var(--accent-emerald);">61%</div>
+                        <div class="career-stat-label">W$SD</div>
+                    </div>
+                </div>
+
+                <!-- Sparkline: Tournament Finishes -->
+                <div class="sparkline-container">
+                    <div class="sparkline-label">
+                        <span>Last 10 Tournament Finishes</span>
+                        <span class="sparkline-trend">&#8593; Trending Up</span>
+                    </div>
+                    <div class="sparkline" id="sparkline">
+                        <!-- Bars generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Playstyle Radar -->
+                <div class="radar-container">
+                    <div class="radar-label">Playstyle Profile</div>
+                    <div class="radar-bars">
+                        <div class="radar-bar-row">
+                            <span class="radar-bar-label">Aggression</span>
+                            <div class="radar-bar-track">
+                                <div class="radar-bar-fill" style="width: 85%; background: var(--gradient-emerald);"></div>
+                            </div>
+                            <span class="radar-bar-val" style="color: var(--accent-emerald);">85</span>
+                        </div>
+                        <div class="radar-bar-row">
+                            <span class="radar-bar-label">Position</span>
+                            <div class="radar-bar-track">
+                                <div class="radar-bar-fill" style="width: 92%; background: linear-gradient(90deg, #06b6d4, #818cf8);"></div>
+                            </div>
+                            <span class="radar-bar-val" style="color: var(--accent-cyan);">92</span>
+                        </div>
+                        <div class="radar-bar-row">
+                            <span class="radar-bar-label">Bluffing</span>
+                            <div class="radar-bar-track">
+                                <div class="radar-bar-fill" style="width: 71%; background: linear-gradient(90deg, #f59e0b, #f97316);"></div>
+                            </div>
+                            <span class="radar-bar-val" style="color: var(--accent-amber);">71</span>
+                        </div>
+                        <div class="radar-bar-row">
+                            <span class="radar-bar-label">Hand Selection</span>
+                            <div class="radar-bar-track">
+                                <div class="radar-bar-fill" style="width: 78%; background: linear-gradient(90deg, #10b981, #06b6d4);"></div>
+                            </div>
+                            <span class="radar-bar-val" style="color: var(--accent-emerald);">78</span>
+                        </div>
+                        <div class="radar-bar-row">
+                            <span class="radar-bar-label">Pot Control</span>
+                            <div class="radar-bar-track">
+                                <div class="radar-bar-fill" style="width: 64%; background: linear-gradient(90deg, #818cf8, #c084fc);"></div>
+                            </div>
+                            <span class="radar-bar-val" style="color: var(--accent-indigo);">64</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4b: Leaderboard -->
+            <div class="section-header">
+                <span class="section-title">Leaderboard</span>
+                <span class="section-badge">All Players</span>
+            </div>
+
+            <div class="leaderboard">
+                <div class="lb-header-row">
+                    <span class="lb-col-header">#</span>
+                    <span class="lb-col-header">Player</span>
+                    <span class="lb-col-header sorted">VPIP</span>
+                    <span class="lb-col-header">PFR</span>
+                    <span class="lb-col-header">AF</span>
+                    <span class="lb-col-header">Win%</span>
+                </div>
+
+                <div class="lb-row highlight">
+                    <span class="lb-rank gold">1</span>
+                    <div class="lb-player">
+                        <div class="lb-player-avatar" style="background: linear-gradient(135deg, #06b6d4, #10b981);">AF</div>
+                        <span class="lb-player-name">Foxen</span>
+                    </div>
+                    <span class="lb-cell">23</span>
+                    <span class="lb-cell">19</span>
+                    <span class="lb-cell">3.1</span>
+                    <span class="lb-cell win-rate">61%</span>
+                </div>
+
+                <div class="lb-row">
+                    <span class="lb-rank silver">2</span>
+                    <div class="lb-player">
+                        <div class="lb-player-avatar" style="background: linear-gradient(135deg, #818cf8, #c084fc);">PI</div>
+                        <span class="lb-player-name">Ivey</span>
+                    </div>
+                    <span class="lb-cell">28</span>
+                    <span class="lb-cell">22</span>
+                    <span class="lb-cell">3.4</span>
+                    <span class="lb-cell win-rate">58%</span>
+                </div>
+
+                <div class="lb-row">
+                    <span class="lb-rank bronze">3</span>
+                    <div class="lb-player">
+                        <div class="lb-player-avatar" style="background: linear-gradient(135deg, #f59e0b, #f97316);">BK</div>
+                        <span class="lb-player-name">Kenney</span>
+                    </div>
+                    <span class="lb-cell">25</span>
+                    <span class="lb-cell">20</span>
+                    <span class="lb-cell">2.8</span>
+                    <span class="lb-cell win-rate">55%</span>
+                </div>
+
+                <div class="lb-row">
+                    <span class="lb-rank">4</span>
+                    <div class="lb-player">
+                        <div class="lb-player-avatar" style="background: linear-gradient(135deg, #f472b6, #c084fc);">SC</div>
+                        <span class="lb-player-name">Chidwick</span>
+                    </div>
+                    <span class="lb-cell">21</span>
+                    <span class="lb-cell">18</span>
+                    <span class="lb-cell">2.9</span>
+                    <span class="lb-cell win-rate">53%</span>
+                </div>
+
+                <div class="lb-row">
+                    <span class="lb-rank">5</span>
+                    <div class="lb-player">
+                        <div class="lb-player-avatar" style="background: linear-gradient(135deg, #ef4444, #f97316);">DN</div>
+                        <span class="lb-player-name">Negreanu</span>
+                    </div>
+                    <span class="lb-cell">26</span>
+                    <span class="lb-cell">17</span>
+                    <span class="lb-cell">2.4</span>
+                    <span class="lb-cell win-rate">51%</span>
+                </div>
+
+                <div class="lb-row">
+                    <span class="lb-rank">6</span>
+                    <div class="lb-player">
+                        <div class="lb-player-avatar" style="background: linear-gradient(135deg, #10b981, #059669);">JB</div>
+                        <span class="lb-player-name">Bonomo</span>
+                    </div>
+                    <span class="lb-cell">19</span>
+                    <span class="lb-cell">15</span>
+                    <span class="lb-cell">2.2</span>
+                    <span class="lb-cell win-rate">49%</span>
+                </div>
+            </div>
+
+            <!-- 4c: H2H Matchup -->
+            <div class="section-header">
+                <span class="section-title">Head-to-Head</span>
+                <span class="section-badge">3 Tournaments</span>
+            </div>
+
+            <div class="h2h-container">
+                <div class="h2h-header">
+                    <h3>Matchup Analysis</h3>
+                </div>
+
+                <div class="h2h-fighters">
+                    <div class="h2h-fighter">
+                        <div class="h2h-avatar player1">AF</div>
+                        <div class="h2h-name" style="color: var(--accent-cyan);">Foxen</div>
+                    </div>
+                    <div class="h2h-vs">
+                        <div class="h2h-vs-text">VS</div>
+                        <div class="h2h-record">
+                            <span class="win">5</span>
+                            <span style="color: var(--text-muted);"> - </span>
+                            <span class="loss">3</span>
+                        </div>
+                    </div>
+                    <div class="h2h-fighter">
+                        <div class="h2h-avatar player2">DN</div>
+                        <div class="h2h-name" style="color: var(--accent-pink);">Negreanu</div>
+                    </div>
+                </div>
+
+                <div class="h2h-stats">
+                    <div class="h2h-stat-row">
+                        <span class="h2h-stat-label">Pots Won</span>
+                        <div class="h2h-bar-container">
+                            <div class="h2h-bar-left" style="width: 62.5%;">5</div>
+                            <div class="h2h-bar-right" style="width: 37.5%;">3</div>
+                        </div>
+                    </div>
+                    <div class="h2h-stat-row">
+                        <span class="h2h-stat-label">Biggest Pot</span>
+                        <div class="h2h-bar-container">
+                            <div class="h2h-bar-left" style="width: 58%;">1.4M</div>
+                            <div class="h2h-bar-right" style="width: 42%;">980K</div>
+                        </div>
+                    </div>
+                    <div class="h2h-stat-row">
+                        <span class="h2h-stat-label">Aggression</span>
+                        <div class="h2h-bar-container">
+                            <div class="h2h-bar-left" style="width: 56%;">3.1</div>
+                            <div class="h2h-bar-right" style="width: 44%;">2.4</div>
+                        </div>
+                    </div>
+                    <div class="h2h-stat-row">
+                        <span class="h2h-stat-label">SD Won</span>
+                        <div class="h2h-bar-container">
+                            <div class="h2h-bar-left" style="width: 55%;">67%</div>
+                            <div class="h2h-bar-right" style="width: 45%;">52%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===================== -->
+    <!-- BOTTOM NAV            -->
+    <!-- ===================== -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="switchMode('live')">
+            <span class="nav-icon">&#127968;</span>
+            Home
+        </button>
+        <button class="nav-item active" onclick="switchMode('live')">
+            <span class="nav-icon">&#128308;</span>
+            Live
+        </button>
+        <button class="nav-item" onclick="switchMode('study')">
+            <span class="nav-icon">&#128218;</span>
+            Study
+        </button>
+        <button class="nav-item" onclick="switchMode('career')">
+            <span class="nav-icon">&#128200;</span>
+            Career
+        </button>
+        <button class="nav-item">
+            <span class="nav-icon">&#9881;</span>
+            Settings
+        </button>
+    </nav>
+
+    <!-- Bottom padding for nav -->
+    <div style="height: 72px;"></div>
+
+</div>
+
+<script>
+    // =====================
+    // MODE SWITCHING
+    // =====================
+    function switchMode(mode) {
+        // Update mode buttons
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+
+        // Update sections
+        document.querySelectorAll('.mode-section').forEach(section => {
+            section.classList.toggle('active', section.id === 'mode-' + mode);
+        });
+
+        // Update bottom nav
+        const navLabels = { live: 'Live', study: 'Study', career: 'Career' };
+        document.querySelectorAll('.nav-item').forEach(item => {
+            const text = item.textContent.trim();
+            item.classList.toggle('active', text === navLabels[mode] || (text === 'Home' && mode === 'live'));
+        });
+    }
+
+    // =====================
+    // STATS DRAWER
+    // =====================
+    function toggleDrawer() {
+        const content = document.getElementById('drawerContent');
+        const chevron = document.getElementById('drawerChevron');
+        content.classList.toggle('open');
+        chevron.classList.toggle('open');
+    }
+
+    // Open drawer by default
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('drawerContent').classList.add('open');
+        document.getElementById('drawerChevron').classList.add('open');
+        buildSparkline();
+        animateCountUp();
+    });
+
+    // =====================
+    // STAT DRILLDOWN
+    // =====================
+    function expandStat(el, statKey) {
+        // Remove expanded from all
+        document.querySelectorAll('.stat-cell').forEach(c => c.classList.remove('expanded'));
+        // Add to clicked
+        el.classList.add('expanded');
+
+        // Show drilldown panel
+        const panel = document.getElementById('drilldownPanel');
+        panel.style.display = 'block';
+        panel.style.animation = 'none';
+        panel.offsetHeight; // Trigger reflow
+        panel.style.animation = 'slideDown 0.3s ease';
+    }
+
+    // =====================
+    // STREET TABS
+    // =====================
+    function switchStreet(street) {
+        document.querySelectorAll('.street-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.street === street);
+        });
+    }
+
+    // =====================
+    // SPEED SELECTOR
+    // =====================
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    // =====================
+    // SPARKLINE
+    // =====================
+    function buildSparkline() {
+        const container = document.getElementById('sparkline');
+        // Places: lower is better. Heights inversely proportional.
+        const data = [
+            { place: '5th', pct: 40 },
+            { place: '3rd', pct: 60 },
+            { place: '6th', pct: 33 },
+            { place: '2nd', pct: 80 },
+            { place: '4th', pct: 50 },
+            { place: '7th', pct: 25 },
+            { place: '3rd', pct: 60 },
+            { place: '2nd', pct: 80 },
+            { place: '1st', pct: 100 },
+            { place: '2nd', pct: 80 },
+        ];
+
+        const colors = {
+            100: 'var(--accent-emerald)',
+            80: 'var(--accent-cyan)',
+            60: 'var(--accent-indigo)',
+            50: 'var(--accent-amber)',
+            40: 'var(--accent-amber)',
+            33: 'var(--accent-red)',
+            25: 'var(--accent-red)',
+        };
+
+        data.forEach((d, i) => {
+            const bar = document.createElement('div');
+            bar.className = 'sparkline-bar';
+            bar.style.height = (d.pct * 0.36) + 'px';
+            bar.style.background = colors[d.pct] || 'var(--text-muted)';
+            bar.style.opacity = 0.7 + (i * 0.03);
+            bar.dataset.place = d.place;
+            bar.style.animationDelay = (i * 0.05) + 's';
+            container.appendChild(bar);
+        });
+    }
+
+    // =====================
+    // COUNT-UP ANIMATION
+    // =====================
+    function animateCountUp() {
+        const elements = document.querySelectorAll('.stat-value.count-up');
+        elements.forEach((el, i) => {
+            el.style.animationDelay = (i * 0.04) + 's';
+        });
+    }
+
+    // =====================
+    // AI FEEDBACK BUTTONS
+    // =====================
+    document.querySelectorAll('.ai-feedback-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.ai-feedback-btn').forEach(b => {
+                b.style.opacity = '0.3';
+            });
+            this.style.opacity = '1';
+            this.style.borderColor = 'var(--accent-emerald)';
+            this.style.background = 'rgba(16, 185, 129, 0.1)';
+        });
+    });
+</script>
+
+</body>
+</html>

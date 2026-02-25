@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUDR Arena — Gamified Prediction Platform</title>
+    <style>
+        /* ===================== */
+        /* Reset & Base          */
+        /* ===================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-base: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #16162a;
+            --bg-surface: #1a1a2e;
+            --bg-elevated: #1e1e35;
+            --border-subtle: rgba(139, 92, 246, 0.15);
+            --border-medium: rgba(139, 92, 246, 0.3);
+            --text-primary: #f0f0f5;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --purple-400: #a78bfa;
+            --purple-500: #8b5cf6;
+            --purple-600: #7c3aed;
+            --purple-700: #6d28d9;
+            --pink-400: #f472b6;
+            --pink-500: #ec4899;
+            --red-400: #f87171;
+            --red-500: #ef4444;
+            --green-400: #4ade80;
+            --green-500: #22c55e;
+            --yellow-400: #facc15;
+            --yellow-500: #eab308;
+            --blue-400: #60a5fa;
+            --blue-500: #3b82f6;
+            --orange-400: #fb923c;
+            --gradient-primary: linear-gradient(135deg, #8b5cf6, #ec4899);
+            --gradient-fire: linear-gradient(135deg, #ef4444, #f97316, #eab308);
+            --gradient-gold: linear-gradient(135deg, #f59e0b, #fbbf24, #f59e0b);
+            --gradient-diamond: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #050508;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ===================== */
+        /* Phone Frame            */
+        /* ===================== */
+        .phone-frame {
+            width: 390px;
+            min-height: 100vh;
+            background: var(--bg-base);
+            position: relative;
+            overflow-x: hidden;
+            box-shadow: 0 0 80px rgba(139, 92, 246, 0.08);
+        }
+
+        @media (max-width: 430px) {
+            .phone-frame { width: 100%; }
+        }
+
+        /* ===================== */
+        /* Back Link             */
+        /* ===================== */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--purple-400);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 12px 16px;
+            transition: opacity 0.2s;
+        }
+        .back-link:hover { opacity: 0.7; }
+        .back-link svg { width: 14px; height: 14px; }
+
+        /* ===================== */
+        /* Header                */
+        /* ===================== */
+        .header {
+            background: linear-gradient(180deg, #12102a 0%, var(--bg-base) 100%);
+            padding: 8px 16px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-logo .stadium {
+            font-size: 22px;
+        }
+
+        .header-logo .brand {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-logo .arena-badge {
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--gradient-fire);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .coins-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(250, 204, 21, 0.12);
+            border: 1px solid rgba(250, 204, 21, 0.25);
+            padding: 5px 10px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--yellow-400);
+        }
+
+        .user-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            color: white;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .level-pip {
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            background: var(--gradient-fire);
+            color: white;
+            font-size: 9px;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--bg-card);
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-level {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .xp-bar-container {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .xp-bar-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(139, 92, 246, 0.15);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            width: 78%;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-full);
+            animation: xpGrow 1.5s ease-out;
+        }
+
+        @keyframes xpGrow {
+            from { width: 0%; }
+        }
+
+        .xp-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ===================== */
+        /* Sections              */
+        /* ===================== */
+        .section {
+            padding: 20px 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title .emoji {
+            font-size: 18px;
+        }
+
+        /* ===================== */
+        /* Live Prediction Arena */
+        /* ===================== */
+        .live-section {
+            background: linear-gradient(180deg, rgba(239, 68, 68, 0.06) 0%, transparent 100%);
+            border-top: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--red-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--red-500);
+            border-radius: 50%;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+
+        .tournament-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .prediction-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-top: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prediction-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+        }
+
+        .prediction-card.glow {
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.15), 0 0 60px rgba(139, 92, 246, 0.05);
+            animation: cardGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes cardGlow {
+            0% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.15), 0 0 60px rgba(139, 92, 246, 0.05); }
+            100% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.2), 0 0 70px rgba(139, 92, 246, 0.08); }
+        }
+
+        .hand-number {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--purple-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .prediction-question {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 8px 0;
+            line-height: 1.3;
+        }
+
+        /* Board cards */
+        .board-cards {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0;
+            justify-content: center;
+        }
+
+        .board-card {
+            width: 52px;
+            height: 72px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .board-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .board-card .rank {
+            font-size: 20px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .board-card .suit {
+            font-size: 22px;
+            line-height: 1;
+            margin-top: -2px;
+        }
+
+        .board-card.red { color: #dc2626; }
+        .board-card.black { color: #1a1a2e; }
+
+        .board-card .corner {
+            position: absolute;
+            top: 4px;
+            left: 5px;
+            font-size: 9px;
+            line-height: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .board-card .corner .c-rank { font-size: 10px; font-weight: 800; }
+        .board-card .corner .c-suit { font-size: 10px; }
+
+        /* Player spotlight */
+        .player-spotlight {
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .player-spotlight strong {
+            color: var(--purple-400);
+            font-weight: 700;
+        }
+
+        /* Prediction options */
+        .prediction-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 14px 0;
+        }
+
+        .prediction-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prediction-btn:hover {
+            border-color: var(--border-medium);
+            background: var(--bg-elevated);
+            transform: translateX(2px);
+        }
+
+        .prediction-btn.selected {
+            border-color: var(--purple-500);
+            background: rgba(139, 92, 246, 0.12);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+        }
+
+        .prediction-btn.selected .pred-indicator {
+            background: var(--purple-500);
+            box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+        }
+
+        .prediction-btn.popular::after {
+            content: 'POPULAR';
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            font-size: 8px;
+            font-weight: 800;
+            color: var(--yellow-400);
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .pred-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .pred-indicator.red { background: var(--red-400); }
+        .pred-indicator.yellow { background: var(--yellow-400); }
+        .pred-indicator.green { background: var(--green-400); }
+        .pred-indicator.blue { background: var(--blue-400); }
+
+        .pred-label {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .pred-odds {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+
+        .pred-pct {
+            font-size: 11px;
+            color: var(--text-muted);
+            min-width: 30px;
+            text-align: right;
+        }
+
+        /* Community bar */
+        .community-bar-container {
+            margin: 10px 0;
+        }
+
+        .community-bar-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .community-bar {
+            width: 100%;
+            height: 8px;
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            display: flex;
+            background: var(--bg-surface);
+        }
+
+        .community-bar .segment {
+            height: 100%;
+            transition: width 0.6s ease;
+        }
+        .community-bar .segment.red { background: var(--red-400); }
+        .community-bar .segment.yellow { background: var(--yellow-400); }
+        .community-bar .segment.green { background: var(--green-400); }
+        .community-bar .segment.blue { background: var(--blue-400); }
+
+        /* Timer */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+
+        .timer-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--orange-400);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .timer-bar-track {
+            flex: 1;
+            height: 4px;
+            background: rgba(251, 146, 60, 0.15);
+            border-radius: var(--radius-full);
+            margin-left: 12px;
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            width: 75%;
+            background: linear-gradient(90deg, var(--orange-400), var(--red-400));
+            border-radius: var(--radius-full);
+            animation: timerCountdown 45s linear forwards;
+        }
+
+        @keyframes timerCountdown {
+            from { width: 75%; }
+            to { width: 0%; }
+        }
+
+        .reward-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--green-400);
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: var(--radius-full);
+            padding: 4px 10px;
+            margin-top: 10px;
+        }
+
+        /* ===================== */
+        /* Results Feed          */
+        /* ===================== */
+        .result-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border-left: 3px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .result-card:hover { transform: translateX(2px); }
+
+        .result-card.correct {
+            border-left-color: var(--green-400);
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.06), var(--bg-card) 30%);
+        }
+
+        .result-card.wrong {
+            border-left-color: var(--red-400);
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.06), var(--bg-card) 30%);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .result-icon { font-size: 16px; }
+
+        .result-question {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .result-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        .result-reward {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--green-400);
+            margin-top: 4px;
+        }
+
+        .result-wrong-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        .accuracy-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .accuracy-stat {
+            color: var(--text-secondary);
+        }
+
+        .accuracy-stat strong {
+            color: var(--purple-400);
+            font-weight: 700;
+        }
+
+        .accuracy-rank {
+            color: var(--yellow-400);
+            font-weight: 700;
+        }
+
+        /* ===================== */
+        /* Battle Pass           */
+        /* ===================== */
+        .battle-pass-section {
+            background: linear-gradient(180deg, rgba(139, 92, 246, 0.06) 0%, transparent 100%);
+        }
+
+        .season-countdown {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .season-countdown strong {
+            color: var(--orange-400);
+        }
+
+        .battle-pass-track {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px 0 14px;
+            scrollbar-width: none;
+        }
+
+        .battle-pass-track::-webkit-scrollbar { display: none; }
+
+        .bp-node {
+            flex-shrink: 0;
+            width: 130px;
+            scroll-snap-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Connecting line */
+        .bp-node:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 22px;
+            left: 65px;
+            width: 130px;
+            height: 3px;
+            z-index: 0;
+        }
+
+        .bp-node.unlocked:not(:last-child)::after {
+            background: var(--gradient-primary);
+        }
+
+        .bp-node.current:not(:last-child)::after {
+            background: linear-gradient(90deg, var(--purple-500), rgba(139, 92, 246, 0.2));
+        }
+
+        .bp-node.locked:not(:last-child)::after {
+            background: rgba(107, 114, 128, 0.2);
+        }
+
+        .bp-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.2s;
+        }
+
+        .bp-circle:hover { transform: scale(1.1); }
+
+        .bp-node.unlocked .bp-circle {
+            background: var(--gradient-primary);
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .bp-node.current .bp-circle {
+            background: var(--gradient-fire);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+            animation: currentPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes currentPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
+        }
+
+        .bp-node.locked .bp-circle {
+            background: var(--bg-surface);
+            border: 2px solid rgba(107, 114, 128, 0.3);
+            opacity: 0.5;
+        }
+
+        .bp-level {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bp-node.current .bp-level {
+            color: var(--yellow-400);
+        }
+
+        .bp-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        .bp-node.locked .bp-name {
+            color: var(--text-muted);
+        }
+
+        .bp-reward {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .bp-node.locked .bp-reward {
+            color: var(--text-muted);
+        }
+
+        .bp-progress-mini {
+            width: 40px;
+            height: 3px;
+            background: rgba(245, 158, 11, 0.2);
+            border-radius: var(--radius-full);
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .bp-progress-mini .fill {
+            height: 100%;
+            width: 80%;
+            background: var(--gradient-fire);
+            border-radius: var(--radius-full);
+        }
+
+        .scroll-hint {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ===================== */
+        /* Leagues & Leaderboard */
+        /* ===================== */
+        .league-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .league-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--gradient-diamond);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.25);
+        }
+
+        .league-info {
+            flex: 1;
+        }
+
+        .league-name {
+            font-size: 18px;
+            font-weight: 800;
+            background: var(--gradient-diamond);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .league-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .leaderboard {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .lb-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.2s;
+        }
+
+        .lb-row:last-child { border-bottom: none; }
+
+        .lb-row.promo { background: rgba(34, 197, 94, 0.06); }
+        .lb-row.you { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: var(--radius-md); margin: 2px; }
+        .lb-row.relegation { background: rgba(239, 68, 68, 0.06); }
+
+        .lb-rank {
+            width: 24px;
+            font-size: 14px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .lb-row.promo .lb-rank { color: var(--green-400); }
+        .lb-row.you .lb-rank { color: var(--purple-400); }
+
+        .lb-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .lb-name {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .lb-name .you-tag {
+            font-size: 10px;
+            color: var(--purple-400);
+            font-weight: 700;
+        }
+
+        .lb-xp {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .lb-badge {
+            font-size: 14px;
+            margin-left: 2px;
+        }
+
+        .lb-zone {
+            font-size: 10px;
+            color: var(--text-muted);
+            padding: 4px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .lb-zone.relegation-zone {
+            color: var(--red-400);
+            font-style: italic;
+        }
+
+        .full-leaderboard-link {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--purple-400);
+            text-decoration: none;
+            border-top: 1px solid var(--border-subtle);
+            transition: background 0.2s;
+        }
+
+        .full-leaderboard-link:hover {
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        /* ===================== */
+        /* Achievement Badges    */
+        /* ===================== */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .badge-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 12px 4px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .badge-item:hover { transform: translateY(-2px); }
+
+        .badge-item.earned {
+            border-color: rgba(250, 204, 21, 0.3);
+            background: linear-gradient(180deg, rgba(250, 204, 21, 0.08), var(--bg-card));
+        }
+
+        .badge-item.earned::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), transparent, rgba(250, 204, 21, 0.05));
+            animation: shimmer 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        .badge-item.locked {
+            opacity: 0.45;
+        }
+
+        .badge-item.locked .badge-icon {
+            filter: grayscale(1);
+        }
+
+        .badge-icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+            position: relative;
+        }
+
+        .badge-item.locked .badge-icon::after {
+            content: '🔒';
+            position: absolute;
+            font-size: 12px;
+            bottom: -4px;
+            right: -8px;
+        }
+
+        .badge-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .badge-item.locked .badge-name {
+            color: var(--text-muted);
+        }
+
+        .badge-progress {
+            width: 85%;
+            height: 3px;
+            background: rgba(139, 92, 246, 0.15);
+            border-radius: var(--radius-full);
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .badge-progress .fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-full);
+        }
+
+        .badge-pct {
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ===================== */
+        /* Social Feed           */
+        /* ===================== */
+        .chat-feed {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+        }
+
+        .chat-message {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
+        }
+
+        .chat-message:last-of-type { border-bottom: none; }
+
+        .chat-message.own {
+            background: rgba(139, 92, 246, 0.06);
+        }
+
+        .chat-author {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--purple-400);
+            margin-bottom: 2px;
+        }
+
+        .chat-message.own .chat-author {
+            color: var(--pink-400);
+        }
+
+        .chat-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .chat-reactions {
+            display: flex;
+            gap: 6px;
+            margin-top: 5px;
+        }
+
+        .chat-reaction {
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-full);
+            padding: 2px 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .chat-reaction:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .chat-input-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            background: var(--bg-surface);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            padding: 8px 14px;
+            font-size: 13px;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input::placeholder { color: var(--text-muted); }
+        .chat-input:focus { border-color: var(--purple-500); }
+
+        .chat-send-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+        }
+
+        /* ===================== */
+        /* Daily Challenges      */
+        /* ===================== */
+        .challenge-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            margin-bottom: 8px;
+            border: 1px solid var(--border-subtle);
+            transition: transform 0.2s;
+        }
+
+        .challenge-card:hover { transform: translateX(2px); }
+
+        .challenge-card.completed {
+            border-color: rgba(34, 197, 94, 0.25);
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.06), var(--bg-card) 40%);
+        }
+
+        .challenge-status {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .challenge-info {
+            flex: 1;
+        }
+
+        .challenge-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .challenge-card.completed .challenge-name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .challenge-bar-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.12);
+            border-radius: var(--radius-full);
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .challenge-bar-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-full);
+            transition: width 0.6s ease;
+        }
+
+        .challenge-card.completed .challenge-bar-fill {
+            background: var(--green-400);
+        }
+
+        .challenge-reward {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--green-400);
+            white-space: nowrap;
+        }
+
+        .daily-summary {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        /* ===================== */
+        /* Bottom Navigation     */
+        /* ===================== */
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 8px 0 12px;
+            background: linear-gradient(180deg, rgba(10, 10, 15, 0.95), var(--bg-base));
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            padding: 4px 12px;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .nav-item:hover { transform: translateY(-1px); }
+
+        .nav-icon { font-size: 20px; opacity: 0.5; }
+        .nav-label { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+
+        .nav-item.active .nav-icon {
+            opacity: 1;
+            filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5));
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--purple-400);
+            font-weight: 700;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            width: 20px;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-full);
+        }
+
+        .nav-dot {
+            position: absolute;
+            top: 0;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--red-500);
+            border-radius: 50%;
+            border: 2px solid var(--bg-base);
+        }
+
+        /* ===================== */
+        /* Spacer for nav        */
+        /* ===================== */
+        .nav-spacer {
+            height: 70px;
+        }
+
+        /* ===================== */
+        /* Dividers              */
+        /* ===================== */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+            margin: 0 16px;
+        }
+
+        /* ===================== */
+        /* Utility               */
+        /* ===================== */
+        .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .flex-between {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ===================== */
+        /* Animations            */
+        /* ===================== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.5s ease-out both;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+        .delay-7 { animation-delay: 0.7s; }
+        .delay-8 { animation-delay: 0.8s; }
+
+        /* Particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 8s infinite;
+        }
+
+        @keyframes particleFloat {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 0.6; }
+            90% { opacity: 0; }
+            100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Subtle floating particles -->
+<div class="particles" id="particles"></div>
+
+<div class="phone-frame">
+
+    <!-- Back link -->
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Back to Prototypes
+    </a>
+
+    <!-- ======================== -->
+    <!-- HEADER                   -->
+    <!-- ======================== -->
+    <header class="header animate-in">
+        <div class="header-top">
+            <div class="header-logo">
+                <span class="stadium">&#127951;</span>
+                <div>
+                    <div class="brand">HUDR</div>
+                    <div class="arena-badge">Arena</div>
+                </div>
+            </div>
+            <div class="coins-badge">
+                &#129689; 1,250
+            </div>
+        </div>
+        <div class="user-bar">
+            <div class="user-avatar">
+                J
+                <span class="level-pip">12</span>
+            </div>
+            <div class="user-info">
+                <div class="user-name">JPokerFan</div>
+                <div class="user-level">Level 12 &middot; Diamond League</div>
+                <div class="xp-bar-container">
+                    <div class="xp-bar-track">
+                        <div class="xp-bar-fill"></div>
+                    </div>
+                    <div class="xp-bar-label">
+                        <span>2,340 XP</span>
+                        <span>3,000 XP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================== -->
+    <!-- LIVE PREDICTION ARENA    -->
+    <!-- ======================== -->
+    <section class="section live-section animate-in delay-1">
+        <div class="section-title">
+            <div class="live-badge">
+                <span class="live-dot"></span>
+                LIVE
+            </div>
+            <span style="color: var(--text-secondary); font-weight: 500; font-size: 13px; margin-left: 4px;">2024 PGT Championship</span>
+        </div>
+
+        <div class="prediction-card glow">
+            <div class="hand-number">Hand #47</div>
+            <div class="prediction-question">What happens next?</div>
+
+            <!-- Board cards -->
+            <div class="board-cards">
+                <div class="board-card red">
+                    <span class="corner"><span class="c-rank">K</span><span class="c-suit">&diams;</span></span>
+                    <span class="rank">K</span>
+                    <span class="suit">&diams;</span>
+                </div>
+                <div class="board-card red">
+                    <span class="corner"><span class="c-rank">Q</span><span class="c-suit">&hearts;</span></span>
+                    <span class="rank">Q</span>
+                    <span class="suit">&hearts;</span>
+                </div>
+                <div class="board-card black">
+                    <span class="corner"><span class="c-rank">9</span><span class="c-suit">&spades;</span></span>
+                    <span class="rank">9</span>
+                    <span class="suit">&spades;</span>
+                </div>
+            </div>
+
+            <!-- Player spotlight -->
+            <div class="player-spotlight">
+                <strong>Alex Foxen</strong> faces a <strong>120K bet</strong> from <strong>Negreanu</strong>
+            </div>
+
+            <!-- Prediction options -->
+            <div class="prediction-options" id="predictionOptions">
+                <div class="prediction-btn" data-option="fold" onclick="selectPrediction(this)">
+                    <span class="pred-indicator red"></span>
+                    <span class="pred-label">Foxen Folds</span>
+                    <span class="pred-odds">3:1</span>
+                    <span class="pred-pct">15%</span>
+                </div>
+                <div class="prediction-btn" data-option="call" onclick="selectPrediction(this)">
+                    <span class="pred-indicator yellow"></span>
+                    <span class="pred-label">Foxen Calls</span>
+                    <span class="pred-odds">2:1</span>
+                    <span class="pred-pct">35%</span>
+                </div>
+                <div class="prediction-btn popular" data-option="raise" onclick="selectPrediction(this)">
+                    <span class="pred-indicator green"></span>
+                    <span class="pred-label">Foxen Raises</span>
+                    <span class="pred-odds">1.5:1</span>
+                    <span class="pred-pct">45%</span>
+                </div>
+                <div class="prediction-btn" data-option="allin" onclick="selectPrediction(this)">
+                    <span class="pred-indicator blue"></span>
+                    <span class="pred-label">Foxen All-In</span>
+                    <span class="pred-odds">8:1</span>
+                    <span class="pred-pct">5%</span>
+                </div>
+            </div>
+
+            <!-- Community sentiment bar -->
+            <div class="community-bar-container">
+                <div class="community-bar-label">Community Predictions</div>
+                <div class="community-bar">
+                    <div class="segment red" style="width: 15%"></div>
+                    <div class="segment yellow" style="width: 35%"></div>
+                    <div class="segment green" style="width: 45%"></div>
+                    <div class="segment blue" style="width: 5%"></div>
+                </div>
+            </div>
+
+            <!-- Timer -->
+            <div class="timer-row">
+                <span class="timer-text">&#9201; <span id="timerText">0:45</span></span>
+                <div class="timer-bar-track">
+                    <div class="timer-bar-fill" id="timerBar"></div>
+                </div>
+            </div>
+
+            <!-- Reward pill -->
+            <div class="reward-pill">&#127919; +50 XP &middot; +25 &#129689; for correct prediction</div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ======================== -->
+    <!-- PREDICTION RESULTS FEED  -->
+    <!-- ======================== -->
+    <section class="section animate-in delay-2">
+        <div class="section-title">
+            <span class="emoji">&#128202;</span> Recent Predictions
+        </div>
+
+        <div class="result-card correct">
+            <div class="result-header">
+                <span class="result-icon">&#9989;</span>
+                <span class="result-question">Hand #42 &mdash; Will Ivey bluff the river?</span>
+            </div>
+            <div class="result-detail">You picked: <strong>Yes</strong> &rarr; CORRECT!</div>
+            <div class="result-reward">+75 XP</div>
+        </div>
+
+        <div class="result-card wrong">
+            <div class="result-header">
+                <span class="result-icon">&#10060;</span>
+                <span class="result-question">Hand #38 &mdash; Biggest pot winner?</span>
+            </div>
+            <div class="result-detail">You picked: <strong>Bonomo</strong> &rarr; Wrong (Foxen won)</div>
+            <div class="result-wrong-text">Better luck next time</div>
+        </div>
+
+        <div class="result-card correct">
+            <div class="result-header">
+                <span class="result-icon">&#9989;</span>
+                <span class="result-question">Hand #35 &mdash; Will anyone go all-in pre-flop?</span>
+            </div>
+            <div class="result-detail">You picked: <strong>No</strong> &rarr; CORRECT!</div>
+            <div class="result-reward">+50 XP</div>
+        </div>
+
+        <div class="accuracy-bar">
+            <span class="accuracy-stat">Your accuracy: <strong>67%</strong> (8/12)</span>
+            <span class="accuracy-rank">Rank: #34 of 1,247</span>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ======================== -->
+    <!-- SEASONAL BATTLE PASS     -->
+    <!-- ======================== -->
+    <section class="section battle-pass-section animate-in delay-3">
+        <div class="section-title">
+            <span class="emoji">&#127894;</span> Season 4 Battle Pass
+        </div>
+
+        <div class="season-countdown">
+            &#9203; Season ends in <strong>23 days</strong>
+        </div>
+
+        <div class="battle-pass-track" id="battlePassTrack">
+            <!-- Level 1 - Unlocked -->
+            <div class="bp-node unlocked">
+                <div class="bp-circle">&#9989;</div>
+                <div class="bp-level">Level 1</div>
+                <div class="bp-name">Rookie</div>
+                <div class="bp-reward">Basic avatar frame</div>
+            </div>
+
+            <!-- Level 5 - Unlocked -->
+            <div class="bp-node unlocked">
+                <div class="bp-circle">&#9989;</div>
+                <div class="bp-level">Level 5</div>
+                <div class="bp-name">Sharp</div>
+                <div class="bp-reward">Custom emoji pack</div>
+            </div>
+
+            <!-- Level 10 - Current -->
+            <div class="bp-node current">
+                <div class="bp-circle">&#11088;</div>
+                <div class="bp-level">Level 10</div>
+                <div class="bp-name">Grinder</div>
+                <div class="bp-reward">Hand Replayer access</div>
+                <div class="bp-progress-mini"><div class="fill"></div></div>
+            </div>
+
+            <!-- Level 15 - Locked -->
+            <div class="bp-node locked">
+                <div class="bp-circle">&#128274;</div>
+                <div class="bp-level">Level 15</div>
+                <div class="bp-name">Shark</div>
+                <div class="bp-reward">AI Coach chat</div>
+            </div>
+
+            <!-- Level 20 - Locked -->
+            <div class="bp-node locked">
+                <div class="bp-circle">&#128274;</div>
+                <div class="bp-level">Level 20</div>
+                <div class="bp-name">Legend</div>
+                <div class="bp-reward">Exclusive player insights</div>
+            </div>
+
+            <!-- Level 25 - Locked -->
+            <div class="bp-node locked">
+                <div class="bp-circle">&#128274;</div>
+                <div class="bp-level">Level 25</div>
+                <div class="bp-name">Hall of Fame</div>
+                <div class="bp-reward">Season badge + all-access</div>
+            </div>
+        </div>
+
+        <div class="scroll-hint">Swipe to explore &rarr;</div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ======================== -->
+    <!-- LEAGUES & LEADERBOARD    -->
+    <!-- ======================== -->
+    <section class="section animate-in delay-4">
+        <div class="section-title">
+            <span class="emoji">&#127942;</span> Weekly League
+        </div>
+
+        <div class="league-header">
+            <div class="league-icon">&#128142;</div>
+            <div class="league-info">
+                <div class="league-name">Diamond League</div>
+                <div class="league-sub">Top 3 promote to Masters</div>
+            </div>
+        </div>
+
+        <div class="leaderboard">
+            <div class="lb-zone" style="color: var(--green-400);">&#9650; Promotion Zone</div>
+
+            <div class="lb-row promo">
+                <span class="lb-rank">1</span>
+                <div class="lb-avatar">&#129416;</div>
+                <span class="lb-name">PokerShark99</span>
+                <span class="lb-xp">4,250 XP</span>
+                <span class="lb-badge">&#127941;</span>
+            </div>
+
+            <div class="lb-row promo">
+                <span class="lb-rank">2</span>
+                <div class="lb-avatar">&#9884;&#65039;</div>
+                <span class="lb-name">AcesHigh</span>
+                <span class="lb-xp">3,890 XP</span>
+            </div>
+
+            <div class="lb-row you">
+                <span class="lb-rank">3</span>
+                <div class="lb-avatar" style="background: var(--gradient-primary); color: white; font-weight: 800;">J</div>
+                <span class="lb-name">JPokerFan <span class="you-tag">(You)</span></span>
+                <span class="lb-xp">3,340 XP</span>
+            </div>
+
+            <div class="lb-row">
+                <span class="lb-rank" style="color: var(--text-muted);">4</span>
+                <div class="lb-avatar">&#128000;</div>
+                <span class="lb-name">RiverRat42</span>
+                <span class="lb-xp">3,100 XP</span>
+            </div>
+
+            <div class="lb-row">
+                <span class="lb-rank" style="color: var(--text-muted);">5</span>
+                <div class="lb-avatar">&#127183;</div>
+                <span class="lb-name">FlopNutz</span>
+                <span class="lb-xp">2,980 XP</span>
+            </div>
+
+            <div class="lb-zone relegation-zone">&#9660; 8&ndash;10 drop to Platinum League</div>
+
+            <a href="#" class="full-leaderboard-link">Full Leaderboard &rarr;</a>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ======================== -->
+    <!-- ACHIEVEMENT BADGES       -->
+    <!-- ======================== -->
+    <section class="section animate-in delay-5">
+        <div class="section-title">
+            <span class="emoji">&#127919;</span> Achievements
+        </div>
+
+        <div class="badges-grid">
+            <!-- Earned: Hot Streak -->
+            <div class="badge-item earned">
+                <div class="badge-icon">&#128293;</div>
+                <div class="badge-name">Hot Streak</div>
+            </div>
+            <!-- Earned: Sharpshooter -->
+            <div class="badge-item earned">
+                <div class="badge-icon">&#127919;</div>
+                <div class="badge-name">Sharp&shy;shooter</div>
+            </div>
+            <!-- In Progress: Card Counter -->
+            <div class="badge-item">
+                <div class="badge-icon">&#127183;</div>
+                <div class="badge-name">Card Counter</div>
+                <div class="badge-progress"><div class="fill" style="width: 73%"></div></div>
+                <div class="badge-pct">73%</div>
+            </div>
+            <!-- Earned: Diamond League -->
+            <div class="badge-item earned">
+                <div class="badge-icon">&#128142;</div>
+                <div class="badge-name">Diamond League</div>
+            </div>
+            <!-- Locked: Season Champion -->
+            <div class="badge-item locked">
+                <div class="badge-icon">&#127942;</div>
+                <div class="badge-name">Season Champ</div>
+            </div>
+            <!-- Locked: AI Challenger -->
+            <div class="badge-item locked">
+                <div class="badge-icon">&#129302;</div>
+                <div class="badge-name">AI Challenger</div>
+            </div>
+            <!-- Locked: Night Owl -->
+            <div class="badge-item locked">
+                <div class="badge-icon">&#127769;</div>
+                <div class="badge-name">Night Owl</div>
+            </div>
+            <!-- Locked: Royal Flush -->
+            <div class="badge-item locked">
+                <div class="badge-icon">&#128081;</div>
+                <div class="badge-name">Royal Flush</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ======================== -->
+    <!-- SOCIAL FEED / ARENA CHAT -->
+    <!-- ======================== -->
+    <section class="section animate-in delay-6">
+        <div class="section-title">
+            <span class="emoji">&#128227;</span> Arena Chat
+        </div>
+
+        <div class="chat-feed">
+            <div class="chat-message">
+                <div class="chat-author">PokerShark99</div>
+                <div class="chat-text">Foxen is def raising here &#128293;</div>
+                <div class="chat-reactions">
+                    <span class="chat-reaction">&#128293; 4</span>
+                    <span class="chat-reaction">&#128077; 2</span>
+                </div>
+            </div>
+            <div class="chat-message">
+                <div class="chat-author">AcesHigh</div>
+                <div class="chat-text">No way, he's been playing tight all session</div>
+                <div class="chat-reactions">
+                    <span class="chat-reaction">&#129300; 3</span>
+                </div>
+            </div>
+            <div class="chat-message">
+                <div class="chat-author">RiverRat42</div>
+                <div class="chat-text">Called it! I picked the fold &#128514;</div>
+                <div class="chat-reactions">
+                    <span class="chat-reaction">&#128514; 5</span>
+                    <span class="chat-reaction">&#10084;&#65039; 1</span>
+                </div>
+            </div>
+            <div class="chat-message own">
+                <div class="chat-author">JPokerFan (You)</div>
+                <div class="chat-text">This hand is going to be huge...</div>
+            </div>
+            <div class="chat-message">
+                <div class="chat-author">FlopNutz</div>
+                <div class="chat-text">Anyone else think Negreanu is trapping?</div>
+                <div class="chat-reactions">
+                    <span class="chat-reaction">&#128064; 6</span>
+                </div>
+            </div>
+
+            <div class="chat-input-bar">
+                <input type="text" class="chat-input" placeholder="Share your read..." />
+                <button class="chat-send-btn" title="Send">&#9654;</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ======================== -->
+    <!-- DAILY CHALLENGES         -->
+    <!-- ======================== -->
+    <section class="section animate-in delay-7">
+        <div class="section-title">
+            <span class="emoji">&#128203;</span> Daily Challenges
+        </div>
+
+        <div class="challenge-card completed">
+            <span class="challenge-status">&#9989;</span>
+            <div class="challenge-info">
+                <div class="challenge-name">Predict 3 hands correctly</div>
+                <div class="challenge-bar-track">
+                    <div class="challenge-bar-fill" style="width: 100%"></div>
+                </div>
+            </div>
+            <span class="challenge-reward">+100 XP</span>
+        </div>
+
+        <div class="challenge-card">
+            <span class="challenge-status">&#128260;</span>
+            <div class="challenge-info">
+                <div class="challenge-name">Watch 2 video clips</div>
+                <div class="challenge-bar-track">
+                    <div class="challenge-bar-fill" style="width: 50%"></div>
+                </div>
+            </div>
+            <span class="challenge-reward">+50 XP</span>
+        </div>
+
+        <div class="challenge-card">
+            <span class="challenge-status">&#11036;</span>
+            <div class="challenge-info">
+                <div class="challenge-name">Share a prediction on social</div>
+                <div class="challenge-bar-track">
+                    <div class="challenge-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            <span class="challenge-reward">+25 XP</span>
+        </div>
+
+        <div class="daily-summary">2/3 Daily Challenges Complete</div>
+    </section>
+
+    <!-- Spacer for bottom nav -->
+    <div class="nav-spacer"></div>
+
+    <!-- ======================== -->
+    <!-- BOTTOM NAVIGATION        -->
+    <!-- ======================== -->
+    <nav class="bottom-nav">
+        <div class="nav-item">
+            <span class="nav-icon">&#127968;</span>
+            <span class="nav-label">Home</span>
+        </div>
+        <div class="nav-item active">
+            <span class="nav-icon">&#127951;</span>
+            <span class="nav-label">Arena</span>
+            <span class="nav-dot"></span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">&#127942;</span>
+            <span class="nav-label">Leagues</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">&#127894;</span>
+            <span class="nav-label">Pass</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">&#128100;</span>
+            <span class="nav-label">Profile</span>
+        </div>
+    </nav>
+
+</div><!-- /phone-frame -->
+
+<script>
+    // =====================
+    // Prediction Selection
+    // =====================
+    function selectPrediction(el) {
+        // Remove selected from all
+        document.querySelectorAll('.prediction-btn').forEach(function(btn) {
+            btn.classList.remove('selected');
+        });
+        // Add selected to clicked
+        el.classList.add('selected');
+
+        // Pulse animation
+        el.style.transform = 'scale(1.02)';
+        setTimeout(function() { el.style.transform = ''; }, 200);
+    }
+
+    // =====================
+    // Countdown Timer
+    // =====================
+    (function() {
+        var seconds = 45;
+        var timerText = document.getElementById('timerText');
+        var timerBar = document.getElementById('timerBar');
+
+        setInterval(function() {
+            if (seconds > 0) {
+                seconds--;
+                var mins = Math.floor(seconds / 60);
+                var secs = seconds % 60;
+                timerText.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+
+                // Update bar width
+                var pct = (seconds / 60) * 100;
+                timerBar.style.width = pct + '%';
+                timerBar.style.animation = 'none';
+            } else {
+                timerText.textContent = '0:00';
+                timerBar.style.width = '0%';
+            }
+        }, 1000);
+    })();
+
+    // =====================
+    // Battle Pass Scroll to Current
+    // =====================
+    (function() {
+        var track = document.getElementById('battlePassTrack');
+        var current = track.querySelector('.bp-node.current');
+        if (current && track) {
+            setTimeout(function() {
+                var offset = current.offsetLeft - track.offsetWidth / 2 + current.offsetWidth / 2;
+                track.scrollTo({ left: offset, behavior: 'smooth' });
+            }, 800);
+        }
+    })();
+
+    // =====================
+    // Floating Particles
+    // =====================
+    (function() {
+        var container = document.getElementById('particles');
+        var colors = ['rgba(139,92,246,0.3)', 'rgba(236,72,153,0.3)', 'rgba(96,165,250,0.2)', 'rgba(250,204,21,0.2)'];
+
+        for (var i = 0; i < 20; i++) {
+            var particle = document.createElement('div');
+            particle.className = 'particle';
+            var size = Math.random() * 4 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.animationDelay = (Math.random() * 8) + 's';
+            particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+            container.appendChild(particle);
+        }
+    })();
+
+    // =====================
+    // Intersection Observer for Animations
+    // =====================
+    (function() {
+        if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.animate-in').forEach(function(el) {
+                observer.observe(el);
+            });
+        }
+    })();
+
+    // =====================
+    // Chat Reaction Toggle
+    // =====================
+    document.querySelectorAll('.chat-reaction').forEach(function(reaction) {
+        reaction.addEventListener('click', function() {
+            var text = this.textContent;
+            var parts = text.trim().split(' ');
+            if (parts.length === 2) {
+                var count = parseInt(parts[1]) + 1;
+                this.textContent = parts[0] + ' ' + count;
+                this.style.background = 'rgba(139, 92, 246, 0.15)';
+                this.style.borderColor = 'rgba(139, 92, 246, 0.3)';
+            }
+        });
+    });
+
+    // =====================
+    // Nav item click
+    // =====================
+    document.querySelectorAll('.nav-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.nav-item').forEach(function(n) {
+                n.classList.remove('active');
+            });
+            this.classList.add('active');
+        });
+    });
+</script>
+
+</body>
+</html>
