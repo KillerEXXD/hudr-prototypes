@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUDR Command Center v2.0 — AI Deterministic Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* =====================================================
+           HUDR Command Center v2.0 — Light Theme
+           Bloomberg Terminal quality on white
+           ===================================================== */
+
+        /* ===================== */
+        /* RESET & VARIABLES     */
+        /* ===================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-page: #e5e7eb;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #f1f3f5;
+            --bg-card: #ffffff;
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
+            --accent-gold: #b45309;
+            --accent-gold-light: #f59e0b;
+            --accent-gold-bg: rgba(180, 83, 9, 0.08);
+            --accent-blue: #2563eb;
+            --accent-blue-bg: rgba(37, 99, 235, 0.08);
+            --accent-emerald: #059669;
+            --accent-emerald-bg: rgba(5, 150, 105, 0.08);
+            --accent-red: #dc2626;
+            --accent-red-bg: rgba(220, 38, 38, 0.08);
+            --accent-orange: #ea580c;
+            --accent-orange-bg: rgba(234, 88, 12, 0.08);
+            --accent-purple: #7c3aed;
+            --accent-purple-bg: rgba(124, 58, 237, 0.08);
+            --accent-amber: #d97706;
+            --accent-slate: #475569;
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-elevated: 0 4px 16px rgba(0,0,0,0.12);
+            --shadow-subtle: 0 1px 2px rgba(0,0,0,0.04);
+            --radius: 6px;
+            --radius-lg: 10px;
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-page);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            font-size: 13px;
+            line-height: 1.4;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* ===================== */
+        /* SCROLLBAR              */
+        /* ===================== */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* ===================== */
+        /* APP LAYOUT            */
+        /* ===================== */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--bg-page);
+        }
+
+        /* ===================== */
+        /* COMMAND BAR (TOP)     */
+        /* ===================== */
+        .command-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 7px 16px;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: var(--shadow-subtle);
+            z-index: 50;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 15px;
+            color: #fff;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .logo:hover { transform: scale(1.05); }
+
+        .brand {
+            font-weight: 800;
+            font-size: 13px;
+            color: var(--accent-gold);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .brand-sub {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .command-wrap {
+            position: relative;
+            flex: 1;
+            max-width: 560px;
+        }
+
+        .command-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .command-input {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 7px 12px 7px 30px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .command-input:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.12);
+            background: var(--bg-primary);
+        }
+        .command-input::placeholder { color: var(--text-muted); }
+
+        .shortcut-badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .topbar-pills {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        .top-pill {
+            padding: 5px 12px;
+            border-radius: var(--radius);
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .top-pill:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+        .top-pill.active {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            background: var(--accent-gold-bg);
+            font-weight: 700;
+        }
+
+        /* ===================== */
+        /* WORKSPACE (3-COL)    */
+        /* ===================== */
+        .workspace {
+            display: grid;
+            grid-template-columns: 230px 1fr 290px;
+            flex: 1;
+            overflow: hidden;
+            gap: 0;
+        }
+
+        @media (max-width: 1100px) {
+            .workspace { grid-template-columns: 200px 1fr; }
+            .context-panel { display: none; }
+        }
+        @media (max-width: 760px) {
+            .workspace { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .context-panel { display: none; }
+        }
+
+        /* ===================== */
+        /* SIDEBAR (LEFT)       */
+        /* ===================== */
+        .sidebar {
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-light);
+            overflow-y: auto;
+            box-shadow: 1px 0 3px rgba(0,0,0,0.03);
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .sidebar-header {
+            padding: 12px 16px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: none;
+            border-left: 3px solid transparent;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: var(--font-sans);
+            transition: all 0.1s;
+        }
+        .tree-item:hover {
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+        .tree-item.active {
+            color: var(--accent-gold);
+            border-left-color: var(--accent-gold);
+            background: var(--accent-gold-bg);
+            font-weight: 600;
+        }
+
+        .tree-indent { padding-left: 28px; font-size: 12px; }
+        .tree-icon { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; }
+
+        .player-style-emoji {
+            font-size: 11px;
+            margin-left: 2px;
+        }
+
+        .player-finish {
+            margin-left: auto;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Tournament selector */
+        .tournament-selector {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .tournament-select {
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            background: var(--bg-secondary);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            outline: none;
+        }
+        .tournament-select:focus { border-color: var(--accent-gold); }
+
+        /* ===================== */
+        /* MAIN AREA (CENTER)   */
+        /* ===================== */
+        .main-area {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-page);
+        }
+
+        /* ===================== */
+        /* CONTEXT PANEL (RIGHT)*/
+        /* ===================== */
+        .context-panel {
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-light);
+            overflow-y: auto;
+            box-shadow: -1px 0 3px rgba(0,0,0,0.03);
+        }
+
+        .ctx-section {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .ctx-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .ctx-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+        .ctx-row span:first-child { color: var(--text-muted); }
+        .ctx-row span:last-child { font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); }
+
+        /* ===================== */
+        /* PANELS                */
+        /* ===================== */
+        .panel {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-body { padding: 14px 16px; }
+
+        /* ===================== */
+        /* KPI ROW               */
+        /* ===================== */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+            gap: 1px;
+            background: var(--border-light);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .kpi {
+            background: var(--bg-primary);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .kpi-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        .kpi-value {
+            font-size: 17px;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+        .kpi-value.gold { color: var(--accent-gold); }
+
+        /* ===================== */
+        /* DATA TABLE            */
+        /* ===================== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            padding: 8px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            text-align: left;
+            border-bottom: 2px solid var(--border-light);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            white-space: nowrap;
+        }
+        .data-table th:hover { color: var(--text-primary); }
+
+        .data-table td {
+            padding: 7px 14px;
+            font-size: 13px;
+            font-family: var(--font-mono);
+            border-bottom: 1px solid var(--border-light);
+            height: 38px;
+            white-space: nowrap;
+            color: var(--text-primary);
+        }
+
+        .data-table tr { transition: background 0.1s; }
+        .data-table tbody tr:hover td { background: rgba(37, 99, 235, 0.03); }
+        .data-table tr.selected td {
+            background: var(--accent-blue-bg);
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        /* ===================== */
+        /* BADGES                */
+        /* ===================== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            white-space: nowrap;
+        }
+
+        .badge-green { background: var(--accent-emerald-bg); color: var(--accent-emerald); }
+        .badge-gold { background: var(--accent-gold-bg); color: var(--accent-gold); }
+        .badge-red { background: var(--accent-red-bg); color: var(--accent-red); }
+        .badge-blue { background: var(--accent-blue-bg); color: var(--accent-blue); }
+        .badge-orange { background: var(--accent-orange-bg); color: var(--accent-orange); }
+        .badge-purple { background: var(--accent-purple-bg); color: var(--accent-purple); }
+        .badge-slate { background: rgba(71, 85, 105, 0.08); color: var(--accent-slate); }
+
+        /* Hand Strength Tier pills */
+        .tier-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 1px 7px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            letter-spacing: 0.03em;
+            color: #fff;
+        }
+        .tier-monster { background: #dc2626; }
+        .tier-strong { background: #ea580c; }
+        .tier-medium { background: #d97706; }
+        .tier-weak { background: #6b7280; }
+        .tier-draw { background: #2563eb; }
+        .tier-air { background: #475569; }
+
+        /* Strength/Leak pills */
+        .strength-pill {
+            display: inline-flex;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            margin: 2px;
+        }
+        .strength-pill.positive { background: var(--accent-emerald-bg); color: var(--accent-emerald); border: 1px solid rgba(5, 150, 105, 0.2); }
+        .strength-pill.negative { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid rgba(220, 38, 38, 0.2); }
+
+        /* ===================== */
+        /* GRADE CIRCLES         */
+        /* ===================== */
+        .grade-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 22px;
+            font-weight: 800;
+            border: 3px solid;
+            flex-shrink: 0;
+        }
+
+        .grade-sm {
+            width: 40px;
+            height: 40px;
+            font-size: 13px;
+            border-width: 2px;
+        }
+
+        .grade-xs {
+            width: 48px;
+            height: 48px;
+            font-size: 16px;
+            border-width: 2px;
+        }
+
+        .grade-high { border-color: var(--accent-emerald); color: var(--accent-emerald); background: var(--accent-emerald-bg); }
+        .grade-mid { border-color: var(--accent-gold); color: var(--accent-gold); background: var(--accent-gold-bg); }
+        .grade-low { border-color: var(--accent-red); color: var(--accent-red); background: var(--accent-red-bg); }
+        .grade-blue { border-color: var(--accent-blue); color: var(--accent-blue); background: var(--accent-blue-bg); }
+
+        /* Skill Rating letters */
+        .skill-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 24px;
+            font-weight: 800;
+            border: 3px solid;
+            flex-shrink: 0;
+        }
+        .skill-circle .skill-sub {
+            font-size: 8px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: -2px;
+        }
+        .skill-aplus { border-color: #059669; color: #059669; background: rgba(5, 150, 105, 0.08); }
+        .skill-a { border-color: #16a34a; color: #16a34a; background: rgba(22, 163, 74, 0.08); }
+        .skill-b { border-color: #2563eb; color: #2563eb; background: rgba(37, 99, 235, 0.08); }
+        .skill-c { border-color: #d97706; color: #d97706; background: rgba(217, 119, 6, 0.08); }
+        .skill-d { border-color: #dc2626; color: #dc2626; background: rgba(220, 38, 38, 0.08); }
+
+        /* Rivalry circle */
+        .rivalry-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 800;
+            border: 2px solid;
+            flex-shrink: 0;
+        }
+
+        /* ===================== */
+        /* SPARK BAR             */
+        /* ===================== */
+        .spark-bar {
+            width: 56px;
+            height: 5px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+
+        .spark-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* ===================== */
+        /* FILTER TABS           */
+        /* ===================== */
+        .filter-tabs {
+            display: flex;
+            gap: 1px;
+            background: var(--border-light);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .filter-tab {
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--bg-primary);
+            color: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: all 0.15s;
+        }
+        .filter-tab:hover { color: var(--text-primary); background: var(--bg-secondary); }
+        .filter-tab.active {
+            color: var(--accent-gold);
+            background: var(--accent-gold-bg);
+            font-weight: 700;
+        }
+
+        /* ===================== */
+        /* YOUTUBE BUTTON        */
+        /* ===================== */
+        .yt-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(220, 38, 38, 0.08);
+            color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: all 0.15s;
+        }
+        .yt-btn:hover { background: rgba(220, 38, 38, 0.15); }
+
+        .yt-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 12px;
+            background: #dc2626;
+            border-radius: 2px;
+            position: relative;
+        }
+        .yt-icon::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 5px solid #fff;
+            border-top: 3px solid transparent;
+            border-bottom: 3px solid transparent;
+            margin-left: 1px;
+        }
+
+        /* ===================== */
+        /* BUTTONS               */
+        /* ===================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 14px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            border: 1px solid var(--border-light);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-light));
+            color: #fff;
+            border-color: var(--accent-gold);
+        }
+        .btn-gold:hover { background: var(--accent-gold); color: #fff; box-shadow: 0 2px 8px rgba(180, 83, 9, 0.25); }
+
+        .btn-sm {
+            padding: 3px 8px;
+            font-size: 11px;
+        }
+
+        /* ===================== */
+        /* INTEL BRIEF           */
+        /* ===================== */
+        .intel-header {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent-gold);
+            margin-bottom: 4px;
+        }
+
+        .intel-query {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .intel-summary {
+            border-left: 3px solid var(--accent-gold);
+            padding: 12px 16px;
+            background: var(--accent-gold-bg);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .finding {
+            display: flex;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .finding:last-child { border-bottom: none; }
+
+        .finding-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--accent-gold-bg);
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+            border: 1px solid rgba(180, 83, 9, 0.2);
+        }
+        .finding-num.alert {
+            background: var(--accent-red-bg);
+            color: var(--accent-red);
+            border-color: rgba(220, 38, 38, 0.2);
+        }
+
+        .finding-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .finding-detail {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .finding-meta {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        /* ===================== */
+        /* EXPLOIT PLAN CARDS    */
+        /* ===================== */
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        @media (max-width: 900px) { .plan-grid { grid-template-columns: 1fr; } }
+
+        .plan-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 14px;
+            border-top: 3px solid;
+            box-shadow: var(--shadow-card);
+        }
+        .plan-card.preflop { border-top-color: var(--accent-emerald); }
+        .plan-card.postflop { border-top-color: var(--accent-blue); }
+        .plan-card.icm { border-top-color: var(--accent-gold); }
+
+        .plan-card h4 {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+
+        .plan-item {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-light);
+            line-height: 1.55;
+        }
+        .plan-item:last-child { border-bottom: none; }
+
+        /* Leak severity card */
+        .leak-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 14px;
+            border-left: 4px solid;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 10px;
+        }
+        .leak-card.critical { border-left-color: var(--accent-red); }
+        .leak-card.moderate { border-left-color: var(--accent-orange); }
+        .leak-card.minor { border-left-color: var(--accent-slate); }
+
+        .severity-stars {
+            color: var(--accent-gold);
+            letter-spacing: 2px;
+            font-size: 13px;
+        }
+
+        .delta-pos { color: var(--accent-emerald); }
+        .delta-neg { color: var(--accent-red); }
+
+        /* ===================== */
+        /* PRICING               */
+        /* ===================== */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 20px;
+            max-width: 700px;
+        }
+        @media (max-width: 600px) { .pricing-grid { grid-template-columns: 1fr; } }
+
+        .price-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+        }
+        .price-card.featured {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 1px var(--accent-gold), var(--shadow-elevated);
+        }
+        .price-card h3 {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .price-amount {
+            font-family: var(--font-mono);
+            font-size: 32px;
+            font-weight: 800;
+            margin: 10px 0 18px;
+        }
+        .price-amount span { font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .price-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .price-features li {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .price-features li::before {
+            content: '>';
+            font-family: var(--font-mono);
+            position: absolute;
+            left: 0;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .price-card.featured .price-features li::before { color: var(--accent-gold); }
+
+        /* ===================== */
+        /* COMMAND PALETTE       */
+        /* ===================== */
+        .cmd-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(2px);
+            display: flex;
+            justify-content: center;
+            padding-top: 80px;
+            animation: fadeIn 0.15s;
+        }
+
+        .cmd-palette {
+            width: 100%;
+            max-width: 560px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-elevated);
+            overflow: hidden;
+            max-height: 400px;
+        }
+
+        .cmd-palette-input {
+            width: 100%;
+            padding: 14px 16px 14px 40px;
+            border: none;
+            border-bottom: 1px solid var(--border-light);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            outline: none;
+        }
+        .cmd-palette-input::placeholder { color: var(--text-muted); }
+
+        .cmd-suggestion {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: var(--font-sans);
+            transition: background 0.1s;
+        }
+        .cmd-suggestion:hover { background: var(--bg-secondary); color: var(--text-primary); }
+        .cmd-suggestion .cmd-icon {
+            color: var(--accent-gold);
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* ===================== */
+        /* STATUS BAR            */
+        /* ===================== */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 4px 16px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-light);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            display: inline-block;
+            margin-right: 5px;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===================== */
+        /* UTILITIES             */
+        /* ===================== */
+        .text-gold { color: var(--accent-gold); }
+        .text-green { color: var(--accent-emerald); }
+        .text-red { color: var(--accent-red); }
+        .text-blue { color: var(--accent-blue); }
+        .text-muted { color: var(--text-muted); }
+        .text-mono { font-family: var(--font-mono); }
+        .fw-700 { font-weight: 700; }
+        .fw-800 { font-weight: 800; }
+
+        .mt-sm { margin-top: 6px; }
+        .mt-md { margin-top: 14px; }
+        .mb-md { margin-bottom: 14px; }
+        .p-md { padding: 14px; }
+
+        .row { display: flex; align-items: center; gap: 8px; }
+        .between { display: flex; align-items: center; justify-content: space-between; }
+        .stack { display: flex; flex-direction: column; gap: 8px; }
+        .flex-wrap { flex-wrap: wrap; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: slideUp 0.2s ease; }
+
+        /* Board texture label */
+        .board-texture {
+            display: inline-flex;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        /* Hide screens */
+        .screen { display: none; }
+        .screen.active { display: flex; flex-direction: column; height: 100%; }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+
+    <!-- ===================================== -->
+    <!-- COMMAND BAR                            -->
+    <!-- ===================================== -->
+    <div class="command-bar">
+        <div class="logo" onclick="navigate('dashboard')">H</div>
+        <div>
+            <div class="brand">HUDR TERMINAL</div>
+            <div class="brand-sub">AI Deterministic Engine v2.0</div>
+        </div>
+        <div class="command-wrap">
+            <span class="command-icon">&#8984;</span>
+            <input class="command-input" id="cmdInput" placeholder="Search tournaments, players, or commands..." autocomplete="off">
+        </div>
+        <span class="shortcut-badge">Ctrl+K</span>
+        <div class="topbar-pills" id="topbarPills"></div>
+    </div>
+
+    <!-- ===================================== -->
+    <!-- WORKSPACE                              -->
+    <!-- ===================================== -->
+    <div class="workspace">
+
+        <!-- LEFT SIDEBAR -->
+        <div class="sidebar" id="sidebar"></div>
+
+        <!-- MAIN AREA -->
+        <div class="main-area" id="mainArea"></div>
+
+        <!-- RIGHT CONTEXT PANEL -->
+        <div class="context-panel" id="contextPanel"></div>
+    </div>
+
+    <!-- ===================================== -->
+    <!-- STATUS BAR                             -->
+    <!-- ===================================== -->
+    <div class="status-bar">
+        <span><span class="status-dot"></span> Connected to HUDR API</span>
+        <span>5 tournaments indexed</span>
+        <span>87 hands loaded</span>
+        <span>AI Engine: Active</span>
+        <span style="margin-left:auto">Last sync: 2m ago</span>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- COMMAND PALETTE OVERLAY               -->
+<!-- ===================================== -->
+<div class="cmd-overlay" id="cmdOverlay" style="display:none" onclick="closePalette()">
+    <div class="cmd-palette" onclick="event.stopPropagation()">
+        <div style="position:relative">
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--accent-gold);font-size:15px">&#8984;</span>
+            <input class="cmd-palette-input" id="cmdPaletteInput" placeholder="Type a query or command..." autocomplete="off">
+        </div>
+        <div style="padding:6px 0">
+            <div style="padding:6px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)">Suggested Queries</div>
+            <button class="cmd-suggestion" onclick="runQuery('Who is the most exploitable player?')"><span class="cmd-icon">&#9670;</span> Who is the most exploitable player?</button>
+            <button class="cmd-suggestion" onclick="runQuery('Show ICM pressure situations')"><span class="cmd-icon">&#9670;</span> Show ICM pressure situations</button>
+            <button class="cmd-suggestion" onclick="runQuery('Compare Negreanu vs Ivey')"><span class="cmd-icon">&#9670;</span> Compare Negreanu vs Ivey</button>
+            <button class="cmd-suggestion" onclick="runQuery('Detect bluff patterns')"><span class="cmd-icon">&#9670;</span> Detect bluff patterns</button>
+            <button class="cmd-suggestion" onclick="runQuery('Tournament turning points')"><span class="cmd-icon">&#9670;</span> Tournament turning points</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* =============================================================
+   HUDR Command Center v2.0 — Pure Vanilla JS
+   All data, routing, rendering inline.
+   ============================================================= */
+
+// ===================== MOCK DATA =====================
+
+const PLAYERS = [
+    { id:'p1', name:'Daniel Negreanu', flag:'\u{1F1E8}\u{1F1E6}', color:'#ef4444', finish:1, status:'winner', hands:87, style:'TAG', styleEmoji:'\u{1F3AF}', skill:'A+', skillClass:'skill-aplus', career:'5 FTs | 2 Wins | Avg: 1.8', vpip:28, pfr:22, threeBet:9, fourBet:4, coldCall:8, steal:38, foldToSteal:62, bbDefense:48, cbetFlop:68, cbetTurn:52, cbetRiver:38, foldToCbetFlop:32, foldToCbetTurn:45, foldToCbetRiver:55, checkRaiseFlop:8, donkBetFlop:5, af:2.8, afFlop:3.2, afTurn:2.5, afRiver:2.1, wtsd:32, wsd:54, wwsf:52, wonWithoutShowdown:62 },
+    { id:'p2', name:'Phil Ivey', flag:'\u{1F1FA}\u{1F1F8}', color:'#10b981', finish:2, status:'eliminated', hands:85, style:'TAG', styleEmoji:'\u{1F3AF}', skill:'A', skillClass:'skill-a', career:'4 FTs | 1 Win | Avg: 2.1', vpip:24, pfr:20, threeBet:8, fourBet:5, coldCall:5, steal:45, foldToSteal:50, bbDefense:55, cbetFlop:65, cbetTurn:48, cbetRiver:35, foldToCbetFlop:35, foldToCbetTurn:42, foldToCbetRiver:58, checkRaiseFlop:10, donkBetFlop:4, af:3.5, afFlop:2.8, afTurn:2.3, afRiver:1.9, wtsd:35, wsd:52, wwsf:55, wonWithoutShowdown:55 },
+    { id:'p3', name:'Phil Hellmuth', flag:'\u{1F1FA}\u{1F1F8}', color:'#3b82f6', finish:3, status:'eliminated', hands:72, style:'TAG', styleEmoji:'\u{1F3AF}', skill:'B', skillClass:'skill-b', career:'6 FTs | 3 Wins | Avg: 2.3', vpip:22, pfr:18, threeBet:7, fourBet:3, coldCall:6, steal:42, foldToSteal:55, bbDefense:52, cbetFlop:72, cbetTurn:58, cbetRiver:42, foldToCbetFlop:28, foldToCbetTurn:40, foldToCbetRiver:50, checkRaiseFlop:6, donkBetFlop:3, af:2.2, afFlop:4.1, afTurn:3.0, afRiver:2.5, wtsd:28, wsd:58, wwsf:48, wonWithoutShowdown:58 },
+    { id:'p4', name:'Justin Bonomo', flag:'\u{1F1FA}\u{1F1F8}', color:'#8b5cf6', finish:4, status:'eliminated', hands:65, style:'TAG', styleEmoji:'\u{1F3AF}', skill:'A', skillClass:'skill-a', career:'3 FTs | 1 Win | Avg: 2.5', vpip:26, pfr:21, threeBet:10, fourBet:5, coldCall:7, steal:44, foldToSteal:52, bbDefense:50, cbetFlop:70, cbetTurn:55, cbetRiver:40, foldToCbetFlop:30, foldToCbetTurn:42, foldToCbetRiver:52, checkRaiseFlop:7, donkBetFlop:3, af:2.5, afFlop:3.5, afTurn:2.8, afRiver:2.4, wtsd:30, wsd:56, wwsf:50, wonWithoutShowdown:60 },
+    { id:'p5', name:'Vanessa Selbst', flag:'\u{1F1FA}\u{1F1F8}', color:'#f59e0b', finish:5, status:'eliminated', hands:58, style:'LAG', styleEmoji:'\u{1F525}', skill:'A', skillClass:'skill-a', career:'3 FTs | 1 Win | Avg: 3.0', vpip:30, pfr:24, threeBet:11, fourBet:6, coldCall:10, steal:35, foldToSteal:58, bbDefense:45, cbetFlop:62, cbetTurn:45, cbetRiver:30, foldToCbetFlop:38, foldToCbetTurn:48, foldToCbetRiver:60, checkRaiseFlop:12, donkBetFlop:8, af:3.0, afFlop:2.6, afTurn:2.0, afRiver:1.7, wtsd:38, wsd:48, wwsf:45, wonWithoutShowdown:50 },
+    { id:'p6', name:'Fedor Holz', flag:'\u{1F1E9}\u{1F1EA}', color:'#06b6d4', finish:6, status:'eliminated', hands:48, style:'TAG', styleEmoji:'\u{1F3AF}', skill:'A', skillClass:'skill-a', career:'4 FTs | 2 Wins | Avg: 2.0', vpip:25, pfr:20, threeBet:10, fourBet:5, coldCall:7, steal:44, foldToSteal:52, bbDefense:50, cbetFlop:70, cbetTurn:55, cbetRiver:40, foldToCbetFlop:30, foldToCbetTurn:42, foldToCbetRiver:52, checkRaiseFlop:7, donkBetFlop:3, af:2.8, afFlop:3.5, afTurn:2.8, afRiver:2.4, wtsd:30, wsd:56, wwsf:50, wonWithoutShowdown:60 },
+    { id:'p7', name:'Bryn Kenney', flag:'\u{1F1FA}\u{1F1F8}', color:'#ec4899', finish:7, status:'eliminated', hands:41, style:'LAG', styleEmoji:'\u{1F525}', skill:'B', skillClass:'skill-b', career:'2 FTs | 0 Wins | Avg: 5.5', vpip:32, pfr:26, threeBet:13, fourBet:7, coldCall:9, steal:48, foldToSteal:45, bbDefense:58, cbetFlop:58, cbetTurn:40, cbetRiver:28, foldToCbetFlop:42, foldToCbetTurn:52, foldToCbetRiver:65, checkRaiseFlop:14, donkBetFlop:10, af:3.2, afFlop:2.1, afTurn:1.6, afRiver:1.4, wtsd:40, wsd:45, wwsf:42, wonWithoutShowdown:45 },
+    { id:'p8', name:'Maria Konnikova', flag:'\u{1F1FA}\u{1F1F8}', color:'#f97316', finish:8, status:'eliminated', hands:35, style:'Nit', styleEmoji:'\u{1F9CA}', skill:'C', skillClass:'skill-c', career:'1 FT | 0 Wins | Avg: 8.0', vpip:20, pfr:16, threeBet:6, fourBet:2, coldCall:5, steal:30, foldToSteal:68, bbDefense:38, cbetFlop:55, cbetTurn:38, cbetRiver:25, foldToCbetFlop:45, foldToCbetTurn:55, foldToCbetRiver:68, checkRaiseFlop:4, donkBetFlop:6, af:1.8, afFlop:1.8, afTurn:1.3, afRiver:1.0, wtsd:42, wsd:42, wwsf:38, wonWithoutShowdown:40 },
+    { id:'p9', name:'Erik Seidel', flag:'\u{1F1FA}\u{1F1F8}', color:'#14b8a6', finish:9, status:'eliminated', hands:22, style:'Nit', styleEmoji:'\u{1F9CA}', skill:'B', skillClass:'skill-b', career:'7 FTs | 2 Wins | Avg: 3.2', vpip:18, pfr:14, threeBet:5, fourBet:2, coldCall:4, steal:35, foldToSteal:70, bbDefense:35, cbetFlop:78, cbetTurn:62, cbetRiver:48, foldToCbetFlop:22, foldToCbetTurn:35, foldToCbetRiver:45, checkRaiseFlop:3, donkBetFlop:1, af:4.2, afFlop:5.0, afTurn:3.8, afRiver:3.2, wtsd:22, wsd:62, wwsf:48, wonWithoutShowdown:70 }
+];
+
+const HANDS = [
+    { id:'h1', num:87, players:['p1','p2'], winner:'p1', pot:89400000, type:'biggest_pot', tier:'MONSTER', texture:'Rainbow Dry', preview:'Negreanu rivers two pair to crack Ivey\'s pocket kings — Final Hand', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=13335' },
+    { id:'h2', num:82, players:['p3','p2'], winner:'p2', pot:38100000, type:'elimination', tier:'STRONG', texture:'Paired Board', preview:'Ivey flops set of queens to eliminate Hellmuth in 3rd place', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=12520' },
+    { id:'h3', num:75, players:['p1','p5'], winner:'p1', pot:12800000, type:'hero_call', tier:'MEDIUM', texture:'Rainbow Dry', preview:'Negreanu calls river with ace-high against Selbst\'s triple barrel', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=11122' },
+    { id:'h4', num:68, players:['p4','p7'], winner:'p4', pot:22400000, type:'cooler', tier:'MONSTER', texture:'Paired Board', preview:'Trip kings vs flopped set of eights — Kenney exits in a classic cooler', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=10090' },
+    { id:'h5', num:60, players:['p2','p6'], winner:'p2', pot:15200000, type:'bluff', tier:'AIR', texture:'Monotone Wet', preview:'Ivey turns bottom two pair into a bluff, folds out Holz\'s aces', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=8525' },
+    { id:'h6', num:55, players:['p1','p3','p2'], winner:'p3', pot:8400000, type:'biggest_pot', tier:'DRAW', texture:'Monotone Wet', preview:'Hellmuth hits flush on the turn in a massive three-way pot', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=7530' },
+    { id:'h7', num:50, players:['p5','p1'], winner:'p5', pot:9600000, type:null, tier:'STRONG', texture:'Rainbow Dry', preview:'Selbst rivers queens full to crack nines full in a sick beat', yt:null },
+    { id:'h8', num:47, players:['p7','p3'], winner:'p7', pot:11200000, type:'bluff', tier:'AIR', texture:'Rainbow Dry', preview:'Kenney fires three barrels with seven-high, bluffs Hellmuth off two pair', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=6005' },
+    { id:'h9', num:42, players:['p8','p4'], winner:'p4', pot:15600000, type:'elimination', tier:'STRONG', texture:'Two-Tone', preview:'Bonomo\'s two pair eliminates Konnikova who was dominated preflop', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=5292' },
+    { id:'h10', num:38, players:['p6','p2'], winner:'p2', pot:7800000, type:'hero_call', tier:'MEDIUM', texture:'Two-Tone', preview:'Ivey calls river shove with top two pair despite flush completing', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=4540' },
+    { id:'h11', num:35, players:['p9','p1'], winner:'p1', pot:17400000, type:'elimination', tier:'MONSTER', texture:'Two-Tone', preview:'Negreanu\'s aces hold vs Seidel\'s shove to eliminate him in 9th', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=3900' },
+    { id:'h12', num:32, players:['p1','p4'], winner:'p4', pot:5200000, type:null, tier:'WEAK', texture:'Rainbow Dry', preview:'Bonomo steals a medium pot with a well-timed river bet', yt:null },
+    { id:'h13', num:28, players:['p5','p3'], winner:'p3', pot:4800000, type:null, tier:'MEDIUM', texture:'Paired Board', preview:'Hellmuth value bets thin on the river and gets called by worse', yt:null },
+    { id:'h14', num:25, players:['p2','p7'], winner:'p7', pot:6200000, type:'bluff', tier:'AIR', texture:'Monotone Wet', preview:'Kenney overbets the river on a four-flush board with a stone-cold bluff', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=2800' },
+    { id:'h15', num:22, players:['p6','p1'], winner:'p1', pot:3800000, type:null, tier:'WEAK', texture:'Rainbow Dry', preview:'Negreanu picks off a c-bet bluff from Holz on a dry board', yt:null },
+    { id:'h16', num:18, players:['p4','p8'], winner:'p8', pot:2400000, type:null, tier:'MEDIUM', texture:'Two-Tone', preview:'Konnikova wins her largest pot of the tournament with top pair', yt:null },
+    { id:'h17', num:15, players:['p3','p9'], winner:'p9', pot:3100000, type:null, tier:'DRAW', texture:'Monotone Wet', preview:'Seidel completes his flush draw on the river for a nice pot', yt:null },
+    { id:'h18', num:12, players:['p1','p7'], winner:'p1', pot:7200000, type:'hero_call', tier:'MEDIUM', texture:'Rainbow Dry', preview:'Negreanu calls Kenney\'s bluff with third pair on a scary board', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=1500' },
+    { id:'h19', num:8, players:['p5','p6'], winner:'p6', pot:4500000, type:null, tier:'STRONG', texture:'Two-Tone', preview:'Holz outplays Selbst postflop with a well-timed check-raise', yt:null },
+    { id:'h20', num:5, players:['p2','p9'], winner:'p2', pot:2800000, type:null, tier:'WEAK', texture:'Rainbow Dry', preview:'Ivey steals from the button with a standard open, Seidel folds BB', yt:null }
+];
+
+// ===================== ROUTING =====================
+
+let currentRoute = { path: 'dashboard', params: {} };
+let selectedPlayer = 'p1';
+let selectedHand = null;
+let currentFilter = 'All';
+
+function navigate(path, params) {
+    params = params || {};
+    currentRoute = { path: path, params: params };
+    if (params.player) selectedPlayer = params.player;
+    render();
+    window.location.hash = '/' + path + (Object.keys(params).length ? '?' + new URLSearchParams(params).toString() : '');
+}
+
+function parseHash() {
+    var raw = (window.location.hash || '#/dashboard').slice(2);
+    var parts = raw.split('?');
+    var path = parts[0] || 'dashboard';
+    var params = {};
+    if (parts[1]) {
+        var sp = new URLSearchParams(parts[1]);
+        sp.forEach(function(v, k) { params[k] = v; });
+    }
+    return { path: path, params: params };
+}
+
+window.addEventListener('hashchange', function() {
+    var r = parseHash();
+    currentRoute = r;
+    if (r.params.player) selectedPlayer = r.params.player;
+    render();
+});
+
+// ===================== HELPERS =====================
+
+function fmtChips(n) {
+    if (n == null) return '\u2014';
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+    return String(n);
+}
+
+function lastName(name) { return name.split(' ').pop(); }
+
+function getPlayer(id) { return PLAYERS.find(function(p) { return p.id === id; }) || PLAYERS[0]; }
+
+function calcExploit(p) {
+    if (!p) return 50;
+    var foldPenalty = Math.max(0, p.foldToSteal - 55) * 1.5;
+    var afDrop = Math.max(0, (p.afFlop || 3) - (p.afRiver || 2)) * 8;
+    var crLow = Math.max(0, 8 - p.checkRaiseFlop) * 3;
+    return Math.min(99, Math.round(40 + foldPenalty + afDrop + crLow));
+}
+
+function gradeClass(v) { return v >= 70 ? 'grade-high' : v >= 45 ? 'grade-mid' : 'grade-low'; }
+
+function severityStars(n) { return '\u2605'.repeat(n) + '\u2606'.repeat(5 - n); }
+
+function tierClass(t) {
+    var m = { MONSTER:'tier-monster', STRONG:'tier-strong', MEDIUM:'tier-medium', WEAK:'tier-weak', DRAW:'tier-draw', AIR:'tier-air' };
+    return m[t] || 'tier-weak';
+}
+
+function typeLabel(t) {
+    if (!t) return '';
+    return t.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+}
+
+function typeBadgeClass(t) {
+    if (!t) return '';
+    if (t === 'bluff' || t === 'elimination') return 'badge-red';
+    if (t === 'biggest_pot') return 'badge-gold';
+    if (t === 'hero_call') return 'badge-green';
+    if (t === 'cooler') return 'badge-blue';
+    return 'badge-slate';
+}
+
+function getStrengths(p) {
+    var s = [];
+    if (p.wsd > 52) s.push('High WSD');
+    if (p.steal > 40) s.push('Strong Steal');
+    if (p.cbetFlop > 65) s.push('Aggressive CBet');
+    if (p.wwsf > 50) s.push('Wins Without SD');
+    if (p.af > 3.0) s.push('High AF');
+    return s;
+}
+
+function getLeaks(p) {
+    var l = [];
+    if (p.foldToSteal > 58) l.push('Overfolds Blinds');
+    if (p.afRiver < 2.2) l.push('River Passive');
+    if (p.checkRaiseFlop < 7) l.push('Low Check-Raise');
+    if (p.coldCall > 8) l.push('Cold Call Leaks');
+    if (p.cbetRiver < 30) l.push('Weak River CBet');
+    return l;
+}
+
+function rivalryScore(p1, p2) {
+    return Math.min(99, Math.abs(p1.vpip - p2.vpip) * 3 + Math.abs(p1.af - p2.af) * 10 + Math.abs(p1.finish - p2.finish) * 5 + 20);
+}
+
+function rivalryLabel(score) {
+    if (score >= 76) return 'Arch-Nemesis';
+    if (score >= 51) return 'Major Rival';
+    if (score >= 21) return 'Notable';
+    return 'Casual';
+}
+
+function rivalryColor(score) {
+    if (score >= 76) return '#dc2626';
+    if (score >= 51) return '#ea580c';
+    if (score >= 21) return '#b45309';
+    return '#9ca3af';
+}
+
+function rivalryBg(score) {
+    if (score >= 76) return 'rgba(220,38,38,0.08)';
+    if (score >= 51) return 'rgba(234,88,12,0.08)';
+    if (score >= 21) return 'rgba(180,83,9,0.08)';
+    return 'rgba(156,163,175,0.08)';
+}
+
+// ===================== RENDER =====================
+
+function render() {
+    renderTopbar();
+    renderSidebar();
+    renderMain();
+    renderContext();
+}
+
+// ===================== TOPBAR PILLS =====================
+
+function renderTopbar() {
+    var pills = ['dashboard', 'intel', 'player', 'report', 'pricing'];
+    var labels = { dashboard:'Dashboard', intel:'AI Intel', player:'Dossier', report:'Exploits', pricing:'Pricing' };
+    var html = '';
+    pills.forEach(function(p) {
+        var cls = currentRoute.path === p ? ' active' : '';
+        html += '<button class="top-pill' + cls + '" onclick="navigate(\'' + p + '\'' + (p === 'player' || p === 'report' ? ', {player:\'' + selectedPlayer + '\'}' : '') + ')">' + labels[p] + '</button>';
+    });
+    document.getElementById('topbarPills').innerHTML = html;
+}
+
+// ===================== SIDEBAR =====================
+
+function renderSidebar() {
+    var p = currentRoute.path;
+    var html = '';
+
+    // Tournament selector
+    html += '<div class="tournament-selector">';
+    html += '<select class="tournament-select"><option>WSOP Main Event 2025</option><option>WPT Borgata Winter Open</option><option>EPT Monte Carlo</option></select>';
+    html += '</div>';
+
+    // Nav
+    html += '<div class="sidebar-section">';
+    html += '<div class="sidebar-header">Navigation</div>';
+    html += '<button class="tree-item' + (p === 'dashboard' ? ' active' : '') + '" onclick="navigate(\'dashboard\')"><span class="tree-icon">\u{1F4CA}</span> Dashboard</button>';
+    html += '<button class="tree-item' + (p === 'intel' ? ' active' : '') + '" onclick="navigate(\'intel\', {q:\'Who is the most exploitable?\'})"><span class="tree-icon">\u{1F9E0}</span> AI Intelligence</button>';
+    html += '</div>';
+
+    // Players
+    html += '<div class="sidebar-section">';
+    html += '<div class="sidebar-header">Players</div>';
+    PLAYERS.forEach(function(pl) {
+        var active = (p === 'player' || p === 'report') && selectedPlayer === pl.id ? ' active' : '';
+        html += '<button class="tree-item tree-indent' + active + '" onclick="navigate(\'player\', {player:\'' + pl.id + '\'})">';
+        html += '<span class="tree-icon" style="color:' + pl.color + '">\u25CF</span>';
+        html += lastName(pl.name);
+        html += '<span class="player-style-emoji">' + pl.styleEmoji + '</span>';
+        html += '<span class="player-finish">#' + pl.finish + '</span>';
+        html += '</button>';
+    });
+    html += '</div>';
+
+    // Highlights
+    html += '<div class="sidebar-section">';
+    html += '<div class="sidebar-header">Highlights</div>';
+    var types = [
+        { key:'All', icon:'\u{1F4CB}', label:'All Hands' },
+        { key:'Bluff', icon:'\u{1F3AD}', label:'Bluffs' },
+        { key:'Elimination', icon:'\u{1F480}', label:'Eliminations' },
+        { key:'Hero_call', icon:'\u{1F9B8}', label:'Hero Calls' },
+        { key:'Cooler', icon:'\u2744\uFE0F', label:'Coolers' },
+        { key:'Biggest_pot', icon:'\u{1F4B0}', label:'Biggest Pots' }
+    ];
+    types.forEach(function(t) {
+        var active = currentFilter === t.key ? ' active' : '';
+        html += '<button class="tree-item tree-indent' + active + '" onclick="setFilter(\'' + t.key + '\')">';
+        html += '<span class="tree-icon">' + t.icon + '</span> ' + t.label;
+        html += '</button>';
+    });
+    html += '</div>';
+
+    // Reports
+    html += '<div class="sidebar-section">';
+    html += '<div class="sidebar-header">Reports</div>';
+    html += '<button class="tree-item' + (p === 'report' ? ' active' : '') + '" onclick="navigate(\'report\', {player:\'' + selectedPlayer + '\'})"><span class="tree-icon">\u{1F4C4}</span> Exploit Report</button>';
+    html += '<button class="tree-item' + (p === 'pricing' ? ' active' : '') + '" onclick="navigate(\'pricing\')"><span class="tree-icon">\u{1F4B3}</span> Pricing</button>';
+    html += '</div>';
+
+    document.getElementById('sidebar').innerHTML = html;
+}
+
+function setFilter(f) {
+    currentFilter = f;
+    if (currentRoute.path !== 'dashboard') navigate('dashboard');
+    else render();
+}
+
+// ===================== MAIN AREA =====================
+
+function renderMain() {
+    var p = currentRoute.path;
+    if (p === 'dashboard') renderDashboard();
+    else if (p === 'intel') renderIntel();
+    else if (p === 'player') renderPlayerDossier();
+    else if (p === 'report') renderExploitReport();
+    else if (p === 'pricing') renderPricing();
+    else renderDashboard();
+}
+
+// ===================== DASHBOARD =====================
+
+function renderDashboard() {
+    var filtered = HANDS;
+    if (currentFilter !== 'All') {
+        var fKey = currentFilter.toLowerCase();
+        filtered = HANDS.filter(function(h) { return h.type === fKey; });
+    }
+
+    var avgVpip = Math.round(PLAYERS.reduce(function(a, p) { return a + p.vpip; }, 0) / PLAYERS.length);
+    var avgAf = (PLAYERS.reduce(function(a, p) { return a + p.af; }, 0) / PLAYERS.length).toFixed(1);
+    var biggestPot = Math.max.apply(null, HANDS.map(function(h) { return h.pot; }));
+    var bluffs = HANDS.filter(function(h) { return h.type === 'bluff'; }).length;
+
+    var html = '<div style="padding:12px 16px">';
+
+    // KPI Row (9 boxes)
+    html += '<div class="kpi-row" style="grid-template-columns:repeat(9, 1fr)">';
+    var kpis = [
+        ['Players', '9'],
+        ['Hands', '87'],
+        ['Prize Pool', '$93.5M'],
+        ['Buy-in', '$10,000'],
+        ['Biggest Pot', fmtChips(biggestPot)],
+        ['Bluffs', String(bluffs)],
+        ['Avg VPIP', avgVpip + '%'],
+        ['Avg AF', avgAf],
+        ['Luck Index', '+8%']
+    ];
+    kpis.forEach(function(k, i) {
+        var cls = i === 8 ? ' gold' : '';
+        html += '<div class="kpi"><div class="kpi-label">' + k[0] + '</div><div class="kpi-value' + cls + '">' + k[1] + '</div></div>';
+    });
+    html += '</div>';
+
+    html += '</div>';
+
+    // Filter tabs
+    var filters = ['All', 'Bluff', 'Elimination', 'Hero_call', 'Cooler', 'Biggest_pot'];
+    html += '<div style="padding:0 16px 10px"><div class="filter-tabs">';
+    filters.forEach(function(f) {
+        var label = f === 'Hero_call' ? 'Hero Call' : f === 'Biggest_pot' ? 'Biggest Pot' : f;
+        var cls = currentFilter === f ? ' active' : '';
+        html += '<button class="filter-tab' + cls + '" onclick="setFilter(\'' + f + '\')">' + label + '</button>';
+    });
+    html += '</div></div>';
+
+    // Hands table
+    html += '<div style="flex:1;overflow:auto;padding:0 16px 16px">';
+    html += '<div class="panel"><table class="data-table"><thead><tr>';
+    html += '<th>#</th><th>Players</th><th>Pot</th><th>Type</th><th>Strength</th><th>Board</th><th>Preview</th><th style="text-align:center">\u25B6 YT</th><th>AI</th>';
+    html += '</tr></thead><tbody>';
+
+    filtered.forEach(function(h) {
+        var ps = h.players.map(function(id) {
+            var pl = getPlayer(id);
+            return lastName(pl.name);
+        }).join(' vs ');
+
+        var sel = selectedHand === h.id ? ' selected' : '';
+        html += '<tr class="' + sel + '" onclick="selectedHand=\'' + h.id + '\';render()" style="cursor:pointer">';
+        html += '<td>' + h.num + '</td>';
+        html += '<td style="font-family:var(--font-sans);font-weight:600">' + ps + '</td>';
+        html += '<td style="color:var(--accent-gold);font-weight:700">' + fmtChips(h.pot) + '</td>';
+        html += '<td>' + (h.type ? '<span class="badge ' + typeBadgeClass(h.type) + '">' + typeLabel(h.type) + '</span>' : '<span style="color:var(--text-muted)">\u2014</span>') + '</td>';
+        html += '<td><span class="tier-pill ' + tierClass(h.tier) + '">' + h.tier + '</span></td>';
+        html += '<td><span class="board-texture">' + h.texture + '</span></td>';
+        html += '<td style="font-family:var(--font-sans);color:var(--text-secondary);max-width:280px;overflow:hidden;text-overflow:ellipsis;font-size:12px">' + h.preview + '</td>';
+        html += '<td style="text-align:center">';
+        if (h.yt) {
+            html += '<button class="yt-btn" onclick="event.stopPropagation();window.open(\'' + h.yt + '\',\'_blank\')"><span class="yt-icon"></span></button>';
+        } else {
+            html += '<span style="color:var(--text-muted)">\u2014</span>';
+        }
+        html += '</td>';
+        html += '<td><button class="btn btn-sm" onclick="event.stopPropagation();navigate(\'intel\',{q:\'Explain hand #' + h.num + '\'})">AI</button></td>';
+        html += '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+
+    // Player leaderboard mini-table
+    html += '<div style="padding:0 16px 16px">';
+    html += '<div class="panel">';
+    html += '<div class="panel-header">PLAYER LEADERBOARD <span style="font-size:10px;color:var(--accent-gold)">AI Rankings</span></div>';
+    html += '<table class="data-table"><thead><tr>';
+    html += '<th>#</th><th>Player</th><th>Style</th><th>Skill</th><th>VPIP</th><th>PFR</th><th>AF</th><th>Exploit</th><th>Actions</th>';
+    html += '</tr></thead><tbody>';
+
+    PLAYERS.forEach(function(pl) {
+        var exp = calcExploit(pl);
+        var skillColor = pl.skill === 'A+' ? '#059669' : pl.skill === 'A' ? '#16a34a' : pl.skill === 'B' ? '#2563eb' : pl.skill === 'C' ? '#d97706' : '#dc2626';
+        html += '<tr style="cursor:pointer" onclick="navigate(\'player\',{player:\'' + pl.id + '\'})">';
+        html += '<td style="color:var(--text-muted)">' + pl.finish + '</td>';
+        html += '<td style="font-family:var(--font-sans);font-weight:600">';
+        html += '<span style="color:' + pl.color + ';margin-right:4px">\u25CF</span>';
+        html += pl.flag + ' ' + lastName(pl.name);
+        html += '</td>';
+        html += '<td><span class="badge badge-gold">' + pl.style + ' ' + pl.styleEmoji + '</span></td>';
+        html += '<td><span style="color:' + skillColor + ';font-weight:800">' + pl.skill + '</span></td>';
+        html += '<td>' + pl.vpip + '%</td>';
+        html += '<td>' + pl.pfr + '%</td>';
+        html += '<td>' + pl.af.toFixed(1) + '</td>';
+        html += '<td>';
+        html += '<div style="display:flex;align-items:center;gap:6px">';
+        html += '<div style="width:40px;height:5px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden"><div style="width:' + exp + '%;height:100%;border-radius:3px;background:' + (exp >= 70 ? 'var(--accent-emerald)' : exp >= 45 ? 'var(--accent-gold)' : 'var(--accent-red)') + '"></div></div>';
+        html += '<span style="font-weight:700;font-size:12px">' + exp + '</span>';
+        html += '</div></td>';
+        html += '<td>';
+        html += '<button class="btn btn-sm" onclick="event.stopPropagation();navigate(\'report\',{player:\'' + pl.id + '\'})">Exploit</button>';
+        html += '</td>';
+        html += '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+
+    document.getElementById('mainArea').innerHTML = html;
+}
+
+// ===================== INTEL BRIEF =====================
+
+function renderIntel() {
+    var q = currentRoute.params.q || 'Who is the most exploitable player?';
+
+    var html = '<div class="animate-in" style="padding:20px 24px;max-width:860px;overflow:auto">';
+    html += '<div class="intel-header">\u2B21 INTELLIGENCE BRIEF</div>';
+    html += '<div class="intel-query">"' + q + '"</div>';
+
+    // Summary
+    html += '<div class="intel-summary">';
+    html += 'Highest confidence exploit path targets <strong style="color:var(--accent-gold)">Daniel Negreanu</strong>\'s blind defense tendencies and river aggression decline. ';
+    html += 'Secondary targets include Hellmuth\'s low 3-bet frequency and Seidel\'s extreme tightness. ';
+    html += 'All findings backed by <strong>87 hands</strong> of observed data from the WSOP Main Event 2025 final table.';
+    html += '</div>';
+
+    // Findings
+    html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:8px">KEY FINDINGS</div>';
+
+    var findings = [
+        { title:"Negreanu's BB Defense is Exploitable", detail:"Fold to steal at 62% vs 52% population baseline. Clear steal-wider opportunity from late position across all stack depths. Profit expectation: +4.2bb/100 in steal spots.", conf:"High", sample:"87 hands" },
+        { title:"River Aggression Drop Across Field", detail:"Average river AF 2.1 vs 3.2 on flop \u2014 consistent pattern of giving up value on river. Most pronounced in Konnikova (AF River 1.0) and Kenney (1.4).", conf:"Medium", sample:"478 actions" },
+        { title:"Low 3-Bet Frequency from Hellmuth", detail:"Phil Hellmuth's 7% 3-bet rate is lowest among regulars. Exploitable by opening wider in his blind and calling his 3-bets tighter (value-heavy range).", conf:"High", sample:"72 hands" },
+        { title:"Seidel's Extreme Tightness Creates Opportunities", detail:"Erik Seidel with 18/14 VPIP/PFR is the tightest player. Auto-fold equity in most pots \u2014 steal relentlessly when he's in the blinds.", conf:"Medium", sample:"22 hands" }
+    ];
+
+    findings.forEach(function(f, i) {
+        html += '<div class="finding">';
+        html += '<div class="finding-num">' + (i + 1) + '</div>';
+        html += '<div style="flex:1">';
+        html += '<div class="finding-title">' + f.title + '</div>';
+        html += '<div class="finding-detail">' + f.detail + '</div>';
+        html += '<div class="finding-meta">';
+        html += '<span class="badge ' + (f.conf === 'High' ? 'badge-green' : 'badge-gold') + '">' + f.conf + ' Confidence</span>';
+        html += '<span class="badge badge-blue">' + f.sample + '</span>';
+        html += '</div></div></div>';
+    });
+
+    // Bluff Alert (Finding #5)
+    html += '<div class="finding" style="background:var(--accent-red-bg);border-radius:var(--radius);padding:14px;margin-top:8px;border:1px solid rgba(220,38,38,0.15)">';
+    html += '<div class="finding-num alert">\u{1F6A8}</div>';
+    html += '<div style="flex:1">';
+    html += '<div class="finding-title" style="color:var(--accent-red)">\u{1F6A8} BLUFF ALERT \u2014 Kenney\'s Three-Barrel Pattern</div>';
+    html += '<div class="finding-detail">Bryn Kenney has fired three barrels (all streets) in <strong>3 of 41 hands</strong> (7.3%). All three instances were pure bluffs with air. When Kenney bets all three streets, fold equity is near-zero \u2014 his range is extremely polarized and bluff-heavy.</div>';
+    html += '<div class="finding-meta">';
+    html += '<span class="badge badge-red">BLUFF DETECTED</span>';
+    html += '<span class="badge badge-gold">Medium Confidence</span>';
+    html += '<span class="badge badge-blue">41 hands</span>';
+    html += '<button class="yt-btn" style="margin-left:8px" onclick="window.open(\'https://youtube.com/watch?v=dQw4w9WgXcQ&t=6005\',\'_blank\')"><span class="yt-icon"></span> Watch Evidence</button>';
+    html += '</div></div></div>';
+
+    // Follow-up queries
+    html += '<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-light)">';
+    html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:10px">FOLLOW-UP QUERIES</div>';
+    var followups = ['How to exploit Negreanu\'s BB defense?', 'Compare river aggression across all players', 'Show Kenney\'s bluff hands with video'];
+    followups.forEach(function(fq) {
+        html += '<button class="btn" style="margin:0 6px 6px 0" onclick="navigate(\'intel\',{q:\'' + fq.replace(/'/g, "\\'") + '\'})">\u{2B21} ' + fq + '</button>';
+    });
+    html += '</div>';
+
+    // Action buttons
+    html += '<div class="row mt-md" style="gap:8px">';
+    html += '<button class="btn" onclick="navigate(\'report\',{player:\'p1\'})">\u{1F4C4} Generate Report</button>';
+    html += '<button class="btn" onclick="navigate(\'player\',{player:\'p1\'})">\u{1F464} View Negreanu</button>';
+    html += '<button class="btn" onclick="navigate(\'dashboard\')">\u{1F4CA} Back to Dashboard</button>';
+    html += '</div>';
+
+    html += '</div>';
+    document.getElementById('mainArea').innerHTML = html;
+}
+
+// ===================== PLAYER DOSSIER =====================
+
+function renderPlayerDossier() {
+    var p = getPlayer(selectedPlayer);
+    var exploit = calcExploit(p);
+    var strengths = getStrengths(p);
+    var leaks = getLeaks(p);
+
+    var html = '<div class="animate-in" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;height:100%;overflow:auto;align-content:start">';
+
+    // Identity + Skill + Exploit
+    html += '<div class="panel">';
+    html += '<div class="panel-header">PLAYER IDENTITY</div>';
+    html += '<div class="panel-body" style="display:flex;gap:18px;align-items:flex-start">';
+
+    // Skill circle
+    html += '<div style="text-align:center"><div class="skill-circle ' + p.skillClass + '">' + p.skill + '<span class="skill-sub">SKILL</span></div></div>';
+
+    // Exploit circle
+    html += '<div style="text-align:center"><div class="grade-circle ' + gradeClass(exploit) + '">' + exploit + '</div><div style="font-size:9px;margin-top:4px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em">Exploit</div></div>';
+
+    // Info
+    html += '<div style="flex:1">';
+    html += '<div style="font-size:17px;font-weight:800">' + p.flag + ' ' + p.name + '</div>';
+    html += '<div style="display:flex;gap:6px;align-items:center;margin-top:4px">';
+    html += '<span class="badge badge-gold">' + p.style + ' ' + p.styleEmoji + '</span>';
+    html += '<span class="badge badge-blue">' + p.hands + ' hands</span>';
+    html += '<span class="badge ' + (p.finish === 1 ? 'badge-green' : 'badge-slate') + '">#' + p.finish + ' ' + p.status + '</span>';
+    html += '</div>';
+    html += '<div style="font-size:12px;color:var(--text-secondary);margin-top:6px;font-family:var(--font-mono)">' + p.career + '</div>';
+
+    // Strength/Leak pills
+    if (strengths.length || leaks.length) {
+        html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:0">';
+        strengths.forEach(function(s) { html += '<span class="strength-pill positive">\u2713 ' + s + '</span>'; });
+        leaks.forEach(function(l) { html += '<span class="strength-pill negative">\u2717 ' + l + '</span>'; });
+        html += '</div>';
+    }
+
+    html += '</div></div></div>';
+
+    // HUD Stats table
+    html += '<div class="panel" style="grid-row:1/3">';
+    html += '<div class="panel-header">HUD STATISTICS <span style="font-size:10px;color:var(--accent-gold)">20 stats</span></div>';
+    html += '<div style="overflow:auto;max-height:420px"><table class="data-table"><thead><tr><th>Stat</th><th>Value</th><th>Range</th></tr></thead><tbody>';
+
+    var statRows = [
+        ['VPIP', p.vpip + '%'], ['PFR', p.pfr + '%'], ['3-Bet', p.threeBet + '%'], ['4-Bet', p.fourBet + '%'],
+        ['Steal', p.steal + '%'], ['Fold to Steal', p.foldToSteal + '%'], ['BB Defense', p.bbDefense + '%'],
+        ['CBet Flop', p.cbetFlop + '%'], ['CBet Turn', p.cbetTurn + '%'], ['CBet River', p.cbetRiver + '%'],
+        ['Check-Raise F', p.checkRaiseFlop + '%'], ['Donk Bet', p.donkBetFlop + '%'],
+        ['AF', p.af.toFixed(1)], ['AF Flop', p.afFlop.toFixed(1)], ['AF Turn', p.afTurn.toFixed(1)], ['AF River', p.afRiver.toFixed(1)],
+        ['WTSD', p.wtsd + '%'], ['WSD', p.wsd + '%'], ['WWSF', p.wwsf + '%'], ['W/O SD', p.wonWithoutShowdown + '%']
+    ];
+
+    statRows.forEach(function(row) {
+        var num = parseFloat(row[1]);
+        var w = Math.min(isNaN(num) ? 50 : (num > 10 ? num : num * 15), 100);
+        var col = num > 50 ? 'var(--accent-emerald)' : num > 25 ? 'var(--accent-gold)' : 'var(--accent-red)';
+        html += '<tr>';
+        html += '<td style="font-family:var(--font-sans);color:var(--text-muted);font-size:12px">' + row[0] + '</td>';
+        html += '<td style="font-weight:700">' + row[1] + '</td>';
+        html += '<td><div class="spark-bar"><div class="spark-fill" style="width:' + w + '%;background:' + col + '"></div></div></td>';
+        html += '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+
+    // Strengths
+    html += '<div class="panel">';
+    html += '<div class="panel-header" style="color:var(--accent-emerald)">STRENGTHS</div>';
+    html += '<div class="panel-body">';
+    if (strengths.length === 0) {
+        html += '<div style="font-size:12px;color:var(--text-muted)">No significant strengths detected</div>';
+    } else {
+        var popMap = { 'High WSD':'50%', 'Strong Steal':'38%', 'Aggressive CBet':'62%', 'Wins Without SD':'48%', 'High AF':'2.5' };
+        strengths.forEach(function(s) {
+            html += '<div class="ctx-row" style="padding:6px 0;border-bottom:1px solid var(--border-light)"><span>' + s + '</span><span><span class="text-green fw-700">\u2713</span> <span class="text-muted">vs ' + (popMap[s] || '50%') + '</span></span></div>';
+        });
+    }
+    html += '</div></div>';
+
+    // Weaknesses
+    html += '<div class="panel" style="grid-column:1">';
+    html += '<div class="panel-header" style="color:var(--accent-red)">WEAKNESSES</div>';
+    html += '<div class="panel-body">';
+    if (leaks.length === 0) {
+        html += '<div style="font-size:12px;color:var(--text-muted)">No significant weaknesses detected</div>';
+    } else {
+        var leakPopMap = { 'Overfolds Blinds':'52%', 'River Passive':'2.5', 'Low Check-Raise':'8%', 'Cold Call Leaks':'7%', 'Weak River CBet':'35%' };
+        leaks.forEach(function(l) {
+            html += '<div class="ctx-row" style="padding:6px 0;border-bottom:1px solid var(--border-light)"><span>' + l + '</span><span><span class="text-red fw-700">\u2717</span> <span class="text-muted">vs ' + (leakPopMap[l] || '50%') + '</span></span></div>';
+        });
+    }
+    html += '</div></div>';
+
+    // Key Hands
+    html += '<div class="panel" style="grid-column:1/-1">';
+    html += '<div class="panel-header">KEY HANDS INVOLVING ' + lastName(p.name).toUpperCase() + ' <span style="font-size:10px;color:var(--accent-gold)">AI Selected</span></div>';
+    html += '<table class="data-table"><thead><tr><th>#</th><th>Opponent</th><th>Pot</th><th>Type</th><th>Strength</th><th>Preview</th><th>\u25B6 YT</th></tr></thead><tbody>';
+
+    var playerHands = HANDS.filter(function(h) { return h.players.indexOf(p.id) !== -1; }).slice(0, 6);
+    playerHands.forEach(function(h) {
+        var opponent = h.players.filter(function(id) { return id !== p.id; }).map(function(id) { return lastName(getPlayer(id).name); }).join(', ');
+        var won = h.winner === p.id;
+        html += '<tr>';
+        html += '<td>' + h.num + '</td>';
+        html += '<td style="font-family:var(--font-sans)">' + opponent + '</td>';
+        html += '<td style="color:' + (won ? 'var(--accent-emerald)' : 'var(--accent-red)') + ';font-weight:700">' + (won ? '+' : '-') + fmtChips(h.pot) + '</td>';
+        html += '<td>' + (h.type ? '<span class="badge ' + typeBadgeClass(h.type) + '">' + typeLabel(h.type) + '</span>' : '\u2014') + '</td>';
+        html += '<td><span class="tier-pill ' + tierClass(h.tier) + '">' + h.tier + '</span></td>';
+        html += '<td style="font-family:var(--font-sans);font-size:12px;color:var(--text-secondary);max-width:260px;overflow:hidden;text-overflow:ellipsis">' + h.preview + '</td>';
+        html += '<td>';
+        if (h.yt) html += '<button class="yt-btn" onclick="window.open(\'' + h.yt + '\',\'_blank\')"><span class="yt-icon"></span></button>';
+        else html += '<span style="color:var(--text-muted)">\u2014</span>';
+        html += '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+
+    // Actions
+    html += '<div style="grid-column:1/-1;padding:8px">';
+    html += '<div class="row" style="gap:8px">';
+    html += '<button class="btn btn-gold" onclick="navigate(\'report\',{player:\'' + p.id + '\'})">Generate Exploit Report</button>';
+    html += '<button class="btn" onclick="navigate(\'intel\',{q:\'How to exploit ' + p.name + '?\'})">Ask AI</button>';
+    html += '<button class="btn" onclick="navigate(\'dashboard\')">Back to Dashboard</button>';
+    html += '</div></div>';
+
+    html += '</div>';
+    document.getElementById('mainArea').innerHTML = html;
+}
+
+// ===================== EXPLOIT REPORT =====================
+
+function renderExploitReport() {
+    var p = getPlayer(selectedPlayer);
+    var exploit = calcExploit(p);
+
+    var leaks = [
+        { name:'Overfolds BB Defense', pVal:p.foldToSteal + '%', pop:'52%', delta:p.foldToSteal - 52, conf:'High', severity:p.foldToSteal > 60 ? 5 : 3, sample:p.hands, level:p.foldToSteal > 60 ? 'Critical' : 'Moderate', levelClass:p.foldToSteal > 60 ? 'critical' : 'moderate', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=3900' },
+        { name:'River Aggression Drop', pVal:p.afRiver.toFixed(1), pop:'2.5', delta:p.afRiver - 2.5, conf:'Medium', severity:p.afRiver < 2 ? 4 : 3, sample:p.hands, level:p.afRiver < 2 ? 'Critical' : 'Moderate', levelClass:p.afRiver < 2 ? 'critical' : 'moderate', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=8525' },
+        { name:'Low Check-Raise Freq', pVal:p.checkRaiseFlop + '%', pop:'8%', delta:p.checkRaiseFlop - 8, conf:p.hands > 50 ? 'Medium' : 'Low', severity:p.checkRaiseFlop < 6 ? 4 : 2, sample:p.hands, level:p.checkRaiseFlop < 6 ? 'Moderate' : 'Minor', levelClass:p.checkRaiseFlop < 6 ? 'moderate' : 'minor', yt:null },
+        { name:'C-Bet Continuation Decline', pVal:p.cbetFlop + '\u2192' + p.cbetTurn + '\u2192' + p.cbetRiver, pop:'65\u219250\u219235', delta:null, conf:'Medium', severity:3, sample:p.hands, level:'Moderate', levelClass:'moderate', yt:'https://youtube.com/watch?v=dQw4w9WgXcQ&t=7530' },
+        { name:'Cold Call Frequency', pVal:p.coldCall + '%', pop:'7%', delta:p.coldCall - 7, conf:'Low', severity:p.coldCall > 9 ? 3 : 1, sample:p.hands, level:p.coldCall > 9 ? 'Moderate' : 'Minor', levelClass:p.coldCall > 9 ? 'moderate' : 'minor', yt:null }
+    ];
+
+    var html = '<div class="animate-in" style="padding:20px 24px;overflow:auto;height:100%">';
+
+    // Header
+    html += '<div class="between">';
+    html += '<div>';
+    html += '<div class="intel-header">\u25C9 EXPLOIT INTELLIGENCE REPORT \u2014 ' + p.name.toUpperCase() + '</div>';
+    html += '<div style="font-size:12px;color:var(--text-muted)">Generated ' + new Date().toLocaleDateString() + ' \u00B7 ' + p.hands + ' hands analyzed \u00B7 AI Deterministic Engine v2.0</div>';
+    html += '</div>';
+    html += '<div class="row" style="gap:6px">';
+    html += '<button class="btn">Export JSON</button>';
+    html += '<button class="btn">Export CSV</button>';
+    html += '<button class="btn">Print</button>';
+    html += '</div></div>';
+
+    // Grade + Identity
+    html += '<div class="row mt-md" style="gap:24px">';
+    html += '<div style="text-align:center"><div class="grade-circle ' + gradeClass(exploit) + '" style="width:84px;height:84px;font-size:28px">' + exploit + '</div><div style="font-size:9px;margin-top:4px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Exploit Index</div></div>';
+    html += '<div style="text-align:center"><div class="skill-circle ' + p.skillClass + '" style="width:84px;height:84px;font-size:28px">' + p.skill + '<span class="skill-sub">SKILL</span></div></div>';
+    html += '<div>';
+    html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)">Target Profile</div>';
+    html += '<div class="row mt-sm" style="gap:16px">';
+    html += '<div><span class="text-muted" style="font-size:11px">Confidence</span><br><span class="badge badge-green">High</span></div>';
+    html += '<div><span class="text-muted" style="font-size:11px">Sample</span><br><span class="text-mono fw-700">' + p.hands + '</span></div>';
+    html += '<div><span class="text-muted" style="font-size:11px">Freshness</span><br><span class="text-mono">3d ago</span></div>';
+    html += '<div><span class="text-muted" style="font-size:11px">Style</span><br><span class="badge badge-gold">' + p.style + ' ' + p.styleEmoji + '</span></div>';
+    html += '</div></div></div>';
+
+    // Leak Matrix Table
+    html += '<div class="panel mt-md">';
+    html += '<div class="panel-header">LEAK MATRIX <span style="color:var(--accent-red)">' + leaks.length + ' leaks detected</span></div>';
+    html += '<table class="data-table"><thead><tr>';
+    html += '<th>Leak</th><th>Player</th><th>Population</th><th>Delta</th><th>Confidence</th><th>Severity</th><th>Level</th><th>Evidence</th>';
+    html += '</tr></thead><tbody>';
+
+    leaks.forEach(function(l) {
+        html += '<tr>';
+        html += '<td style="font-family:var(--font-sans);font-weight:600">' + l.name + '</td>';
+        html += '<td>' + l.pVal + '</td>';
+        html += '<td style="color:var(--text-muted)">' + l.pop + '</td>';
+        html += '<td class="' + (l.delta != null ? (l.delta > 0 ? 'delta-pos' : 'delta-neg') : '') + '">' + (l.delta != null ? (l.delta > 0 ? '+' : '') + l.delta.toFixed(1) : '\u2014') + '</td>';
+        html += '<td><span class="badge ' + (l.conf === 'High' ? 'badge-green' : l.conf === 'Medium' ? 'badge-gold' : 'badge-red') + '">' + l.conf + '</span></td>';
+        html += '<td><span class="severity-stars">' + severityStars(l.severity) + '</span></td>';
+        html += '<td><span class="badge ' + (l.level === 'Critical' ? 'badge-red' : l.level === 'Moderate' ? 'badge-orange' : 'badge-slate') + '">' + l.level + '</span></td>';
+        html += '<td>';
+        if (l.yt) {
+            html += '<button class="yt-btn" onclick="event.stopPropagation();window.open(\'' + l.yt + '\',\'_blank\')"><span class="yt-icon"></span> Watch</button>';
+        } else {
+            html += '<span style="color:var(--text-muted)">\u2014</span>';
+        }
+        html += '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+
+    // Leak detail cards
+    html += '<div class="mt-md" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+    leaks.slice(0, 4).forEach(function(l) {
+        html += '<div class="leak-card ' + l.levelClass + '">';
+        html += '<div class="between"><strong style="font-size:13px">' + l.name + '</strong><span class="severity-stars">' + severityStars(l.severity) + '</span></div>';
+        html += '<div style="font-size:12px;color:var(--text-secondary);margin-top:6px;line-height:1.5">Player: <strong>' + l.pVal + '</strong> vs Population: <strong>' + l.pop + '</strong></div>';
+        html += '<div class="row mt-sm" style="gap:6px">';
+        html += '<span class="badge ' + (l.conf === 'High' ? 'badge-green' : 'badge-gold') + '">' + l.conf + '</span>';
+        html += '<span class="badge badge-blue">' + l.sample + ' hands</span>';
+        html += '<span class="badge ' + (l.level === 'Critical' ? 'badge-red' : l.level === 'Moderate' ? 'badge-orange' : 'badge-slate') + '">' + l.level + '</span>';
+        if (l.yt) html += '<button class="yt-btn" onclick="window.open(\'' + l.yt + '\',\'_blank\')" style="margin-left:auto"><span class="yt-icon"></span> Watch Evidence</button>';
+        html += '</div></div>';
+    });
+    html += '</div>';
+
+    // Exploit Action Plan
+    html += '<div class="mt-md">';
+    html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:10px">EXPLOIT ACTION PLAN</div>';
+    html += '<div class="plan-grid">';
+
+    html += '<div class="plan-card preflop"><h4 style="color:var(--accent-emerald)">Preflop Adjustments</h4>';
+    html += '<div class="plan-item">Steal wider from BTN/CO when target is in BB (' + p.foldToSteal + '% fold rate)</div>';
+    html += '<div class="plan-item">Increase 3-bet sizing against loose openers (VPIP ' + p.vpip + '%+)</div>';
+    html += '<div class="plan-item">Tighten call range vs their 3-bets (they under-bluff preflop)</div>';
+    html += '</div>';
+
+    html += '<div class="plan-card postflop"><h4 style="color:var(--accent-blue)">Postflop Adjustments</h4>';
+    html += '<div class="plan-item">Float flop c-bets more liberally (' + p.cbetFlop + '%\u2192' + p.cbetTurn + '% drop-off)</div>';
+    html += '<div class="plan-item">Barrel turns after their flop check (low check-raise ' + p.checkRaiseFlop + '%)</div>';
+    html += '<div class="plan-item">Value bet rivers thinner (their AF drops to ' + p.afRiver.toFixed(1) + ')</div>';
+    html += '</div>';
+
+    html += '<div class="plan-card icm"><h4 style="color:var(--accent-gold)">ICM Adjustments</h4>';
+    html += '<div class="plan-item">Apply maximum pressure in blind defense spots near pay jumps</div>';
+    html += '<div class="plan-item">Reduce bluff frequency vs them on rivers (they call too much)</div>';
+    html += '<div class="plan-item">Size up value bets with deeper effective stacks (>30bb)</div>';
+    html += '</div>';
+
+    html += '</div></div>';
+
+    // Confidence footer
+    html += '<div class="kpi-row mt-md" style="grid-template-columns:repeat(4,1fr)">';
+    html += '<div class="kpi"><div class="kpi-label">Hands Analyzed</div><div class="kpi-value">' + p.hands + '</div></div>';
+    html += '<div class="kpi"><div class="kpi-label">Leak Count</div><div class="kpi-value">' + leaks.length + '</div></div>';
+    html += '<div class="kpi"><div class="kpi-label">Significance</div><div class="kpi-value">' + (p.hands > 50 ? 'Valid' : 'Low') + '</div></div>';
+    html += '<div class="kpi"><div class="kpi-label">Last Updated</div><div class="kpi-value">3d ago</div></div>';
+    html += '</div>';
+
+    html += '</div>';
+    document.getElementById('mainArea').innerHTML = html;
+}
+
+// ===================== PRICING =====================
+
+function renderPricing() {
+    var html = '<div class="animate-in" style="padding:24px;overflow:auto">';
+    html += '<div class="intel-header">PRICING</div>';
+    html += '<div style="font-size:14px;color:var(--text-secondary);margin-bottom:20px">Select your HUDR Terminal access level</div>';
+
+    html += '<div class="pricing-grid">';
+
+    // Basic
+    html += '<div class="price-card">';
+    html += '<h3 style="color:var(--text-muted)">Terminal Basic</h3>';
+    html += '<div class="price-amount" style="color:var(--text-primary)">$0</div>';
+    html += '<ul class="price-features">';
+    html += '<li>3 intelligence queries / day</li>';
+    html += '<li>Dashboard view only</li>';
+    html += '<li>Basic player stats (6 stats)</li>';
+    html += '<li>Key moments only</li>';
+    html += '<li>No YouTube integration</li>';
+    html += '</ul></div>';
+
+    // Pro
+    html += '<div class="price-card featured">';
+    html += '<h3 style="color:var(--accent-gold)">Terminal Pro</h3>';
+    html += '<div class="price-amount" style="color:var(--accent-gold)">$10<span>/mo</span></div>';
+    html += '<ul class="price-features">';
+    html += '<li>Unlimited intelligence queries</li>';
+    html += '<li>Full exploit dossiers + leak matrix</li>';
+    html += '<li>20-stat HUD with spark bars</li>';
+    html += '<li>AI Deterministic Engine access</li>';
+    html += '<li>Bluff detection + pattern alerts</li>';
+    html += '<li>YouTube hand link integration</li>';
+    html += '<li>Skill ratings + rivalry scores</li>';
+    html += '<li>Export JSON / CSV / PDF</li>';
+    html += '<li>Priority API access</li>';
+    html += '</ul>';
+    html += '<button class="btn btn-gold mt-md" style="width:100%">UPGRADE TO PRO</button>';
+    html += '</div>';
+
+    html += '</div>';
+
+    // Feature comparison table
+    html += '<div style="padding:0 20px 24px;max-width:700px">';
+    html += '<div class="panel">';
+    html += '<div class="panel-header">FEATURE COMPARISON</div>';
+    html += '<table class="data-table"><thead><tr>';
+    html += '<th>Feature</th><th style="text-align:center">Basic</th><th style="text-align:center">Pro</th>';
+    html += '</tr></thead><tbody>';
+
+    var features = [
+        ['Dashboard View', true, true],
+        ['Player Stats (6 basic)', true, true],
+        ['AI Queries (3/day)', true, true],
+        ['Full 20-Stat HUD', false, true],
+        ['Exploit Dossiers', false, true],
+        ['Leak Matrix Analysis', false, true],
+        ['Bluff Detection Alerts', false, true],
+        ['Skill Ratings', false, true],
+        ['Rivalry Scores', false, true],
+        ['YouTube Hand Links', false, true],
+        ['Board Texture Analysis', false, true],
+        ['Unlimited AI Queries', false, true],
+        ['Export (JSON/CSV/PDF)', false, true],
+        ['Priority API Access', false, true],
+        ['Hand Strength Tiers', false, true]
+    ];
+
+    features.forEach(function(f) {
+        html += '<tr>';
+        html += '<td style="font-family:var(--font-sans)">' + f[0] + '</td>';
+        html += '<td style="text-align:center;color:' + (f[1] ? 'var(--accent-emerald)' : 'var(--text-muted)') + '">' + (f[1] ? '\u2713' : '\u2014') + '</td>';
+        html += '<td style="text-align:center;color:var(--accent-emerald);font-weight:700">\u2713</td>';
+        html += '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+
+    html += '</div>';
+    document.getElementById('mainArea').innerHTML = html;
+}
+
+// ===================== CONTEXT PANEL =====================
+
+function renderContext() {
+    var p = getPlayer(selectedPlayer);
+    var exploit = calcExploit(p);
+    var strengths = getStrengths(p);
+    var leaks = getLeaks(p);
+
+    var html = '';
+
+    // Selected Context
+    html += '<div class="ctx-section">';
+    html += '<div class="ctx-label">Selected Player</div>';
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
+    html += '<div style="width:36px;height:36px;border-radius:50%;background:' + p.color + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px">' + p.name.split(' ').map(function(w) { return w[0]; }).join('') + '</div>';
+    html += '<div>';
+    html += '<div style="font-weight:700;font-size:13px">' + p.flag + ' ' + lastName(p.name) + '</div>';
+    html += '<div style="font-size:11px;color:var(--text-muted)">#' + p.finish + ' \u00B7 ' + p.style + ' ' + p.styleEmoji + '</div>';
+    html += '</div></div>';
+
+    html += '<div class="ctx-row"><span>Exploit Index</span><span class="text-gold fw-700">' + exploit + '/100</span></div>';
+    html += '<div class="ctx-row"><span>Skill Rating</span><span class="fw-700" style="color:' + (p.skill === 'A+' || p.skill === 'A' ? 'var(--accent-emerald)' : p.skill === 'B' ? 'var(--accent-blue)' : 'var(--accent-gold)') + '">' + p.skill + '</span></div>';
+    html += '<div class="ctx-row"><span>Hands</span><span>' + p.hands + '</span></div>';
+    html += '<div class="ctx-row"><span>Career</span><span style="font-size:10px">' + p.career.split('|')[0].trim() + '</span></div>';
+    html += '</div>';
+
+    // Quick Stats
+    html += '<div class="ctx-section">';
+    html += '<div class="ctx-label">Quick Stats</div>';
+    [['VPIP', p.vpip + '%'], ['PFR', p.pfr + '%'], ['3-Bet', p.threeBet + '%'], ['AF', p.af.toFixed(1)], ['WTSD', p.wtsd + '%'], ['WSD', p.wsd + '%']].forEach(function(s) {
+        html += '<div class="ctx-row"><span>' + s[0] + '</span><span>' + s[1] + '</span></div>';
+    });
+    html += '</div>';
+
+    // Strengths / Leaks
+    html += '<div class="ctx-section">';
+    html += '<div class="ctx-label">Strengths / Leaks</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:0">';
+    strengths.forEach(function(s) { html += '<span class="strength-pill positive">\u2713 ' + s + '</span>'; });
+    leaks.forEach(function(l) { html += '<span class="strength-pill negative">\u2717 ' + l + '</span>'; });
+    if (!strengths.length && !leaks.length) html += '<span style="font-size:11px;color:var(--text-muted)">Insufficient data</span>';
+    html += '</div></div>';
+
+    // Rivalry Score
+    html += '<div class="ctx-section">';
+    html += '<div class="ctx-label">Rivalry Score</div>';
+    var rival = PLAYERS.find(function(pl) { return pl.id !== p.id && (pl.finish === p.finish - 1 || pl.finish === p.finish + 1); }) || PLAYERS[1];
+    var rScore = rivalryScore(p, rival);
+    var rColor = rivalryColor(rScore);
+    html += '<div style="display:flex;align-items:center;gap:12px">';
+    html += '<div class="rivalry-circle" style="border-color:' + rColor + ';color:' + rColor + ';background:' + rivalryBg(rScore) + '">' + rScore + '</div>';
+    html += '<div>';
+    html += '<div style="font-size:12px;font-weight:700;color:' + rColor + '">' + rivalryLabel(rScore) + '</div>';
+    html += '<div style="font-size:11px;color:var(--text-muted)">vs ' + lastName(rival.name) + '</div>';
+    html += '</div></div></div>';
+
+    // AI Insights
+    html += '<div class="ctx-section">';
+    html += '<div class="ctx-label">AI Insights</div>';
+    var insights = [
+        { icon:'\u{1F9E0}', text:'Exploit BB defense when in position' },
+        { icon:'\u{1F4C8}', text:'River aggression drops significantly' },
+        { icon:'\u{1F3AF}', text:p.style === 'LAG' ? 'LAG style creates more bluff spots' : 'Tight range = strong 3-bet holdings' }
+    ];
+    insights.forEach(function(ins) {
+        html += '<div style="padding:6px 0;border-bottom:1px solid var(--border-light);font-size:12px;color:var(--text-secondary);line-height:1.5;cursor:pointer" onclick="navigate(\'intel\',{q:\'' + ins.text.replace(/'/g, "\\'") + '\'})">';
+        html += '<span style="margin-right:6px">' + ins.icon + '</span>' + ins.text;
+        html += '</div>';
+    });
+    html += '</div>';
+
+    // Action button
+    html += '<div class="ctx-section">';
+    html += '<button class="btn btn-gold" style="width:100%" onclick="navigate(\'report\',{player:\'' + p.id + '\'})">Generate Exploit Report</button>';
+    html += '</div>';
+
+    document.getElementById('contextPanel').innerHTML = html;
+}
+
+// ===================== COMMAND PALETTE =====================
+
+function openPalette() {
+    document.getElementById('cmdOverlay').style.display = 'flex';
+    var input = document.getElementById('cmdPaletteInput');
+    input.value = '';
+    setTimeout(function() { input.focus(); }, 50);
+}
+
+function closePalette() {
+    document.getElementById('cmdOverlay').style.display = 'none';
+}
+
+function runQuery(q) {
+    closePalette();
+    navigate('intel', { q: q });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        var overlay = document.getElementById('cmdOverlay');
+        if (overlay.style.display === 'flex') closePalette();
+        else openPalette();
+    }
+    if (e.key === 'Escape') closePalette();
+});
+
+// Command bar input
+document.getElementById('cmdInput').addEventListener('focus', function() {
+    openPalette();
+});
+
+document.getElementById('cmdInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+        runQuery(this.value.trim());
+        this.value = '';
+    }
+});
+
+document.getElementById('cmdPaletteInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+        runQuery(this.value.trim());
+        this.value = '';
+    }
+});
+
+// ===================== INIT =====================
+
+(function() {
+    var r = parseHash();
+    currentRoute = r;
+    if (r.params.player) selectedPlayer = r.params.player;
+    render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HUDR Insight Engine v2.0 — AI Poker Intelligence</title>
+<style>
+/* ===================== */
+/* CSS Reset & Base      */
+/* ===================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-page: #e5e7eb;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f1f3f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8f9fa;
+  --border-light: #e5e7eb;
+  --border-medium: #d1d5db;
+  --border-dark: #9ca3af;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --accent-purple: #7c3aed;
+  --accent-purple-light: #a78bfa;
+  --accent-purple-dim: rgba(124, 58, 237, 0.08);
+  --accent-purple-glow: rgba(124, 58, 237, 0.15);
+  --accent-blue: #2563eb;
+  --accent-emerald: #059669;
+  --accent-green: #16a34a;
+  --accent-orange: #ea580c;
+  --accent-red: #dc2626;
+  --accent-amber: #d97706;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-elevated: 0 4px 16px rgba(0,0,0,0.12);
+  --font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+  font-family: var(--font-stack);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-page);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===================== */
+/* Phone Viewport Frame  */
+/* ===================== */
+.phone-frame {
+  max-width: 390px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--bg-primary);
+}
+
+@media (min-width: 500px) {
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px 0;
+  }
+  .phone-frame {
+    border-radius: 32px;
+    border: 1px solid var(--border-medium);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+    min-height: calc(100vh - 40px);
+    overflow: hidden;
+  }
+}
+
+/* ===================== */
+/* Header / Top Bar      */
+/* ===================== */
+.header {
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.95);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--accent-purple);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-stack);
+}
+
+.header-btn:hover {
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+.header-btn-primary {
+  background: var(--accent-purple);
+  color: #fff;
+  border-color: var(--accent-purple);
+}
+
+.header-btn-primary:hover {
+  background: #6d28d9;
+  border-color: #6d28d9;
+}
+
+/* ===================== */
+/* Screen Container      */
+/* ===================== */
+.screen {
+  padding: 0 16px 32px;
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* ===================== */
+/* Search Input          */
+/* ===================== */
+.search-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  pointer-events: none;
+  color: var(--text-muted);
+}
+
+.search-input {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  height: 52px;
+  padding: 0 16px 0 44px;
+  font-size: 15px;
+  font-family: var(--font-stack);
+  color: var(--text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px var(--accent-purple-dim), 0 4px 16px rgba(124, 58, 237, 0.06);
+}
+
+.search-input-sm {
+  height: 42px;
+  font-size: 13px;
+  border-radius: var(--radius-md);
+  padding: 0 14px 0 38px;
+}
+
+/* ===================== */
+/* Chips / Pills         */
+/* ===================== */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  font-family: var(--font-stack);
+}
+
+.chip:hover {
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  background: var(--accent-purple-dim);
+}
+
+/* ===================== */
+/* Tournament Pills      */
+/* ===================== */
+.tournament-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.t-pill {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--border-medium);
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-stack);
+}
+
+.t-pill.active {
+  border-color: var(--accent-purple);
+  background: var(--accent-purple-dim);
+  color: var(--accent-purple);
+}
+
+.t-pill:hover:not(.active) {
+  border-color: var(--accent-purple);
+  color: var(--text-secondary);
+}
+
+/* ===================== */
+/* Cards                 */
+/* ===================== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.card-clickable {
+  cursor: pointer;
+}
+
+.card-clickable:hover {
+  transform: translateY(-1px);
+}
+
+.card-accent-left {
+  border-left: 3px solid var(--accent-purple);
+}
+
+.card-green-left {
+  border-left: 3px solid var(--accent-emerald);
+}
+
+.card-red-left {
+  border-left: 3px solid var(--accent-red);
+}
+
+.card-orange-left {
+  border-left: 3px solid var(--accent-orange);
+}
+
+.card-amber-left {
+  border-left: 3px solid var(--accent-amber);
+}
+
+.card-blue-left {
+  border-left: 3px solid var(--accent-blue);
+}
+
+/* ===================== */
+/* Section Labels        */
+/* ===================== */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+/* ===================== */
+/* Typography            */
+/* ===================== */
+.heading-lg {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.heading-md {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+
+.text-muted { color: var(--text-muted); }
+.text-secondary { color: var(--text-secondary); }
+.text-accent { color: var(--accent-purple); }
+.text-mono { font-family: var(--font-mono); }
+
+/* ===================== */
+/* Buttons               */
+/* ===================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-stack);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary {
+  background: var(--accent-purple);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #6d28d9;
+}
+
+.btn-primary-full {
+  width: 100%;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--accent-purple);
+  border: 1px solid var(--border-light);
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent-purple);
+  background: var(--accent-purple-dim);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.link-btn {
+  color: var(--accent-purple);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: var(--font-stack);
+  transition: color var(--transition-fast);
+  padding: 0;
+}
+
+.link-btn:hover {
+  color: #6d28d9;
+  text-decoration: underline;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: var(--font-stack);
+  transition: color var(--transition-fast);
+}
+
+.back-link:hover {
+  color: var(--accent-purple);
+}
+
+/* ===================== */
+/* Utility Classes       */
+/* ===================== */
+.stack { display: flex; flex-direction: column; gap: 10px; }
+.stack-lg { display: flex; flex-direction: column; gap: 18px; }
+.row { display: flex; align-items: center; gap: 10px; }
+.between { display: flex; align-items: center; justify-content: space-between; }
+.center { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.mt-xs { margin-top: 6px; }
+.mt-sm { margin-top: 10px; }
+.mt-md { margin-top: 16px; }
+.mt-lg { margin-top: 24px; }
+.mb-sm { margin-bottom: 10px; }
+.mb-md { margin-bottom: 16px; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.flex-1 { flex: 1; min-width: 0; }
+
+/* ===================== */
+/* Confidence Badge      */
+/* ===================== */
+.confidence {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.confidence-high {
+  background: rgba(5, 150, 105, 0.08);
+  color: var(--accent-emerald);
+}
+
+.confidence-medium {
+  background: rgba(217, 119, 6, 0.08);
+  color: var(--accent-amber);
+}
+
+.confidence-low {
+  background: rgba(220, 38, 38, 0.08);
+  color: var(--accent-red);
+}
+
+/* ===================== */
+/* Hand Strength Tiers   */
+/* ===================== */
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tier-monster { background: rgba(220, 38, 38, 0.1); color: #dc2626; }
+.tier-strong { background: rgba(234, 88, 12, 0.1); color: #ea580c; }
+.tier-medium { background: rgba(217, 119, 6, 0.1); color: #d97706; }
+.tier-weak { background: rgba(107, 114, 128, 0.1); color: #6b7280; }
+.tier-draw { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+.tier-air { background: rgba(71, 85, 105, 0.1); color: #475569; }
+
+/* ===================== */
+/* Skill Rating Circle   */
+/* ===================== */
+.skill-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.skill-circle-lg {
+  width: 52px;
+  height: 52px;
+  font-size: 18px;
+}
+
+.skill-aplus { background: #059669; }
+.skill-a { background: #16a34a; }
+.skill-b { background: #2563eb; }
+.skill-c { background: #d97706; }
+.skill-d { background: #dc2626; }
+
+/* ===================== */
+/* Style Classification  */
+/* ===================== */
+.style-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+
+/* ===================== */
+/* Career Record         */
+/* ===================== */
+.career-record {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ===================== */
+/* Strength / Leak Pills */
+/* ===================== */
+.strength-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(5, 150, 105, 0.08);
+  color: #059669;
+  border: 1px solid rgba(5, 150, 105, 0.15);
+}
+
+.leak-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.15);
+}
+
+/* ===================== */
+/* Rivalry Score         */
+/* ===================== */
+.rivalry-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+
+.rivalry-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ===================== */
+/* YouTube Button        */
+/* ===================== */
+.yt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  font-family: var(--font-stack);
+  text-decoration: none;
+}
+
+.yt-btn:hover {
+  background: #b91c1c;
+}
+
+/* ===================== */
+/* Bluff Detection Card  */
+/* ===================== */
+.bluff-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-left: 4px solid #dc2626;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+.bluff-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #dc2626;
+  margin-bottom: 8px;
+}
+
+.bluff-detail {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ===================== */
+/* Severity Indicators   */
+/* ===================== */
+.severity-critical {
+  border-left: 4px solid #dc2626;
+}
+
+.severity-moderate {
+  border-left: 4px solid #ea580c;
+}
+
+.severity-minor {
+  border-left: 4px solid #2563eb;
+}
+
+/* ===================== */
+/* AI Prose              */
+/* ===================== */
+.ai-prose {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+.ai-prose p {
+  margin: 0 0 0.75em;
+}
+
+.ai-prose strong {
+  font-weight: 600;
+  color: var(--accent-purple);
+}
+
+.ai-prose .player-link {
+  color: var(--accent-purple);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(124, 58, 237, 0.3);
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+
+.ai-prose .player-link:hover {
+  text-decoration-color: var(--accent-purple);
+}
+
+/* ===================== */
+/* Citation References   */
+/* ===================== */
+.cite-ref {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: var(--accent-purple-dim);
+  color: var(--accent-purple);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 4px;
+  margin: 0 2px;
+  cursor: pointer;
+  vertical-align: super;
+  line-height: 1;
+  transition: background var(--transition-fast);
+}
+
+.cite-ref:hover {
+  background: var(--accent-purple-glow);
+}
+
+/* ===================== */
+/* Source Cards           */
+/* ===================== */
+.sources-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.source-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.source-card:hover {
+  border-color: var(--accent-purple);
+  transform: translateY(-1px);
+}
+
+.source-type {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.source-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.source-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.source-preview {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.source-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ===================== */
+/* Query Echo            */
+/* ===================== */
+.query-echo {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+}
+
+.query-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  border: 1px solid var(--border-light);
+}
+
+.query-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ===================== */
+/* Tournament Hero       */
+/* ===================== */
+.tournament-hero {
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: #fff;
+}
+
+.tournament-hero .hero-event {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tournament-hero .hero-name {
+  font-size: 22px;
+  font-weight: 800;
+  margin-top: 4px;
+  letter-spacing: -0.3px;
+}
+
+.tournament-hero .hero-venue {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 4px;
+}
+
+.kpi-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.kpi {
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.kpi-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+.kpi-value {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* ===================== */
+/* Insight Cards         */
+/* ===================== */
+.insight-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-card);
+}
+
+.insight-card:hover {
+  border-color: var(--accent-purple);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.insight-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.insight-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.insight-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ===================== */
+/* Key Moment Rows       */
+/* ===================== */
+.moment-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.moment-row:hover {
+  background: var(--bg-secondary);
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.moment-row:last-child {
+  border-bottom: none;
+}
+
+.hand-badge {
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: var(--accent-purple-dim);
+  color: var(--accent-purple);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.highlight-pill {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.highlight-biggest_pot { background: rgba(217, 119, 6, 0.08); color: var(--accent-amber); }
+.highlight-bluff { background: rgba(220, 38, 38, 0.08); color: var(--accent-red); }
+.highlight-hero_call { background: rgba(5, 150, 105, 0.08); color: var(--accent-emerald); }
+.highlight-cooler { background: rgba(124, 58, 237, 0.08); color: var(--accent-purple); }
+.highlight-elimination { background: rgba(220, 38, 38, 0.08); color: var(--accent-red); }
+.highlight-bad_beat { background: rgba(217, 119, 6, 0.08); color: var(--accent-amber); }
+
+.pot-value {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* ===================== */
+/* Player Header         */
+/* ===================== */
+.player-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 17px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+.player-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+
+.player-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.meta-pill {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-light);
+}
+
+/* ===================== */
+/* HUD Stats Grid        */
+/* ===================== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.stat-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border-light);
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* ===================== */
+/* Pricing               */
+/* ===================== */
+.pricing-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.price-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.price-card.featured {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 1px var(--accent-purple), var(--shadow-elevated);
+  position: relative;
+  overflow: hidden;
+}
+
+.price-card.featured::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-purple-light));
+}
+
+.plan-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.plan-price {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.plan-price span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.plan-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.plan-features li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-left: 22px;
+  position: relative;
+}
+
+.plan-features li::before {
+  content: '\2713';
+  position: absolute;
+  left: 0;
+  color: var(--accent-purple);
+  font-weight: 700;
+}
+
+/* ===================== */
+/* Paywall               */
+/* ===================== */
+.paywall {
+  position: relative;
+  margin-top: 12px;
+}
+
+.paywall-content {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.paywall-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.95) 50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 24px;
+  gap: 10px;
+}
+
+.paywall-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* ===================== */
+/* Luck Score Gauge      */
+/* ===================== */
+.luck-gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.luck-gauge-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+.luck-gauge-detail {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ===================== */
+/* Actions Bar           */
+/* ===================== */
+.actions-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ===================== */
+/* Animations            */
+/* ===================== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeInUp 0.35s ease forwards; }
+.fade-d1 { animation: fadeInUp 0.35s ease 0.08s forwards; opacity: 0; }
+.fade-d2 { animation: fadeInUp 0.35s ease 0.16s forwards; opacity: 0; }
+.fade-d3 { animation: fadeInUp 0.35s ease 0.24s forwards; opacity: 0; }
+.fade-d4 { animation: fadeInUp 0.35s ease 0.32s forwards; opacity: 0; }
+.fade-d5 { animation: fadeInUp 0.35s ease 0.40s forwards; opacity: 0; }
+.fade-d6 { animation: fadeInUp 0.35s ease 0.48s forwards; opacity: 0; }
+.fade-d7 { animation: fadeInUp 0.35s ease 0.56s forwards; opacity: 0; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse { animation: pulse 2s ease-in-out infinite; }
+
+/* ===================== */
+/* Powered By            */
+/* ===================== */
+.powered {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 28px;
+  opacity: 0.6;
+}
+
+/* ===================== */
+/* Player Grid Card      */
+/* ===================== */
+.player-grid-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-card);
+}
+
+.player-grid-card:hover {
+  border-color: var(--accent-purple);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
+}
+
+.player-grid-stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.player-grid-stat {
+  text-align: center;
+}
+
+.player-grid-stat .label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.player-grid-stat .value {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+/* ===================== */
+/* Scrollbar             */
+/* ===================== */
+.phone-frame::-webkit-scrollbar {
+  width: 0px;
+}
+</style>
+</head>
+<body>
+
+<div class="phone-frame" id="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo" onclick="navigate('search')">
+      <div class="logo-icon">H</div>
+      <span class="logo-text">HUDR</span>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="navigate('tournament')">Overview</button>
+      <button class="header-btn header-btn-primary" onclick="navigate('answer', {q: 'Who is the most exploitable?'})">Ask AI</button>
+    </div>
+  </div>
+
+  <!-- Screen: Search/Home -->
+  <div class="screen active" id="screen-search">
+    <div class="center fade-in" style="padding-top: 48px;">
+      <div class="logo-icon" style="width: 48px; height: 48px; font-size: 20px; margin-bottom: 20px;">H</div>
+      <h1 class="heading-lg" style="max-width: 320px;">What do you want to know about this tournament?</h1>
+      <p class="text-muted fade-d1" style="margin-top: 8px; font-size: 13px; max-width: 300px; line-height: 1.5;">Ask about any player, hand, or strategy. Get AI-powered answers with evidence.</p>
+    </div>
+    <div class="fade-d2" style="margin-top: 24px;">
+      <div class="search-wrap">
+        <span class="search-icon">&#128269;</span>
+        <input class="search-input" id="search-home-input" placeholder="Ask about any player, hand, or strategy..." onkeydown="if(event.key==='Enter' && this.value.trim()) navigate('answer', {q: this.value.trim()})">
+      </div>
+    </div>
+    <div class="fade-d3" style="margin-top: 16px;">
+      <div class="chips" id="search-suggestions"></div>
+    </div>
+    <div class="fade-d4" style="margin-top: 24px;">
+      <div class="section-label" style="text-align: center;">Available Tournaments</div>
+      <div class="tournament-pills" id="search-tournaments"></div>
+    </div>
+    <div class="powered fade-d5">Powered by HUDR AI Deterministic Engine</div>
+  </div>
+
+  <!-- Screen: Tournament Overview -->
+  <div class="screen" id="screen-tournament">
+    <div class="stack-lg" id="tournament-content"></div>
+  </div>
+
+  <!-- Screen: Players Grid -->
+  <div class="screen" id="screen-players">
+    <div class="stack-lg" id="players-content"></div>
+  </div>
+
+  <!-- Screen: AI Answer -->
+  <div class="screen" id="screen-answer">
+    <div class="stack-lg" id="answer-content"></div>
+  </div>
+
+  <!-- Screen: Player Profile -->
+  <div class="screen" id="screen-player">
+    <div class="stack-lg" id="player-content"></div>
+  </div>
+
+  <!-- Screen: Exploit Report -->
+  <div class="screen" id="screen-report">
+    <div class="stack-lg" id="report-content"></div>
+  </div>
+
+  <!-- Screen: Pricing -->
+  <div class="screen" id="screen-pricing">
+    <div class="stack-lg" id="pricing-content"></div>
+  </div>
+</div>
+
+<script>
+/* =============================================
+   HUDR Insight Engine v2.0
+   Light Theme + AI Deterministic Engine
+   ============================================= */
+
+// ===================== Data =====================
+
+const PLAYERS = [
+  { id: 'p1', name: 'Daniel Negreanu', initials: 'DN', flag: '\u{1F1E8}\u{1F1E6}', color: '#7c3aed', finish: 1, status: 'winner', hands: 87, startStack: 4200000, endStack: 19800000 },
+  { id: 'p2', name: 'Phil Ivey', initials: 'PI', flag: '\u{1F1FA}\u{1F1F8}', color: '#2563eb', finish: 2, status: 'eliminated', hands: 85, startStack: 3800000, endStack: 0 },
+  { id: 'p3', name: 'Phil Hellmuth', initials: 'PH', flag: '\u{1F1FA}\u{1F1F8}', color: '#dc2626', finish: 3, status: 'eliminated', hands: 82, startStack: 2100000, endStack: 0 },
+  { id: 'p4', name: 'Justin Bonomo', initials: 'JB', flag: '\u{1F1FA}\u{1F1F8}', color: '#059669', finish: 4, status: 'eliminated', hands: 71, startStack: 2900000, endStack: 0 },
+  { id: 'p5', name: 'Vanessa Selbst', initials: 'VS', flag: '\u{1F1FA}\u{1F1F8}', color: '#ea580c', finish: 5, status: 'eliminated', hands: 63, startStack: 1800000, endStack: 0 },
+  { id: 'p6', name: 'Fedor Holz', initials: 'FH', flag: '\u{1F1E9}\u{1F1EA}', color: '#0d9488', finish: 6, status: 'eliminated', hands: 55, startStack: 2200000, endStack: 0 },
+  { id: 'p7', name: 'Bryn Kenney', initials: 'BK', flag: '\u{1F1FA}\u{1F1F8}', color: '#d97706', finish: 7, status: 'eliminated', hands: 44, startStack: 1500000, endStack: 0 },
+  { id: 'p8', name: 'Maria Konnikova', initials: 'MK', flag: '\u{1F1FA}\u{1F1F8}', color: '#6b7280', finish: 8, status: 'eliminated', hands: 31, startStack: 900000, endStack: 0 },
+  { id: 'p9', name: 'Erik Seidel', initials: 'ES', flag: '\u{1F1FA}\u{1F1F8}', color: '#475569', finish: 9, status: 'eliminated', hands: 22, startStack: 600000, endStack: 0 }
+];
+
+const STATS = {
+  p1: { vpip: 28, pfr: 22, threeBet: 9, fourBet: 2.5, steal: 38, foldToSteal: 62, bbDefense: 44, cbetFlop: 72, cbetTurn: 55, cbetRiver: 38, checkRaiseFlop: 6, af: 2.8, afFlop: 3.2, afTurn: 2.6, afRiver: 2.1, wtsd: 28, wsd: 54, wwsf: 48, wosd: 42, totalHands: 87 },
+  p2: { vpip: 24, pfr: 20, threeBet: 11, fourBet: 3.0, steal: 35, foldToSteal: 55, bbDefense: 48, cbetFlop: 68, cbetTurn: 52, cbetRiver: 42, checkRaiseFlop: 9, af: 3.5, afFlop: 3.8, afTurn: 3.4, afRiver: 3.2, wtsd: 25, wsd: 58, wwsf: 52, wosd: 46, totalHands: 85 },
+  p3: { vpip: 22, pfr: 18, threeBet: 7, fourBet: 2.0, steal: 32, foldToSteal: 65, bbDefense: 38, cbetFlop: 70, cbetTurn: 48, cbetRiver: 30, checkRaiseFlop: 5, af: 2.2, afFlop: 2.8, afTurn: 2.0, afRiver: 1.6, wtsd: 30, wsd: 48, wwsf: 44, wosd: 38, totalHands: 82 },
+  p4: { vpip: 26, pfr: 21, threeBet: 10, fourBet: 2.8, steal: 36, foldToSteal: 58, bbDefense: 46, cbetFlop: 65, cbetTurn: 50, cbetRiver: 36, checkRaiseFlop: 8, af: 2.5, afFlop: 2.9, afTurn: 2.4, afRiver: 2.0, wtsd: 27, wsd: 52, wwsf: 50, wosd: 44, totalHands: 71 },
+  p5: { vpip: 30, pfr: 24, threeBet: 12, fourBet: 3.5, steal: 42, foldToSteal: 48, bbDefense: 52, cbetFlop: 74, cbetTurn: 58, cbetRiver: 44, checkRaiseFlop: 10, af: 3.0, afFlop: 3.4, afTurn: 3.0, afRiver: 2.5, wtsd: 32, wsd: 50, wwsf: 46, wosd: 40, totalHands: 63 },
+  p6: { vpip: 25, pfr: 20, threeBet: 10, fourBet: 2.5, steal: 34, foldToSteal: 56, bbDefense: 45, cbetFlop: 66, cbetTurn: 51, cbetRiver: 35, checkRaiseFlop: 7, af: 2.8, afFlop: 3.1, afTurn: 2.7, afRiver: 2.3, wtsd: 26, wsd: 55, wwsf: 49, wosd: 43, totalHands: 55 },
+  p7: { vpip: 32, pfr: 26, threeBet: 14, fourBet: 4.0, steal: 45, foldToSteal: 44, bbDefense: 55, cbetFlop: 76, cbetTurn: 60, cbetRiver: 46, checkRaiseFlop: 11, af: 3.2, afFlop: 3.6, afTurn: 3.2, afRiver: 2.8, wtsd: 34, wsd: 46, wwsf: 44, wosd: 38, totalHands: 44 },
+  p8: { vpip: 20, pfr: 16, threeBet: 5, fourBet: 1.5, steal: 28, foldToSteal: 70, bbDefense: 32, cbetFlop: 62, cbetTurn: 44, cbetRiver: 28, checkRaiseFlop: 4, af: 1.8, afFlop: 2.2, afTurn: 1.6, afRiver: 1.2, wtsd: 22, wsd: 42, wwsf: 38, wosd: 34, totalHands: 31 },
+  p9: { vpip: 18, pfr: 14, threeBet: 8, fourBet: 2.0, steal: 30, foldToSteal: 68, bbDefense: 35, cbetFlop: 64, cbetTurn: 46, cbetRiver: 32, checkRaiseFlop: 6, af: 4.2, afFlop: 4.8, afTurn: 4.0, afRiver: 3.6, wtsd: 20, wsd: 62, wwsf: 55, wosd: 48, totalHands: 22 }
+};
+
+const SKILL_RATINGS = {
+  p1: { rating: 'A+', color: '#059669' }, p2: { rating: 'A', color: '#16a34a' },
+  p3: { rating: 'B', color: '#2563eb' }, p4: { rating: 'A', color: '#16a34a' },
+  p5: { rating: 'A', color: '#16a34a' }, p6: { rating: 'A', color: '#16a34a' },
+  p7: { rating: 'B', color: '#2563eb' }, p8: { rating: 'C', color: '#d97706' },
+  p9: { rating: 'B', color: '#2563eb' }
+};
+
+const STYLES = {
+  p1: { label: 'TAG', emoji: '\u{1F3AF}' }, p2: { label: 'TAG', emoji: '\u{1F3AF}' },
+  p3: { label: 'TAG', emoji: '\u{1F3AF}' }, p4: { label: 'TAG', emoji: '\u{1F3AF}' },
+  p5: { label: 'LAG', emoji: '\u{1F525}' }, p6: { label: 'TAG', emoji: '\u{1F3AF}' },
+  p7: { label: 'LAG', emoji: '\u{1F525}' }, p8: { label: 'Nit', emoji: '\u{1F9CA}' },
+  p9: { label: 'Nit', emoji: '\u{1F9CA}' }
+};
+
+const CAREERS = {
+  p1: '6 FTs | 2 Wins | Avg: 2.1', p2: '5 FTs | 1 Win | Avg: 2.8',
+  p3: '16 FTs | 3 Wins | Avg: 3.2', p4: '4 FTs | 1 Win | Avg: 3.0',
+  p5: '3 FTs | 1 Win | Avg: 2.3', p6: '4 FTs | 2 Wins | Avg: 1.8',
+  p7: '3 FTs | 0 Wins | Avg: 5.1', p8: '1 FT | 0 Wins | Avg: 8.0',
+  p9: '8 FTs | 1 Win | Avg: 3.5'
+};
+
+const STRENGTHS = {
+  p1: ['Tight Opener', 'Value Bettor', 'River Closer', 'Table Read'],
+  p2: ['Balanced Range', 'Bluff Catcher', 'Float Master', 'ICM Aware'],
+  p3: ['Positional Play', 'Steal Artist', 'Tells Reader'],
+  p4: ['Range Balance', 'ICM Master', 'Thin Value'],
+  p5: ['Aggressive 3-Bet', 'Barrel Master', 'Fearless Bluffer'],
+  p6: ['GTO Balanced', 'Short Stack Play', 'Equity Realization'],
+  p7: ['Aggressive Stealer', 'Barrel Pressure', 'Wide Range'],
+  p8: ['Patient Play', 'Hand Selection', 'Low Variance'],
+  p9: ['Selective Aggression', 'Post-Flop Master', 'River Value']
+};
+
+const LEAKS = {
+  p1: ['Fit-or-Fold Post', 'Over-folds 3B', 'Passive River'],
+  p2: ['Predictable Sizing', 'Low Steal Rate'],
+  p3: ['Over-folds BB', 'River Aggression Drop', 'Low Check-Raise'],
+  p4: ['Passive Turn', 'Tight 4-Bet Range'],
+  p5: ['Overbluffs River', 'Wide VPIP Range'],
+  p6: ['Exploitable Turn', 'Predictable CBet'],
+  p7: ['Too Wide Preflop', 'Overvalues Draws', 'Low WSD'],
+  p8: ['Too Tight Overall', 'Overfolds to Steal', 'Passive Post'],
+  p9: ['Short Sample', 'Exploitable Tightness', 'Low Table Count']
+};
+
+const LUCK_SCORES = {
+  p1: 112, p2: 95, p3: 88, p4: 105, p5: 78, p6: 98, p7: 92, p8: 65, p9: 102
+};
+
+const HIGHLIGHTS = [
+  { id: 'h87', num: 87, preview: 'Negreanu rivers two pair vs Ivey pocket kings', type: 'biggest_pot', label: 'Biggest Pot', tier: 'monster', pot: 8400000, yt: 3842 },
+  { id: 'h82', num: 82, preview: 'Hellmuth eliminated after failed river bluff', type: 'elimination', label: 'Elimination', tier: 'air', pot: 4200000, yt: 3120 },
+  { id: 'h65', num: 65, preview: 'Selbst hero-calls Kenney all-in with second pair', type: 'hero_call', label: 'Hero Call', tier: 'medium', pot: 3100000, yt: 2456 },
+  { id: 'h51', num: 51, preview: 'Bonomo cooler — set over set vs Holz', type: 'cooler', label: 'Cooler', tier: 'monster', pot: 5200000, yt: 1890 },
+  { id: 'h38', num: 38, preview: 'Ivey triple-barrel bluff forces Negreanu fold', type: 'bluff', label: 'Bluff', tier: 'air', pot: 2800000, yt: 1240 },
+  { id: 'h22', num: 22, preview: 'Seidel eliminated on bad beat — aces cracked by 67s', type: 'bad_beat', label: 'Bad Beat', tier: 'strong', pot: 1900000, yt: 680 }
+];
+
+const INSIGHTS = [
+  { icon: '\u{1F4CA}', title: 'Aggression Patterns', text: 'Preflop raise rates cluster 18-26% with Kenney the outlier at 26%. Post-flop aggression separates winners.' },
+  { icon: '\u{1F3AF}', title: 'ICM Implications', text: 'Pay jumps create 3 distinct strategy zones. Bubble play was unusually passive with 4 players folding >60%.' },
+  { icon: '\u{1F52E}', title: 'AI Prediction', text: 'Negreanu had 34% win probability by hand 60 based on stack trajectory and opponent tendencies.' },
+  { icon: '\u{26A0}\uFE0F', title: 'Bluff Detection', text: '7 confirmed bluffs detected. Ivey ran 3 successful triple-barrels. Hellmuth\'s final bluff was the costliest.' }
+];
+
+const SCOUTING = {
+  p1: "Negreanu plays a disciplined TAG style with excellent hand reading. His VPIP/PFR gap of 6 suggests some speculative calling, but his positional awareness compensates. Key weakness is river passivity \u2014 his AF drops from 3.2 on flop to 2.1 on river, indicating he gives up value on later streets. His 62% fold-to-steal rate creates steal opportunities from late position.",
+  p2: "Ivey is the most balanced player at the table with near-perfect metrics across all streets. His 3.5 AF is the second-highest, maintained consistently from flop to river. The only exploitable tendency is a slightly predictable bet sizing pattern \u2014 he uses 2/3 pot on bluffs and 1/2 pot for value. His 58% WSD suggests he picks his spots carefully.",
+  p3: "Hellmuth's tight range (22/18 VPIP/PFR) makes his hands readable. His 65% fold-to-steal is the second-highest, creating clear steal opportunities. River AF of 1.6 vs 2.8 on flop shows significant aggression drop. His 5% check-raise frequency allows opponents to barrel freely.",
+  p4: "Bonomo brings a mathematically precise approach. His 10% 3-bet and 2.8% 4-bet create a balanced re-raising range. The 46% BB defense rate is near optimal. His main leak is passive turn play \u2014 he check-calls more than he should on the second street.",
+  p5: "Selbst is the most aggressive player at the table by preflop metrics (30/24 VPIP/PFR). Her 12% 3-bet and 42% steal rate put constant pressure on opponents. She barrel-fires at the highest rates (74%/58%/44% across streets). Her weakness is over-bluffing the river, where she gets caught at a higher rate than optimal.",
+  p6: "Holz plays a GTO-influenced style that's hard to exploit. His stats are well-balanced across all categories. The main weakness is a predictable c-bet pattern that drops sharply on the turn, allowing floats to be profitable against him.",
+  p7: "Kenney is the widest player at the table (32/26) with the highest aggression metrics. His 14% 3-bet and 45% steal create constant pressure. However, his 46% WSD is concerning \u2014 he goes to showdown too often with weak holdings and has the lowest win rate when seeing a river.",
+  p8: "Konnikova plays an extremely tight style (20/16) that limits her pots and opportunities. Her 70% fold-to-steal is the highest at the table, making her the easiest target for blind steals. Her 1.8 AF is below average and she rarely check-raises (4%), allowing aggressive players to dominate.",
+  p9: "Seidel has the tightest style at the table (18/14) but compensates with the highest AF of 4.2. When he enters a pot, he's aggressive and wins at showdown 62% of the time \u2014 the best rate at the table. His small sample (22 hands) makes these stats less reliable."
+};
+
+const YOUTUBE_BASE = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+
+// ===================== Helpers =====================
+
+function fmtChips(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+  return String(n);
+}
+
+function getStatColor(value, stat) {
+  if (stat === 'af') {
+    if (value >= 3.5) return '#059669';
+    if (value >= 2.0) return '#d97706';
+    return '#dc2626';
+  }
+  if (value > 55) return '#059669';
+  if (value > 30) return '#d97706';
+  return '#dc2626';
+}
+
+function tierClass(tier) {
+  return 'tier-' + (tier || 'medium');
+}
+
+function tierLabel(tier) {
+  const labels = { monster: 'MONSTER', strong: 'STRONG', medium: 'MEDIUM', weak: 'WEAK', draw: 'DRAW', air: 'AIR' };
+  return labels[tier] || 'MEDIUM';
+}
+
+function skillClass(pid) {
+  const r = SKILL_RATINGS[pid]?.rating || 'B';
+  if (r === 'A+') return 'skill-aplus';
+  return 'skill-' + r.toLowerCase();
+}
+
+function rivalryInfo(score) {
+  if (score >= 76) return { label: 'Arch-Nemesis', color: '#dc2626' };
+  if (score >= 51) return { label: 'Major Rival', color: '#ea580c' };
+  if (score >= 21) return { label: 'Notable', color: '#2563eb' };
+  return { label: 'Casual', color: '#9ca3af' };
+}
+
+function ytLink(seconds) {
+  return YOUTUBE_BASE + '&t=' + seconds;
+}
+
+function getPlayer(pid) {
+  return PLAYERS.find(p => p.id === pid) || PLAYERS[0];
+}
+
+function ordinal(n) {
+  const s = ['th','st','nd','rd'];
+  const v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+// ===================== Navigation =====================
+
+let currentScreen = 'search';
+let currentParams = {};
+
+function navigate(screen, params) {
+  params = params || {};
+  const hash = '#/' + screen + (Object.keys(params).length ? '?' + new URLSearchParams(params).toString() : '');
+  window.location.hash = hash;
+}
+
+function parseHash() {
+  const raw = (window.location.hash || '#/search').slice(2);
+  const [path, qs] = raw.split('?');
+  return { screen: path || 'search', params: Object.fromEntries(new URLSearchParams(qs || '')) };
+}
+
+function showScreen(screen, params) {
+  currentScreen = screen;
+  currentParams = params || {};
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + screen);
+  if (el) {
+    el.classList.add('active');
+    renderScreen(screen, params);
+  }
+
+  // Scroll to top
+  document.querySelector('.phone-frame').scrollTop = 0;
+}
+
+window.addEventListener('hashchange', () => {
+  const { screen, params } = parseHash();
+  showScreen(screen, params);
+});
+
+// ===================== Render Router =====================
+
+function renderScreen(screen, params) {
+  switch (screen) {
+    case 'search': renderSearch(); break;
+    case 'tournament': renderTournament(); break;
+    case 'players': renderPlayers(); break;
+    case 'answer': renderAnswer(params); break;
+    case 'player': renderPlayer(params); break;
+    case 'report': renderReport(params); break;
+    case 'pricing': renderPricing(); break;
+    default: renderSearch();
+  }
+}
+
+// ===================== Screen: Search/Home =====================
+
+function renderSearch() {
+  const suggestions = [
+    'Who is the most exploitable?',
+    'Show me the biggest turning points',
+    'Tell me the tournament story',
+    'How to play against Negreanu?',
+    'Compare Ivey and Hellmuth',
+    'Who bluffs the most?'
+  ];
+
+  const tournaments = [
+    { id: 'wsop', name: 'WSOP Main Event 2025', active: true },
+    { id: 'wpt', name: 'WPT Borgata Winter', active: false },
+    { id: 'ept', name: 'EPT Monte Carlo', active: false }
+  ];
+
+  document.getElementById('search-suggestions').innerHTML = suggestions.map(q =>
+    `<button class="chip" onclick="navigate('answer', {q: '${q.replace(/'/g, "\\'")}'})">` + q + '</button>'
+  ).join('');
+
+  document.getElementById('search-tournaments').innerHTML = tournaments.map(t =>
+    `<button class="t-pill ${t.active ? 'active' : ''}" onclick="navigate('tournament')">${t.name}</button>`
+  ).join('');
+}
+
+// ===================== Screen: Tournament Overview =====================
+
+function renderTournament() {
+  const el = document.getElementById('tournament-content');
+  el.innerHTML = `
+    <div class="fade-in">
+      <button class="back-link" onclick="navigate('search')">\u2190 Back to search</button>
+    </div>
+
+    <div class="tournament-hero fade-d1">
+      <div class="hero-event">World Series of Poker</div>
+      <div class="hero-name">WSOP Main Event 2025</div>
+      <div class="hero-venue">Horseshoe Casino, Las Vegas \u00B7 July 15, 2025</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Players</div><div class="kpi-value">9</div></div>
+        <div class="kpi"><div class="kpi-label">Hands</div><div class="kpi-value">87</div></div>
+        <div class="kpi"><div class="kpi-label">Prize Pool</div><div class="kpi-value">$93.5M</div></div>
+        <div class="kpi"><div class="kpi-label">Buy-in</div><div class="kpi-value">$10,000</div></div>
+      </div>
+    </div>
+
+    <div class="fade-d2">
+      <div class="section-label">Quick Insights</div>
+      <div class="stack">
+        ${INSIGHTS.map((ins, i) => `
+          <div class="insight-card ${['card-accent-left','card-green-left','card-blue-left','card-red-left'][i]}" onclick="navigate('answer', {q: '${ins.title.replace(/'/g, "\\'")}'})" style="border-left-width: 3px;">
+            <span class="insight-icon">${ins.icon}</span>
+            <div>
+              <div class="insight-title">${ins.title}</div>
+              <div class="insight-text">${ins.text}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="fade-d3">
+      <div class="between" style="margin-bottom: 10px;">
+        <div class="section-label" style="margin-bottom: 0;">Key Moments</div>
+        <button class="link-btn" onclick="navigate('answer', {q: 'Show me all key moments'})">Ask AI \u2192</button>
+      </div>
+      <div class="card" style="padding: 4px 16px;">
+        ${HIGHLIGHTS.map(h => `
+          <div class="moment-row" onclick="navigate('answer', {q: 'Tell me about hand #${h.num}'})">
+            <span class="hand-badge">#${h.num}</span>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 12px; font-weight: 600; color: var(--text-primary); line-height: 1.3;">${h.preview}</div>
+            </div>
+            <span class="tier-badge ${tierClass(h.tier)}">${tierLabel(h.tier)}</span>
+            <span class="highlight-pill highlight-${h.type}">${h.label}</span>
+            <span class="pot-value">${fmtChips(h.pot)}</span>
+            <a class="yt-btn" href="${ytLink(h.yt)}" target="_blank" onclick="event.stopPropagation();">\u25B6 Watch</a>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="fade-d4">
+      <div class="section-label">Ask about this tournament</div>
+      <div class="search-wrap">
+        <span class="search-icon">&#128269;</span>
+        <input class="search-input search-input-sm" placeholder="What do you want to know?" onkeydown="if(event.key==='Enter' && this.value.trim()) navigate('answer', {q: this.value.trim()})">
+      </div>
+      <div class="mt-sm">
+        <div class="chips">
+          <button class="chip" onclick="navigate('answer', {q: 'What were the ICM mistakes?'})">What were the ICM mistakes?</button>
+          <button class="chip" onclick="navigate('answer', {q: 'Who got eliminated first?'})">Who got eliminated first?</button>
+          <button class="chip" onclick="navigate('answer', {q: 'Show me all the bluffs'})">Show me all the bluffs</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fade-d5 between" style="padding: 8px 0;">
+      <button class="btn btn-ghost btn-sm" onclick="navigate('players')">Browse All Players \u2192</button>
+      <button class="btn btn-primary btn-sm" onclick="navigate('answer', {q: 'Who is the most exploitable player?'})">Ask AI</button>
+    </div>
+  `;
+}
+
+// ===================== Screen: Players Grid =====================
+
+function renderPlayers() {
+  const el = document.getElementById('players-content');
+  el.innerHTML = `
+    <div class="fade-in">
+      <button class="back-link" onclick="navigate('tournament')">\u2190 Back to tournament</button>
+    </div>
+    <div class="fade-d1">
+      <div class="heading-md">Players \u2014 WSOP Main Event Final Table</div>
+      <div class="text-muted" style="font-size: 12px; margin-bottom: 8px;">9 players \u00B7 87 hands \u00B7 Tap any player for full profile</div>
+    </div>
+    <div class="stack fade-d2">
+      ${PLAYERS.map((p, i) => {
+        const s = STATS[p.id];
+        const sk = SKILL_RATINGS[p.id];
+        const st = STYLES[p.id];
+        return `
+          <div class="player-grid-card fade-d${Math.min(i + 2, 7)}" onclick="navigate('player', {player: '${p.id}'})">
+            <div class="row">
+              <div class="avatar avatar-sm" style="background: ${p.color};">${p.initials}</div>
+              <div class="skill-circle ${skillClass(p.id)}">${sk.rating}</div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 14px; font-weight: 700;">
+                  ${p.flag} ${p.name}
+                  <span class="text-muted" style="font-weight: 500; margin-left: 4px;">#${p.finish}</span>
+                </div>
+                <div class="row" style="gap: 6px; margin-top: 2px;">
+                  <span class="style-badge">${st.label} ${st.emoji}</span>
+                  <span class="career-record">${CAREERS[p.id]}</span>
+                </div>
+              </div>
+            </div>
+            <div class="player-grid-stats">
+              <div class="player-grid-stat"><div class="label">VPIP</div><div class="value">${s.vpip}%</div></div>
+              <div class="player-grid-stat"><div class="label">PFR</div><div class="value">${s.pfr}%</div></div>
+              <div class="player-grid-stat"><div class="label">AF</div><div class="value">${s.af}</div></div>
+              <div class="player-grid-stat"><div class="label">Hands</div><div class="value">${p.hands}</div></div>
+            </div>
+            <div style="margin-top: 8px; display: flex; gap: 6px; justify-content: flex-end;">
+              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); navigate('report', {player: '${p.id}'})">Exploit Report</button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ===================== Screen: AI Answer =====================
+
+function renderAnswer(params) {
+  const query = params.q || 'Who is the most exploitable player?';
+  const pid = params.player || 'p1';
+  const player = getPlayer(pid);
+
+  const isCompare = query.toLowerCase().includes('compare') && query.toLowerCase().includes('and');
+  const isBluff = query.toLowerCase().includes('bluff');
+  const isExploit = query.toLowerCase().includes('exploit');
+  const isMoment = query.toLowerCase().includes('hand #');
+
+  // Build AI response text
+  let answerText;
+  if (isCompare) {
+    answerText = `Based on analysis of 87 hands from the WSOP Main Event Final Table, <strong class="player-link" onclick="navigate('player', {player: 'p2'})">Phil Ivey</strong> and <strong class="player-link" onclick="navigate('player', {player: 'p3'})">Phil Hellmuth</strong> represent contrasting approaches to final table play. Ivey maintains a consistent 3.5 AF across all streets, while Hellmuth's aggression drops from 2.8 on the flop to just 1.6 on the river. Ivey's 58% WSD vs Hellmuth's 48% confirms Ivey picks better spots to commit chips. The matchup data shows Ivey won 4 of 6 direct confrontations, including the pivotal Hand #82 that eliminated Hellmuth.`;
+  } else if (isBluff) {
+    answerText = `The AI Deterministic Engine detected <strong>7 confirmed bluffs</strong> across 87 hands. <strong class="player-link" onclick="navigate('player', {player: 'p2'})">Phil Ivey</strong> was the most prolific bluffer with 3 successful triple-barrel bluffs, all identified by the engine's bet-sizing and range analysis. <strong class="player-link" onclick="navigate('player', {player: 'p3'})">Phil Hellmuth</strong> attempted 2 bluffs \u2014 his final one on Hand #82 was a catastrophic river overbet with complete air that cost him his tournament life. <strong class="player-link" onclick="navigate('player', {player: 'p7'})">Bryn Kenney</strong> ran 2 semi-bluffs with draws, converting one on the turn.`;
+  } else if (isMoment) {
+    answerText = `In this pivotal hand, the pot reached <strong>8.4M chips</strong> \u2014 the largest of the final table. <strong class="player-link" onclick="navigate('player', {player: 'p1'})">Daniel Negreanu</strong> rivered two pair against <strong class="player-link" onclick="navigate('player', {player: 'p2'})">Phil Ivey's</strong> pocket kings. The AI engine classified this as a MONSTER tier hand with 94% equity by the river. Negreanu's river bet of 2.1x pot was perfectly sized to extract maximum value from Ivey's overpair. This hand gave Negreanu a commanding 2:1 chip lead heads-up.`;
+  } else {
+    answerText = `Based on analysis of 87 hands from the WSOP Main Event Final Table, the most exploitable player is <strong class="player-link" onclick="navigate('player', {player: 'p1'})">Daniel Negreanu</strong> with a VPIP/PFR gap suggesting speculative calling tendencies. His river aggression factor drops significantly (2.1 vs 3.2 on the flop), indicating he may be giving up value on later streets. <strong class="player-link" onclick="navigate('player', {player: 'p3'})">Phil Hellmuth's</strong> tight 3-bet frequency (7%) also presents opportunities to steal wider against him in late position. The evidence from Hand #87 (final hand) and Hand #82 (Hellmuth elimination) shows clear pattern tendencies that can be exploited with proper preparation.`;
+  }
+
+  // Sources
+  const sources = [
+    { type: '\u{1F0CF}', title: 'Hand #87 \u2014 Final Hand', preview: 'Negreanu rivers two pair vs Ivey pocket kings', tier: 'monster', yt: 3842 },
+    { type: '\u{1F464}', title: player.name + ' \u2014 HUD Stats', preview: 'VPIP ' + STATS[pid].vpip + '% \u00B7 PFR ' + STATS[pid].pfr + '% \u00B7 AF ' + STATS[pid].af, tier: null, yt: null },
+    { type: '\u{1F4CA}', title: 'Tournament Insights', preview: 'Aggression patterns and ICM tendencies', tier: null, yt: null }
+  ];
+
+  const followUps = [
+    'How do I exploit this?',
+    'Show me the evidence hands',
+    'Compare to population baseline',
+    'Generate exploit report'
+  ];
+
+  const el = document.getElementById('answer-content');
+  el.innerHTML = `
+    <div class="fade-in">
+      <button class="back-link" onclick="navigate('tournament')">\u2190 Back to tournament</button>
+    </div>
+
+    <div class="query-echo fade-d1">
+      <div class="query-avatar">\u{1F464}</div>
+      <div class="query-text">${escHtml(query)}</div>
+    </div>
+
+    <div class="ai-prose fade-d2">
+      <p>${answerText}</p>
+    </div>
+
+    ${isBluff ? `
+    <div class="bluff-card fade-d2" style="margin-top: -6px; margin-bottom: 6px;">
+      <div class="bluff-header">\u{1F6A8} BLUFF DETECTED \u2014 Hand #82</div>
+      <div class="row" style="gap: 8px; margin-bottom: 6px;">
+        <span class="tier-badge tier-air">AIR</span>
+        <span style="font-size: 11px; color: var(--text-secondary);">Hellmuth 7\u26602\u2660 on K\u2666Q\u26659\u26638\u2660J\u2663</span>
+      </div>
+      <div class="bluff-detail">
+        <strong>Bet 2.5x pot on river</strong> \u2014 massive overbet with complete air.<br>
+        Opponent: <strong style="color: var(--accent-emerald);">Ivey snap-called</strong> with K\u2660J\u2666 (two pair).<br>
+        Result: Hellmuth eliminated in 3rd place.
+      </div>
+      <div style="margin-top: 8px;">
+        <a class="yt-btn" href="${ytLink(3120)}" target="_blank">\u25B6 Watch this hand</a>
+      </div>
+    </div>
+    ` : ''}
+
+    ${isCompare ? `
+    <div class="card fade-d2" style="margin-top: -6px; margin-bottom: 6px;">
+      <div class="row" style="justify-content: center; gap: 20px;">
+        <div style="text-align: center;">
+          <div class="avatar" style="background: #2563eb; margin: 0 auto 6px;">PI</div>
+          <div style="font-size: 13px; font-weight: 700;">Phil Ivey</div>
+        </div>
+        <div style="text-align: center;">
+          <div class="rivalry-circle" style="background: #ea580c;">72</div>
+          <div class="rivalry-label" style="color: #ea580c; margin-top: 4px;">Major Rival</div>
+        </div>
+        <div style="text-align: center;">
+          <div class="avatar" style="background: #dc2626; margin: 0 auto 6px;">PH</div>
+          <div style="font-size: 13px; font-weight: 700;">Phil Hellmuth</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+        <span style="font-size: 11px; color: var(--text-muted);">6 direct hands \u00B7 Ivey leads 4-2 \u00B7 Rivalry Score: 72/100</span>
+      </div>
+    </div>
+    ` : ''}
+
+    <div class="fade-d3">
+      <div class="section-label">Sources</div>
+      <div class="sources-grid">
+        ${sources.map((s, i) => `
+          <div class="source-card" onclick="${i === 0 ? "navigate('answer', {q: 'Tell me about hand #87'})" : i === 1 ? "navigate('player', {player: '" + pid + "'})" : "navigate('tournament')"}">
+            <div class="source-type">${s.type}</div>
+            <div class="source-body">
+              <div class="source-title">${s.title}</div>
+              <div class="source-preview">${s.preview}</div>
+            </div>
+            <div class="source-actions">
+              ${s.tier ? `<span class="tier-badge ${tierClass(s.tier)}">${tierLabel(s.tier)}</span>` : ''}
+              ${s.yt ? `<a class="yt-btn" href="${ytLink(s.yt)}" target="_blank" onclick="event.stopPropagation();">\u25B6</a>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="fade-d4">
+      <div class="section-label">Follow-up questions</div>
+      <div class="chips">
+        ${followUps.map(q => `
+          <button class="chip" onclick="${q.includes('exploit report') ? "navigate('report', {player: '" + pid + "'})" : "navigate('answer', {q: '" + q.replace(/'/g, "\\'") + "', player: '" + pid + "'})"}">${q}</button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="fade-d5 actions-bar">
+      <button class="btn btn-ghost btn-sm" onclick="navigate('report', {player: '${pid}'})">\u{1F4C4} Exploit Report</button>
+      <button class="btn btn-ghost btn-sm" onclick="navigate('player', {player: '${pid}'})">\u{1F464} Player Profile</button>
+      <button class="btn btn-ghost btn-sm">\u{1F4BE} Save to Notes</button>
+    </div>
+
+    <div class="fade-d6 between" style="padding: 8px 0;">
+      <span class="confidence confidence-high">High confidence</span>
+      <span class="text-muted" style="font-size: 11px;">87 hands analyzed \u00B7 Updated 3 days ago</span>
+    </div>
+  `;
+}
+
+// ===================== Screen: Player Profile =====================
+
+function renderPlayer(params) {
+  const pid = params.player || 'p1';
+  const p = getPlayer(pid);
+  const s = STATS[pid];
+  const sk = SKILL_RATINGS[pid];
+  const st = STYLES[pid];
+  const luck = LUCK_SCORES[pid];
+  const strengths = STRENGTHS[pid] || [];
+  const leaks = LEAKS[pid] || [];
+
+  const statGroups = [
+    { label: 'VPIP', value: s.vpip + '%', pct: s.vpip, color: getStatColor(s.vpip, 'vpip') },
+    { label: 'PFR', value: s.pfr + '%', pct: s.pfr, color: getStatColor(s.pfr, 'pfr') },
+    { label: '3-Bet', value: s.threeBet + '%', pct: s.threeBet * 3, color: getStatColor(s.threeBet * 3, '3bet') },
+    { label: '4-Bet', value: s.fourBet + '%', pct: s.fourBet * 5 },
+    { label: 'Steal', value: s.steal + '%', pct: s.steal },
+    { label: 'Fold Steal', value: s.foldToSteal + '%', pct: s.foldToSteal },
+    { label: 'BB Def', value: s.bbDefense + '%', pct: s.bbDefense },
+    { label: 'CBet F', value: s.cbetFlop + '%', pct: s.cbetFlop },
+    { label: 'CBet T', value: s.cbetTurn + '%', pct: s.cbetTurn },
+    { label: 'CBet R', value: s.cbetRiver + '%', pct: s.cbetRiver },
+    { label: 'C-Raise', value: s.checkRaiseFlop + '%', pct: s.checkRaiseFlop * 3 },
+    { label: 'AF', value: s.af.toFixed(1), pct: s.af * 15, color: getStatColor(s.af, 'af') },
+    { label: 'WTSD', value: s.wtsd + '%', pct: s.wtsd },
+    { label: 'WSD', value: s.wsd + '%', pct: s.wsd },
+    { label: 'WWSF', value: s.wwsf + '%', pct: s.wwsf },
+    { label: 'W/O SD', value: s.wosd + '%', pct: s.wosd }
+  ];
+
+  // Luck gauge SVG
+  const luckAngle = ((luck - 0) / 200) * 180; // 0-200 maps to 0-180 degrees
+  const luckColor = luck >= 100 ? '#059669' : '#dc2626';
+  const luckDelta = luck - 100;
+  const luckText = luckDelta >= 0 ? '+' + luckDelta + '% above expectation' : luckDelta + '% below expectation';
+
+  // SVG arc calculation
+  const gaugeRadius = 50;
+  const gaugeCx = 60;
+  const gaugeCy = 55;
+  const startAngle = Math.PI;
+  const endAngle = Math.PI + (luckAngle / 180) * Math.PI;
+  const x1 = gaugeCx + gaugeRadius * Math.cos(startAngle);
+  const y1 = gaugeCy + gaugeRadius * Math.sin(startAngle);
+  const x2 = gaugeCx + gaugeRadius * Math.cos(endAngle);
+  const y2 = gaugeCy + gaugeRadius * Math.sin(endAngle);
+  const largeArc = luckAngle > 90 ? 1 : 0;
+
+  const el = document.getElementById('player-content');
+  el.innerHTML = `
+    <div class="fade-in">
+      <button class="back-link" onclick="navigate('players')">\u2190 All players</button>
+    </div>
+
+    <div class="player-header fade-d1">
+      <div class="avatar" style="background: ${p.color};">${p.initials}</div>
+      <div class="skill-circle skill-circle-lg ${skillClass(pid)}">${sk.rating}</div>
+      <div style="flex: 1;">
+        <div class="player-name">${p.flag} ${p.name}</div>
+        <div class="row" style="gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+          <span class="meta-pill">#${p.finish} \u2014 ${p.status === 'winner' ? 'Winner' : 'Eliminated'}</span>
+          <span class="style-badge">${st.label} ${st.emoji}</span>
+        </div>
+        <div class="career-record" style="margin-top: 4px;">${CAREERS[pid]}</div>
+      </div>
+    </div>
+
+    <div class="player-meta fade-d1" style="margin-top: -8px;">
+      <span class="meta-pill">${p.hands} hands</span>
+      <span class="meta-pill">Stack: ${fmtChips(p.startStack)} \u2192 ${fmtChips(p.endStack || 0)}</span>
+    </div>
+
+    ${SCOUTING[pid] ? `
+    <div class="fade-d2">
+      <div class="section-label">AI Scouting Report</div>
+      <div class="ai-prose">
+        <p>${SCOUTING[pid]} <span class="cite-ref" onclick="navigate('report', {player: '${pid}'})">1</span></p>
+      </div>
+    </div>
+    ` : ''}
+
+    <div class="fade-d3">
+      <div class="section-label">HUD Statistics</div>
+      <div class="stats-grid">
+        ${statGroups.map(sg => `
+          <div class="stat-card">
+            <div class="stat-label">${sg.label}</div>
+            <div class="stat-value" style="color: ${sg.color || 'var(--text-primary)'};">${sg.value}</div>
+            ${sg.pct != null ? `<div class="stat-bar"><div class="stat-bar-fill" style="width: ${Math.min(sg.pct, 100)}%; background: ${sg.color || 'var(--accent-purple)'};"></div></div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="fade-d4">
+      <div class="section-label">Strengths & Leaks</div>
+      <div style="margin-bottom: 8px;">
+        <div style="font-size: 11px; font-weight: 600; color: var(--accent-emerald); margin-bottom: 6px;">STRENGTHS</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          ${strengths.map(s => `<span class="strength-pill">${s}</span>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 600; color: var(--accent-red); margin-bottom: 6px;">LEAKS</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          ${leaks.map(l => `<span class="leak-pill">${l}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="fade-d5">
+      <div class="section-label">Luck Score</div>
+      <div class="card">
+        <div class="luck-gauge-wrap">
+          <svg width="120" height="68" viewBox="0 0 120 68">
+            <!-- Background arc -->
+            <path d="M 10 55 A 50 50 0 0 1 110 55" fill="none" stroke="#e5e7eb" stroke-width="8" stroke-linecap="round"/>
+            <!-- Value arc -->
+            <path d="M ${x1} ${y1} A ${gaugeRadius} ${gaugeRadius} 0 ${largeArc} 1 ${x2} ${y2}" fill="none" stroke="${luckColor}" stroke-width="8" stroke-linecap="round"/>
+            <!-- Center text -->
+            <text x="60" y="52" text-anchor="middle" font-size="20" font-weight="800" fill="${luckColor}" font-family="var(--font-mono)">${luck}</text>
+          </svg>
+          <div class="luck-gauge-label" style="color: ${luckColor};">${luckText}</div>
+          <div class="luck-gauge-detail">Score range: 0 (unlucky) \u2014 100 (neutral) \u2014 200 (lucky)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fade-d6">
+      <div class="section-label">Ask about this player</div>
+      <div class="search-wrap">
+        <span class="search-icon">&#128269;</span>
+        <input class="search-input search-input-sm" placeholder="Ask about ${p.name}..." onkeydown="if(event.key==='Enter' && this.value.trim()) navigate('answer', {q: this.value.trim(), player: '${pid}'})">
+      </div>
+      <div class="mt-sm">
+        <div class="chips">
+          <button class="chip" onclick="navigate('answer', {q: 'Top leaks for ${p.name.split(' ')[1]}?', player: '${pid}'})">Top leaks for ${p.name.split(' ')[1]}?</button>
+          <button class="chip" onclick="navigate('answer', {q: 'How to exploit?', player: '${pid}'})">How to exploit?</button>
+          <button class="chip" onclick="navigate('answer', {q: 'Compare to population', player: '${pid}'})">Compare to population</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fade-d7">
+      <button class="btn btn-primary btn-primary-full" onclick="navigate('report', {player: '${pid}'})">Generate Full Exploit Report \u2192</button>
+    </div>
+  `;
+}
+
+// ===================== Screen: Exploit Report =====================
+
+function renderReport(params) {
+  const pid = params.player || 'p1';
+  const p = getPlayer(pid);
+  const s = STATS[pid];
+  const sk = SKILL_RATINGS[pid];
+
+  const leakData = [
+    {
+      name: 'Overfolds in BB Defense',
+      severity: 'critical',
+      playerVal: s.foldToSteal + '%',
+      popVal: '52%',
+      delta: s.foldToSteal - 52,
+      confidence: 'High',
+      evidence: 'Observed ' + s.foldToSteal + '% fold to steal vs 52% population baseline across ' + s.totalHands + ' hands. This creates a clear steal-wider opportunity from late position.',
+      sample: s.totalHands + ' hands',
+      hands: ['#38', '#55'],
+      yt: [1240, 2100]
+    },
+    {
+      name: 'River Aggression Drop',
+      severity: 'moderate',
+      playerVal: (s.afRiver || 2.1).toFixed(1),
+      popVal: '2.8',
+      delta: -0.7,
+      confidence: 'Medium',
+      evidence: 'River AF of ' + (s.afRiver || 2.1) + ' vs ' + (s.afFlop || 3.2) + ' on the flop represents a significant aggression decline. They may be giving up value on river bets.',
+      sample: s.totalHands + ' hands',
+      hands: ['#87', '#65'],
+      yt: [3842, 2456]
+    },
+    {
+      name: 'Low Check-Raise Frequency',
+      severity: 'minor',
+      playerVal: s.checkRaiseFlop + '%',
+      popVal: '8%',
+      delta: s.checkRaiseFlop - 8,
+      confidence: 'Medium',
+      evidence: 'Check-raise frequency of ' + s.checkRaiseFlop + '% allows aggressive players to barrel freely on most board textures without fear of raises.',
+      sample: s.totalHands + ' hands',
+      hands: ['#22'],
+      yt: [680]
+    },
+    {
+      name: 'C-Bet Frequency Decline',
+      severity: 'moderate',
+      playerVal: s.cbetFlop + '% \u2192 ' + s.cbetTurn + '% \u2192 ' + s.cbetRiver + '%',
+      popVal: '65% \u2192 50% \u2192 35%',
+      delta: null,
+      confidence: 'Medium',
+      evidence: 'C-bet frequency drops from ' + s.cbetFlop + '% on flop to ' + s.cbetRiver + '% on river. This pattern allows floating the flop profitably, knowing they abandon many turns.',
+      sample: s.totalHands + ' hands',
+      hands: ['#51'],
+      yt: [1890]
+    }
+  ];
+
+  const el = document.getElementById('report-content');
+  el.innerHTML = `
+    <div class="fade-in">
+      <button class="back-link" onclick="navigate('player', {player: '${pid}'})">\u2190 Back to ${p.name}</button>
+    </div>
+
+    <div class="fade-d1">
+      <div class="heading-md">${p.name} \u2014 Exploit Report</div>
+      <div class="row" style="gap: 8px; margin-top: 4px;">
+        <span class="confidence confidence-high">High confidence</span>
+        <span class="text-muted" style="font-size: 11px;">Generated from ${s.totalHands} hands \u00B7 Updated 3 days ago</span>
+      </div>
+    </div>
+
+    <div class="card card-accent-left fade-d2">
+      <div class="section-label">Executive Summary</div>
+      <div class="ai-prose">
+        <p>
+          <strong>${p.name}</strong> shows actionable edges in blind defense and river play<span class="cite-ref">1</span>.
+          Their tendency to overfold in BB spots (${s.foldToSteal}% vs 52% population)
+          creates a clear steal-wider opportunity<span class="cite-ref">2</span>.
+          Combined with a significant aggression drop on the river (AF ${s.afRiver || 2.1} vs ${s.afFlop || 3.2} on flop),
+          this player gives up value on later streets and can be pressured into folding marginal holdings<span class="cite-ref">3</span>.
+        </p>
+      </div>
+    </div>
+
+    ${leakData.slice(0, 2).map((leak, i) => `
+      <div class="card severity-${leak.severity} fade-d${i + 3}">
+        <div class="between mb-sm">
+          <div style="font-size: 14px; font-weight: 700; color: var(--text-primary);">${leak.name}</div>
+          <div class="row" style="gap: 6px;">
+            <span class="confidence confidence-${leak.confidence.toLowerCase()}">${leak.confidence}</span>
+            <span style="font-size: 10px; padding: 2px 6px; border-radius: var(--radius-full); background: ${leak.severity === 'critical' ? 'rgba(220,38,38,0.08)' : leak.severity === 'moderate' ? 'rgba(234,88,12,0.08)' : 'rgba(37,99,235,0.08)'}; color: ${leak.severity === 'critical' ? '#dc2626' : leak.severity === 'moderate' ? '#ea580c' : '#2563eb'}; font-weight: 600; text-transform: uppercase;">${leak.severity}</span>
+          </div>
+        </div>
+        <div class="ai-prose">
+          <p>${leak.evidence} <span class="cite-ref">${i + 1}</span></p>
+        </div>
+        <div class="row mt-sm" style="gap: 20px;">
+          <div>
+            <div class="stat-label">Player</div>
+            <div class="text-mono" style="font-weight: 700; font-size: 16px; color: var(--accent-red);">${leak.playerVal}</div>
+          </div>
+          <div style="color: var(--text-muted); font-size: 16px;">vs</div>
+          <div>
+            <div class="stat-label">Population</div>
+            <div class="text-mono" style="font-weight: 700; font-size: 16px; color: var(--text-muted);">${leak.popVal}</div>
+          </div>
+          <div style="margin-left: auto;">
+            <div class="stat-label">Sample</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">${leak.sample}</div>
+          </div>
+        </div>
+        <div class="mt-sm">
+          <div class="section-label">Evidence Hands</div>
+          <div class="row" style="gap: 6px;">
+            ${leak.hands.map((h, hi) => `
+              <button class="chip" onclick="navigate('answer', {q: 'Explain hand ${h}', player: '${pid}'})">\u{1F0CF} Hand ${h}</button>
+              <a class="yt-btn" href="${ytLink(leak.yt[hi])}" target="_blank">\u25B6 Watch</a>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('')}
+
+    <!-- Paywall after first 2 leaks -->
+    <div class="paywall fade-d5">
+      <div class="paywall-content">
+        ${leakData.slice(2).map(leak => `
+          <div class="card severity-${leak.severity}" style="margin-bottom: 10px;">
+            <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">${leak.name}</div>
+            <div class="ai-prose"><p>${leak.evidence}</p></div>
+            <div class="row mt-sm" style="gap: 20px;">
+              <div><div class="stat-label">Player</div><div class="text-mono" style="font-weight: 700;">${leak.playerVal}</div></div>
+              <div style="color: var(--text-muted);">vs</div>
+              <div><div class="stat-label">Population</div><div class="text-mono" style="font-weight: 700;">${leak.popVal}</div></div>
+            </div>
+          </div>
+        `).join('')}
+        <div class="card" style="margin-bottom: 10px;">
+          <div class="section-label">Actionable Exploit Plan</div>
+          <div class="ai-prose">
+            <p><strong>Preflop:</strong> Steal wider from late position. Their ${s.foldToSteal}% fold-to-steal creates immediate profit.</p>
+            <p><strong>Postflop:</strong> Float flop bets more often. Their c-bet continuation rate drops sharply on turns.</p>
+            <p><strong>River:</strong> Value bet thinner. Their low river AF means they check back marginal holdings.</p>
+          </div>
+        </div>
+      </div>
+      <div class="paywall-overlay">
+        <div class="paywall-text">Unlock full exploit report with HUDR Pro</div>
+        <button class="btn btn-primary" onclick="navigate('pricing')">Upgrade to HUDR Pro \u2014 $10/mo</button>
+        <button class="link-btn" onclick="navigate('pricing')">See all Pro features \u2192</button>
+      </div>
+    </div>
+  `;
+}
+
+// ===================== Screen: Pricing =====================
+
+function renderPricing() {
+  const el = document.getElementById('pricing-content');
+  el.innerHTML = `
+    <div class="fade-in">
+      <button class="back-link" onclick="navigate('search')">\u2190 Back</button>
+    </div>
+
+    <div class="center fade-d1" style="margin-top: 12px;">
+      <h2 class="heading-lg" style="max-width: 300px;">Unlock the full intelligence engine</h2>
+      <p class="text-muted" style="font-size: 13px; max-width: 280px; margin-top: 8px; line-height: 1.5;">
+        Get AI-powered answers with evidence chains, full exploit reports, and unlimited queries
+      </p>
+    </div>
+
+    <div class="pricing-grid fade-d2" style="margin-top: 20px;">
+      <div class="price-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0</div>
+        <ul class="plan-features">
+          <li>3 AI queries per day</li>
+          <li>Tournament overviews</li>
+          <li>Basic player stats</li>
+          <li>Key moments timeline</li>
+        </ul>
+      </div>
+      <div class="price-card featured">
+        <div class="plan-name" style="color: var(--accent-purple);">HUDR Pro</div>
+        <div class="plan-price">$10<span>/mo</span></div>
+        <ul class="plan-features">
+          <li>Unlimited AI queries</li>
+          <li>Full exploit reports with evidence</li>
+          <li>AI Deterministic Engine access</li>
+          <li>Bluff detection & hand strength tiers</li>
+          <li>Player scouting reports</li>
+          <li>Luck Score & rivalry analysis</li>
+          <li>YouTube hand clip integration</li>
+          <li>Evidence chain deep-dives</li>
+          <li>Export reports to PDF</li>
+          <li>Priority support</li>
+        </ul>
+        <button class="btn btn-primary btn-primary-full" style="margin-top: 16px;" onclick="alert('HUDR Pro activated! (demo)')">Start HUDR Pro</button>
+      </div>
+    </div>
+
+    <div class="center fade-d3" style="margin-top: 20px;">
+      <button class="link-btn" onclick="navigate('search')">Try 3 free queries first \u2192</button>
+    </div>
+
+    <div class="powered fade-d4">Powered by HUDR AI Deterministic Engine</div>
+  `;
+}
+
+// ===================== Utility =====================
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ===================== Init =====================
+
+document.addEventListener('DOMContentLoaded', () => {
+  const { screen, params } = parseHash();
+  showScreen(screen, params);
+});
+
+// Also handle initial load without hash
+if (!window.location.hash) {
+  window.location.hash = '/search';
+}
+</script>
+</body>
+</html>

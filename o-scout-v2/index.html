@@ -1,0 +1,2369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUDR Scout v2.0 — AI Poker Intelligence</title>
+    <style>
+        /* =============================================
+           HUDR Prototype O — "The Scout" v2.0
+           Light Theme + AI Deterministic Engine
+           FotMob + DraftKings + The Athletic inspired
+           ============================================= */
+
+        /* ===================== Reset & Variables ===================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-page: #e5e7eb;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #f1f3f5;
+            --bg-card: #ffffff;
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
+            --accent-orange: #ea580c;
+            --accent-orange-light: #fb923c;
+            --accent-blue: #2563eb;
+            --accent-emerald: #059669;
+            --accent-red: #dc2626;
+            --accent-amber: #d97706;
+            --accent-purple: #7c3aed;
+            --accent-gold: #ca8a04;
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-elevated: 0 4px 16px rgba(0,0,0,0.12);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-full: 9999px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+        }
+
+        /* ===================== Phone Frame ===================== */
+        .phone-frame {
+            width: 390px;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+            position: relative;
+            overflow-x: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.08);
+            padding-bottom: 80px;
+        }
+
+        @media (max-width: 430px) {
+            .phone-frame { width: 100%; }
+        }
+
+        /* ===================== Top Bar ===================== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ea580c, #f97316);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .top-bar-title {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: var(--accent-orange);
+        }
+
+        .top-bar-version {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            margin-left: 6px;
+        }
+
+        .search-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-muted);
+            transition: all 0.15s;
+        }
+
+        .search-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+
+        /* ===================== Bottom Tab Bar ===================== */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 390px;
+            z-index: 50;
+            display: flex;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border-light);
+            padding: 6px 0 env(safe-area-inset-bottom, 8px);
+        }
+
+        @media (max-width: 430px) {
+            .tab-bar { width: 100%; left: 0; transform: none; }
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 6px 0;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+            transition: color 0.15s;
+        }
+
+        .tab-item.active { color: var(--accent-orange); }
+        .tab-item .tab-icon { font-size: 20px; }
+
+        /* ===================== Content Layout ===================== */
+        .content { padding: 0 16px; }
+        .screen-hidden { display: none; }
+
+        /* ===================== Hero Card ===================== */
+        .hero-card {
+            border-radius: var(--radius);
+            padding: 22px;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.15s;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            box-shadow: var(--shadow-elevated);
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold));
+        }
+
+        .hero-card:hover { transform: scale(1.01); }
+
+        .hero-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.8;
+        }
+
+        .hero-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin: 4px 0;
+        }
+
+        .hero-sub {
+            font-size: 13px;
+            opacity: 0.75;
+        }
+
+        .kpi-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .kpi-pill {
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            background: rgba(255,255,255,0.15);
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ===================== Section ===================== */
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 0 16px;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text-primary);
+        }
+
+        .section-link {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-orange);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+
+        /* ===================== Horizontal Scroll ===================== */
+        .h-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 16px 4px;
+            margin: 0;
+            scrollbar-width: none;
+        }
+
+        .h-scroll::-webkit-scrollbar { display: none; }
+        .h-scroll > * { scroll-snap-align: start; flex-shrink: 0; }
+
+        /* ===================== Mini Tournament Card ===================== */
+        .mini-card {
+            width: 180px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s;
+            box-shadow: var(--shadow-card);
+        }
+
+        .mini-card:hover { transform: scale(1.03); border-color: var(--accent-orange); }
+
+        .mini-gradient { height: 5px; background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold)); }
+
+        .mini-body { padding: 12px; }
+
+        .mini-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .mini-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .mini-badges {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .mini-badge {
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            background: var(--accent-red);
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        /* ===================== Player Avatar ===================== */
+        .player-avatar {
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .avatar-lg { width: 64px; height: 64px; font-size: 24px; }
+        .avatar-md { width: 48px; height: 48px; font-size: 18px; }
+        .avatar-sm { width: 36px; height: 36px; font-size: 14px; }
+
+        /* ===================== Player Mini (horizontal grid) ===================== */
+        .player-mini {
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .player-mini .player-avatar { margin: 0 auto 6px; }
+
+        .player-mini-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .player-mini-stat {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ===================== Luck Score Gauge ===================== */
+        .luck-card {
+            width: 120px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.15s;
+        }
+
+        .luck-card:hover { transform: scale(1.03); }
+
+        .luck-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 6px;
+        }
+
+        .luck-value {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* ===================== Insight Card ===================== */
+        .insight-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            box-shadow: var(--shadow-card);
+            transition: border-color 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-orange);
+        }
+
+        .insight-card:hover { border-color: var(--accent-orange); }
+
+        /* ===================== Moment Card ===================== */
+        .moment-card {
+            width: 240px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.15s;
+            box-shadow: var(--shadow-card);
+        }
+
+        .moment-card:hover { transform: scale(1.03); }
+        .moment-accent { height: 4px; }
+
+        .moment-body { padding: 12px; }
+
+        .moment-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .moment-type {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .moment-text {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .moment-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .moment-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        /* ===================== Hand Strength Tier Badge ===================== */
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #fff;
+        }
+
+        .tier-monster { background: #dc2626; }
+        .tier-strong { background: #ea580c; }
+        .tier-medium { background: #d97706; }
+        .tier-weak { background: #6b7280; }
+        .tier-draw { background: #2563eb; }
+        .tier-air { background: #475569; }
+
+        /* ===================== Board Texture Label ===================== */
+        .board-texture {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-size: 10px;
+            font-weight: 600;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+
+        /* ===================== YouTube Button ===================== */
+        .yt-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            background: #dc2626;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-decoration: none;
+        }
+
+        .yt-btn:hover { background: #b91c1c; }
+
+        .yt-btn svg {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+        }
+
+        /* ===================== Skill Rating Circle ===================== */
+        .skill-rating {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .skill-rating-sm {
+            width: 24px;
+            height: 24px;
+            font-size: 10px;
+        }
+
+        /* ===================== Style Badge ===================== */
+        .style-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 14px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 700;
+            background: var(--bg-card);
+            border: 2px solid var(--border-medium);
+        }
+
+        /* ===================== Strength/Leak Tags ===================== */
+        .tag-strength {
+            display: inline-flex;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            background: #ecfdf5;
+            color: #059669;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #a7f3d0;
+        }
+
+        .tag-leak {
+            display: inline-flex;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            background: #fef2f2;
+            color: #dc2626;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #fecaca;
+        }
+
+        /* ===================== Rivalry Section ===================== */
+        .rivalry-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            margin-bottom: 8px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .rivalry-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .rivalry-info { flex: 1; }
+
+        .rivalry-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===================== Search Screen ===================== */
+        .search-screen { padding: 24px 16px; }
+
+        .search-input-wrap {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-medium);
+            border-radius: var(--radius);
+            height: 50px;
+            padding: 0 16px 0 44px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.15s;
+            box-shadow: var(--shadow-card);
+        }
+
+        .search-input:focus { border-color: var(--accent-orange); }
+        .search-input::placeholder { color: var(--text-muted); }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .category-pills {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .category-pills::-webkit-scrollbar { display: none; }
+
+        .cat-pill {
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .cat-pill.active {
+            background: var(--accent-orange);
+            border-color: var(--accent-orange);
+            color: #fff;
+        }
+
+        .cat-pill:hover:not(.active) { border-color: var(--accent-orange); color: var(--accent-orange); }
+
+        .suggestion-bubble {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 18px 18px 18px 4px;
+            padding: 12px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-card);
+        }
+
+        .suggestion-bubble:hover { border-color: var(--accent-orange); background: #fff7ed; }
+
+        /* ===================== Standing Row ===================== */
+        .standing-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .standing-row:hover { background: var(--bg-secondary); }
+
+        .standing-rank {
+            font-size: 14px;
+            font-weight: 800;
+            width: 24px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .standing-rank.gold { color: #ca8a04; }
+        .standing-rank.silver { color: #9ca3af; }
+        .standing-rank.bronze { color: #b45309; }
+
+        .standing-info { flex: 1; }
+
+        .standing-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .standing-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .standing-result {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* ===================== Tab Strip ===================== */
+        .tab-strip {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            padding: 0 16px 12px;
+            scrollbar-width: none;
+        }
+
+        .tab-strip::-webkit-scrollbar { display: none; }
+
+        .strip-tab {
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .strip-tab.active {
+            background: var(--accent-orange);
+            border-color: var(--accent-orange);
+            color: #fff;
+        }
+
+        /* ===================== Scouting Card (Trading Card) ===================== */
+        .scout-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-elevated);
+        }
+
+        .scout-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold));
+        }
+
+        .scout-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .scout-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scout-name {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+        }
+
+        .scout-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-orange);
+        }
+
+        .scout-stat-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ===================== Stat Bubble ===================== */
+        .stat-bubble {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            border: 2px solid;
+            text-align: center;
+            background: var(--bg-card);
+        }
+
+        .stat-bubble-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* ===================== Grade Ring (SVG) ===================== */
+        .grade-ring-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grade-ring-value {
+            position: absolute;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        /* ===================== Leak Card ===================== */
+        .leak-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+        }
+
+        .leak-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .leak-card.severity-high::before { background: var(--accent-red); }
+        .leak-card.severity-medium::before { background: var(--accent-amber); }
+        .leak-card.severity-low::before { background: var(--accent-emerald); }
+
+        .leak-severity-bar {
+            padding: 6px 14px 6px 18px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .leak-severity-bar.high { background: #fef2f2; color: var(--accent-red); }
+        .leak-severity-bar.medium { background: #fffbeb; color: var(--accent-amber); }
+        .leak-severity-bar.low { background: #ecfdf5; color: var(--accent-emerald); }
+
+        .leak-body { padding: 14px 14px 14px 18px; }
+
+        .leak-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .leak-compare {
+            display: flex;
+            gap: 24px;
+            margin: 10px 0;
+        }
+
+        .leak-val-group { display: flex; flex-direction: column; }
+
+        .leak-val-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .leak-val {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .leak-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ===================== AI Chat ===================== */
+        .chat-user {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+        }
+
+        .chat-user-bubble {
+            background: var(--accent-orange);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 18px 18px 4px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            max-width: 80%;
+            box-shadow: 0 2px 8px rgba(234,88,12,0.2);
+        }
+
+        .chat-ai {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .chat-ai-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-orange), #f97316);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .chat-ai-bubble {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            padding: 14px 16px;
+            border-radius: 18px 18px 18px 4px;
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 85%;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-card);
+        }
+
+        .chat-ai-bubble strong { color: var(--accent-orange); cursor: pointer; }
+
+        /* Embed Cards in Chat */
+        .embed-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        .embed-card:hover { border-color: var(--accent-orange); }
+
+        .embed-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .embed-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .embed-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 6px;
+        }
+
+        /* Bluff Detection Card */
+        .bluff-card {
+            background: #fef2f2;
+            border: 2px solid var(--accent-red);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin: 10px 0;
+        }
+
+        .bluff-header {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--accent-red);
+            margin-bottom: 6px;
+        }
+
+        .bluff-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        /* ===================== Pricing ===================== */
+        .pricing-hero {
+            text-align: center;
+            padding: 32px 16px;
+        }
+
+        .pricing-title {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .plan-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 16px;
+        }
+
+        .plan-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .plan-card.featured {
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 1px var(--accent-orange), var(--shadow-elevated);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card.featured::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold));
+        }
+
+        .plan-icon { font-size: 28px; margin-bottom: 8px; }
+
+        .plan-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .plan-price {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 4px 0 12px;
+            color: var(--text-primary);
+        }
+
+        .plan-price span {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .plan-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .plan-features li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .plan-features li::before {
+            content: '\2713';
+            color: var(--accent-orange);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* ===================== Paywall ===================== */
+        .paywall { position: relative; }
+
+        .paywall-blur {
+            filter: blur(5px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .paywall-cta {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 0%, var(--bg-secondary) 50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 24px;
+            gap: 10px;
+        }
+
+        .paywall-text {
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        /* ===================== Checklist ===================== */
+        .checklist {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+
+        .checklist-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .check-item:last-child { border-bottom: none; }
+
+        .check-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2px solid var(--border-medium);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .check-num {
+            color: var(--accent-orange);
+            font-weight: 700;
+            min-width: 18px;
+        }
+
+        /* ===================== Buttons ===================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-orange { background: var(--accent-orange); color: #fff; }
+        .btn-orange:hover { background: #c2410c; }
+        .btn-orange.full { width: 100%; }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-medium);
+        }
+
+        .btn-ghost:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
+
+        /* ===================== Utilities ===================== */
+        .text-orange { color: var(--accent-orange); }
+        .text-green { color: var(--accent-emerald); }
+        .text-red { color: var(--accent-red); }
+        .text-gold { color: var(--accent-gold); }
+        .text-muted { color: var(--text-muted); }
+        .fw-700 { font-weight: 700; }
+        .fw-800 { font-weight: 800; }
+
+        .mt-sm { margin-top: 8px; }
+        .mt-md { margin-top: 16px; }
+        .mt-lg { margin-top: 24px; }
+        .mb-sm { margin-bottom: 8px; }
+        .mb-md { margin-bottom: 16px; }
+
+        .stack { display: flex; flex-direction: column; gap: 12px; }
+        .row { display: flex; align-items: center; gap: 10px; }
+        .wrap { flex-wrap: wrap; }
+
+        /* ===================== Stagger Fade-In Animation ===================== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger > * {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .stagger > *:nth-child(1) { animation-delay: 0.0s; }
+        .stagger > *:nth-child(2) { animation-delay: 0.05s; }
+        .stagger > *:nth-child(3) { animation-delay: 0.06s; }
+        .stagger > *:nth-child(4) { animation-delay: 0.09s; }
+        .stagger > *:nth-child(5) { animation-delay: 0.12s; }
+        .stagger > *:nth-child(6) { animation-delay: 0.15s; }
+        .stagger > *:nth-child(7) { animation-delay: 0.18s; }
+        .stagger > *:nth-child(8) { animation-delay: 0.21s; }
+        .stagger > *:nth-child(9) { animation-delay: 0.24s; }
+        .stagger > *:nth-child(10) { animation-delay: 0.27s; }
+        .stagger > *:nth-child(11) { animation-delay: 0.30s; }
+        .stagger > *:nth-child(12) { animation-delay: 0.33s; }
+
+        @keyframes fillRing {
+            from { stroke-dashoffset: 226; }
+        }
+
+        /* ===================== Hand Row (in tournament hands tab) ===================== */
+        .hand-row {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+
+        .hand-row:hover { background: var(--bg-secondary); }
+
+        .hand-row-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hand-row-bottom {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        /* ===================== Career Record ===================== */
+        .career-record {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .career-sep { color: var(--border-medium); }
+
+        /* ===================== Luck Gauge SVG ===================== */
+        @keyframes luckFill {
+            from { stroke-dashoffset: 157; }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame" id="app"></div>
+    <div class="tab-bar" id="tabBar"></div>
+
+    <script>
+    /* =============================================
+       HUDR Scout v2.0 — Vanilla JS SPA
+       Self-contained: all data + logic inline
+       ============================================= */
+
+    // ===================== Mock Data =====================
+
+    const PLAYERS = [
+        { id:'p1', name:'Daniel Negreanu', flag:'\u{1F1E8}\u{1F1E6}', initials:'DN', color:'#ea580c', finish:1, status:'winner', hands:87, startStack:4500000, endStack:9350000 },
+        { id:'p2', name:'Phil Ivey', flag:'\u{1F1FA}\u{1F1F8}', initials:'PI', color:'#2563eb', finish:2, status:'runner-up', hands:87, startStack:3200000, endStack:0 },
+        { id:'p3', name:'Phil Hellmuth', flag:'\u{1F1FA}\u{1F1F8}', initials:'PH', color:'#7c3aed', finish:3, status:'eliminated', hands:72, startStack:2800000, endStack:0 },
+        { id:'p4', name:'Justin Bonomo', flag:'\u{1F1FA}\u{1F1F8}', initials:'JB', color:'#059669', finish:4, status:'eliminated', hands:65, startStack:2100000, endStack:0 },
+        { id:'p5', name:'Vanessa Selbst', flag:'\u{1F1FA}\u{1F1F8}', initials:'VS', color:'#dc2626', finish:5, status:'eliminated', hands:58, startStack:1800000, endStack:0 },
+        { id:'p6', name:'Fedor Holz', flag:'\u{1F1E9}\u{1F1EA}', initials:'FH', color:'#0891b2', finish:6, status:'eliminated', hands:52, startStack:1500000, endStack:0 },
+        { id:'p7', name:'Bryn Kenney', flag:'\u{1F1FA}\u{1F1F8}', initials:'BK', color:'#d97706', finish:7, status:'eliminated', hands:44, startStack:1200000, endStack:0 },
+        { id:'p8', name:'Maria Konnikova', flag:'\u{1F1FA}\u{1F1F8}', initials:'MK', color:'#e11d48', finish:8, status:'eliminated', hands:35, startStack:900000, endStack:0 },
+        { id:'p9', name:'Erik Seidel', flag:'\u{1F1FA}\u{1F1F8}', initials:'ES', color:'#6366f1', finish:9, status:'eliminated', hands:28, startStack:600000, endStack:0 }
+    ];
+
+    const STATS = {
+        p1: { vpip:28, pfr:22, threeBet:9, af:2.8, wtsd:42, wsd:54, steal:38, foldToSteal:55, cbetFlop:72, cbetTurn:52, cbetRiver:38, checkRaiseFlop:8, afFlop:3.2, afRiver:2.1, totalHands:87 },
+        p2: { vpip:24, pfr:20, threeBet:11, af:3.5, wtsd:38, wsd:58, steal:44, foldToSteal:48, cbetFlop:68, cbetTurn:55, cbetRiver:42, checkRaiseFlop:10, afFlop:3.8, afRiver:3.1, totalHands:87 },
+        p3: { vpip:22, pfr:18, threeBet:7, af:2.2, wtsd:45, wsd:48, steal:32, foldToSteal:62, cbetFlop:65, cbetTurn:45, cbetRiver:30, checkRaiseFlop:5, afFlop:2.5, afRiver:1.8, totalHands:72 },
+        p4: { vpip:26, pfr:21, threeBet:10, af:2.5, wtsd:40, wsd:52, steal:40, foldToSteal:52, cbetFlop:70, cbetTurn:50, cbetRiver:35, checkRaiseFlop:7, afFlop:2.9, afRiver:2.0, totalHands:65 },
+        p5: { vpip:30, pfr:24, threeBet:12, af:3.0, wtsd:44, wsd:50, steal:46, foldToSteal:45, cbetFlop:74, cbetTurn:58, cbetRiver:40, checkRaiseFlop:11, afFlop:3.4, afRiver:2.5, totalHands:58 },
+        p6: { vpip:25, pfr:20, threeBet:9, af:2.8, wtsd:37, wsd:55, steal:42, foldToSteal:50, cbetFlop:69, cbetTurn:52, cbetRiver:36, checkRaiseFlop:9, afFlop:3.1, afRiver:2.4, totalHands:52 },
+        p7: { vpip:32, pfr:26, threeBet:13, af:3.2, wtsd:46, wsd:47, steal:50, foldToSteal:42, cbetFlop:76, cbetTurn:60, cbetRiver:44, checkRaiseFlop:12, afFlop:3.6, afRiver:2.8, totalHands:44 },
+        p8: { vpip:20, pfr:16, threeBet:6, af:1.8, wtsd:35, wsd:45, steal:28, foldToSteal:65, cbetFlop:60, cbetTurn:40, cbetRiver:25, checkRaiseFlop:4, afFlop:2.0, afRiver:1.5, totalHands:35 },
+        p9: { vpip:18, pfr:14, threeBet:5, af:4.2, wtsd:33, wsd:60, steal:30, foldToSteal:60, cbetFlop:62, cbetTurn:48, cbetRiver:32, checkRaiseFlop:6, afFlop:4.5, afRiver:3.8, totalHands:28 }
+    };
+
+    const SKILL_RATINGS = {
+        p1: { grade:'A+', color:'#059669' }, p2: { grade:'A', color:'#16a34a' },
+        p3: { grade:'B', color:'#2563eb' }, p4: { grade:'A', color:'#16a34a' },
+        p5: { grade:'A', color:'#16a34a' }, p6: { grade:'A', color:'#16a34a' },
+        p7: { grade:'B', color:'#2563eb' }, p8: { grade:'C', color:'#d97706' },
+        p9: { grade:'B', color:'#2563eb' }
+    };
+
+    const STYLES = {
+        p1: { label:'TAG', emoji:'\u{1F3AF}', desc:'Tight-Aggressive \u2014 selective but assertive' },
+        p2: { label:'TAG', emoji:'\u{1F3AF}', desc:'Tight-Aggressive \u2014 precision and aggression' },
+        p3: { label:'TAG', emoji:'\u{1F3AF}', desc:'Tight-Aggressive \u2014 exploitative tendencies' },
+        p4: { label:'TAG', emoji:'\u{1F3AF}', desc:'Tight-Aggressive \u2014 balanced and solid' },
+        p5: { label:'LAG', emoji:'\u{1F525}', desc:'Loose-Aggressive \u2014 wide ranges, high aggression' },
+        p6: { label:'TAG', emoji:'\u{1F3AF}', desc:'Tight-Aggressive \u2014 GTO-oriented' },
+        p7: { label:'LAG', emoji:'\u{1F525}', desc:'Loose-Aggressive \u2014 relentless pressure' },
+        p8: { label:'Nit', emoji:'\u{1F9CA}', desc:'Very tight \u2014 folds most, plays premium only' },
+        p9: { label:'Nit', emoji:'\u{1F9CA}', desc:'Ultra-tight \u2014 maximum aggression when committed' }
+    };
+
+    const LUCK_SCORES = { p1:12, p2:5, p3:-3, p4:2, p5:-8, p6:1, p7:-12, p8:-5, p9:15 };
+
+    const CAREERS = {
+        p1: '6 FTs | 2 Wins | Avg Finish: 2.1',
+        p2: '5 FTs | 3 Wins | Avg Finish: 1.8',
+        p3: '8 FTs | 1 Win | Avg Finish: 3.2',
+        p4: '4 FTs | 1 Win | Avg Finish: 2.5',
+        p5: '3 FTs | 1 Win | Avg Finish: 2.3',
+        p6: '4 FTs | 2 Wins | Avg Finish: 2.0',
+        p7: '3 FTs | 0 Wins | Avg Finish: 4.1',
+        p8: '2 FTs | 0 Wins | Avg Finish: 5.5',
+        p9: '7 FTs | 1 Win | Avg Finish: 3.0'
+    };
+
+    const RIVALRIES = {
+        p1: [
+            { opponentId:'p2', score:82, label:'Arch-Nemesis', color:'#dc2626' },
+            { opponentId:'p3', score:65, label:'Major Rival', color:'#ea580c' }
+        ],
+        p2: [
+            { opponentId:'p1', score:82, label:'Arch-Nemesis', color:'#dc2626' },
+            { opponentId:'p5', score:58, label:'Major Rival', color:'#ea580c' }
+        ]
+    };
+
+    const HIGHLIGHTS = [
+        { id:'h1', hand:87, type:'biggest_pot', tier:'monster', board:'Wet Flop \u{1F30A}', preview:'Negreanu rivers two pair to crack Ivey\'s pocket kings', pot:89400000, players:['p1','p2'], ytTime:4821 },
+        { id:'h2', hand:73, type:'bluff', tier:'air', board:'Dry Board \u{1F3DC}\u{FE0F}', preview:'Hellmuth runs massive triple-barrel bluff on turn', pot:42000000, players:['p3','p5'], ytTime:3950 },
+        { id:'h3', hand:61, type:'elimination', tier:'strong', board:'Paired Board', preview:'Bonomo eliminated by Ivey with set over set', pot:35600000, players:['p2','p4'], ytTime:3120 },
+        { id:'h4', hand:55, type:'hero_call', tier:'medium', board:'Monotone \u2660', preview:'Selbst makes incredible hero call with second pair', pot:28000000, players:['p5','p7'], ytTime:2800 },
+        { id:'h5', hand:42, type:'cooler', tier:'monster', board:'Wet Flop \u{1F30A}', preview:'Holz flops the nut flush, Kenney flops a set', pot:24000000, players:['p6','p7'], ytTime:2100 },
+        { id:'h6', hand:31, type:'bad_beat', tier:'strong', board:'Dry Board \u{1F3DC}\u{FE0F}', preview:'Konnikova gets unlucky on the river vs Seidel', pot:18500000, players:['p8','p9'], ytTime:1500 }
+    ];
+
+    const INSIGHTS = [
+        { id:'i1', icon:'\u{1F9E0}', title:'Negreanu\'s River Edge', text:'Daniel Negreanu won 73% of pots that reached the river, the highest rate at the final table. His thin value bets averaged 62% pot.', border:'var(--accent-orange)' },
+        { id:'i2', icon:'\u{1F4A1}', title:'Hellmuth\'s 3-Bet Weakness', text:'Phil Hellmuth\'s 3-bet frequency of 7% is well below the 10% average. Opponents stole 18% more pots when he was in the blinds.', border:'var(--accent-blue)' },
+        { id:'i3', icon:'\u{1F525}', title:'Selbst\'s LAG Dominance', text:'Vanessa Selbst played the widest range (VPIP 30%) yet maintained +EV through aggressive post-flop play with an AF of 3.0.', border:'var(--accent-red)' }
+    ];
+
+    const SCOUTING_TEXT = {
+        p1: 'Negreanu combines tight preflop selection with exceptional post-flop reading ability. His river AF of 2.1 suggests some potential for exploitation on later streets, but his overall win rate at showdown (54%) demonstrates strong hand selection. Target his BB defense with wider steals from late position.',
+        p2: 'Ivey is arguably the most complete player at the table. His AF of 3.5 across all streets makes him extremely difficult to play against. Focus on position advantage and avoid marginal spots. His fold-to-steal of 48% means he defends adequately.',
+        p3: 'Hellmuth plays an exploitable tight style with low 3-bet frequency (7%). Steal aggressively when he is in the blinds. His check-raise frequency of 5% means you can c-bet with high frequency. Be cautious when he shows aggression \u2014 his range is heavily weighted toward value.'
+    };
+
+    const TOURNAMENT = {
+        name: 'WSOP Main Event 2025',
+        event: 'World Series of Poker',
+        venue: 'Horseshoe Las Vegas',
+        date: 'July 2025',
+        playerCount: 9,
+        handCount: 87,
+        prizePool: 93500000,
+        gradient: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
+    };
+
+    const YT_BASE = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=';
+
+    // ===================== Utility Functions =====================
+
+    function fmtChips(n) {
+        if (n == null) return '\u2014';
+        if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+        if (n >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
+        return '$' + n;
+    }
+
+    function calcExploit(s) {
+        if (!s) return 50;
+        return Math.min(99, Math.round(40 + Math.max(0, s.foldToSteal - 55) * 1.5 + Math.max(0, (s.afFlop || 3) - (s.afRiver || 2)) * 8 + Math.max(0, 8 - s.checkRaiseFlop) * 3));
+    }
+
+    function statColor(v) {
+        if (v >= 55) return 'var(--accent-emerald)';
+        if (v >= 30) return 'var(--accent-amber)';
+        return 'var(--accent-red)';
+    }
+
+    function highlightColor(type) {
+        var m = { biggest_pot:'#ca8a04', bluff:'#dc2626', elimination:'#dc2626', hero_call:'#059669', cooler:'#2563eb', bad_beat:'#d97706' };
+        return m[type] || 'var(--accent-orange)';
+    }
+
+    function tierClass(tier) {
+        return 'tier-' + (tier || 'medium');
+    }
+
+    function tierLabel(tier) {
+        var m = { monster:'MONSTER', strong:'STRONG', medium:'MEDIUM', weak:'WEAK', draw:'DRAW', air:'AIR' };
+        return m[tier] || 'MEDIUM';
+    }
+
+    function playerName(id) {
+        var p = PLAYERS.find(function(x) { return x.id === id; });
+        return p ? p.name.split(' ').pop() : id;
+    }
+
+    function ordinal(n) {
+        var s = ['st','nd','rd'];
+        return n + (s[n-1] || 'th');
+    }
+
+    function ytBtn(seconds) {
+        return '<a href="' + YT_BASE + seconds + '" target="_blank" rel="noopener" class="yt-btn" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>Watch</a>';
+    }
+
+    function skillCircle(id, extraClass) {
+        var r = SKILL_RATINGS[id] || { grade:'B', color:'#2563eb' };
+        var cls = 'skill-rating' + (extraClass ? ' ' + extraClass : '');
+        return '<div class="' + cls + '" style="background:' + r.color + '">' + r.grade + '</div>';
+    }
+
+    function styleBadge(id) {
+        var s = STYLES[id] || { label:'TAG', emoji:'\u{1F3AF}' };
+        return '<span class="style-badge">' + s.label + ' ' + s.emoji + '</span>';
+    }
+
+    function luckGaugeSvg(score, size) {
+        size = size || 60;
+        var r = (size / 2) - 4;
+        var circ = Math.PI * r;
+        var pct = Math.min(1, Math.max(0, (score + 20) / 40));
+        var offset = circ - (circ * pct);
+        var color = score > 5 ? '#059669' : score < -5 ? '#dc2626' : '#d97706';
+        var sign = score > 0 ? '+' : '';
+        return '<svg width="' + size + '" height="' + (size * 0.6) + '" viewBox="0 0 ' + size + ' ' + (size * 0.6) + '">' +
+            '<path d="M4,' + (size * 0.55) + ' A' + r + ',' + r + ' 0 0,1 ' + (size - 4) + ',' + (size * 0.55) + '" fill="none" stroke="#e5e7eb" stroke-width="5" stroke-linecap="round"/>' +
+            '<path d="M4,' + (size * 0.55) + ' A' + r + ',' + r + ' 0 0,1 ' + (size - 4) + ',' + (size * 0.55) + '" fill="none" stroke="' + color + '" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + circ.toFixed(1) + '" stroke-dashoffset="' + offset.toFixed(1) + '" style="animation:luckFill 1s ease-out forwards"/>' +
+            '<text x="' + (size / 2) + '" y="' + (size * 0.52) + '" text-anchor="middle" font-size="' + (size * 0.22) + '" font-weight="800" fill="' + color + '">' + sign + score + '%</text>' +
+            '</svg>';
+    }
+
+    // ===================== Router =====================
+
+    var currentRoute = { path: 'home', params: {} };
+
+    function parseHash() {
+        var raw = (window.location.hash || '#/home').slice(2);
+        var parts = raw.split('?');
+        var path = parts[0] || 'home';
+        var params = {};
+        if (parts[1]) {
+            parts[1].split('&').forEach(function(p) {
+                var kv = p.split('=');
+                params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+            });
+        }
+        return { path: path, params: params };
+    }
+
+    function go(path, params) {
+        params = params || {};
+        var q = Object.keys(params).map(function(k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+        window.location.hash = '/' + path + (q ? '?' + q : '');
+    }
+
+    function render() {
+        currentRoute = parseHash();
+        var app = document.getElementById('app');
+        app.innerHTML = renderTopBar() + renderScreen();
+        renderTabBar();
+    }
+
+    window.addEventListener('hashchange', render);
+    if (!window.location.hash) window.location.hash = '/home';
+
+    // ===================== Top Bar =====================
+
+    function renderTopBar() {
+        return '<div class="top-bar">' +
+            '<div class="row" style="gap:8px;cursor:pointer" onclick="go(\'home\')">' +
+                '<div class="logo">H</div>' +
+                '<span class="top-bar-title">HUDR</span>' +
+                '<span class="top-bar-version">v2.0</span>' +
+            '</div>' +
+            '<button class="search-btn" onclick="go(\'search\')">\u{1F50D}</button>' +
+        '</div>';
+    }
+
+    // ===================== Tab Bar =====================
+
+    function renderTabBar() {
+        var tabs = [
+            { id:'home', icon:'\u{1F3E0}', label:'Home' },
+            { id:'search', icon:'\u{1F50D}', label:'Search' },
+            { id:'ai', icon:'\u2728', label:'AI' },
+            { id:'favorites', icon:'\u2B50', label:'Saved' },
+            { id:'pricing', icon:'\u{1F464}', label:'Profile' }
+        ];
+        var active = currentRoute.path;
+        var html = '';
+        tabs.forEach(function(t) {
+            var cls = 'tab-item' + (active === t.id ? ' active' : '');
+            html += '<button class="' + cls + '" onclick="go(\'' + t.id + '\')">' +
+                '<span class="tab-icon">' + t.icon + '</span>' + t.label +
+            '</button>';
+        });
+        document.getElementById('tabBar').innerHTML = html;
+    }
+
+    // ===================== Screen Router =====================
+
+    function renderScreen() {
+        var p = currentRoute.path;
+        switch(p) {
+            case 'home': return renderHome();
+            case 'search': return renderSearch();
+            case 'tournament': return renderTournament();
+            case 'ai': return renderAI();
+            case 'player': return renderPlayer();
+            case 'report': return renderExploitReport();
+            case 'pricing': return renderPricing();
+            case 'favorites': return renderFavorites();
+            default: return renderHome();
+        }
+    }
+
+    // ===================== Home Screen =====================
+
+    function renderHome() {
+        var html = '<div class="stagger">';
+
+        // Hero Tournament Card
+        html += '<div class="content">' +
+            '<div class="hero-card" onclick="go(\'tournament\')">' +
+                '<div class="hero-label">' + TOURNAMENT.event + '</div>' +
+                '<div class="hero-title">' + TOURNAMENT.name + '</div>' +
+                '<div class="hero-sub">' + TOURNAMENT.venue + ' \u00B7 ' + TOURNAMENT.date + '</div>' +
+                '<div class="kpi-row">' +
+                    '<span class="kpi-pill">' + TOURNAMENT.playerCount + ' Players</span>' +
+                    '<span class="kpi-pill">' + TOURNAMENT.handCount + ' Hands</span>' +
+                    '<span class="kpi-pill">' + fmtChips(TOURNAMENT.prizePool) + '</span>' +
+                    '<span class="kpi-pill">\u2728 AI Ready</span>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        // Tournament Carousel
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">Tournaments</div>' +
+                '<button class="section-link" onclick="go(\'search\')">See All</button>' +
+            '</div>' +
+            '<div class="h-scroll">';
+
+        var tourneys = [
+            { name:'WSOP Main Event', meta:'Final Table \u00B7 87 hands', live:false, ai:true },
+            { name:'WPT Legends', meta:'8 Players \u00B7 62 hands', live:true, ai:true },
+            { name:'EPT Barcelona', meta:'9 Players \u00B7 95 hands', live:false, ai:false }
+        ];
+        tourneys.forEach(function(t) {
+            html += '<div class="mini-card" onclick="go(\'tournament\')">' +
+                '<div class="mini-gradient"></div>' +
+                '<div class="mini-body">' +
+                    '<div class="mini-name">' + t.name + '</div>' +
+                    '<div class="mini-meta">' + t.meta + '</div>' +
+                    '<div class="mini-badges">' +
+                        '<span class="mini-badge" style="background:#eff6ff;color:#2563eb">' + t.meta.split('\u00B7')[1].trim() + '</span>' +
+                        (t.live ? '<span class="live-badge">LIVE</span>' : '') +
+                        (t.ai ? '<span class="mini-badge" style="background:#fff7ed;color:#ea580c">AI</span>' : '') +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        // Luckiest Players Carousel (NEW)
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">Luckiest Players</div>' +
+            '</div>' +
+            '<div class="h-scroll">';
+
+        var sorted = PLAYERS.slice().sort(function(a, b) { return LUCK_SCORES[b.id] - LUCK_SCORES[a.id]; });
+        sorted.forEach(function(p) {
+            html += '<div class="luck-card" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
+                luckGaugeSvg(LUCK_SCORES[p.id], 80) +
+                '<div class="luck-name">' + p.name.split(' ').pop() + '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        // Trending AI Insights
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">AI Insights</div>' +
+                '<button class="section-link" onclick="go(\'ai\')">Ask AI</button>' +
+            '</div>' +
+            '<div class="content stagger">';
+
+        INSIGHTS.forEach(function(ins) {
+            html += '<div class="insight-card" style="--border-accent:' + ins.border + '" onclick="go(\'ai\',{q:\'' + encodeURIComponent(ins.title) + '\'})">' +
+                '<span style="font-size:24px;padding-left:8px">' + ins.icon + '</span>' +
+                '<div>' +
+                    '<div style="font-size:14px;font-weight:700;color:var(--text-primary)">' + ins.title + '</div>' +
+                    '<div style="font-size:13px;color:var(--text-secondary);line-height:1.5">' + ins.text + '</div>' +
+                    '<span class="text-orange" style="font-size:13px;font-weight:600">Read more \u2192</span>' +
+                '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        // Top Players
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">Top Players</div>' +
+                '<button class="section-link" onclick="go(\'search\')">All</button>' +
+            '</div>' +
+            '<div class="h-scroll">';
+
+        PLAYERS.forEach(function(p) {
+            html += '<div class="player-mini" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
+                '<div class="player-avatar avatar-md" style="background:' + p.color + '">' + p.initials + '</div>' +
+                '<div class="player-mini-name">' + p.name.split(' ').pop() + '</div>' +
+                '<div class="player-mini-stat">#' + p.finish + '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        // Key Moments with tier badges + YouTube
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">Key Moments</div>' +
+            '</div>' +
+            '<div class="h-scroll">';
+
+        HIGHLIGHTS.forEach(function(h) {
+            html += '<div class="moment-card" onclick="go(\'ai\',{q:\'Tell me about hand #' + h.hand + '\'})">' +
+                '<div class="moment-accent" style="background:' + highlightColor(h.type) + '"></div>' +
+                '<div class="moment-body">' +
+                    '<div class="moment-top">' +
+                        '<div class="moment-type" style="color:' + highlightColor(h.type) + '">' + h.type.replace('_',' ') + '</div>' +
+                        '<span class="tier-badge ' + tierClass(h.tier) + '">' + tierLabel(h.tier) + '</span>' +
+                    '</div>' +
+                    '<div class="moment-text">' + h.preview + '</div>' +
+                    '<div class="moment-bottom">' +
+                        '<span class="moment-meta">Hand #' + h.hand + ' \u00B7 ' + fmtChips(h.pot) + '</span>' +
+                        ytBtn(h.ytTime) +
+                    '</div>' +
+                    '<div style="margin-top:6px"><span class="board-texture">' + h.board + '</span></div>' +
+                '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        html += '</div>';
+        return html;
+    }
+
+    // ===================== Search Screen =====================
+
+    function renderSearch() {
+        var html = '<div class="search-screen stagger">';
+        html += '<h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Ask HUDR AI</h2>';
+        html += '<p class="text-muted mb-md">Ask anything about the tournament</p>';
+
+        html += '<div class="search-input-wrap">' +
+            '<span class="search-icon">\u{1F50D}</span>' +
+            '<input class="search-input" placeholder="Ask about players, hands, strategy..." id="searchInput" onkeydown="if(event.key===\'Enter\'){var v=this.value.trim();if(v)go(\'ai\',{q:v})}">' +
+        '</div>';
+
+        // Category pills
+        var cats = ['Tournament', 'Player', 'Hand', 'Strategy'];
+        html += '<div class="category-pills" id="catPills">';
+        cats.forEach(function(c, i) {
+            html += '<button class="cat-pill' + (i === 0 ? ' active' : '') + '" onclick="switchCat(\'' + c + '\',this)">' + c + '</button>';
+        });
+        html += '</div>';
+
+        // Suggestions
+        var suggestions = {
+            Tournament: ['Who is the most exploitable?', 'Show the biggest turning points', 'Tell me the tournament story'],
+            Player: ['How should I play against Negreanu?', 'Who bluffs the most?', 'Compare Ivey and Hellmuth'],
+            Hand: ['Show me the final hand', 'Biggest bluff?', 'Most dramatic elimination'],
+            Strategy: ['ICM exploit checklist', 'BB defense strategy', 'River bluff frequencies']
+        };
+
+        cats.forEach(function(c) {
+            var vis = c === 'Tournament' ? '' : ' style="display:none"';
+            html += '<div class="stack" id="sug_' + c + '"' + vis + '>';
+            suggestions[c].forEach(function(q) {
+                html += '<div class="suggestion-bubble" onclick="go(\'ai\',{q:\'' + q.replace(/'/g, "\\'") + '\'})">' + q + '</div>';
+            });
+            html += '</div>';
+        });
+
+        // Player quick list
+        html += '<div class="mt-lg">' +
+            '<div style="font-size:15px;font-weight:700;margin-bottom:12px">Players</div>';
+
+        PLAYERS.slice(0, 6).forEach(function(p) {
+            var r = SKILL_RATINGS[p.id];
+            html += '<div class="standing-row" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
+                '<div class="standing-rank ' + (p.finish === 1 ? 'gold' : p.finish === 2 ? 'silver' : p.finish === 3 ? 'bronze' : '') + '">' + p.finish + '</div>' +
+                '<div class="player-avatar avatar-sm" style="background:' + p.color + '">' + p.initials + '</div>' +
+                '<div class="standing-info">' +
+                    '<div class="standing-name">' + p.flag + ' ' + p.name + ' ' + skillCircle(p.id, 'skill-rating-sm') + '</div>' +
+                    '<div class="standing-meta">' + p.hands + ' hands \u00B7 ' + p.status + '</div>' +
+                '</div>' +
+                '<button class="btn-ghost btn btn-sm" onclick="event.stopPropagation();go(\'report\',{player:\'' + p.id + '\'})">Scout</button>' +
+            '</div>';
+        });
+        html += '</div></div>';
+        return html;
+    }
+
+    // ===================== Tournament Detail Screen =====================
+
+    var tournamentTab = 'overview';
+
+    function renderTournament() {
+        var html = '';
+
+        // Hero
+        html += '<div class="content">' +
+            '<div class="hero-card">' +
+                '<div class="hero-label">' + TOURNAMENT.event + '</div>' +
+                '<div class="hero-title">' + TOURNAMENT.name + '</div>' +
+                '<div class="hero-sub">' + TOURNAMENT.venue + ' \u00B7 ' + TOURNAMENT.date + '</div>' +
+                '<div class="kpi-row">' +
+                    '<span class="kpi-pill">' + TOURNAMENT.playerCount + ' Players</span>' +
+                    '<span class="kpi-pill">' + TOURNAMENT.handCount + ' Hands</span>' +
+                    '<span class="kpi-pill">' + fmtChips(TOURNAMENT.prizePool) + '</span>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        // Tab strip
+        var tabs = ['overview', 'players', 'hands', 'highlights', 'ai'];
+        html += '<div class="tab-strip">';
+        tabs.forEach(function(t) {
+            html += '<button class="strip-tab' + (tournamentTab === t ? ' active' : '') + '" onclick="tournamentTab=\'' + t + '\';render()">' + t.charAt(0).toUpperCase() + t.slice(1) + '</button>';
+        });
+        html += '</div>';
+
+        // Tab content
+        if (tournamentTab === 'overview') {
+            html += '<div class="content stagger">';
+            html += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px">' +
+                INSIGHTS[0].text +
+                '<span class="text-orange" style="cursor:pointer" onclick="go(\'ai\',{q:\'Tell me the full story\'})"> Read full story \u2192</span>' +
+            '</div>';
+
+            html += '<div style="font-size:15px;font-weight:700;margin-bottom:8px">Quick AI</div>' +
+                '<div class="row wrap" style="gap:8px">';
+            ['Who played best?', 'Biggest bluff?', 'Tournament story'].forEach(function(q) {
+                html += '<button class="btn btn-ghost btn-sm" onclick="go(\'ai\',{q:\'' + q + '\'})">' + q + '</button>';
+            });
+            html += '</div>';
+
+            html += '<div class="mt-lg"><div style="font-size:15px;font-weight:700;margin-bottom:8px">Final Standings</div>';
+            PLAYERS.slice().sort(function(a, b) { return a.finish - b.finish; }).slice(0, 6).forEach(function(p) {
+                html += '<div class="standing-row" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
+                    '<div class="standing-rank ' + (p.finish === 1 ? 'gold' : p.finish === 2 ? 'silver' : p.finish === 3 ? 'bronze' : '') + '">' + p.finish + '</div>' +
+                    '<div class="player-avatar avatar-sm" style="background:' + p.color + '">' + p.initials + '</div>' +
+                    '<div class="standing-info">' +
+                        '<div class="standing-name">' + p.flag + ' ' + p.name + '</div>' +
+                        '<div class="standing-meta">' + fmtChips(p.startStack) + ' \u2192 ' + (p.endStack > 0 ? fmtChips(p.endStack) : 'Out') + '</div>' +
+                    '</div>' +
+                    '<div class="standing-result" style="color:' + (p.status === 'winner' ? 'var(--accent-emerald)' : 'var(--accent-red)') + '">' +
+                        (p.status === 'winner' ? '\u{1F3C6}' : ordinal(p.finish)) +
+                    '</div>' +
+                '</div>';
+            });
+            html += '</div></div>';
+
+        } else if (tournamentTab === 'players') {
+            html += '<div class="content stagger">';
+            PLAYERS.slice().sort(function(a, b) { return a.finish - b.finish; }).forEach(function(p) {
+                var s = STATS[p.id];
+                html += '<div class="standing-row" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
+                    '<div class="player-avatar avatar-sm" style="background:' + p.color + '">' + p.initials + '</div>' +
+                    '<div class="standing-info">' +
+                        '<div class="standing-name">' + p.flag + ' ' + p.name + ' ' + skillCircle(p.id, 'skill-rating-sm') + '</div>' +
+                        '<div class="standing-meta">VPIP ' + s.vpip + '% \u00B7 PFR ' + s.pfr + '% \u00B7 AF ' + s.af + ' \u00B7 ' + styleBadge(p.id) + '</div>' +
+                    '</div>' +
+                    '<button class="btn-ghost btn btn-sm" onclick="event.stopPropagation();go(\'report\',{player:\'' + p.id + '\'})">Scout</button>' +
+                '</div>';
+            });
+            html += '</div>';
+
+        } else if (tournamentTab === 'hands') {
+            html += '<div class="content stagger">';
+            var boardTextures = ['Wet Flop \u{1F30A}', 'Dry Board \u{1F3DC}\u{FE0F}', 'Monotone \u2660', 'Paired Board', 'Wet Flop \u{1F30A}', 'Dry Board \u{1F3DC}\u{FE0F}', 'Rainbow', 'Monotone \u2663', 'Wet Flop \u{1F30A}', 'Paired Board', 'Dry Board \u{1F3DC}\u{FE0F}', 'Rainbow', 'Monotone \u2665', 'Wet Flop \u{1F30A}', 'Dry Board \u{1F3DC}\u{FE0F}'];
+            var tiers = ['monster', 'strong', 'medium', 'weak', 'strong', 'draw', 'medium', 'air', 'strong', 'monster', 'weak', 'medium', 'draw', 'strong', 'medium'];
+            for (var i = 0; i < 15; i++) {
+                var hn = 87 - i;
+                var p1i = i % 9;
+                var p2i = (i + 3) % 9;
+                var pot = Math.round((90000000 - i * 4500000) * (0.8 + Math.random() * 0.4));
+                html += '<div class="hand-row" onclick="go(\'ai\',{q:\'Tell me about hand #' + hn + '\'})">' +
+                    '<div class="hand-row-top">' +
+                        '<div><span style="font-weight:700">#' + hn + '</span> <span class="text-muted" style="margin-left:8px">' + playerName(PLAYERS[p1i].id) + ' vs ' + playerName(PLAYERS[p2i].id) + '</span></div>' +
+                        '<span class="fw-700 text-gold">' + fmtChips(pot) + '</span>' +
+                    '</div>' +
+                    '<div class="hand-row-bottom">' +
+                        '<span class="tier-badge ' + tierClass(tiers[i]) + '">' + tierLabel(tiers[i]) + '</span>' +
+                        '<span class="board-texture">' + boardTextures[i] + '</span>' +
+                    '</div>' +
+                '</div>';
+            }
+            html += '</div>';
+
+        } else if (tournamentTab === 'highlights') {
+            html += '<div class="content stagger">';
+            HIGHLIGHTS.forEach(function(h) {
+                html += '<div class="moment-card" style="width:100%;max-width:400px;margin-bottom:12px" onclick="go(\'ai\',{q:\'Tell me about hand #' + h.hand + '\'})">' +
+                    '<div class="moment-accent" style="background:' + highlightColor(h.type) + '"></div>' +
+                    '<div class="moment-body">' +
+                        '<div class="moment-top">' +
+                            '<div class="moment-type" style="color:' + highlightColor(h.type) + '">' + h.type.replace('_', ' ') + '</div>' +
+                            '<span class="tier-badge ' + tierClass(h.tier) + '">' + tierLabel(h.tier) + '</span>' +
+                        '</div>' +
+                        '<div class="moment-text">' + h.preview + '</div>' +
+                        '<div class="moment-bottom">' +
+                            '<span class="moment-meta">Hand #' + h.hand + ' \u00B7 ' + fmtChips(h.pot) + '</span>' +
+                            ytBtn(h.ytTime) +
+                        '</div>' +
+                        '<div style="margin-top:6px"><span class="board-texture">' + h.board + '</span></div>' +
+                    '</div>' +
+                '</div>';
+            });
+            html += '</div>';
+
+        } else if (tournamentTab === 'ai') {
+            html += '<div class="content">' +
+                '<div class="mt-md">' +
+                    '<div class="search-input-wrap">' +
+                        '<span class="search-icon">\u2728</span>' +
+                        '<input class="search-input" placeholder="Ask anything about this tournament..." onkeydown="if(event.key===\'Enter\'){var v=this.value.trim();if(v)go(\'ai\',{q:v})}">' +
+                    '</div>' +
+                    '<div class="stack mt-md">';
+            ['Who is the most exploitable?', 'Tell me the full story', 'Compare top 3 players'].forEach(function(q) {
+                html += '<div class="suggestion-bubble" onclick="go(\'ai\',{q:\'' + q.replace(/'/g, "\\'") + '\'})">' + q + '</div>';
+            });
+            html += '</div></div></div>';
+        }
+
+        return html;
+    }
+
+    // ===================== AI Chat Screen =====================
+
+    function renderAI() {
+        var q = currentRoute.params.q || '';
+
+        if (!q) {
+            var html = '<div class="search-screen stagger">';
+            html += '<h2 style="font-size:22px;font-weight:800">Ask HUDR AI</h2>' +
+                '<p class="text-muted mb-md">Ask anything about the tournament, players, or strategy</p>' +
+                '<div class="search-input-wrap">' +
+                    '<span class="search-icon">\u2728</span>' +
+                    '<input class="search-input" placeholder="Ask anything..." onkeydown="if(event.key===\'Enter\'){var v=this.value.trim();if(v)go(\'ai\',{q:v})}">' +
+                '</div>' +
+                '<div class="stack mt-lg">';
+            ['Who is the most exploitable player?', 'Show me the biggest bluff', 'How should I play against Negreanu?', 'Tell me the tournament story'].forEach(function(q) {
+                html += '<div class="suggestion-bubble" onclick="go(\'ai\',{q:\'' + q.replace(/'/g, "\\'") + '\'})">' + q + '</div>';
+            });
+            html += '</div></div>';
+            return html;
+        }
+
+        var answer = 'Based on analysis of ' + TOURNAMENT.handCount + ' hands from the WSOP Main Event Final Table, <strong onclick="go(\'player\',{player:\'p1\'})">Daniel Negreanu</strong> shows the most balanced game with a VPIP/PFR of 28/22. His river AF drops to 2.1, suggesting potential exploitation on later streets.\n\n<strong onclick="go(\'player\',{player:\'p3\'})">Phil Hellmuth</strong>\'s low 3-bet frequency (7%) creates opportunities to steal wider against him. His fold-to-steal of 62% is well above average.\n\nThe most dramatic moment was Hand #87 where Negreanu rivered two pair to crack <strong onclick="go(\'player\',{player:\'p2\'})">Ivey</strong>\'s pocket kings in a $89.4M pot.';
+
+        var html = '<div class="content stagger">';
+        html += '<button class="text-orange fw-700" style="background:none;border:none;font-size:14px;cursor:pointer;margin-bottom:12px" onclick="go(\'ai\')">\u2190 New Question</button>';
+
+        // User message
+        html += '<div class="chat-user"><div class="chat-user-bubble">' + decodeURIComponent(q) + '</div></div>';
+
+        // AI Response
+        html += '<div class="chat-ai">' +
+            '<div class="chat-ai-avatar">\u2728</div>' +
+            '<div style="flex:1">' +
+                '<div class="chat-ai-bubble">' +
+                    '<div style="line-height:1.7">' + answer.replace(/\n\n/g, '<br><br>') + '</div>' +
+                    // Embedded hand card with tier + YT
+                    '<div class="embed-card" onclick="go(\'ai\',{q:\'Tell me about hand 87\'})">' +
+                        '<div class="embed-title">\u{1F0CF} Hand #87 \u2014 Final Hand <span class="tier-badge tier-monster" style="margin-left:6px">MONSTER</span></div>' +
+                        '<div class="embed-meta">Negreanu vs Ivey \u00B7 ' + fmtChips(89400000) + ' pot</div>' +
+                        '<div class="embed-bottom">' +
+                            '<span class="board-texture">Wet Flop \u{1F30A}</span>' +
+                            ytBtn(4821) +
+                        '</div>' +
+                    '</div>' +
+                    // Embedded player card with skill + style
+                    '<div class="embed-card" onclick="go(\'player\',{player:\'p1\'})">' +
+                        '<div class="embed-title">\u{1F464} Daniel Negreanu ' + skillCircle('p1', 'skill-rating-sm') + ' ' + styleBadge('p1') + '</div>' +
+                        '<div class="embed-meta">VPIP 28% \u00B7 PFR 22% \u00B7 AF 2.8 \u00B7 87 hands</div>' +
+                    '</div>' +
+                    // Bluff detection card
+                    '<div class="bluff-card">' +
+                        '<div class="bluff-header">\u{1F6A8} BLUFF DETECTED</div>' +
+                        '<div class="embed-title">Hand #73 \u2014 Hellmuth Triple Barrel <span class="tier-badge tier-air" style="margin-left:6px">AIR</span></div>' +
+                        '<div class="bluff-detail">Bet 2.5x pot on river with 9-high</div>' +
+                        '<div class="bluff-detail">Opponent: <strong>Selbst</strong> \u2014 Folded</div>' +
+                        '<div class="embed-bottom" style="margin-top:6px">' +
+                            '<span class="board-texture">Dry Board \u{1F3DC}\u{FE0F}</span>' +
+                            ytBtn(3950) +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                // Follow-ups
+                '<div class="h-scroll mt-sm" style="padding:0;margin:0;gap:8px">' +
+                    '<button class="cat-pill" onclick="go(\'ai\',{q:\'How do I exploit this?\'})">How do I exploit this?</button>' +
+                    '<button class="cat-pill" onclick="go(\'ai\',{q:\'Show evidence hands\'})">Show evidence hands</button>' +
+                    '<button class="cat-pill" onclick="go(\'report\',{player:\'p1\'})">Generate exploit report</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        // Quick action buttons
+        html += '<div class="row mt-md">' +
+            '<button class="btn btn-ghost btn-sm" onclick="go(\'report\',{player:\'p1\'})">\u{1F4C4} Exploit Report</button>' +
+            '<button class="btn btn-ghost btn-sm" onclick="go(\'player\',{player:\'p1\'})">\u{1F464} Player Profile</button>' +
+        '</div>';
+
+        html += '</div>';
+        return html;
+    }
+
+    // ===================== Player Profile (Scouting Card) =====================
+
+    function renderPlayer() {
+        var pid = currentRoute.params.player || 'p1';
+        var player = PLAYERS.find(function(p) { return p.id === pid; }) || PLAYERS[0];
+        var stats = STATS[pid] || STATS.p1;
+        var skill = SKILL_RATINGS[pid] || SKILL_RATINGS.p1;
+        var style = STYLES[pid] || STYLES.p1;
+        var career = CAREERS[pid] || '';
+        var rivals = RIVALRIES[pid] || [];
+        var luck = LUCK_SCORES[pid] || 0;
+        var scoutText = SCOUTING_TEXT[pid] || '';
+
+        var statBubbles = [
+            { label:'VPIP', value:stats.vpip, color:statColor(stats.vpip) },
+            { label:'PFR', value:stats.pfr, color:statColor(stats.pfr) },
+            { label:'3-Bet', value:stats.threeBet, color:statColor(stats.threeBet * 3) },
+            { label:'AF', value:stats.af, color:'var(--accent-orange)' },
+            { label:'WTSD', value:stats.wtsd, color:statColor(stats.wtsd) },
+            { label:'WSD', value:stats.wsd, color:statColor(stats.wsd) }
+        ];
+
+        var strengths = [];
+        var weaknesses = [];
+        if (stats.wsd > 52) strengths.push('Showdown Warrior');
+        if (stats.steal > 40) strengths.push('Value Bettor');
+        if (stats.cbetFlop > 65) strengths.push('Tight Opener');
+        if (stats.af > 3.0) strengths.push('River Closer');
+        if (stats.foldToSteal > 58) weaknesses.push('Over-folds 3B');
+        if (stats.afRiver < 2.2) weaknesses.push('Passive River');
+        if (stats.checkRaiseFlop < 7) weaknesses.push('Fit-or-Fold Post');
+        if (stats.vpip > 28 && stats.pfr < 20) weaknesses.push('Wide Open Limp');
+
+        var html = '<div class="content stagger">';
+        html += '<button class="text-orange fw-700" style="background:none;border:none;font-size:14px;cursor:pointer;margin-bottom:12px" onclick="go(\'tournament\')">\u2190 Tournament</button>';
+
+        // Scouting Card
+        html += '<div class="scout-card">' +
+            '<div class="scout-header">' +
+                '<div class="player-avatar avatar-lg" style="background:' + player.color + '">' + player.initials + '</div>' +
+                '<div style="flex:1">' +
+                    '<div class="scout-label">Scouting Report</div>' +
+                    '<div class="scout-name-row">' +
+                        '<div class="scout-name">' + player.flag + ' ' + player.name + '</div>' +
+                        '<div class="skill-rating" style="background:' + skill.color + '">' + skill.grade + '</div>' +
+                    '</div>' +
+                    '<div class="text-muted" style="font-size:13px">#' + player.finish + ' \u00B7 ' + player.hands + ' hands \u00B7 ' + player.status + '</div>' +
+                    '<div class="career-record mt-sm">' + career + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="scout-stat-row">';
+
+        statBubbles.forEach(function(s) {
+            var val = (typeof s.value === 'number' && s.value > 10) ? s.value + '%' : s.value;
+            html += '<div style="text-align:center">' +
+                '<div class="stat-bubble" style="border-color:' + s.color + ';color:' + s.color + '">' + val + '</div>' +
+                '<div class="stat-bubble-label">' + s.label + '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        // Style + Luck row
+        html += '<div style="display:flex;gap:12px;margin-bottom:12px">';
+
+        // Style classification
+        html += '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card)">' +
+            '<span style="font-size:28px">' + style.emoji + '</span>' +
+            '<div>' +
+                '<div style="font-weight:700;font-size:15px;color:var(--text-primary)">' + style.label + '</div>' +
+                '<div class="text-muted" style="font-size:12px">' + style.desc + '</div>' +
+            '</div>' +
+        '</div>';
+
+        // Luck gauge
+        html += '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:10px;text-align:center;box-shadow:var(--shadow-card);min-width:90px">' +
+            '<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px">Luck</div>' +
+            luckGaugeSvg(luck, 70) +
+        '</div>';
+
+        html += '</div>';
+
+        // Strength tags
+        if (strengths.length > 0) {
+            html += '<div>' +
+                '<div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent-emerald)">Strengths</div>' +
+                '<div class="row wrap" style="gap:6px">';
+            strengths.forEach(function(s) {
+                html += '<span class="tag-strength">' + s + '</span>';
+            });
+            html += '</div></div>';
+        }
+
+        // Leak tags
+        if (weaknesses.length > 0) {
+            html += '<div>' +
+                '<div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent-red)">Leaks</div>' +
+                '<div class="row wrap" style="gap:6px">';
+            weaknesses.forEach(function(w) {
+                html += '<span class="tag-leak">' + w + '</span>';
+            });
+            html += '</div></div>';
+        }
+
+        // Rivalries
+        if (rivals.length > 0) {
+            html += '<div class="mt-sm">' +
+                '<div style="font-size:15px;font-weight:700;margin-bottom:8px">Rivalries</div>';
+            rivals.forEach(function(r) {
+                var opp = PLAYERS.find(function(p) { return p.id === r.opponentId; });
+                if (!opp) return;
+                html += '<div class="rivalry-card" onclick="go(\'player\',{player:\'' + r.opponentId + '\'})">' +
+                    '<div class="rivalry-circle" style="background:' + r.color + '">' + r.score + '</div>' +
+                    '<div class="rivalry-info">' +
+                        '<div class="rivalry-label" style="color:' + r.color + '">' + r.label + '</div>' +
+                        '<div style="font-weight:700;font-size:14px">' + opp.flag + ' ' + opp.name + '</div>' +
+                        '<div class="text-muted" style="font-size:12px">Contested ' + Math.round(r.score * 0.4) + ' pots \u00B7 ' + Math.round(r.score * 0.15) + ' showdowns</div>' +
+                    '</div>' +
+                    skillCircle(r.opponentId, 'skill-rating-sm') +
+                '</div>';
+            });
+            html += '</div>';
+        }
+
+        // Scouting text
+        if (scoutText) {
+            html += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin-top:8px">' + scoutText + '</div>';
+        }
+
+        // Ask AI + Exploit Report
+        html += '<div class="search-input-wrap mt-md">' +
+            '<span class="search-icon">\u2728</span>' +
+            '<input class="search-input" placeholder="Ask about ' + player.name + '..." onkeydown="if(event.key===\'Enter\'){var v=this.value.trim();if(v)go(\'ai\',{q:v,player:\'' + pid + '\'})}">' +
+        '</div>';
+
+        html += '<button class="btn btn-orange full mt-sm" onclick="go(\'report\',{player:\'' + pid + '\'})">Generate Exploit Report \u2192</button>';
+
+        html += '</div>';
+        return html;
+    }
+
+    // ===================== Exploit Report =====================
+
+    function renderExploitReport() {
+        var pid = currentRoute.params.player || 'p1';
+        var player = PLAYERS.find(function(p) { return p.id === pid; }) || PLAYERS[0];
+        var stats = STATS[pid] || STATS.p1;
+        var exploit = calcExploit(stats);
+        var circumference = 2 * Math.PI * 36;
+        var ringOffset = circumference - (circumference * exploit / 100);
+        var ringColor = exploit >= 70 ? 'var(--accent-emerald)' : exploit >= 45 ? 'var(--accent-amber)' : 'var(--accent-red)';
+
+        var leaks = [
+            { name:'Overfolds BB Defense', severity:'high', pVal:stats.foldToSteal + '%', pop:'52%', desc:'Folds ' + stats.foldToSteal + '% to steals. Steal wider from late position.', tier:'medium', ytTime:2100 },
+            { name:'River Aggression Drop', severity:'medium', pVal:(stats.afRiver || 2.1).toFixed(1), pop:'2.5', desc:'AF drops from ' + (stats.afFlop || 3.2) + ' (flop) to ' + (stats.afRiver || 2.1) + ' (river). Value bet thinner on rivers.', tier:'strong', ytTime:3120 },
+            { name:'Low Check-Raise Frequency', severity:stats.checkRaiseFlop < 5 ? 'high' : 'medium', pVal:stats.checkRaiseFlop + '%', pop:'8%', desc:'Only ' + stats.checkRaiseFlop + '% check-raise means safe to barrel on most textures.', tier:'weak', ytTime:3950 },
+            { name:'C-Bet Continuation Decline', severity:'low', pVal:stats.cbetFlop + '%\u2192' + stats.cbetRiver + '%', pop:'65%\u219235%', desc:'Float flop bets profitably knowing they abandon many turns.', tier:'draw', ytTime:4821 }
+        ];
+
+        var html = '<div class="content stagger">';
+        html += '<button class="text-orange fw-700" style="background:none;border:none;font-size:14px;cursor:pointer;margin-bottom:12px" onclick="go(\'player\',{player:\'' + pid + '\'})">\u2190 ' + player.name + '</button>';
+
+        // Report header card
+        html += '<div class="scout-card" style="text-align:center">' +
+            '<div class="scout-label">Exploit Report</div>' +
+            '<div class="scout-name">' + player.flag + ' ' + player.name + '</div>';
+
+        // Grade ring
+        html += '<div class="grade-ring-wrap mt-md" style="margin:16px auto;width:90px;height:90px">' +
+            '<svg width="90" height="90" viewBox="0 0 90 90">' +
+                '<circle cx="45" cy="45" r="36" fill="none" stroke="var(--border-light)" stroke-width="6"/>' +
+                '<circle cx="45" cy="45" r="36" fill="none" stroke="' + ringColor + '" stroke-width="6" stroke-linecap="round" stroke-dasharray="' + circumference.toFixed(1) + '" stroke-dashoffset="' + ringOffset.toFixed(1) + '" style="transform:rotate(-90deg);transform-origin:center;animation:fillRing 1.2s ease-out forwards"/>' +
+            '</svg>' +
+            '<div class="grade-ring-value" style="color:' + ringColor + '">' + exploit + '</div>' +
+        '</div>';
+
+        html += '<div class="text-muted" style="font-size:12px">Based on ' + stats.totalHands + ' hands \u00B7 High confidence</div>';
+        html += '</div>';
+
+        // Visible leak cards (first 2)
+        leaks.slice(0, 2).forEach(function(l) {
+            html += '<div class="leak-card severity-' + l.severity + '">' +
+                '<div class="leak-severity-bar ' + l.severity + '">' + l.severity + ' priority</div>' +
+                '<div class="leak-body">' +
+                    '<div class="leak-title">' + l.name + ' <span class="tier-badge ' + tierClass(l.tier) + '" style="margin-left:6px">' + tierLabel(l.tier) + '</span></div>' +
+                    '<div class="leak-compare">' +
+                        '<div class="leak-val-group">' +
+                            '<span class="leak-val-label">Their Value</span>' +
+                            '<span class="leak-val text-red">' + l.pVal + '</span>' +
+                        '</div>' +
+                        '<div class="leak-val-group">' +
+                            '<span class="leak-val-label">Population</span>' +
+                            '<span class="leak-val text-muted">' + l.pop + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="leak-desc">' + l.desc + '</div>' +
+                    '<div class="row mt-sm" style="gap:8px">' +
+                        '<button class="btn btn-ghost btn-sm" onclick="go(\'ai\',{q:\'Evidence for ' + l.name + ' leak\'})">View Evidence \u2192</button>' +
+                        ytBtn(l.ytTime) +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        });
+
+        // Paywall
+        html += '<div class="paywall">' +
+            '<div class="paywall-blur">';
+
+        leaks.slice(2).forEach(function(l) {
+            html += '<div class="leak-card severity-' + l.severity + '">' +
+                '<div class="leak-severity-bar ' + l.severity + '">' + l.severity + ' priority</div>' +
+                '<div class="leak-body">' +
+                    '<div class="leak-title">' + l.name + '</div>' +
+                    '<div class="leak-desc">' + l.desc + '</div>' +
+                '</div>' +
+            '</div>';
+        });
+
+        html += '<div class="checklist">' +
+            '<div class="checklist-title">Opponent Prep Checklist</div>';
+        ['Steal wider from BTN/CO', 'Float flop bets more liberally', 'Value bet rivers thinner', 'Tighten call range vs their 3-bets'].forEach(function(item, i) {
+            html += '<div class="check-item">' +
+                '<div class="check-box"></div>' +
+                '<span class="check-num">' + (i + 1) + '.</span>' +
+                '<span>' + item + '</span>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        html += '<div class="paywall-cta">' +
+            '<div class="paywall-text">Unlock Full Scout Report</div>' +
+            '<button class="btn btn-orange" onclick="go(\'pricing\')">Go Shark \u2014 $10/mo</button>' +
+            '<button class="text-orange fw-700" style="background:none;border:none;font-size:13px;cursor:pointer" onclick="go(\'pricing\')">See all features \u2192</button>' +
+        '</div></div>';
+
+        html += '</div>';
+        return html;
+    }
+
+    // ===================== Favorites Screen =====================
+
+    function renderFavorites() {
+        var html = '<div class="content stagger">';
+        html += '<h2 style="font-size:22px;font-weight:800;margin:16px 0 8px">Saved</h2>' +
+            '<p class="text-muted mb-md">Your saved players and tournaments</p>';
+
+        // Saved tournament
+        html += '<div style="font-size:15px;font-weight:700;margin-bottom:8px">Tournaments</div>';
+        html += '<div class="mini-card" style="width:100%;margin-bottom:16px" onclick="go(\'tournament\')">' +
+            '<div class="mini-gradient"></div>' +
+            '<div class="mini-body">' +
+                '<div class="mini-name">' + TOURNAMENT.name + '</div>' +
+                '<div class="mini-meta">' + TOURNAMENT.event + ' \u00B7 ' + TOURNAMENT.date + '</div>' +
+                '<div class="mini-badges">' +
+                    '<span class="mini-badge" style="background:#eff6ff;color:#2563eb">' + TOURNAMENT.handCount + ' hands</span>' +
+                    '<span class="mini-badge" style="background:#fff7ed;color:#ea580c">AI</span>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        html += '<div style="font-size:15px;font-weight:700;margin-bottom:8px">Players</div>';
+
+        PLAYERS.slice(0, 4).forEach(function(p) {
+            html += '<div class="standing-row" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
+                '<div class="player-avatar avatar-sm" style="background:' + p.color + '">' + p.initials + '</div>' +
+                '<div class="standing-info">' +
+                    '<div class="standing-name">' + p.flag + ' ' + p.name + ' ' + skillCircle(p.id, 'skill-rating-sm') + '</div>' +
+                    '<div class="standing-meta">Saved from WSOP Main Event</div>' +
+                '</div>' +
+                '<button class="btn-ghost btn btn-sm" onclick="event.stopPropagation();go(\'report\',{player:\'' + p.id + '\'})">Scout</button>' +
+            '</div>';
+        });
+
+        html += '</div>';
+        return html;
+    }
+
+    // ===================== Pricing Screen =====================
+
+    function renderPricing() {
+        var html = '<div class="stagger">';
+        html += '<div class="pricing-hero">' +
+            '<div class="pricing-title">Level Up Your Game</div>' +
+            '<p class="text-muted">Unlock the full HUDR intelligence platform</p>' +
+        '</div>';
+
+        html += '<div class="plan-grid">';
+
+        // Rookie plan
+        html += '<div class="plan-card">' +
+            '<div class="plan-icon">\u{1F3C8}</div>' +
+            '<div class="plan-name">Rookie</div>' +
+            '<div class="plan-price">$0</div>' +
+            '<ul class="plan-features">' +
+                '<li>3 AI queries per day</li>' +
+                '<li>Tournament overviews</li>' +
+                '<li>Basic player stats</li>' +
+                '<li>Key moments</li>' +
+            '</ul>' +
+            '<button class="btn btn-ghost full mt-md" style="opacity:0.6">Current Plan</button>' +
+        '</div>';
+
+        // Shark plan
+        html += '<div class="plan-card featured">' +
+            '<div class="plan-icon">\u{1F988}</div>' +
+            '<div class="plan-name text-orange">Shark</div>' +
+            '<div class="plan-price">$10<span>/mo</span></div>' +
+            '<ul class="plan-features">' +
+                '<li>Unlimited AI Queries</li>' +
+                '<li>Full Exploit Reports</li>' +
+                '<li>AI Deterministic Engine</li>' +
+                '<li>Player Scouting Cards</li>' +
+                '<li>YouTube Hand Links</li>' +
+                '<li>Export & Share</li>' +
+                '<li>Priority Updates</li>' +
+            '</ul>' +
+            '<button class="btn btn-orange full mt-md">Go Shark \u2014 $10/mo</button>' +
+        '</div>';
+
+        html += '</div>';
+
+        // AI Engine feature callout
+        html += '<div class="content mt-lg">' +
+            '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-card);text-align:center">' +
+                '<div style="font-size:28px;margin-bottom:8px">\u{1F9E0}</div>' +
+                '<div style="font-size:16px;font-weight:700;margin-bottom:4px">AI Deterministic Engine</div>' +
+                '<div class="text-muted" style="font-size:13px;line-height:1.5">Hand strength tiers, player skill ratings, style classification, bluff detection, rivalry scores, luck analysis, and board texture labeling \u2014 all computed deterministically from hand data.</div>' +
+            '</div>' +
+        '</div>';
+
+        html += '<div style="text-align:center;padding:24px">' +
+            '<div class="text-muted" style="font-size:13px">Join 1,200+ players using HUDR Pro</div>' +
+        '</div>';
+
+        html += '</div>';
+        return html;
+    }
+
+    // ===================== Category Switcher =====================
+
+    function switchCat(cat, el) {
+        // Update pills
+        var pills = document.querySelectorAll('#catPills .cat-pill');
+        pills.forEach(function(p) { p.classList.remove('active'); });
+        el.classList.add('active');
+
+        // Show/hide suggestion groups
+        ['Tournament', 'Player', 'Hand', 'Strategy'].forEach(function(c) {
+            var el = document.getElementById('sug_' + c);
+            if (el) el.style.display = (c === cat) ? '' : 'none';
+        });
+    }
+
+    // ===================== Initial Render =====================
+    window.addEventListener('DOMContentLoaded', render);
+    </script>
+</body>
+</html>
