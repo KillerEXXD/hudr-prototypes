@@ -394,6 +394,7 @@
             overflow: hidden;
             box-shadow: var(--shadow-card);
         }
+        .kpi-row-9 { grid-template-columns: repeat(9, 1fr); }
 
         .kpi {
             background: var(--bg-primary);
@@ -1058,9 +1059,119 @@
             text-transform: uppercase;
         }
 
+        /* Dossier grid */
+        .dossier-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 12px;
+            height: 100%;
+            overflow: auto;
+            align-content: start;
+        }
+
+        /* Leak detail grid */
+        .leak-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Exploit header row */
+        .exploit-header-row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* Target profile row */
+        .target-profile-row {
+            display: flex;
+            gap: 16px;
+        }
+
         /* Hide screens */
         .screen { display: none; }
         .screen.active { display: flex; flex-direction: column; height: 100%; }
+
+        /* ===================== */
+        /* MOBILE RESPONSIVE    */
+        /* ===================== */
+        @media (max-width: 760px) {
+            body { overflow: auto; font-size: 12px; }
+            .app { height: auto; min-height: 100vh; }
+
+            /* Command bar — collapse to essentials */
+            .command-bar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+            .brand { font-size: 11px; }
+            .brand-sub { display: none; }
+            .command-wrap { order: 10; flex-basis: 100%; max-width: 100%; }
+            .shortcut-badge { display: none; }
+            .topbar-pills { order: 5; gap: 2px; overflow-x: auto; flex-shrink: 1; }
+            .top-pill { padding: 4px 8px; font-size: 11px; }
+
+            /* Main area — allow scroll */
+            .main-area { overflow-y: auto !important; height: auto !important; }
+
+            /* KPI row — wrap on mobile */
+            .kpi-row { grid-template-columns: repeat(3, 1fr) !important; }
+            .kpi { padding: 8px 10px; }
+            .kpi-label { font-size: 9px; }
+            .kpi-value { font-size: 14px; }
+
+            /* Filter tabs — horizontal scroll */
+            .filter-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .filter-tab { padding: 6px 10px; font-size: 11px; flex-shrink: 0; }
+
+            /* Data tables — horizontal scroll */
+            .panel { overflow-x: auto; }
+            .data-table { min-width: 600px; }
+            .data-table th { padding: 6px 10px; font-size: 9px; }
+            .data-table td { padding: 5px 10px; font-size: 12px; height: 34px; }
+
+            /* Player dossier — single column */
+            .dossier-grid { grid-template-columns: 1fr !important; height: auto !important; padding: 10px !important; }
+
+            /* Leak detail cards — single column */
+            .leak-detail-grid { grid-template-columns: 1fr !important; }
+            .leak-card { margin-bottom: 8px; }
+
+            /* Exploit header — stack on mobile */
+            .exploit-header-row { flex-wrap: wrap; gap: 12px; }
+            .target-profile-row { flex-wrap: wrap; gap: 10px; }
+
+            /* Plan grid */
+            .plan-grid { grid-template-columns: 1fr !important; }
+
+            /* Status bar — horizontal scroll */
+            .status-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 12px; font-size: 10px; white-space: nowrap; }
+
+            /* Grade circles — smaller on mobile */
+            .grade-circle { width: 56px; height: 56px; font-size: 18px; }
+            .skill-circle { width: 56px; height: 56px; font-size: 20px; }
+
+            /* Intel brief — tighter padding */
+            .finding { gap: 10px; padding: 10px 0; }
+            .finding-meta { flex-wrap: wrap; }
+            .intel-summary { font-size: 13px; padding: 10px 12px; }
+
+            /* Pricing grid */
+            .pricing-grid { grid-template-columns: 1fr !important; padding: 12px !important; }
+
+            /* Command palette — full-width mobile */
+            .cmd-palette { max-width: 95vw; margin: 0 10px; }
+            .cmd-overlay { padding-top: 40px; }
+
+            /* Buttons — smaller on mobile */
+            .btn { padding: 5px 10px; font-size: 11px; }
+            .yt-btn { padding: 2px 6px; font-size: 10px; }
+
+            /* Action rows — wrap */
+            .row { flex-wrap: wrap; }
+
+            /* Exploit report header — stack vertically */
+            .between { flex-wrap: wrap; gap: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -1414,7 +1525,7 @@ function renderDashboard() {
     var html = '<div style="padding:12px 16px">';
 
     // KPI Row (9 boxes)
-    html += '<div class="kpi-row" style="grid-template-columns:repeat(9, 1fr)">';
+    html += '<div class="kpi-row kpi-row-9">';
     var kpis = [
         ['Players', '9'],
         ['Hands', '87'],
@@ -1595,7 +1706,7 @@ function renderPlayerDossier() {
     var strengths = getStrengths(p);
     var leaks = getLeaks(p);
 
-    var html = '<div class="animate-in" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;height:100%;overflow:auto;align-content:start">';
+    var html = '<div class="animate-in dossier-grid">';
 
     // Identity + Skill + Exploit
     html += '<div class="panel">';
@@ -1747,12 +1858,12 @@ function renderExploitReport() {
     html += '</div></div>';
 
     // Grade + Identity
-    html += '<div class="row mt-md" style="gap:24px">';
+    html += '<div class="exploit-header-row mt-md">';
     html += '<div style="text-align:center"><div class="grade-circle ' + gradeClass(exploit) + '" style="width:84px;height:84px;font-size:28px">' + exploit + '</div><div style="font-size:9px;margin-top:4px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Exploit Index</div></div>';
     html += '<div style="text-align:center"><div class="skill-circle ' + p.skillClass + '" style="width:84px;height:84px;font-size:28px">' + p.skill + '<span class="skill-sub">SKILL</span></div></div>';
     html += '<div>';
     html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)">Target Profile</div>';
-    html += '<div class="row mt-sm" style="gap:16px">';
+    html += '<div class="target-profile-row mt-sm">';
     html += '<div><span class="text-muted" style="font-size:11px">Confidence</span><br><span class="badge badge-green">High</span></div>';
     html += '<div><span class="text-muted" style="font-size:11px">Sample</span><br><span class="text-mono fw-700">' + p.hands + '</span></div>';
     html += '<div><span class="text-muted" style="font-size:11px">Freshness</span><br><span class="text-mono">3d ago</span></div>';
@@ -1786,7 +1897,7 @@ function renderExploitReport() {
     html += '</tbody></table></div>';
 
     // Leak detail cards
-    html += '<div class="mt-md" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+    html += '<div class="mt-md leak-detail-grid">';
     leaks.slice(0, 4).forEach(function(l) {
         html += '<div class="leak-card ' + l.levelClass + '">';
         html += '<div class="between"><strong style="font-size:13px">' + l.name + '</strong><span class="severity-stars">' + severityStars(l.severity) + '</span></div>';
@@ -1826,7 +1937,7 @@ function renderExploitReport() {
     html += '</div></div>';
 
     // Confidence footer
-    html += '<div class="kpi-row mt-md" style="grid-template-columns:repeat(4,1fr)">';
+    html += '<div class="kpi-row mt-md">';
     html += '<div class="kpi"><div class="kpi-label">Hands Analyzed</div><div class="kpi-value">' + p.hands + '</div></div>';
     html += '<div class="kpi"><div class="kpi-label">Leak Count</div><div class="kpi-value">' + leaks.length + '</div></div>';
     html += '<div class="kpi"><div class="kpi-label">Significance</div><div class="kpi-value">' + (p.hands > 50 ? 'Valid' : 'Low') + '</div></div>';
