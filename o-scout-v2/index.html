@@ -15,16 +15,17 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg-page: #e5e7eb;
+            --bg-page: #f0f2f5;
             --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #f1f3f5;
+            --bg-secondary: #f8f9fb;
+            --bg-tertiary: #f1f3f6;
             --bg-card: #ffffff;
+            --bg-surface: #fafbfc;
             --border-light: #e5e7eb;
             --border-medium: #d1d5db;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --text-muted: #9ca3af;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
             --accent-orange: #ea580c;
             --accent-orange-light: #fb923c;
             --accent-blue: #2563eb;
@@ -33,8 +34,9 @@
             --accent-amber: #d97706;
             --accent-purple: #7c3aed;
             --accent-gold: #ca8a04;
-            --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow-elevated: 0 4px 16px rgba(0,0,0,0.12);
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-elevated: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-glow-orange: 0 0 0 3px rgba(234,88,12,0.12);
             --radius: 14px;
             --radius-sm: 10px;
             --radius-full: 9999px;
@@ -1987,6 +1989,250 @@
             color: var(--text-muted);
             font-style: italic;
         }
+
+        /* ===================== Playing Card Mini ===================== */
+        .card-mini {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 38px; border-radius: 5px;
+            background: #fff; border: 1.5px solid var(--border-medium);
+            font-size: 11px; font-weight: 800; line-height: 1;
+            flex-shrink: 0; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+        .card-mini.red { color: #dc2626; border-color: #fecaca; }
+        .card-mini.black { color: #1e293b; }
+        .card-mini-rank { position: absolute; top: 2px; left: 3px; font-size: 10px; }
+        .card-mini-suit { font-size: 13px; margin-top: 6px; }
+        .board-cards { display: flex; gap: 4px; align-items: center; }
+
+        /* ===================== Intelligence Ticker ===================== */
+        .intel-ticker {
+            display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 2px;
+            scrollbar-width: none; -webkit-overflow-scrolling: touch; margin-bottom: 16px;
+        }
+        .intel-ticker::-webkit-scrollbar { display: none; }
+        .ticker-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 14px; border-radius: var(--radius-full);
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            font-size: 12px; font-weight: 600; color: var(--text-primary);
+            white-space: nowrap; flex-shrink: 0; cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s; box-shadow: var(--shadow-card);
+        }
+        .ticker-pill:hover { border-color: var(--accent-orange); box-shadow: var(--shadow-glow-orange); }
+
+        /* ===================== Intelligence Card ===================== */
+        .intel-card {
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: var(--radius); padding: 14px 16px 14px 20px;
+            display: flex; gap: 12px; cursor: pointer; margin-bottom: 10px;
+            box-shadow: var(--shadow-card); transition: border-color 0.15s, box-shadow 0.15s;
+            position: relative; overflow: hidden;
+        }
+        .intel-card::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+        }
+        .intel-card.intel-orange::before { background: var(--accent-orange); }
+        .intel-card.intel-red::before { background: var(--accent-red); }
+        .intel-card.intel-blue::before { background: var(--accent-blue); }
+        .intel-card.intel-purple::before { background: var(--accent-purple); }
+        .intel-card.intel-emerald::before { background: var(--accent-emerald); }
+        .intel-card:hover { border-color: rgba(0,0,0,0.12); box-shadow: var(--shadow-elevated); }
+        .intel-card-icon { font-size: 24px; flex-shrink: 0; }
+        .intel-card-body { flex: 1; min-width: 0; }
+        .intel-card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+        .intel-card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+        .intel-card-cta { font-size: 12px; font-weight: 600; color: var(--accent-orange); margin-top: 4px; }
+
+        /* ===================== Status Hero (Dark Cinematic) ===================== */
+        .status-hero {
+            border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden;
+            color: #f1f5f9; margin: 12px 16px 16px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+            border: 1px solid rgba(255,255,255,0.08); box-shadow: var(--shadow-elevated);
+            cursor: pointer;
+        }
+        .status-hero::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold), var(--accent-orange));
+        }
+        .status-hero-event { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+        .status-hero-name { font-size: 20px; font-weight: 800; margin: 4px 0 8px; }
+        .status-hero-meta { font-size: 12px; color: rgba(255,255,255,0.6); display: flex; align-items: center; gap: 8px; }
+        .status-hero-badge {
+            display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+            border-radius: var(--radius-full); font-size: 10px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.06em;
+        }
+        .status-hero-badge.completed { background: rgba(5,150,105,0.2); color: #6ee7b7; }
+        .status-hero-badge.live { background: rgba(239,68,68,0.2); color: #fca5a5; animation: pulse 1.5s ease-in-out infinite; }
+        .status-hero-leader { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; }
+        .status-hero-leader-name { font-size: 13px; font-weight: 700; }
+        .status-hero-leader-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; }
+
+        /* ===================== Threat Grid ===================== */
+        .threat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 16px; }
+        .threat-cell {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            cursor: pointer; padding: 8px 4px; border-radius: var(--radius-sm);
+            transition: background 0.15s; background: var(--bg-card); border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-card);
+        }
+        .threat-cell:hover { border-color: var(--accent-orange); box-shadow: var(--shadow-glow-orange); }
+        .threat-avatar-ring { position: relative; display: flex; align-items: center; justify-content: center; }
+        .threat-avatar-ring svg { position: absolute; top: -3px; left: -3px; }
+        .threat-name { font-size: 11px; font-weight: 700; color: var(--text-primary); text-align: center; }
+        .threat-score { font-size: 10px; font-weight: 700; }
+        .threat-score.high { color: var(--accent-red); }
+        .threat-score.medium { color: var(--accent-amber); }
+        .threat-score.low { color: var(--accent-emerald); }
+
+        /* ===================== Moment Hero Card ===================== */
+        .moment-hero {
+            margin: 0 16px 16px; border-radius: var(--radius);
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            overflow: hidden; box-shadow: var(--shadow-elevated); cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .moment-hero:hover { transform: scale(1.005); }
+        .moment-hero-top { padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
+        .moment-hero-vs { font-size: 12px; font-weight: 800; color: var(--text-muted); }
+        .moment-hero-board {
+            padding: 14px 16px; background: var(--bg-tertiary);
+            border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .moment-hero-bottom { padding: 12px 16px; }
+        .moment-hero-pot { font-size: 18px; font-weight: 800; color: var(--accent-gold); }
+        .moment-hero-ai {
+            font-size: 12px; color: var(--accent-purple); font-style: italic;
+            margin-top: 6px; line-height: 1.5;
+        }
+        .moment-hero-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+
+        /* ===================== Quiz Card ===================== */
+        .quiz-card {
+            margin: 0 16px 16px; border-radius: var(--radius);
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            overflow: hidden; box-shadow: var(--shadow-card);
+        }
+        .quiz-header {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(124,58,237,0.02));
+            border-bottom: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .quiz-header-title {
+            font-size: 12px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--accent-purple);
+        }
+        .quiz-body { padding: 16px; }
+        .quiz-situation { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .quiz-actions { display: flex; gap: 8px; }
+        .quiz-btn {
+            flex: 1; padding: 12px; border-radius: var(--radius-sm);
+            border: 2px solid var(--border-medium); background: var(--bg-secondary);
+            color: var(--text-primary); font-size: 14px; font-weight: 700;
+            cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: center;
+        }
+        .quiz-btn:hover { border-color: var(--accent-purple); background: rgba(124,58,237,0.04); }
+        .quiz-btn.selected { border-color: var(--accent-purple); background: rgba(124,58,237,0.08); color: var(--accent-purple); }
+        .quiz-btn.correct { border-color: var(--accent-emerald); background: rgba(5,150,105,0.08); color: var(--accent-emerald); }
+        .quiz-btn.wrong { border-color: var(--accent-red); background: rgba(220,38,38,0.06); color: var(--accent-red); }
+        .quiz-reveal {
+            padding: 14px 16px; border-top: 1px solid var(--border-light);
+            background: rgba(124,58,237,0.03);
+        }
+        .quiz-reveal-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--accent-purple); margin-bottom: 4px; }
+        .quiz-reveal-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+        .quiz-streak {
+            display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+            border-radius: var(--radius-full); background: rgba(234,88,12,0.08);
+            color: var(--accent-orange); font-size: 12px; font-weight: 700;
+        }
+        .equity-bar { height: 8px; border-radius: 4px; background: var(--bg-tertiary); margin: 8px 0; overflow: hidden; }
+        .equity-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease-out; }
+        .hole-cards { display: flex; gap: 4px; justify-content: center; margin: 12px 0; }
+        .hole-cards .card-mini { width: 36px; height: 50px; }
+        .hole-cards .card-mini .card-mini-rank { font-size: 13px; }
+        .hole-cards .card-mini .card-mini-suit { font-size: 16px; }
+
+        /* ===================== Story Components ===================== */
+        .stack-chart { margin: 0 16px 16px; }
+        .stack-chart svg { border-radius: var(--radius-sm); background: var(--bg-card); border: 1px solid var(--border-light); }
+        .stack-legend { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px; }
+        .stack-legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+        .stack-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        .chapter-card {
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: var(--radius); margin: 0 16px 12px; overflow: hidden; box-shadow: var(--shadow-card);
+        }
+        .chapter-mood { height: 3px; }
+        .chapter-mood.calm { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .chapter-mood.tense { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .chapter-mood.dramatic { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .chapter-body { padding: 14px 16px; }
+        .chapter-title { font-size: 16px; font-weight: 800; color: var(--text-primary); }
+        .chapter-range { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+        .chapter-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-top: 8px; }
+        .chapter-key-hand { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-light); font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+
+        .elim-timeline { padding: 0 16px; position: relative; margin-left: 24px; }
+        .elim-line { position: absolute; left: 5px; top: 0; bottom: 0; width: 2px; background: var(--border-light); }
+        .elim-item { display: flex; gap: 12px; padding: 8px 0; position: relative; }
+        .elim-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid; flex-shrink: 0; background: var(--bg-page); z-index: 1; }
+        .elim-info { flex: 1; }
+        .elim-hand { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+        .elim-desc { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .elim-by { font-size: 11px; color: var(--text-secondary); }
+
+        .gambit-card {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm); padding: 12px; margin: 0 16px 8px;
+            cursor: pointer; transition: border-color 0.15s; box-shadow: var(--shadow-card);
+        }
+        .gambit-card:hover { border-color: var(--accent-orange); }
+        .gambit-icon { font-size: 22px; width: 36px; text-align: center; }
+        .gambit-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .gambit-desc { font-size: 12px; color: var(--text-secondary); }
+        .gambit-hand { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+        .bluff-item {
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm); padding: 14px; margin: 0 16px 10px; box-shadow: var(--shadow-card);
+        }
+        .bluff-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .bluff-item-title { font-size: 14px; font-weight: 700; }
+        .bluff-result { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-full); }
+        .bluff-result.success { background: rgba(5,150,105,0.1); color: var(--accent-emerald); }
+        .bluff-result.caught { background: rgba(220,38,38,0.08); color: var(--accent-red); }
+        .bluff-item-meta { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+
+        /* ===================== Play Tab ===================== */
+        .play-header { padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+        .play-title { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+        .play-stats { display: flex; gap: 16px; padding: 0 16px 12px; }
+        .play-stat { text-align: center; }
+        .play-stat-value { font-size: 24px; font-weight: 800; color: var(--text-primary); }
+        .play-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+        .past-quiz {
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm); padding: 12px; margin: 0 16px 8px;
+            display: flex; align-items: center; gap: 12px; cursor: pointer; box-shadow: var(--shadow-card);
+        }
+        .past-quiz-result {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 800; flex-shrink: 0;
+        }
+        .past-quiz-result.correct { background: rgba(5,150,105,0.1); color: var(--accent-emerald); }
+        .past-quiz-result.wrong { background: rgba(220,38,38,0.08); color: var(--accent-red); }
+
+        /* ===================== You Tab ===================== */
+        .iq-ring { text-align: center; padding: 24px 16px; }
+        .iq-ring-value { font-size: 32px; font-weight: 800; }
+        .iq-ring-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -2255,6 +2501,97 @@
 
     const YT_BASE = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=';
 
+    // ===================== Chip Stack Timeline =====================
+    const STACK_TIMELINE = {
+        p1: [4500000,4200000,4800000,5100000,4900000,5500000,6200000,6800000,7500000,8200000,9350000],
+        p2: [3200000,3800000,4200000,3900000,4500000,5000000,5800000,6100000,5500000,4200000,0],
+        p3: [2800000,3100000,2600000,2900000,2400000,2100000,1800000,0],
+        p4: [2100000,2300000,2000000,2500000,2200000,1800000,0],
+        p5: [1800000,2200000,2800000,2400000,1900000,0],
+        p6: [1500000,1300000,1700000,1200000,0],
+        p7: [1200000,900000,1100000,0],
+        p8: [900000,700000,0],
+        p9: [600000,0]
+    };
+
+    // ===================== Tournament Story Arc =====================
+    const STORY_ARC = {
+        chapters: [
+            { id:'ch1', title:'The Opening Salvo', handRange:'Hands 1\u201325', mood:'calm', color:'#3b82f6',
+              summary:'Cautious play early as players size each other up. Negreanu establishes table image with selective aggression. Two quick eliminations thin the field.',
+              keyHand:{ hand:12, desc:'Konnikova eliminated by Ivey \u2014 AK vs QQ all-in preflop', board:['As','Kh','7c','3d','2s'] }},
+            { id:'ch2', title:'The Grind', handRange:'Hands 26\u201355', mood:'tense', color:'#f59e0b',
+              summary:'The middle stretch sees wild stack volatility. Hellmuth doubles through Bonomo on a cooler. Selbst makes a legendary hero call on the river.',
+              keyHand:{ hand:42, desc:'Holz flops nut flush vs Kenney\'s set \u2014 massive 42M pot', board:['9h','6h','2h','Jc','4d'] }},
+            { id:'ch3', title:'The Final Battle', handRange:'Hands 56\u201387', mood:'dramatic', color:'#ef4444',
+              summary:'Three-handed play explodes. Hellmuth fires a legendary triple-barrel bluff that gets picked off. Negreanu rivers two pair in the final hand to claim the title.',
+              keyHand:{ hand:87, desc:'Negreanu rivers two pair to crack Ivey\'s pocket kings', board:['Qh','9d','4c','7s','Qc'] }}
+        ],
+        eliminations: [
+            { hand:12, playerId:'p8', eliminatedBy:'p2', desc:'AK vs QQ all-in preflop' },
+            { hand:22, playerId:'p9', eliminatedBy:'p1', desc:'Short-stacked shove with A5s' },
+            { hand:35, playerId:'p7', eliminatedBy:'p2', desc:'Set over set on the flop' },
+            { hand:42, playerId:'p6', eliminatedBy:'p6', desc:'Nut flush vs top set \u2014 cooler' },
+            { hand:52, playerId:'p5', eliminatedBy:'p1', desc:'Hero call gone wrong' },
+            { hand:61, playerId:'p4', eliminatedBy:'p2', desc:'Set over set again' },
+            { hand:72, playerId:'p3', eliminatedBy:'p1', desc:'Massive bluff picked off' },
+            { hand:87, playerId:'p2', eliminatedBy:'p1', desc:'Rivered two pair vs pocket kings' }
+        ]
+    };
+
+    // ===================== Quiz Hands =====================
+    const QUIZ_HANDS = [
+        { id:'q1', hand:55, situation:'4 players remain. You\'re in the BB with 15BB.', facing:'CO raises 2.2x.', holeCards:['Jh','Ts'],
+          board:['Kd','Qh','4c'], street:'Flop', pot:'6.8BB', action:'Villain bets 3BB into 6.8BB pot.',
+          options:['Fold','Call','Raise All-In'],
+          correct:2, proAction:'Raise All-In', proName:'Selbst', equity:42,
+          explanation:'Open-ended straight draw + overcards. With 15BB, shoving maximizes fold equity and equity realization. Calling is too passive with this stack depth.',
+          proPercent:72 },
+        { id:'q2', hand:73, situation:'3 players remain. You\'re on BTN with 22BB.', facing:'You opened 2.2x, BB called.', holeCards:['9c','7c'],
+          board:['Ks','8d','2h','6c'], street:'Turn', pot:'12BB', action:'BB checks to you.',
+          options:['Check Back','Bet 6BB','Bet All-In'],
+          correct:1, proAction:'Bet 6BB', proName:'Hellmuth', equity:28,
+          explanation:'Hellmuth fires the triple barrel with 9-high here. The turn 6c gives him a gutshot to go with the bluff. Bold, but only 48% of pros agree \u2014 a controversial play.',
+          proPercent:48 },
+        { id:'q3', hand:31, situation:'6 players remain. You\'re in the SB with 28BB.', facing:'Folded to you. BB is a tight nit.', holeCards:['Ah','3d'],
+          board:[], street:'Preflop', pot:'2.5BB', action:'Action on you.',
+          options:['Fold','Limp','Raise 2.5x'],
+          correct:2, proAction:'Raise 2.5x', proName:'Negreanu', equity:60,
+          explanation:'Against a nit folding 65%+ to steals, any ace is a profitable steal. Negreanu opens wide here knowing the BB won\'t defend light.',
+          proPercent:85 }
+    ];
+
+    // ===================== Gambit Themes =====================
+    const GAMBIT_THEMES = [
+        { id:'g1', name:'The River Trap', icon:'\u{1F3AD}', hand:61, desc:'Ivey slowplays top set, then check-raises river for max value', color:'#f59e0b' },
+        { id:'g2', name:'The Squeeze', icon:'\u26A1', hand:34, desc:'Selbst 3-bet squeezes with suited connectors vs two callers', color:'#3b82f6' },
+        { id:'g3', name:'The Stone Cold Bluff', icon:'\u2744\uFE0F', hand:73, desc:'Hellmuth fires three barrels with complete air \u2014 nine-high', color:'#ef4444' },
+        { id:'g4', name:'The Cooler', icon:'\u{1F4A5}', hand:42, desc:'Holz nut flush vs Kenney flopped set \u2014 an unavoidable collision', color:'#7c3aed' }
+    ];
+
+    // ===================== Bluff Report =====================
+    const BLUFF_REPORT = [
+        { hand:73, bluffer:'p3', victim:'p5', street:'River', sizing:'2.5x pot', holding:'9\u26639\u2660 (nine-high)', board:['Ks','8d','2h','6c','Jh'], result:'fold', success:true },
+        { hand:45, bluffer:'p7', victim:'p4', street:'Turn', sizing:'75% pot', holding:'T\u2663 9\u2663 (missed draw)', board:['Ah','5d','3s','8c'], result:'call', success:false },
+        { hand:18, bluffer:'p1', victim:'p3', street:'River', sizing:'33% pot', holding:'A\u2660 4\u2660 (ace-high)', board:['Kh','Qc','7d','2s','9h'], result:'fold', success:true }
+    ];
+
+    // ===================== Career Sparklines =====================
+    const CAREER_SPARKLINES = {
+        p1: { vpip:[30,29,28,27,28,28], pfr:[23,22,22,21,22,22], af:[3.1,2.9,2.8,2.7,2.8,2.8] },
+        p2: { vpip:[24,25,26,25,26,26], pfr:[20,21,22,21,22,22], af:[3.5,3.3,3.4,3.5,3.2,3.4] },
+        p3: { vpip:[22,24,25,23,24,24], pfr:[18,20,21,19,20,20], af:[2.4,2.2,2.3,2.5,2.2,2.3] },
+        p4: { vpip:[30,32,31,33,32,32], pfr:[20,19,18,19,18,18], af:[2.0,1.8,1.9,1.7,1.8,1.8] },
+        p5: { vpip:[30,29,31,30,30,30], pfr:[22,23,24,23,24,24], af:[3.0,2.8,3.1,2.9,3.0,3.0] },
+        p6: { vpip:[19,18,17,18,17,17], pfr:[16,15,14,15,14,14], af:[2.5,2.6,2.4,2.5,2.5,2.5] },
+        p7: { vpip:[27,28,26,27,27,27], pfr:[20,21,19,20,20,20], af:[2.2,2.0,2.1,2.3,2.1,2.1] },
+        p8: { vpip:[20,22,21,23,22,22], pfr:[15,16,15,17,16,16], af:[1.8,1.9,2.0,1.8,1.9,1.9] },
+        p9: { vpip:[25,24,23,24,23,23], pfr:[20,19,18,19,18,18], af:[2.8,2.7,2.9,2.8,2.8,2.8] }
+    };
+
+    // ===================== Quiz State =====================
+    var quizState = { answered: {}, streak: 0, total: 0, correct: 0 };
+
     // ===================== Utility Functions =====================
 
     function fmtChips(n) {
@@ -2403,14 +2740,192 @@
             '</svg>';
     }
 
+    // ===================== Card SVG Helpers =====================
+
+    function cardSvg(card) {
+        if (!card || card.length < 2) return '<span class="card-mini black">?</span>';
+        var rank = card[0], suit = card[1];
+        var suitMap = { s:'\u2660', h:'\u2665', d:'\u2666', c:'\u2663' };
+        var suitSymbol = suitMap[suit] || '?';
+        var isRed = suit === 'h' || suit === 'd';
+        var display = rank === 'T' ? '10' : rank;
+        return '<span class="card-mini ' + (isRed ? 'red' : 'black') + '">' +
+            '<span class="card-mini-rank">' + display + '</span>' +
+            '<span class="card-mini-suit">' + suitSymbol + '</span></span>';
+    }
+
+    function boardCardsSvg(cards) {
+        if (!cards || !cards.length) return '';
+        return '<div class="board-cards">' + cards.map(cardSvg).join('') + '</div>';
+    }
+
+    function holeCardsSvg(cards) {
+        if (!cards || !cards.length) return '';
+        return '<div class="hole-cards">' + cards.map(cardSvg).join('') + '</div>';
+    }
+
+    // ===================== Sparkline SVG =====================
+
+    function sparklineSvg(data, width, height, color) {
+        width = width || 80; height = height || 24; color = color || 'var(--accent-orange)';
+        if (!data || data.length < 2) return '';
+        var max = Math.max.apply(null, data), min = Math.min.apply(null, data);
+        var range = max - min || 1;
+        var step = width / (data.length - 1);
+        var pts = data.map(function(v, i) {
+            return (i * step).toFixed(1) + ',' + (height - ((v - min) / range) * (height - 4) - 2).toFixed(1);
+        });
+        return '<svg width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">' +
+            '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + color + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<circle cx="' + pts[pts.length-1].split(',')[0] + '" cy="' + pts[pts.length-1].split(',')[1] + '" r="2" fill="' + color + '"/></svg>';
+    }
+
+    // ===================== Threat Meter / Ring =====================
+
+    function threatMeterSvg(score, width) {
+        width = width || 54;
+        var pct = Math.min(100, Math.max(0, score));
+        var color = pct >= 70 ? '#ef4444' : pct >= 40 ? '#f59e0b' : '#10b981';
+        var fillW = (pct / 100) * width;
+        return '<svg width="' + width + '" height="6" viewBox="0 0 ' + width + ' 6">' +
+            '<rect x="0" y="0" width="' + width + '" height="6" rx="3" fill="#e5e7eb"/>' +
+            '<rect x="0" y="0" width="' + fillW + '" height="6" rx="3" fill="' + color + '"/></svg>';
+    }
+
+    function threatRingSvg(score, size) {
+        size = size || 48;
+        var r = (size / 2) - 2;
+        var circ = 2 * Math.PI * r;
+        var pct = Math.min(100, Math.max(0, score)) / 100;
+        var offset = circ - (circ * pct);
+        var color = score >= 70 ? '#ef4444' : score >= 40 ? '#f59e0b' : '#10b981';
+        return '<svg width="' + (size+4) + '" height="' + (size+4) + '" viewBox="0 0 ' + (size+4) + ' ' + (size+4) + '">' +
+            '<circle cx="' + (size/2+2) + '" cy="' + (size/2+2) + '" r="' + r + '" fill="none" stroke="#e5e7eb" stroke-width="3"/>' +
+            '<circle cx="' + (size/2+2) + '" cy="' + (size/2+2) + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="3" stroke-linecap="round" ' +
+            'stroke-dasharray="' + circ.toFixed(1) + '" stroke-dashoffset="' + offset.toFixed(1) + '" style="transform:rotate(-90deg);transform-origin:center"/></svg>';
+    }
+
+    // ===================== Chip Stack Chart SVG =====================
+
+    function stackChartSvg(playerIds, width, height) {
+        width = width || 358; height = height || 180;
+        var pad = { top:10, right:10, bottom:24, left:10 };
+        var cW = width - pad.left - pad.right, cH = height - pad.top - pad.bottom;
+        var maxLen = 0, maxVal = 0;
+        playerIds.forEach(function(pid) {
+            var d = STACK_TIMELINE[pid] || [];
+            if (d.length > maxLen) maxLen = d.length;
+            d.forEach(function(v) { if (v > maxVal) maxVal = v; });
+        });
+        if (maxLen < 2 || maxVal === 0) return '';
+        var svg = '<svg width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">';
+        // Grid lines
+        for (var g = 0; g <= 4; g++) {
+            var gy = pad.top + (cH / 4) * g;
+            svg += '<line x1="' + pad.left + '" y1="' + gy + '" x2="' + (width-pad.right) + '" y2="' + gy + '" stroke="#e5e7eb" stroke-width="0.5"/>';
+        }
+        // Y-axis labels
+        for (var y = 0; y <= 4; y++) {
+            var yy = pad.top + (cH / 4) * y;
+            var yVal = maxVal - (maxVal / 4) * y;
+            svg += '<text x="' + pad.left + '" y="' + (yy - 3) + '" font-size="8" fill="#94a3b8">' + fmtChips(Math.round(yVal)) + '</text>';
+        }
+        // Player lines
+        playerIds.forEach(function(pid) {
+            var data = STACK_TIMELINE[pid] || [];
+            var p = PLAYERS.find(function(x) { return x.id === pid; });
+            var color = p ? p.color : '#666';
+            var pts = [];
+            data.forEach(function(v, i) {
+                var x = pad.left + (i / (maxLen - 1)) * cW;
+                var yp = pad.top + cH - (v / maxVal) * cH;
+                pts.push(x.toFixed(1) + ',' + yp.toFixed(1));
+            });
+            svg += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>';
+            // X mark if eliminated
+            if (data[data.length-1] === 0 && data.length >= 2) {
+                var lx = pad.left + ((data.length-1) / (maxLen-1)) * cW;
+                svg += '<text x="' + lx + '" y="' + (pad.top + cH + 2) + '" text-anchor="middle" fill="' + color + '" font-size="10" font-weight="800">\u2716</text>';
+            }
+            // End dot for winner
+            if (data[data.length-1] > 0) {
+                var ex = pad.left + ((data.length-1) / (maxLen-1)) * cW;
+                var ey = pad.top + cH - (data[data.length-1] / maxVal) * cH;
+                svg += '<circle cx="' + ex + '" cy="' + ey + '" r="3" fill="' + color + '"/>';
+            }
+        });
+        // Hand labels along bottom
+        var handLabels = [1, Math.round(87*0.25), Math.round(87*0.5), Math.round(87*0.75), 87];
+        handLabels.forEach(function(h) {
+            var hx = pad.left + ((h-1) / (maxLen-1)) * cW;
+            svg += '<text x="' + hx + '" y="' + (height - 4) + '" text-anchor="middle" font-size="8" fill="#94a3b8">H' + h + '</text>';
+        });
+        svg += '</svg>';
+        return svg;
+    }
+
+    // ===================== Quiz Card Renderer =====================
+
+    function renderQuizCard(quiz, full) {
+        var answered = quizState.answered[quiz.id];
+        var isAnswered = answered !== undefined;
+        var html = '<div class="quiz-card">';
+        html += '<div class="quiz-header"><span class="quiz-header-title">\u{1F9E0} What Would You Do?</span>';
+        if (quizState.streak > 0) html += '<span class="quiz-streak">\u{1F525} ' + quizState.streak + '</span>';
+        html += '</div>';
+        html += '<div class="quiz-body">';
+        html += '<div class="quiz-situation"><strong>' + quiz.situation + '</strong> ' + quiz.facing + '</div>';
+        if (quiz.board && quiz.board.length) {
+            html += '<div style="text-align:center;margin:8px 0"><span style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase">' + quiz.street + '</span></div>';
+            html += '<div style="display:flex;justify-content:center;margin-bottom:8px">' + boardCardsSvg(quiz.board) + '</div>';
+        }
+        html += '<div style="text-align:center;margin-bottom:4px"><span style="font-size:11px;font-weight:600;color:var(--text-muted)">Your Hand</span></div>';
+        html += holeCardsSvg(quiz.holeCards);
+        if (quiz.action) html += '<div style="text-align:center;font-size:13px;color:var(--text-secondary);margin:8px 0">' + quiz.action + '</div>';
+        html += '<div class="quiz-actions">';
+        quiz.options.forEach(function(opt, i) {
+            var cls = 'quiz-btn';
+            if (isAnswered) {
+                if (i === quiz.correct) cls += ' correct';
+                else if (i === answered && i !== quiz.correct) cls += ' wrong';
+            }
+            html += '<button class="' + cls + '" onclick="event.stopPropagation();answerQuiz(\'' + quiz.id + '\',' + i + ')">' + opt + '</button>';
+        });
+        html += '</div></div>';
+        if (isAnswered) {
+            var wasCorrect = answered === quiz.correct;
+            html += '<div class="quiz-reveal">';
+            html += '<div class="quiz-reveal-title">' + (wasCorrect ? '\u2705 Correct!' : '\u274C Not quite') + '</div>';
+            html += '<div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:4px">' + quiz.proName + ' chose: ' + quiz.proAction + '</div>';
+            html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">' + quiz.proPercent + '% of pros agreed</div>';
+            html += '<div class="equity-bar"><div class="equity-fill" style="width:' + quiz.equity + '%;background:' + (quiz.equity > 50 ? 'var(--accent-emerald)' : 'var(--accent-amber)') + '"></div></div>';
+            html += '<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Hero equity: ' + quiz.equity + '%</div>';
+            html += '<div class="quiz-reveal-text">' + quiz.explanation + '</div>';
+            html += '</div>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    function answerQuiz(quizId, choice) {
+        if (quizState.answered[quizId] !== undefined) return;
+        var quiz = QUIZ_HANDS.find(function(q) { return q.id === quizId; });
+        if (!quiz) return;
+        quizState.answered[quizId] = choice;
+        quizState.total++;
+        if (choice === quiz.correct) { quizState.correct++; quizState.streak++; }
+        else { quizState.streak = 0; }
+        render();
+    }
+
     // ===================== Router =====================
 
-    var currentRoute = { path: 'home', params: {} };
+    var currentRoute = { path: 'intel', params: {} };
 
     function parseHash() {
-        var raw = (window.location.hash || '#/home').slice(2);
+        var raw = (window.location.hash || '#/intel').slice(2);
         var parts = raw.split('?');
-        var path = parts[0] || 'home';
+        var path = parts[0] || 'intel';
         var params = {};
         if (parts[1]) {
             parts[1].split('&').forEach(function(p) {
@@ -2435,18 +2950,18 @@
     }
 
     window.addEventListener('hashchange', render);
-    if (!window.location.hash) window.location.hash = '/home';
+    if (!window.location.hash) window.location.hash = '/intel';
 
     // ===================== Top Bar =====================
 
     function renderTopBar() {
         return '<div class="top-bar">' +
-            '<div class="row" style="gap:8px;cursor:pointer" onclick="go(\'home\')">' +
+            '<div class="row" style="gap:8px;cursor:pointer" onclick="go(\'intel\')">' +
                 '<div class="logo">H</div>' +
                 '<span class="top-bar-title">HUDR</span>' +
                 '<span class="top-bar-version">v2.0</span>' +
             '</div>' +
-            '<button class="search-btn" onclick="go(\'search\')">\u{1F50D}</button>' +
+            '<button class="search-btn" onclick="go(\'scout\')">\u{1F50D}</button>' +
         '</div>';
     }
 
@@ -2454,13 +2969,18 @@
 
     function renderTabBar() {
         var tabs = [
-            { id:'home', icon:'\u{1F3E0}', label:'Home' },
-            { id:'search', icon:'\u{1F50D}', label:'Search' },
-            { id:'ai', icon:'\u2728', label:'AI' },
-            { id:'favorites', icon:'\u2B50', label:'Saved' },
-            { id:'pricing', icon:'\u{1F464}', label:'Profile' }
+            { id:'intel', icon:'\u{1F4E1}', label:'Intel' },
+            { id:'scout', icon:'\u{1F3AF}', label:'Scout' },
+            { id:'play', icon:'\u{1F9E0}', label:'Play' },
+            { id:'story', icon:'\u{1F4D6}', label:'Story' },
+            { id:'you', icon:'\u{1F464}', label:'You' }
         ];
         var active = currentRoute.path;
+        // Map sub-routes to parent tabs
+        if (active === 'tournament' || active === 'hand') active = 'intel';
+        if (active === 'player' || active === 'report' || active === 'search' || active === 'players' || active === 'tournaments') active = 'scout';
+        if (active === 'ai') active = 'play';
+        if (active === 'favorites' || active === 'pricing') active = 'you';
         var html = '';
         tabs.forEach(function(t) {
             var cls = 'tab-item' + (active === t.id ? ' active' : '');
@@ -2476,7 +2996,12 @@
     function renderScreen() {
         var p = currentRoute.path;
         switch(p) {
-            case 'home': return renderHome();
+            case 'intel': return renderIntel();
+            case 'home': return renderIntel();
+            case 'scout': return renderScout();
+            case 'play': return renderPlay();
+            case 'story': return renderStory();
+            case 'you': return renderYou();
             case 'search': return renderSearch();
             case 'tournaments': return renderTournaments();
             case 'players': return renderPlayers();
@@ -2487,116 +3012,154 @@
             case 'pricing': return renderPricing();
             case 'favorites': return renderFavorites();
             case 'hand': return renderHandPlaceholder();
-            default: return renderHome();
+            default: return renderIntel();
         }
     }
 
-    // ===================== Home Screen =====================
+    // ===================== Intel Screen (Intelligence Briefing) =====================
 
-    function renderHome() {
+    function renderIntel() {
         var html = '<div class="stagger">';
 
-        // Hero Tournament Card
+        // === 1. STATUS HERO — Dark cinematic tournament card ===
+        var leader = PLAYERS[0]; // Negreanu (chip leader / winner)
+        var topStacks = PLAYERS.slice(0,3);
         html += '<div class="content">' +
-            '<div class="hero-card" onclick="go(\'tournament\')">' +
-                '<div class="hero-label">' + TOURNAMENT.event + '</div>' +
-                '<div class="hero-title">' + TOURNAMENT.name + '</div>' +
-                '<div class="hero-sub">' + TOURNAMENT.venue + ' \u00B7 ' + TOURNAMENT.date + '</div>' +
-                '<div class="kpi-row">' +
-                    '<span class="kpi-pill">' + TOURNAMENT.playerCount + ' Players</span>' +
-                    '<span class="kpi-pill">' + TOURNAMENT.handCount + ' Hands</span>' +
-                    '<span class="kpi-pill">' + fmtChips(TOURNAMENT.prizePool) + '</span>' +
-                    '<span class="kpi-pill">\u2728 AI Ready</span>' +
+            '<div class="status-hero" onclick="go(\'tournament\')">' +
+                '<div class="status-hero-event">' + TOURNAMENT.event + '</div>' +
+                '<div class="status-hero-name">' + TOURNAMENT.name + '</div>' +
+                '<div class="status-hero-meta">' +
+                    TOURNAMENT.playerCount + ' players \u00B7 ' + TOURNAMENT.handCount + ' hands \u00B7 ' + fmtChips(TOURNAMENT.prizePool) +
+                '</div>' +
+                '<div style="display:flex;align-items:center;gap:12px;margin-top:12px">' +
+                    '<span class="status-hero-badge">COMPLETED</span>' +
+                    '<span class="status-hero-leader">\u{1F451} ' + leader.name + '</span>' +
+                '</div>' +
+                '<div style="margin-top:14px">' +
+                    sparklineSvg(STACK_TIMELINE[leader.id], 200, 32, '#fb923c') +
                 '</div>' +
             '</div>' +
         '</div>';
 
-        // Tournament Carousel
+        // === 2. INTELLIGENCE TICKER — Horizontal alert pills ===
+        var tickerItems = [
+            { icon:'\u{1F6A8}', text:'Hellmuth fold-to-3bet: 62%', color:'var(--accent-red)' },
+            { icon:'\u{1F4C8}', text:'Negreanu +4.85M chip lead', color:'var(--accent-emerald)' },
+            { icon:'\u{1F3AF}', text:'Bluff detected Hand #73', color:'var(--accent-purple)' },
+            { icon:'\u{1F9CA}', text:'Konnikova: 12 folds in a row', color:'var(--accent-blue)' },
+            { icon:'\u26A1', text:'Selbst 3-bet squeeze Hand #34', color:'var(--accent-amber)' },
+            { icon:'\u{1F525}', text:'Kenney VPIP: 32% (LAG)', color:'var(--accent-orange)' }
+        ];
+        html += '<div class="intel-ticker">';
+        tickerItems.forEach(function(t) {
+            html += '<div class="ticker-pill">' +
+                '<span>' + t.icon + '</span>' +
+                '<span>' + t.text + '</span>' +
+            '</div>';
+        });
+        html += '</div>';
+
+        // === 3. THE MOMENT — Hero hand card (biggest hand) ===
+        var bigHand = HIGHLIGHTS[0]; // Hand #87 - biggest pot
+        var p1 = PLAYERS.find(function(p) { return p.id === bigHand.players[0]; });
+        var p2 = PLAYERS.find(function(p) { return p.id === bigHand.players[1]; });
+        var chBoard = STORY_ARC.chapters[2].keyHand.board; // ['Qh','9d','4c','7s','Qc']
+
+        html += '<div class="content">' +
+            '<div class="section-header">' +
+                '<div class="section-title">\u{1F3C6} The Moment</div>' +
+            '</div>' +
+            '<div class="moment-hero">' +
+                '<div class="moment-hero-top">' +
+                    '<div style="display:flex;align-items:center;gap:8px">' +
+                        '<div class="player-avatar avatar-sm" style="background:' + p1.color + '">' + p1.initials + '</div>' +
+                        '<span style="font-weight:700;font-size:14px">' + p1.name.split(' ').pop() + '</span>' +
+                    '</div>' +
+                    '<div class="moment-hero-vs">VS</div>' +
+                    '<div style="display:flex;align-items:center;gap:8px">' +
+                        '<span style="font-weight:700;font-size:14px">' + p2.name.split(' ').pop() + '</span>' +
+                        '<div class="player-avatar avatar-sm" style="background:' + p2.color + '">' + p2.initials + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="moment-hero-board">' + boardCardsSvg(chBoard) + '</div>' +
+                '<div class="moment-hero-bottom">' +
+                    '<div class="moment-hero-pot">' +
+                        '<span>\u{1F4B0}</span> ' + fmtChips(bigHand.pot) +
+                        ' <span class="tier-badge ' + tierClass(bigHand.tier) + '" style="margin-left:6px">' + tierLabel(bigHand.tier) + '</span>' +
+                    '</div>' +
+                    '<div class="moment-hero-ai">' +
+                        '\u201C' + bigHand.preview + '\u201D' +
+                    '</div>' +
+                    '<div class="moment-hero-actions">' +
+                        replayBtn(bigHand.hand) + ytBtn(bigHand.ytTime) +
+                        '<span style="font-size:12px;color:var(--text-muted)">Hand #' + bigHand.hand + '</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        // === 4. QUICK QUIZ — "What Would You Do?" ===
+        html += '<div class="content">' +
+            '<div class="section-header">' +
+                '<div class="section-title">\u{1F9E0} What Would You Do?</div>' +
+                '<button class="section-link" onclick="go(\'play\')">More \u2192</button>' +
+            '</div>' +
+            renderQuizCard(QUIZ_HANDS[0], false) +
+        '</div>';
+
+        // === 5. PLAYER THREAT GRID — 3x3 ===
         html += '<div class="section">' +
             '<div class="section-header">' +
-                '<div class="section-title">Tournaments</div>' +
-                '<button class="section-link" onclick="go(\'tournaments\')">See All</button>' +
+                '<div class="section-title">\u{1F3AF} Threat Assessment</div>' +
+                '<button class="section-link" onclick="go(\'scout\')">Full Scout \u2192</button>' +
             '</div>' +
-            '<div class="h-scroll">';
+            '<div class="threat-grid">';
 
-        var tourneys = [
-            { name:'WSOP Main Event', meta:'Final Table \u00B7 87 hands', live:false, ai:true },
-            { name:'WPT Legends', meta:'8 Players \u00B7 62 hands', live:true, ai:true },
-            { name:'EPT Barcelona', meta:'9 Players \u00B7 95 hands', live:false, ai:false }
-        ];
-        tourneys.forEach(function(t) {
-            html += '<div class="mini-card" onclick="go(\'tournament\')">' +
-                '<div class="mini-gradient"></div>' +
-                '<div class="mini-body">' +
-                    '<div class="mini-name">' + t.name + '</div>' +
-                    '<div class="mini-meta">' + t.meta + '</div>' +
-                    '<div class="mini-badges">' +
-                        '<span class="mini-badge" style="background:#eff6ff;color:#2563eb">' + t.meta.split('\u00B7')[1].trim() + '</span>' +
-                        (t.live ? '<span class="live-badge">LIVE</span>' : '') +
-                        (t.ai ? '<span class="mini-badge" style="background:#fff7ed;color:#ea580c">AI</span>' : '') +
-                    '</div>' +
+        PLAYERS.forEach(function(p) {
+            var exploit = calcExploit(STATS[p.id] || {});
+            html += '<div class="threat-cell" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
+                '<div class="threat-avatar-ring">' +
+                    threatRingSvg(exploit, 56) +
+                    '<div class="player-avatar avatar-sm" style="background:' + p.color + ';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">' + p.initials + '</div>' +
+                '</div>' +
+                '<div class="threat-name">' + p.name.split(' ').pop() + '</div>' +
+                '<div class="threat-score" style="color:' + (exploit >= 70 ? 'var(--accent-red)' : exploit >= 55 ? 'var(--accent-orange)' : 'var(--accent-emerald)') + '">' +
+                    exploit + '%' +
                 '</div>' +
             '</div>';
         });
         html += '</div></div>';
 
-        // Luckiest Players Carousel (NEW)
+        // === 6. TRENDING INSIGHTS — Intel cards with colored accents ===
+        var insightMeta = [
+            { color:'intel-orange', cta:'Exploit \u2192' },
+            { color:'intel-blue', cta:'Analyze \u2192' },
+            { color:'intel-red', cta:'Scout \u2192' }
+        ];
         html += '<div class="section">' +
             '<div class="section-header">' +
-                '<div class="section-title">Luckiest Players</div>' +
-            '</div>' +
-            '<div class="h-scroll">';
-
-        var sorted = PLAYERS.slice().sort(function(a, b) { return LUCK_SCORES[b.id] - LUCK_SCORES[a.id]; });
-        sorted.forEach(function(p) {
-            html += '<div class="luck-card" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
-                luckGaugeSvg(LUCK_SCORES[p.id], 80) +
-                '<div class="luck-name">' + p.name.split(' ').pop() + '</div>' +
-            '</div>';
-        });
-        html += '</div></div>';
-
-        // Trending AI Insights
-        html += '<div class="section">' +
-            '<div class="section-header">' +
-                '<div class="section-title">AI Insights</div>' +
-                '<button class="section-link" onclick="go(\'ai\')">Ask AI</button>' +
+                '<div class="section-title">\u{1F4A1} Trending Insights</div>' +
             '</div>' +
             '<div class="content stagger">';
 
-        INSIGHTS.forEach(function(ins) {
-            html += '<div class="insight-card" style="--border-accent:' + ins.border + '" onclick="go(\'ai\',{q:\'' + encodeURIComponent(ins.title) + '\'})">' +
-                '<span style="font-size:24px;padding-left:8px">' + ins.icon + '</span>' +
-                '<div>' +
-                    '<div style="font-size:14px;font-weight:700;color:var(--text-primary)">' + ins.title + '</div>' +
-                    '<div style="font-size:13px;color:var(--text-secondary);line-height:1.5">' + ins.text + '</div>' +
-                    '<span class="text-orange" style="font-size:13px;font-weight:600">Read more \u2192</span>' +
+        INSIGHTS.forEach(function(ins, i) {
+            var meta = insightMeta[i] || insightMeta[0];
+            html += '<div class="intel-card ' + meta.color + '" onclick="go(\'ai\',{q:\'' + encodeURIComponent(ins.title) + '\'})">' +
+                '<div class="intel-card-icon">' + ins.icon + '</div>' +
+                '<div class="intel-card-body">' +
+                    '<div class="intel-card-title">' + ins.title + '</div>' +
+                    '<div class="intel-card-desc">' + ins.text + '</div>' +
+                    '<span class="intel-card-cta">' + meta.cta + '</span>' +
                 '</div>' +
             '</div>';
         });
         html += '</div></div>';
 
-        // Top Players
+        // === 7. KEY MOMENTS — Carousel with board cards ===
         html += '<div class="section">' +
             '<div class="section-header">' +
-                '<div class="section-title">Top Players</div>' +
-                '<button class="section-link" onclick="go(\'players\')">All</button>' +
-            '</div>' +
-            '<div class="h-scroll">';
-
-        PLAYERS.forEach(function(p) {
-            html += '<div class="player-mini" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
-                '<div class="player-avatar avatar-md" style="background:' + p.color + '">' + p.initials + '</div>' +
-                '<div class="player-mini-name">' + p.name.split(' ').pop() + '</div>' +
-                '<div class="player-mini-stat">#' + p.finish + '</div>' +
-            '</div>';
-        });
-        html += '</div></div>';
-
-        // Key Moments with tier badges + YouTube
-        html += '<div class="section">' +
-            '<div class="section-header">' +
-                '<div class="section-title">Key Moments</div>' +
+                '<div class="section-title">\u{1F525} Key Moments</div>' +
+                '<button class="section-link" onclick="go(\'story\')">Full Story \u2192</button>' +
             '</div>' +
             '<div class="h-scroll">';
 
@@ -3604,6 +4167,376 @@
                 '<button class="btn-ghost btn btn-sm" onclick="event.stopPropagation();go(\'report\',{player:\'' + p.id + '\'})">Scout</button>' +
             '</div>';
         });
+
+        html += '</div>';
+        return html;
+    }
+
+    // ===================== Scout Screen (Search + Players) =====================
+
+    function renderScout() {
+        var html = '<div class="stagger">';
+
+        // Header
+        html += '<div class="content">' +
+            '<div style="font-size:22px;font-weight:800;color:var(--text-primary)">\u{1F3AF} Player Scout</div>' +
+            '<div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Find exploits. Build edges. Win more.</div>' +
+        '</div>';
+
+        // Search bar
+        html += '<div class="content">' +
+            '<div class="search-bar" style="margin-bottom:0">' +
+                '<span class="search-icon">\u{1F50D}</span>' +
+                '<input type="text" class="search-input" placeholder="Search players..." oninput="scoutSearch(this.value)">' +
+            '</div>' +
+        '</div>';
+
+        // Most Exploitable banner
+        var exploitSorted = PLAYERS.slice().sort(function(a, b) {
+            return calcExploit(STATS[b.id] || {}) - calcExploit(STATS[a.id] || {});
+        });
+        var topExploit = exploitSorted.slice(0, 3);
+
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">\u{1F6A8} Most Exploitable</div>' +
+            '</div>' +
+            '<div class="h-scroll">';
+
+        topExploit.forEach(function(p) {
+            var stats = STATS[p.id] || {};
+            var exploit = calcExploit(stats);
+            var exploitColor = exploit >= 70 ? 'var(--accent-red)' : exploit >= 55 ? 'var(--accent-orange)' : 'var(--accent-emerald)';
+            var leaks = PLAYER_LEAKS_DATA[p.id] || [];
+            var topLeak = leaks.length > 0 ? leaks[0].title : 'No major leaks';
+
+            html += '<div style="min-width:200px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:16px;cursor:pointer;box-shadow:var(--shadow-card)" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
+                '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
+                    '<div class="player-avatar avatar-md" style="background:' + p.color + '">' + p.initials + '</div>' +
+                    '<div>' +
+                        '<div style="font-weight:700;font-size:14px">' + p.name + '</div>' +
+                        '<div style="font-size:12px;color:var(--text-muted)">#' + p.finish + ' \u00B7 ' + p.hands + ' hands</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="margin-bottom:8px">' + threatMeterSvg(exploit, 168) + '</div>' +
+                '<div style="font-size:13px;font-weight:700;color:' + exploitColor + '">\u{1F3AF} ' + exploit + '% Exploitable</div>' +
+                '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px">\u26A0\uFE0F ' + topLeak + '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        // All Players grid
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">All Players</div>' +
+                '<button class="section-link" onclick="go(\'players\')">Full List \u2192</button>' +
+            '</div>' +
+            '<div id="scoutPlayerList" class="content stagger">';
+
+        html += renderScoutPlayerList(PLAYERS);
+        html += '</div></div>';
+
+        html += '</div>';
+        return html;
+    }
+
+    function renderScoutPlayerList(list) {
+        var html = '';
+        list.forEach(function(p) {
+            var stats = STATS[p.id] || {};
+            var skill = SKILL_RATINGS[p.id] || { grade:'B', color:'#2563eb' };
+            var style = STYLES[p.id] || { label:'TAG', emoji:'\u{1F3AF}' };
+            var exploit = calcExploit(stats);
+            var exploitColor = exploit >= 70 ? 'var(--accent-red)' : exploit >= 55 ? 'var(--accent-orange)' : 'var(--accent-emerald)';
+
+            html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-sm);cursor:pointer;box-shadow:var(--shadow-card)" onclick="go(\'player\',{player:\'' + p.id + '\'})">' +
+                '<div style="position:relative">' +
+                    threatRingSvg(exploit, 48) +
+                    '<div class="player-avatar" style="background:' + p.color + ';width:32px;height:32px;font-size:11px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">' + p.initials + '</div>' +
+                '</div>' +
+                '<div style="flex:1;min-width:0">' +
+                    '<div style="display:flex;align-items:center;gap:6px">' +
+                        '<span style="font-weight:700;font-size:14px">' + p.name + '</span>' +
+                        '<span class="skill-rating" style="background:' + skill.color + ';font-size:10px;padding:1px 5px">' + skill.grade + '</span>' +
+                        '<span style="font-size:11px;color:var(--text-muted)">' + style.emoji + ' ' + style.label + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;align-items:center;gap:8px;margin-top:4px">' +
+                        '<span style="font-size:12px;color:' + exploitColor + ';font-weight:600">' + exploit + '%</span>' +
+                        '<span style="flex:1;max-width:80px">' + threatMeterSvg(exploit, 80) + '</span>' +
+                        '<span style="font-size:11px;color:var(--text-muted)">#' + p.finish + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<span style="font-size:16px;color:var(--text-muted)">\u203A</span>' +
+            '</div>';
+        });
+        return html;
+    }
+
+    function scoutSearch(val) {
+        var q = val.toLowerCase();
+        var filtered = PLAYERS.filter(function(p) {
+            return p.name.toLowerCase().indexOf(q) !== -1;
+        });
+        var el = document.getElementById('scoutPlayerList');
+        if (el) el.innerHTML = renderScoutPlayerList(filtered);
+    }
+
+    // ===================== Play Screen (Poker IQ Challenge) =====================
+
+    function renderPlay() {
+        var html = '<div class="stagger">';
+
+        // Header with stats
+        html += '<div class="play-header">' +
+            '<div class="play-title">\u{1F9E0} Poker IQ</div>' +
+            '<div class="play-stats">' +
+                '<div class="play-stat">' +
+                    '<div class="play-stat-value">' + quizState.correct + '/' + quizState.total + '</div>' +
+                    '<div class="play-stat-label">Correct</div>' +
+                '</div>' +
+                '<div class="play-stat">' +
+                    '<div class="play-stat-value">' + (quizState.total > 0 ? Math.round(quizState.correct / quizState.total * 100) : 0) + '%</div>' +
+                    '<div class="play-stat-label">Accuracy</div>' +
+                '</div>' +
+                '<div class="play-stat">' +
+                    '<div class="play-stat-value">' + (quizState.streak > 0 ? '\u{1F525} ' + quizState.streak : '0') + '</div>' +
+                    '<div class="play-stat-label">Streak</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        // Daily Challenge
+        html += '<div class="content">' +
+            '<div style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:10px">\u{1F31F} Daily Challenge</div>' +
+            renderQuizCard(QUIZ_HANDS[0], true) +
+        '</div>';
+
+        // More Hands
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">More Hands</div>' +
+            '</div>' +
+            '<div class="content stagger">';
+
+        for (var i = 1; i < QUIZ_HANDS.length; i++) {
+            html += renderQuizCard(QUIZ_HANDS[i], true);
+        }
+        html += '</div></div>';
+
+        html += '</div>';
+        return html;
+    }
+
+    // ===================== Story Screen (Tournament Narrative) =====================
+
+    function renderStory() {
+        var html = '<div class="stagger">';
+
+        // Header
+        html += '<div class="content">' +
+            '<div style="font-size:22px;font-weight:800;color:var(--text-primary)">\u{1F4D6} The Story</div>' +
+            '<div style="font-size:13px;color:var(--text-secondary);margin-top:4px">' + TOURNAMENT.name + ' \u2014 A tale in ' + TOURNAMENT.handCount + ' hands</div>' +
+        '</div>';
+
+        // === 1. CHIP STACK CHART ===
+        html += '<div class="content">' +
+            '<div class="stack-chart">' +
+                stackChartSvg(['p1','p2','p3','p4','p5'], 358, 180) +
+                '<div class="stack-legend">';
+
+        ['p1','p2','p3','p4','p5'].forEach(function(pid) {
+            var p = PLAYERS.find(function(pl) { return pl.id === pid; });
+            if (p) {
+                html += '<div class="stack-legend-item">' +
+                    '<div class="stack-legend-dot" style="background:' + p.color + '"></div>' +
+                    '<span>' + p.name.split(' ').pop() + '</span>' +
+                '</div>';
+            }
+        });
+        html += '</div></div></div>';
+
+        // === 2. STORY CHAPTERS ===
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">\u{1F4DA} Chapters</div>' +
+            '</div>' +
+            '<div class="content stagger">';
+
+        STORY_ARC.chapters.forEach(function(ch) {
+            html += '<div class="chapter-card">' +
+                '<div class="chapter-mood ' + ch.mood + '"></div>' +
+                '<div class="chapter-body">' +
+                    '<div class="chapter-title">' + ch.title + '</div>' +
+                    '<div class="chapter-range">' + ch.handRange + '</div>' +
+                    '<div class="chapter-summary">' + ch.summary + '</div>' +
+                    '<div class="chapter-key-hand">' +
+                        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+                            '<span style="font-size:12px;font-weight:700;color:var(--accent-orange)">KEY HAND #' + ch.keyHand.hand + '</span>' +
+                            replayBtn(ch.keyHand.hand) +
+                        '</div>' +
+                        '<div style="margin-bottom:6px">' + boardCardsSvg(ch.keyHand.board) + '</div>' +
+                        '<div style="font-size:12px;color:var(--text-secondary)">' + ch.keyHand.desc + '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        // === 3. ELIMINATION TIMELINE ===
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">\u{1F480} Elimination Timeline</div>' +
+            '</div>' +
+            '<div class="content">' +
+            '<div class="elim-timeline">' +
+                '<div class="elim-line"></div>';
+
+        STORY_ARC.eliminations.forEach(function(e) {
+            var eliminated = PLAYERS.find(function(p) { return p.id === e.playerId; });
+            var elimBy = PLAYERS.find(function(p) { return p.id === e.eliminatedBy; });
+            var place = eliminated ? eliminated.finish : '?';
+            html += '<div class="elim-item">' +
+                '<div class="elim-dot" style="background:' + (eliminated ? eliminated.color : '#94a3b8') + '"></div>' +
+                '<div class="elim-info">' +
+                    '<div class="elim-hand">Hand #' + e.hand + '</div>' +
+                    '<div class="elim-desc">' +
+                        '<strong>' + (eliminated ? eliminated.name.split(' ').pop() : '?') + '</strong> (' + place + ordSuffix(place) + ')' +
+                        (elimBy ? ' \u2014 by ' + elimBy.name.split(' ').pop() : '') +
+                    '</div>' +
+                    '<div style="font-size:11px;color:var(--text-muted)">' + e.desc + '</div>' +
+                '</div>' +
+            '</div>';
+        });
+        html += '</div></div></div>';
+
+        // === 4. GAMBIT THEMES ===
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">\u265F\uFE0F Strategic Gambits</div>' +
+            '</div>' +
+            '<div class="content stagger">';
+
+        GAMBIT_THEMES.forEach(function(g) {
+            html += '<div class="gambit-card" onclick="go(\'ai\',{q:\'Tell me about the ' + g.name + ' in hand #' + g.hand + '\'})">' +
+                '<div class="gambit-icon" style="background:' + g.color + '20;color:' + g.color + '">' + g.icon + '</div>' +
+                '<div style="flex:1;min-width:0">' +
+                    '<div class="gambit-name">' + g.name + '</div>' +
+                    '<div class="gambit-desc">' + g.desc + '</div>' +
+                    '<div class="gambit-hand">Hand #' + g.hand + ' \u2192</div>' +
+                '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        // === 5. BLUFF REPORT ===
+        html += '<div class="section">' +
+            '<div class="section-header">' +
+                '<div class="section-title">\u{1F3AD} Bluff Report</div>' +
+                '<span style="font-size:12px;color:var(--text-muted)">' + BLUFF_REPORT.length + ' detected</span>' +
+            '</div>' +
+            '<div class="content stagger">';
+
+        BLUFF_REPORT.forEach(function(b) {
+            var bluffer = PLAYERS.find(function(p) { return p.id === b.bluffer; });
+            html += '<div class="bluff-item">' +
+                '<div class="bluff-item-header">' +
+                    '<div class="bluff-item-title">' +
+                        (bluffer ? bluffer.name.split(' ').pop() : '?') + ' \u2014 ' + b.street + ' Bluff' +
+                    '</div>' +
+                    '<div class="bluff-result ' + (b.success ? 'success' : 'caught') + '">' +
+                        (b.success ? '\u2713 Success' : '\u2717 Caught') +
+                    '</div>' +
+                '</div>' +
+                '<div style="margin:8px 0">' + boardCardsSvg(b.board) + '</div>' +
+                '<div class="bluff-item-meta">' +
+                    '<span>Holding: ' + b.holding + '</span>' +
+                    '<span>Sizing: ' + b.sizing + '</span>' +
+                    '<span>Hand #' + b.hand + '</span>' +
+                '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        html += '</div>';
+        return html;
+    }
+
+    function ordSuffix(n) {
+        if (n === 1) return 'st';
+        if (n === 2) return 'nd';
+        if (n === 3) return 'rd';
+        return 'th';
+    }
+
+    // ===================== You Screen (Profile + Saved + Subscription) =====================
+
+    function renderYou() {
+        var html = '<div class="stagger">';
+
+        // Poker IQ Score ring
+        var accuracy = quizState.total > 0 ? Math.round(quizState.correct / quizState.total * 100) : 0;
+        var iqColor = accuracy >= 70 ? 'var(--accent-emerald)' : accuracy >= 40 ? 'var(--accent-amber)' : 'var(--accent-red)';
+
+        html += '<div class="content" style="text-align:center;padding-top:12px">' +
+            '<div class="iq-ring">' +
+                '<svg width="120" height="120" viewBox="0 0 120 120">' +
+                    '<circle cx="60" cy="60" r="52" fill="none" stroke="var(--border-light)" stroke-width="8"/>' +
+                    '<circle cx="60" cy="60" r="52" fill="none" stroke="' + iqColor + '" stroke-width="8" ' +
+                        'stroke-dasharray="' + (accuracy * 3.267) + ' 326.7" stroke-dashoffset="0" ' +
+                        'transform="rotate(-90 60 60)" stroke-linecap="round"/>' +
+                '</svg>' +
+                '<div class="iq-ring-value" style="color:' + iqColor + '">' + accuracy + '</div>' +
+                '<div class="iq-ring-label">Poker IQ</div>' +
+            '</div>' +
+            '<div style="display:flex;justify-content:center;gap:24px;margin-top:16px">' +
+                '<div style="text-align:center">' +
+                    '<div style="font-size:20px;font-weight:800">' + quizState.correct + '/' + quizState.total + '</div>' +
+                    '<div style="font-size:11px;color:var(--text-muted)">Correct</div>' +
+                '</div>' +
+                '<div style="text-align:center">' +
+                    '<div style="font-size:20px;font-weight:800">' + (quizState.streak > 0 ? '\u{1F525} ' + quizState.streak : '0') + '</div>' +
+                    '<div style="font-size:11px;color:var(--text-muted)">Streak</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        // Quick links
+        html += '<div class="content stagger" style="margin-top:8px">' +
+            '<div style="display:flex;gap:10px">' +
+                '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:16px;text-align:center;cursor:pointer" onclick="go(\'favorites\')">' +
+                    '<div style="font-size:24px;margin-bottom:4px">\u2B50</div>' +
+                    '<div style="font-size:13px;font-weight:600">Saved</div>' +
+                '</div>' +
+                '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:16px;text-align:center;cursor:pointer" onclick="go(\'play\')">' +
+                    '<div style="font-size:24px;margin-bottom:4px">\u{1F9E0}</div>' +
+                    '<div style="font-size:13px;font-weight:600">Quiz</div>' +
+                '</div>' +
+                '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:16px;text-align:center;cursor:pointer" onclick="go(\'tournaments\')">' +
+                    '<div style="font-size:24px;margin-bottom:4px">\u{1F3C6}</div>' +
+                    '<div style="font-size:13px;font-weight:600">History</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        // Subscription card
+        html += '<div class="content" style="margin-top:8px">' +
+            '<div style="background:linear-gradient(135deg,#1e293b 0%,#334155 100%);border-radius:var(--radius);padding:20px;color:white">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center">' +
+                    '<div>' +
+                        '<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.6)">Current Plan</div>' +
+                        '<div style="font-size:18px;font-weight:800;margin-top:4px">Rookie</div>' +
+                        '<div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px">3 AI queries/day \u00B7 Basic stats</div>' +
+                    '</div>' +
+                    '<button class="btn btn-orange" onclick="go(\'pricing\')" style="white-space:nowrap">Upgrade \u2192</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        // About section
+        html += '<div class="content" style="margin-top:8px;text-align:center;padding-bottom:24px">' +
+            '<div style="font-size:12px;color:var(--text-muted)">HUDR v2.0 \u00B7 AI Poker Intelligence</div>' +
+            '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">Built with \u2764\uFE0F for the poker community</div>' +
+        '</div>';
 
         html += '</div>';
         return html;
