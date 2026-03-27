@@ -1335,6 +1335,187 @@
         @keyframes luckFill {
             from { stroke-dashoffset: 157; }
         }
+
+        /* ===================== Tournaments List Page ===================== */
+        .tournaments-page { padding: 0 16px; }
+
+        .tournaments-back {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 12px 0 8px;
+        }
+
+        .tournaments-back:hover { color: var(--accent-orange); }
+
+        .tournaments-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .tournaments-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .tournaments-search {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            font-size: 14px;
+            color: var(--text-primary);
+            font-family: inherit;
+            outline: none;
+            margin-bottom: 12px;
+        }
+
+        .tournaments-search:focus { border-color: var(--accent-orange); box-shadow: 0 0 0 2px rgba(234,88,12,0.1); }
+
+        .tournaments-search-wrap {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .tournaments-search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filter-chips::-webkit-scrollbar { display: none; }
+
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: inherit;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-chip:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+
+        .filter-chip.active {
+            background: var(--accent-orange);
+            color: #fff;
+            border-color: var(--accent-orange);
+        }
+
+        .filter-chip .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .filter-chip.active .live-dot { background: #fff; }
+
+        .tournament-list-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+            box-shadow: var(--shadow-card);
+        }
+
+        .tournament-list-card:hover { transform: scale(1.01); border-color: var(--accent-orange); box-shadow: var(--shadow-elevated); }
+
+        .tournament-list-gradient { height: 4px; background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold)); }
+        .tournament-list-gradient.live-gradient { background: linear-gradient(90deg, var(--accent-red), #f87171); }
+        .tournament-list-gradient.upcoming-gradient { background: linear-gradient(90deg, var(--accent-blue), #60a5fa); }
+
+        .tournament-list-body { padding: 14px 16px; }
+
+        .tournament-list-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .tournament-list-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .tournament-list-venue {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .tournament-list-stats {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tournament-list-count {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .tournaments-empty {
+            text-align: center;
+            padding: 48px 16px;
+            color: var(--text-muted);
+        }
+
+        .tournaments-empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .tournaments-empty-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .tournaments-empty-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -1449,6 +1630,19 @@
         prizePool: 93500000,
         gradient: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
     };
+
+    const TOURNAMENTS_LIST = [
+        { id:'t1', name:'WSOP Main Event 2025', event:'World Series of Poker', venue:'Horseshoe Las Vegas', date:'July 2025', players:9, hands:87, prize:93500000, live:false, ai:true, status:'completed' },
+        { id:'t2', name:'WPT Legends', event:'World Poker Tour', venue:'Commerce Casino', date:'March 2025', players:8, hands:62, prize:25000000, live:true, ai:true, status:'live' },
+        { id:'t3', name:'EPT Barcelona', event:'European Poker Tour', venue:'Casino Barcelona', date:'August 2025', players:9, hands:95, prize:42000000, live:false, ai:true, status:'completed' },
+        { id:'t4', name:'Triton Million', event:'Triton Poker', venue:'Montenegro', date:'September 2025', players:6, hands:45, prize:18000000, live:false, ai:false, status:'completed' },
+        { id:'t5', name:'Super High Roller Bowl', event:'PokerGO', venue:'Aria Las Vegas', date:'June 2025', players:7, hands:71, prize:51000000, live:false, ai:true, status:'completed' },
+        { id:'t6', name:'PCA Main Event', event:'PokerStars', venue:'Atlantis Bahamas', date:'January 2026', players:9, hands:0, prize:35000000, live:false, ai:false, status:'upcoming' },
+        { id:'t7', name:'Aussie Millions', event:'Crown Melbourne', venue:'Melbourne', date:'February 2026', players:8, hands:0, prize:28000000, live:false, ai:false, status:'upcoming' },
+        { id:'t8', name:'WSOP Europe', event:'World Series of Poker', venue:'King\'s Casino Rozvadov', date:'October 2025', players:9, hands:82, prize:31000000, live:false, ai:true, status:'completed' },
+        { id:'t9', name:'WPT World Championship', event:'World Poker Tour', venue:'Wynn Las Vegas', date:'December 2025', players:6, hands:58, prize:40000000, live:false, ai:false, status:'completed' },
+        { id:'t10', name:'GPI Poker Masters', event:'PokerGO', venue:'Aria Las Vegas', date:'April 2025', players:8, hands:0, prize:15000000, live:true, ai:false, status:'live' }
+    ];
 
     const YT_BASE = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=';
 
@@ -1601,6 +1795,7 @@
         switch(p) {
             case 'home': return renderHome();
             case 'search': return renderSearch();
+            case 'tournaments': return renderTournaments();
             case 'tournament': return renderTournament();
             case 'ai': return renderAI();
             case 'player': return renderPlayer();
@@ -1635,7 +1830,7 @@
         html += '<div class="section">' +
             '<div class="section-header">' +
                 '<div class="section-title">Tournaments</div>' +
-                '<button class="section-link" onclick="go(\'search\')">See All</button>' +
+                '<button class="section-link" onclick="go(\'tournaments\')">See All</button>' +
             '</div>' +
             '<div class="h-scroll">';
 
@@ -1741,6 +1936,117 @@
 
         html += '</div>';
         return html;
+    }
+
+    // ===================== Tournaments List Screen =====================
+
+    var tournamentsFilter = 'all';
+    var tournamentsSearch = '';
+
+    function renderTournaments() {
+        var filter = currentRoute.params.filter || 'all';
+        tournamentsFilter = filter;
+
+        var html = '<div class="tournaments-page stagger">';
+
+        // Back button
+        html += '<button class="tournaments-back" onclick="go(\'home\')">\u2190 Scout Home</button>';
+
+        // Title
+        html += '<div class="tournaments-title">Tournaments</div>';
+        html += '<div class="tournaments-subtitle">Browse final tables from major poker events</div>';
+
+        // Search
+        html += '<div class="tournaments-search-wrap">' +
+            '<span class="tournaments-search-icon">\u{1F50D}</span>' +
+            '<input class="tournaments-search" placeholder="Search tournaments..." id="tourneySearchInput" oninput="filterTournaments()" value="' + tournamentsSearch + '">' +
+        '</div>';
+
+        // Filter chips
+        var filters = [
+            { id:'all', label:'All', icon:'\u{1F3C6}' },
+            { id:'live', label:'Live', icon:'' },
+            { id:'ai', label:'AI Ready', icon:'\u2728' },
+            { id:'completed', label:'Completed', icon:'\u2705' },
+            { id:'upcoming', label:'Upcoming', icon:'\u{1F4C5}' }
+        ];
+
+        html += '<div class="filter-chips">';
+        filters.forEach(function(f) {
+            var active = filter === f.id ? ' active' : '';
+            var liveDot = f.id === 'live' ? '<span class="live-dot"></span>' : '';
+            html += '<button class="filter-chip' + active + '" onclick="go(\'tournaments\',{filter:\'' + f.id + '\'})">' +
+                (f.icon ? f.icon + ' ' : '') + liveDot + f.label +
+            '</button>';
+        });
+        html += '</div>';
+
+        // Filter tournaments
+        var list = TOURNAMENTS_LIST.filter(function(t) {
+            if (filter === 'live') return t.live;
+            if (filter === 'ai') return t.ai;
+            if (filter === 'completed') return t.status === 'completed';
+            if (filter === 'upcoming') return t.status === 'upcoming';
+            return true;
+        });
+
+        // Apply search
+        if (tournamentsSearch) {
+            var q = tournamentsSearch.toLowerCase();
+            list = list.filter(function(t) {
+                return t.name.toLowerCase().indexOf(q) !== -1 || t.venue.toLowerCase().indexOf(q) !== -1 || t.event.toLowerCase().indexOf(q) !== -1;
+            });
+        }
+
+        // Count
+        html += '<div class="tournament-list-count">' + list.length + ' tournament' + (list.length !== 1 ? 's' : '') + '</div>';
+
+        if (list.length === 0) {
+            html += '<div class="tournaments-empty">' +
+                '<div class="tournaments-empty-icon">\u{1F3C6}</div>' +
+                '<div class="tournaments-empty-text">No tournaments found</div>' +
+                '<div class="tournaments-empty-sub">Try a different filter or search term</div>' +
+            '</div>';
+        } else {
+            // Tournament cards
+            list.forEach(function(t) {
+                var gradientClass = t.live ? 'live-gradient' : t.status === 'upcoming' ? 'upcoming-gradient' : '';
+                html += '<div class="tournament-list-card" onclick="go(\'tournament\')">' +
+                    '<div class="tournament-list-gradient ' + gradientClass + '"></div>' +
+                    '<div class="tournament-list-body">' +
+                        '<div class="tournament-list-header">' +
+                            '<div class="tournament-list-name">' + t.name + '</div>' +
+                        '</div>' +
+                        '<div class="tournament-list-venue">' + t.venue + ' \u00B7 ' + t.date + '</div>' +
+                        '<div class="tournament-list-stats">' +
+                            '<span class="mini-badge" style="background:#f1f5f9;color:#475569">' + t.players + ' Players</span>' +
+                            (t.hands > 0 ? '<span class="mini-badge" style="background:#eff6ff;color:#2563eb">' + t.hands + ' hands</span>' : '') +
+                            (t.live ? '<span class="live-badge">LIVE</span>' : '') +
+                            (t.ai ? '<span class="mini-badge" style="background:#fff7ed;color:#ea580c">AI</span>' : '') +
+                            '<span class="mini-badge" style="background:#f0fdf4;color:#16a34a">' + fmtChips(t.prize) + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            });
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    function filterTournaments() {
+        var input = document.getElementById('tourneySearchInput');
+        if (input) {
+            tournamentsSearch = input.value;
+            var app = document.getElementById('app');
+            app.innerHTML = renderTopBar() + renderTournaments();
+            // Restore focus and cursor position
+            var newInput = document.getElementById('tourneySearchInput');
+            if (newInput) {
+                newInput.focus();
+                newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+            }
+        }
     }
 
     // ===================== Search Screen =====================
