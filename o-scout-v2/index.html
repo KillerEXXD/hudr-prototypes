@@ -3827,7 +3827,7 @@
         return html;
     }
 
-    // ===================== Player Profile (Scouting Card) =====================
+    // ===================== Player Dossier (Redesigned Scouting Card) =====================
 
     function renderPlayer() {
         var pid = currentRoute.params.player || 'p1';
@@ -3844,9 +3844,70 @@
         var strengths = PLAYER_STRENGTHS_DATA[pid] || [];
         var leaks = PLAYER_LEAKS_DATA[pid] || [];
         var trends = PLAYER_TRENDS[pid] || {};
+        var sparklines = CAREER_SPARKLINES[pid] || {};
         var exploit = calcExploit(stats);
         var exploitColor = exploit >= 70 ? '#dc2626' : exploit >= 55 ? '#ea580c' : '#059669';
+        var exploitLabel = exploit >= 70 ? 'HIGH' : exploit >= 55 ? 'MEDIUM' : 'LOW';
 
+        var html = '<div class="content stagger">';
+        html += '<button class="tournaments-back" onclick="go(\'scout\')">\u2190 Back to Scout</button>';
+
+        // ===== DOSSIER HEADER =====
+        html += '<div class="scout-card">' +
+            '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent-orange);margin-bottom:8px">SCOUTING DOSSIER</div>' +
+            '<div class="scout-header">' +
+                '<div style="position:relative">' +
+                    threatRingSvg(exploit, 64) +
+                    '<div class="player-avatar avatar-lg" style="background:' + player.color + ';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">' + player.initials + '</div>' +
+                '</div>' +
+                '<div style="flex:1">' +
+                    '<div class="scout-name-row">' +
+                        '<div class="scout-name">' + player.flag + ' ' + player.name + '</div>' +
+                        '<div class="skill-rating" style="background:' + skill.color + '">' + skill.grade + '</div>' +
+                    '</div>' +
+                    '<div style="display:flex;align-items:center;gap:6px;margin-top:4px">' +
+                        '<span style="font-size:12px;padding:2px 8px;background:var(--bg-tertiary);border-radius:var(--radius-full);font-weight:600">' + style.emoji + ' ' + style.label + '</span>' +
+                        '<span style="font-size:12px;color:var(--text-muted)">#' + player.finish + ' \u00B7 ' + player.hands + ' hands</span>' +
+                    '</div>' +
+                    '<div class="career-record mt-sm">' + career + '</div>' +
+                '</div>' +
+            '</div>';
+
+        // Identity one-liner with accent border
+        if (identity) {
+            html += '<div style="border-left:3px solid var(--accent-orange);padding:8px 12px;margin-top:12px;background:var(--bg-surface);border-radius:0 var(--radius-sm) var(--radius-sm) 0">' +
+                '<div style="font-size:13px;font-style:italic;color:var(--text-secondary);line-height:1.5">\u201C' + identity + '\u201D</div>' +
+            '</div>';
+        }
+
+        html += '</div>';
+
+        // ===== THREAT ASSESSMENT ROW — 3 cards =====
+        html += '<div style="display:flex;gap:8px;margin-bottom:14px">';
+
+        // Style card
+        html += '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:10px;text-align:center;box-shadow:var(--shadow-card)">' +
+            '<div style="font-size:24px">' + style.emoji + '</div>' +
+            '<div style="font-weight:700;font-size:13px;margin-top:2px">' + style.label + '</div>' +
+            '<div style="font-size:10px;color:var(--text-muted)">Play Style</div>' +
+        '</div>';
+
+        // Luck gauge
+        html += '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:10px;text-align:center;box-shadow:var(--shadow-card)">' +
+            luckGaugeSvg(luck, 48) +
+            '<div style="font-size:10px;color:var(--text-muted);margin-top:2px">Luck Factor</div>' +
+        '</div>';
+
+        // Exploit score
+        html += '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:10px;text-align:center;box-shadow:var(--shadow-card)">' +
+            '<div style="font-size:22px;font-weight:800;color:' + exploitColor + '">' + exploit + '%</div>' +
+            '<div style="font-size:10px;font-weight:700;color:' + exploitColor + '">' + exploitLabel + '</div>' +
+            '<div style="font-size:10px;color:var(--text-muted)">Exploitable</div>' +
+        '</div>';
+
+        html += '</div>';
+
+        // ===== HUD STAT BUBBLES =====
         var statBubbles = [
             { label:'VPIP', value:stats.vpip, color:statColor(stats.vpip) },
             { label:'PFR', value:stats.pfr, color:statColor(stats.pfr) },
@@ -3855,32 +3916,8 @@
             { label:'WTSD', value:stats.wtsd, color:statColor(stats.wtsd) },
             { label:'WSD', value:stats.wsd, color:statColor(stats.wsd) }
         ];
-
-        var html = '<div class="content stagger">';
-        html += '<button class="tournaments-back" onclick="go(\'players\')">\u2190 All Players</button>';
-
-        // ===== Hero Card: Identity + Avatar + Core Info =====
-        html += '<div class="scout-card">' +
-            '<div class="scout-header">' +
-                '<div class="player-avatar avatar-lg" style="background:' + player.color + '">' + player.initials + '</div>' +
-                '<div style="flex:1">' +
-                    '<div class="scout-label">Scouting Report</div>' +
-                    '<div class="scout-name-row">' +
-                        '<div class="scout-name">' + player.flag + ' ' + player.name + '</div>' +
-                        '<div class="skill-rating" style="background:' + skill.color + '">' + skill.grade + '</div>' +
-                    '</div>' +
-                    '<div class="text-muted" style="font-size:13px">#' + player.finish + ' \u00B7 ' + player.hands + ' hands \u00B7 ' + player.status + '</div>' +
-                    '<div class="career-record mt-sm">' + career + '</div>' +
-                '</div>' +
-            '</div>';
-
-        // Identity one-liner
-        if (identity) {
-            html += '<div class="sr-identity">\u201C' + identity + '\u201D</div>';
-        }
-
-        // HUD stat bubbles
-        html += '<div class="scout-stat-row">';
+        html += '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow-card);margin-bottom:14px">' +
+            '<div class="scout-stat-row" style="margin:0">';
         statBubbles.forEach(function(s) {
             var val = (typeof s.value === 'number' && s.value > 10) ? s.value + '%' : s.value;
             html += '<div style="text-align:center">' +
@@ -3890,34 +3927,7 @@
         });
         html += '</div></div>';
 
-        // ===== Style + Luck + Exploit row =====
-        html += '<div style="display:flex;gap:10px;margin-bottom:14px">';
-
-        // Style
-        html += '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:12px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-card)">' +
-            '<span style="font-size:26px">' + style.emoji + '</span>' +
-            '<div>' +
-                '<div style="font-weight:700;font-size:14px;color:var(--text-primary)">' + style.label + '</div>' +
-                '<div class="text-muted" style="font-size:11px">' + style.desc + '</div>' +
-            '</div>' +
-        '</div>';
-
-        // Luck
-        html += '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:8px;text-align:center;box-shadow:var(--shadow-card);min-width:72px">' +
-            '<div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px">Luck</div>' +
-            luckGaugeSvg(luck, 56) +
-        '</div>';
-
-        // Exploit score
-        html += '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:8px;text-align:center;box-shadow:var(--shadow-card);min-width:72px">' +
-            '<div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px">Exploit</div>' +
-            '<div style="font-size:22px;font-weight:800;color:' + exploitColor + '">' + exploit + '</div>' +
-            '<div style="font-size:9px;color:' + exploitColor + ';font-weight:600">' + (exploit >= 70 ? 'High' : exploit >= 55 ? 'Medium' : 'Low') + '</div>' +
-        '</div>';
-
-        html += '</div>';
-
-        // ===== Radar Chart: 6 Dimensions =====
+        // ===== RADAR CHART: 6 Dimensions =====
         html += '<div class="sr-section">' +
             '<div class="sr-section-title">\u{1F4CA} Player Dimensions</div>' +
             '<div style="display:flex;justify-content:center">' +
@@ -3944,43 +3954,77 @@
         });
         html += '</div></div>';
 
-        // ===== Strengths (from 48-rule engine) =====
-        if (strengths.length > 0) {
-            html += '<div class="sr-section">' +
-                '<div class="sr-section-title" style="color:#059669">\u{1F6E1}\uFE0F Strengths <span class="sr-count">' + strengths.length + '</span></div>';
-            strengths.forEach(function(s) {
-                html += '<div class="sr-strength-card">' +
-                    '<div class="sr-rule-header">' +
-                        '<span class="sr-rule-title">' + s.title + '</span>' +
-                        '<span class="sr-rule-stat">' + s.stat + '</span>' +
-                    '</div>' +
-                    '<div class="sr-rule-desc">' + s.desc + '</div>' +
-                '</div>';
-            });
-            html += '</div>';
-        }
-
-        // ===== Leaks (from 48-rule engine) =====
+        // ===== HOW TO BEAT THEM (was "Leaks") =====
         if (leaks.length > 0) {
             html += '<div class="sr-section">' +
-                '<div class="sr-section-title" style="color:#dc2626">\u26A0\uFE0F Leaks <span class="sr-count">' + leaks.length + '</span></div>';
+                '<div class="sr-section-title" style="color:#dc2626">\u{1F3AF} How to Beat Them <span class="sr-count">' + leaks.length + '</span></div>';
             leaks.forEach(function(l) {
                 var sevColor = l.severity === 'critical' ? '#dc2626' : l.severity === 'moderate' ? '#ea580c' : '#d97706';
                 var sevBg = l.severity === 'critical' ? '#fef2f2' : l.severity === 'moderate' ? '#fff7ed' : '#fffbeb';
+                var actionPrefix = l.severity === 'critical' ? 'EXPLOIT' : l.severity === 'moderate' ? 'TARGET' : 'PROBE';
                 html += '<div class="sr-leak-card" style="border-left:3px solid ' + sevColor + '">' +
                     '<div class="sr-rule-header">' +
-                        '<span class="sr-rule-title">' + l.title + '</span>' +
+                        '<span style="font-size:10px;font-weight:800;color:' + sevColor + ';letter-spacing:0.5px">' + actionPrefix + '</span>' +
                         '<span class="sr-severity" style="background:' + sevBg + ';color:' + sevColor + '">' + l.severity + '</span>' +
                     '</div>' +
-                    '<div class="sr-rule-stat" style="display:block;margin:4px 0">' + l.stat + '</div>' +
+                    '<div class="sr-rule-title" style="margin:4px 0 2px;font-size:14px">' + l.title + '</div>' +
+                    '<div class="sr-rule-stat" style="display:block;margin:2px 0 4px;font-size:12px">' + l.stat + '</div>' +
                     '<div class="sr-rule-desc">' + l.desc + '</div>' +
                 '</div>';
             });
             html += '</div>';
         }
 
-        // ===== Career Trends =====
-        if (trends.overall) {
+        // ===== WHAT TO AVOID (was "Strengths") =====
+        if (strengths.length > 0) {
+            html += '<div class="sr-section">' +
+                '<div class="sr-section-title" style="color:#059669">\u26D4 What to Avoid <span class="sr-count">' + strengths.length + '</span></div>';
+            strengths.forEach(function(s) {
+                html += '<div class="sr-strength-card">' +
+                    '<div class="sr-rule-header">' +
+                        '<span style="font-size:10px;font-weight:800;color:#059669;letter-spacing:0.5px">DON\'T</span>' +
+                        '<span class="sr-rule-stat">' + s.stat + '</span>' +
+                    '</div>' +
+                    '<div class="sr-rule-title" style="margin:4px 0 2px;font-size:14px">' + s.title + '</div>' +
+                    '<div class="sr-rule-desc">' + s.desc + '</div>' +
+                '</div>';
+            });
+            html += '</div>';
+        }
+
+        // ===== CAREER TRENDS with Sparklines =====
+        if (sparklines.vpip && sparklines.vpip.length > 0) {
+            html += '<div class="sr-section">' +
+                '<div class="sr-section-title">\u{1F4C8} Career Trends</div>' +
+                '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow-card)">';
+
+            var sparkStats = [
+                { label:'VPIP', data:sparklines.vpip, color:'#2563eb' },
+                { label:'PFR', data:sparklines.pfr, color:'#059669' },
+                { label:'AF', data:sparklines.af, color:'#ea580c' }
+            ];
+            sparkStats.forEach(function(ss) {
+                var lastVal = ss.data[ss.data.length - 1];
+                var firstVal = ss.data[0];
+                var trendDir = lastVal > firstVal ? '\u2191' : lastVal < firstVal ? '\u2193' : '\u2192';
+                var trendColor = lastVal > firstVal ? '#059669' : lastVal < firstVal ? '#dc2626' : '#94a3b8';
+                html += '<div style="display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid var(--border-light)">' +
+                    '<span style="font-size:12px;font-weight:700;width:36px;color:var(--text-secondary)">' + ss.label + '</span>' +
+                    '<div style="flex:1">' + sparklineSvg(ss.data, 140, 24, ss.color) + '</div>' +
+                    '<span style="font-size:13px;font-weight:700;color:' + ss.color + '">' + lastVal + '</span>' +
+                    '<span style="font-size:12px;color:' + trendColor + '">' + trendDir + '</span>' +
+                '</div>';
+            });
+
+            // Overall trend note
+            if (trends.overall) {
+                html += '<div style="margin-top:8px;padding-top:8px">' +
+                    '<div style="font-size:12px;color:var(--text-secondary)">Overall: <b>' + trends.overall + '</b> \u2014 ' + trends.note + '</div>' +
+                '</div>';
+            }
+            html += '</div></div>';
+        } else if (trends.overall) {
+            // Fallback to arrow-based trends
             html += '<div class="sr-section">' +
                 '<div class="sr-section-title">\u{1F4C8} Career Trend</div>' +
                 '<div class="sr-trends-card">' +
@@ -4018,7 +4062,7 @@
         // ===== AI Scouting Narrative =====
         if (scoutText) {
             html += '<div class="sr-section">' +
-                '<div class="sr-section-title">\u{1F9E0} AI Scouting Analysis</div>' +
+                '<div class="sr-section-title">\u{1F9E0} AI Analysis</div>' +
                 '<div style="font-size:13px;color:var(--text-secondary);line-height:1.65;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow-card)">' + scoutText + '</div>' +
             '</div>';
         }
@@ -4029,7 +4073,7 @@
             '<input class="search-input" placeholder="Ask about ' + player.name + '..." onkeydown="if(event.key===\'Enter\'){var v=this.value.trim();if(v)go(\'ai\',{q:v,player:\'' + pid + '\'})}">' +
         '</div>';
 
-        html += '<button class="btn btn-orange full mt-sm" onclick="go(\'report\',{player:\'' + pid + '\'})">Generate Exploit Report \u2192</button>';
+        html += '<button class="btn btn-orange full mt-sm" onclick="go(\'report\',{player:\'' + pid + '\'})">Full Exploit Report \u2192</button>';
 
         html += '</div>';
         return html;
