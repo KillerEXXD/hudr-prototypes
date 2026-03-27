@@ -540,6 +540,30 @@
             fill: currentColor;
         }
 
+        .replay-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            background: #2563eb;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-decoration: none;
+        }
+
+        .replay-btn:hover { background: #1d4ed8; }
+
+        .replay-btn svg {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+        }
+
         /* ===================== Skill Rating Circle ===================== */
         .skill-rating {
             width: 36px;
@@ -2349,6 +2373,10 @@
         return '<a href="' + YT_BASE + seconds + '" target="_blank" rel="noopener" class="yt-btn" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>Watch</a>';
     }
 
+    function replayBtn(handNumber) {
+        return '<a href="#/hand?id=' + handNumber + '" class="replay-btn" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Replay</a>';
+    }
+
     function skillCircle(id, extraClass) {
         var r = SKILL_RATINGS[id] || { grade:'B', color:'#2563eb' };
         var cls = 'skill-rating' + (extraClass ? ' ' + extraClass : '');
@@ -2458,6 +2486,7 @@
             case 'report': return renderExploitReport();
             case 'pricing': return renderPricing();
             case 'favorites': return renderFavorites();
+            case 'hand': return renderHandPlaceholder();
             default: return renderHome();
         }
     }
@@ -2582,7 +2611,7 @@
                     '<div class="moment-text">' + h.preview + '</div>' +
                     '<div class="moment-bottom">' +
                         '<span class="moment-meta">Hand #' + h.hand + ' \u00B7 ' + fmtChips(h.pot) + '</span>' +
-                        ytBtn(h.ytTime) +
+                        '<span style="display:flex;gap:4px">' + replayBtn(h.hand) + ytBtn(h.ytTime) + '</span>' +
                     '</div>' +
                     '<div style="margin-top:6px"><span class="board-texture">' + h.board + '</span></div>' +
                 '</div>' +
@@ -3111,6 +3140,7 @@
                     '<div class="hand-row-bottom">' +
                         '<span class="tier-badge ' + tierClass(tiers[i]) + '">' + tierLabel(tiers[i]) + '</span>' +
                         '<span class="board-texture">' + boardTextures[i] + '</span>' +
+                        '<span style="display:flex;gap:4px;margin-left:auto">' + replayBtn(hn) + ytBtn(2100 + i * 300) + '</span>' +
                     '</div>' +
                 '</div>';
             }
@@ -3129,7 +3159,7 @@
                         '<div class="moment-text">' + h.preview + '</div>' +
                         '<div class="moment-bottom">' +
                             '<span class="moment-meta">Hand #' + h.hand + ' \u00B7 ' + fmtChips(h.pot) + '</span>' +
-                            ytBtn(h.ytTime) +
+                            '<span style="display:flex;gap:4px">' + replayBtn(h.hand) + ytBtn(h.ytTime) + '</span>' +
                         '</div>' +
                         '<div style="margin-top:6px"><span class="board-texture">' + h.board + '</span></div>' +
                     '</div>' +
@@ -3195,7 +3225,7 @@
                         '<div class="embed-meta">Negreanu vs Ivey \u00B7 ' + fmtChips(89400000) + ' pot</div>' +
                         '<div class="embed-bottom">' +
                             '<span class="board-texture">Wet Flop \u{1F30A}</span>' +
-                            ytBtn(4821) +
+                            '<span style="display:flex;gap:4px">' + replayBtn(87) + ytBtn(4821) + '</span>' +
                         '</div>' +
                     '</div>' +
                     // Embedded player card with skill + style
@@ -3211,7 +3241,7 @@
                         '<div class="bluff-detail">Opponent: <strong>Selbst</strong> \u2014 Folded</div>' +
                         '<div class="embed-bottom" style="margin-top:6px">' +
                             '<span class="board-texture">Dry Board \u{1F3DC}\u{FE0F}</span>' +
-                            ytBtn(3950) +
+                            '<span style="display:flex;gap:4px">' + replayBtn(73) + ytBtn(3950) + '</span>' +
                         '</div>' +
                     '</div>' +
                 '</div>' +
@@ -3454,10 +3484,10 @@
         var ringColor = exploit >= 70 ? 'var(--accent-emerald)' : exploit >= 45 ? 'var(--accent-amber)' : 'var(--accent-red)';
 
         var leaks = [
-            { name:'Overfolds BB Defense', severity:'high', pVal:stats.foldToSteal + '%', pop:'52%', desc:'Folds ' + stats.foldToSteal + '% to steals. Steal wider from late position.', tier:'medium', ytTime:2100 },
-            { name:'River Aggression Drop', severity:'medium', pVal:(stats.afRiver || 2.1).toFixed(1), pop:'2.5', desc:'AF drops from ' + (stats.afFlop || 3.2) + ' (flop) to ' + (stats.afRiver || 2.1) + ' (river). Value bet thinner on rivers.', tier:'strong', ytTime:3120 },
-            { name:'Low Check-Raise Frequency', severity:stats.checkRaiseFlop < 5 ? 'high' : 'medium', pVal:stats.checkRaiseFlop + '%', pop:'8%', desc:'Only ' + stats.checkRaiseFlop + '% check-raise means safe to barrel on most textures.', tier:'weak', ytTime:3950 },
-            { name:'C-Bet Continuation Decline', severity:'low', pVal:stats.cbetFlop + '%\u2192' + stats.cbetRiver + '%', pop:'65%\u219235%', desc:'Float flop bets profitably knowing they abandon many turns.', tier:'draw', ytTime:4821 }
+            { name:'Overfolds BB Defense', severity:'high', pVal:stats.foldToSteal + '%', pop:'52%', desc:'Folds ' + stats.foldToSteal + '% to steals. Steal wider from late position.', tier:'medium', ytTime:2100, hand:42 },
+            { name:'River Aggression Drop', severity:'medium', pVal:(stats.afRiver || 2.1).toFixed(1), pop:'2.5', desc:'AF drops from ' + (stats.afFlop || 3.2) + ' (flop) to ' + (stats.afRiver || 2.1) + ' (river). Value bet thinner on rivers.', tier:'strong', ytTime:3120, hand:61 },
+            { name:'Low Check-Raise Frequency', severity:stats.checkRaiseFlop < 5 ? 'high' : 'medium', pVal:stats.checkRaiseFlop + '%', pop:'8%', desc:'Only ' + stats.checkRaiseFlop + '% check-raise means safe to barrel on most textures.', tier:'weak', ytTime:3950, hand:73 },
+            { name:'C-Bet Continuation Decline', severity:'low', pVal:stats.cbetFlop + '%\u2192' + stats.cbetRiver + '%', pop:'65%\u219235%', desc:'Float flop bets profitably knowing they abandon many turns.', tier:'draw', ytTime:4821, hand:87 }
         ];
 
         var html = '<div class="content stagger">';
@@ -3499,6 +3529,7 @@
                     '<div class="leak-desc">' + l.desc + '</div>' +
                     '<div class="row mt-sm" style="gap:8px">' +
                         '<button class="btn btn-ghost btn-sm" onclick="go(\'ai\',{q:\'Evidence for ' + l.name + ' leak\'})">View Evidence \u2192</button>' +
+                        replayBtn(l.hand) +
                         ytBtn(l.ytTime) +
                     '</div>' +
                 '</div>' +
@@ -3652,6 +3683,23 @@
             var el = document.getElementById('sug_' + c);
             if (el) el.style.display = (c === cat) ? '' : 'none';
         });
+    }
+
+    // ===================== Hand Replayer Placeholder =====================
+
+    function renderHandPlaceholder() {
+        var handId = currentRoute.params.id || '?';
+        var html = '<div class="content" style="text-align:center;padding-top:60px">';
+        html += '<div style="font-size:56px;margin-bottom:16px">\u{1F0CF}</div>';
+        html += '<div style="font-size:24px;font-weight:800;margin-bottom:8px">Hand #' + handId + '</div>';
+        html += '<div style="font-size:14px;color:var(--text-muted);margin-bottom:8px">Hand Replayer</div>';
+        html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:32px">Step-by-step replay with actions, bets, and board progression</div>';
+        html += '<div style="display:inline-flex;gap:10px">';
+        html += '<button class="btn btn-orange" onclick="history.back()">\u2190 Go Back</button>';
+        html += ytBtn(2100);
+        html += '</div>';
+        html += '</div>';
+        return html;
     }
 
     // ===================== Initial Render =====================
