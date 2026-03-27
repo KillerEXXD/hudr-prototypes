@@ -1717,6 +1717,252 @@
             flex-wrap: wrap;
             margin-top: 8px;
         }
+
+        .pcard-identity {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            padding: 8px 0 4px;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 4px;
+        }
+
+        .pcard-preview {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .pcard-preview-strength {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .pcard-preview-leak {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 3px solid #dc2626;
+        }
+
+        .pcard-preview-icon {
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .pcard-preview-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pcard-preview-stat {
+            font-size: 10px;
+            color: #059669;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .pcard-preview-sev {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .pcard-cta {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-orange);
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* ===================== Scout Report (Player Detail) ===================== */
+
+        .sr-identity {
+            font-style: italic;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            margin: 10px 0 4px;
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .sr-section {
+            margin-top: 16px;
+        }
+
+        .sr-section-title {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sr-count {
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            border-radius: var(--radius-full);
+            padding: 1px 8px;
+        }
+
+        /* Dimension bars grid */
+        .sr-dims-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .sr-dim-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 8px 10px;
+        }
+
+        .sr-dim-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 72px;
+            white-space: nowrap;
+        }
+
+        .sr-dim-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .sr-dim-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s ease-out;
+        }
+
+        .sr-dim-value {
+            font-size: 12px;
+            font-weight: 800;
+            min-width: 24px;
+            text-align: right;
+        }
+
+        /* Strength cards */
+        .sr-strength-card {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .sr-rule-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sr-rule-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .sr-rule-stat {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-emerald);
+            white-space: nowrap;
+        }
+
+        .sr-rule-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Leak cards */
+        .sr-leak-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .sr-severity {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            white-space: nowrap;
+        }
+
+        .sr-leak-card .sr-rule-stat {
+            color: var(--accent-red);
+            font-size: 11px;
+        }
+
+        /* Trend card */
+        .sr-trends-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+        }
+
+        .sr-trend-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .sr-trend-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .sr-trend-overall {
+            font-size: 13px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .sr-trend-note {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -1821,6 +2067,134 @@
         p3: 'Hellmuth plays an exploitable tight style with low 3-bet frequency (7%). Steal aggressively when he is in the blinds. His check-raise frequency of 5% means you can c-bet with high frequency. Be cautious when he shows aggression \u2014 his range is heavily weighted toward value.'
     };
 
+    // ===================== Player Dimensions (Radar Chart) =====================
+    const PLAYER_DIMENSIONS = {
+        p1: { aggression:72, risk:58, icm:78, precision:82, adaptability:75, clutch:88 },
+        p2: { aggression:85, risk:65, icm:72, precision:90, adaptability:88, clutch:92 },
+        p3: { aggression:48, risk:38, icm:85, precision:65, adaptability:52, clutch:60 },
+        p4: { aggression:68, risk:55, icm:70, precision:78, adaptability:72, clutch:76 },
+        p5: { aggression:88, risk:78, icm:45, precision:72, adaptability:82, clutch:70 },
+        p6: { aggression:70, risk:52, icm:75, precision:80, adaptability:78, clutch:82 },
+        p7: { aggression:92, risk:85, icm:35, precision:62, adaptability:70, clutch:58 },
+        p8: { aggression:35, risk:28, icm:90, precision:55, adaptability:40, clutch:45 },
+        p9: { aggression:42, risk:30, icm:88, precision:75, adaptability:48, clutch:85 }
+    };
+
+    // ===================== Player Identity One-Liners =====================
+    const PLAYER_IDENTITIES = {
+        p1: 'A calculated predator who picks spots with surgical precision \u2014 patient, reads the table, strikes on rivers.',
+        p2: 'The most complete player at the table \u2014 relentless across all streets, impossible to put on a hand.',
+        p3: 'Plays like a loaded spring \u2014 ultra-tight, ultra-predictable, but devastating when he wakes up with a hand.',
+        p4: 'A balanced technician who grinds edges through positional play and well-timed aggression.',
+        p5: 'A fearless LAG who bulldozes through tables \u2014 high variance, high reward, always in the mix.',
+        p6: 'GTO robot with a human touch \u2014 exploits small edges across thousands of decisions.',
+        p7: 'A volatile force of nature \u2014 either stacking everyone or busting first. No in-between.',
+        p8: 'A glacier at the poker table \u2014 waits endlessly, then strikes once with overwhelming force.',
+        p9: 'The silent assassin \u2014 plays the fewest hands but wins the biggest pots through sheer aggression when committed.'
+    };
+
+    // ===================== Player Strengths (from 48-rule engine) =====================
+    const PLAYER_STRENGTHS_DATA = {
+        p1: [
+            { title:'Selective Aggressor', stat:'PFR/VPIP: 0.79', desc:'Enters pots with raises not calls \u2014 strong hand selection with assertive entry.' },
+            { title:'River Value Extraction', stat:'WSD: 54%', desc:'Wins 54% at showdown \u2014 consistently picks the right spots to go to war.' },
+            { title:'Profitable Stealer', stat:'Steal: 38%, Fold-to-Resteal: 55%', desc:'Active stealer with adequate defense when challenged on steals.' }
+        ],
+        p2: [
+            { title:'Balanced Street Aggression', stat:'AF Flop/Turn/River: 3.8/3.2/3.1', desc:'Maintains aggression across all streets \u2014 relentless, consistent pressure.' },
+            { title:'Active 3-Bettor', stat:'3-Bet: 11%, Fold-to-4Bet: <55%', desc:'Aggressive 3-bettor who defends vs 4-bets \u2014 not a one-and-done raiser.' },
+            { title:'Showdown Warrior', stat:'WSD: 58%, WTSD: 38%', desc:'Picks showdown spots carefully and wins at an elite rate.' },
+            { title:'Effective Check-Raiser', stat:'CR Flop: 10%', desc:'Uses check-raises to trap aggressive opponents \u2014 multi-dimensional.' }
+        ],
+        p3: [
+            { title:'ICM Awareness', stat:'VPIP: 22%, Fold-to-3B: 62%', desc:'Plays a disciplined, survival-oriented style well-suited for deep tournament runs.' },
+            { title:'C-Bet Continuation', stat:'Flop/Turn/River: 65/45/30%', desc:'Measured c-bet frequencies that avoid overcommitting to weak boards.' }
+        ],
+        p4: [
+            { title:'Selective Aggressor', stat:'PFR/VPIP: 0.81', desc:'One of the highest PFR-to-VPIP ratios at the table \u2014 enters pots aggressively.' },
+            { title:'Showdown Winner', stat:'WSD: 52%', desc:'Above-average showdown conversion rate shows strong hand reading ability.' },
+            { title:'Profitable Stealer', stat:'Steal: 40%, Fold-to-Resteal: 52%', desc:'Steals actively and defends well when three-bet.' }
+        ],
+        p5: [
+            { title:'Maximum Pressure', stat:'AF: 3.0, 3-Bet: 12%', desc:'Puts opponents in high-pressure situations constantly with wide aggression.' },
+            { title:'Effective Check-Raiser', stat:'CR Flop: 11%', desc:'Traps aggressors with well-timed check-raises on the flop.' },
+            { title:'Squeeze Play User', stat:'3-Bet: 12%, Wide Steal: 46%', desc:'Punishes flat-callers with squeeze plays \u2014 a multi-bet weapon.' }
+        ],
+        p6: [
+            { title:'Balanced Fundamentals', stat:'VPIP:25/PFR:20/AF:2.8', desc:'Well-balanced core stats \u2014 near-optimal ranges across all situations.' },
+            { title:'Won Without Showdown', stat:'WSD: 55%, Low WTSD: 37%', desc:'Wins pots without needing to show cards \u2014 aggressive postflop forcing folds.' },
+            { title:'Check-Raise Game', stat:'CR Flop: 9%', desc:'Healthy check-raise frequency adds deception to defensive play.' }
+        ],
+        p7: [
+            { title:'Maximum Street Aggression', stat:'AF Flop: 3.6, Triple Barrel', desc:'The most aggressive player at the table \u2014 fires on every street relentlessly.' },
+            { title:'Highest Check-Raise Frequency', stat:'CR Flop: 12%', desc:'Uses check-raises more than anyone \u2014 opponents can never feel safe betting into him.' }
+        ],
+        p8: [
+            { title:'ICM Discipline', stat:'VPIP: 20%, Fold-to-Steal: 65%', desc:'Maximum patience \u2014 survives by avoiding marginal spots and preserving stack.' }
+        ],
+        p9: [
+            { title:'River Closer', stat:'AF River: 3.8', desc:'Highest river aggression at the table \u2014 applies maximum pressure at the final decision point.' },
+            { title:'Showdown Precision', stat:'WSD: 60%, WTSD: 33%', desc:'Rarely goes to showdown but wins 60% when he does \u2014 elite hand selection.' },
+            { title:'ICM Mastery', stat:'VPIP: 18%, Tight + Deadly', desc:'Plays the fewest hands but makes every one count with extreme conviction.' }
+        ]
+    };
+
+    // ===================== Player Leaks (from 48-rule engine) =====================
+    const PLAYER_LEAKS_DATA = {
+        p1: [
+            { title:'River Aggression Drop', severity:'moderate', stat:'AF River: 2.1 (vs 3.2 flop)', desc:'Aggression drops significantly on later streets \u2014 opponents can call turns knowing the river is safe.' },
+            { title:'Overfolds BB Defense', severity:'moderate', stat:'Fold-to-Steal: 55%', desc:'Folds slightly too much in blinds \u2014 can be exploited with wider late-position steals.' }
+        ],
+        p2: [
+            { title:'Limited ICM Adjustment', severity:'minor', stat:'Same ranges regardless of stack depth', desc:'Plays the same regardless of ICM pressure \u2014 exploitable near bubble situations.' }
+        ],
+        p3: [
+            { title:'Overfolds to 3-Bets', severity:'critical', stat:'Fold-to-3B: 62%', desc:'Folds way too much to 3-bets \u2014 free money for opponents who 3-bet light.' },
+            { title:'Low Check-Raise Frequency', severity:'moderate', stat:'CR Flop: 5%', desc:'Virtually never check-raises \u2014 one-dimensional postflop play that\u2019s easy to exploit.' },
+            { title:'Passive on River', severity:'moderate', stat:'AF River: 1.8', desc:'Shuts down on the river \u2014 opponents can bluff rivers profitably knowing he won\u2019t fight back.' },
+            { title:'Never 3-Bets Light', severity:'minor', stat:'3-Bet: 7%', desc:'3-bet range is exclusively premium \u2014 opponents always know where they stand.' }
+        ],
+        p4: [
+            { title:'Low Check-Raise', severity:'minor', stat:'CR Flop: 7%', desc:'Below-average check-raise frequency makes postflop play slightly predictable.' },
+            { title:'C-Bet Decline', severity:'moderate', stat:'Flop 70% \u2192 River 35%', desc:'Gives up too easily on later streets \u2014 opponents float flop c-bets profitably.' }
+        ],
+        p5: [
+            { title:'Too Many Hands', severity:'moderate', stat:'VPIP: 30%, Negative ICM', desc:'Plays too wide for a tournament setting \u2014 high-variance approach bleeds chips in marginal spots.' },
+            { title:'Low ICM Awareness', severity:'critical', stat:'No tightening near bubble', desc:'Doesn\u2019t adjust for tournament pressure \u2014 can be trapped in ICM spots.' }
+        ],
+        p6: [
+            { title:'Predictable Turn Behavior', severity:'minor', stat:'C-Bet Turn: 52% (textbook)', desc:'Turn play is somewhat formulaic \u2014 experienced opponents can read the pattern.' }
+        ],
+        p7: [
+            { title:'Goes to Showdown Too Often', severity:'critical', stat:'WTSD: 46%, WSD: 47%', desc:'Goes to showdown too often and doesn\u2019t win enough \u2014 classic calling station tendency on later streets.' },
+            { title:'Low Showdown Win Rate', severity:'critical', stat:'WSD: 47%', desc:'Reaches showdown frequently but loses more than wins \u2014 poor hand reading or stubbornness.' },
+            { title:'Zero ICM Awareness', severity:'critical', stat:'VPIP: 32%, Widest at table', desc:'Plays as if it\u2019s a cash game \u2014 ignores tournament life preservation entirely.' }
+        ],
+        p8: [
+            { title:'Excessive Passivity', severity:'critical', stat:'AF: 1.8, PFR/VPIP: 0.80', desc:'Plays too passively overall \u2014 misses value and allows opponents to see cheap cards.' },
+            { title:'Overfolds to Steals', severity:'critical', stat:'Fold-to-Steal: 65%', desc:'Folds 65% to steals \u2014 opponents print money by opening wide against this player.' },
+            { title:'No Check-Raise Game', severity:'moderate', stat:'CR Flop: 4%', desc:'Virtually never check-raises \u2014 entirely one-dimensional defensive strategy.' },
+            { title:'River Shutdown', severity:'moderate', stat:'AF River: 1.5, C-Bet River: 25%', desc:'Completely passive on rivers \u2014 never bluffs, rarely value bets thin.' }
+        ],
+        p9: [
+            { title:'Ultra-Tight Entry', severity:'moderate', stat:'VPIP: 18%', desc:'Folds too many playable hands \u2014 opponents can steal blinds constantly against this player.' },
+            { title:'Low Adaptability', severity:'moderate', stat:'Narrow action variety', desc:'Plays the same style regardless of dynamics \u2014 easily adjustable to by observant opponents.' }
+        ]
+    };
+
+    // ===================== Stat Trends (Career Direction) =====================
+    const PLAYER_TRENDS = {
+        p1: { vpip:'stable', pfr:'stable', af:'decreasing', overall:'stable', note:'Consistent across 6 FTs' },
+        p2: { vpip:'decreasing', pfr:'stable', af:'increasing', overall:'tightening', note:'Getting more selective and aggressive' },
+        p3: { vpip:'decreasing', pfr:'decreasing', af:'stable', overall:'tightening', note:'Increasingly conservative over 8 FTs' },
+        p4: { vpip:'stable', pfr:'increasing', af:'stable', overall:'stable', note:'Becoming slightly more aggressive preflop' },
+        p5: { vpip:'increasing', pfr:'increasing', af:'stable', overall:'loosening', note:'Playing wider over recent FTs' },
+        p6: { vpip:'stable', pfr:'stable', af:'stable', overall:'stable', note:'Remarkably consistent GTO approach' },
+        p7: { vpip:'increasing', pfr:'increasing', af:'increasing', overall:'loosening', note:'Becoming more reckless' },
+        p8: { vpip:'decreasing', pfr:'decreasing', af:'decreasing', overall:'tightening', note:'Regressing into extreme nittery' },
+        p9: { vpip:'stable', pfr:'stable', af:'increasing', overall:'stable', note:'Same tight range but more aggressive postflop' }
+    };
+
     const TOURNAMENT = {
         name: 'WSOP Main Event 2025',
         event: 'World Series of Poker',
@@ -1875,6 +2249,76 @@
         if (v >= 55) return 'var(--accent-emerald)';
         if (v >= 30) return 'var(--accent-amber)';
         return 'var(--accent-red)';
+    }
+
+    // SVG Radar Chart for 6 player dimensions
+    function radarChartSvg(dims, color, size) {
+        size = size || 180;
+        var cx = size / 2, cy = size / 2, r = size * 0.38;
+        var labels = ['AGG', 'RISK', 'ICM', 'PREC', 'ADAPT', 'CLUTCH'];
+        var values = [dims.aggression, dims.risk, dims.icm, dims.precision, dims.adaptability, dims.clutch];
+        var n = 6;
+
+        function polarXY(angle, radius) {
+            var rad = (angle - 90) * Math.PI / 180;
+            return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
+        }
+
+        var svg = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">';
+
+        // Grid rings (25%, 50%, 75%, 100%)
+        [0.25, 0.5, 0.75, 1.0].forEach(function(pct) {
+            var pts = [];
+            for (var i = 0; i < n; i++) {
+                var p = polarXY(i * 60, r * pct);
+                pts.push(p.x.toFixed(1) + ',' + p.y.toFixed(1));
+            }
+            svg += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="#d1d5db" stroke-width="' + (pct === 1 ? '1' : '0.5') + '" opacity="0.5"/>';
+        });
+
+        // Axis lines
+        for (var i = 0; i < n; i++) {
+            var p = polarXY(i * 60, r);
+            svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + p.x.toFixed(1) + '" y2="' + p.y.toFixed(1) + '" stroke="#d1d5db" stroke-width="0.5" opacity="0.4"/>';
+        }
+
+        // Data polygon
+        var dataPts = [];
+        for (var i = 0; i < n; i++) {
+            var p = polarXY(i * 60, r * values[i] / 100);
+            dataPts.push(p.x.toFixed(1) + ',' + p.y.toFixed(1));
+        }
+        svg += '<polygon points="' + dataPts.join(' ') + '" fill="' + color + '" fill-opacity="0.15" stroke="' + color + '" stroke-width="2"/>';
+
+        // Data points
+        for (var i = 0; i < n; i++) {
+            var p = polarXY(i * 60, r * values[i] / 100);
+            svg += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="3" fill="' + color + '"/>';
+        }
+
+        // Labels
+        var labelR = r + 16;
+        for (var i = 0; i < n; i++) {
+            var p = polarXY(i * 60, labelR);
+            svg += '<text x="' + p.x.toFixed(1) + '" y="' + (p.y + 1).toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" fill="#6b7280" font-size="10" font-weight="600">' + labels[i] + '</text>';
+        }
+
+        // Value labels (smaller, closer)
+        var valR = r + 28;
+        for (var i = 0; i < n; i++) {
+            var p = polarXY(i * 60, valR);
+            svg += '<text x="' + p.x.toFixed(1) + '" y="' + (p.y + 1).toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" fill="' + color + '" font-size="9" font-weight="700">' + values[i] + '</text>';
+        }
+
+        svg += '</svg>';
+        return svg;
+    }
+
+    // Trend arrow helper
+    function trendArrow(trend) {
+        if (trend === 'increasing') return '<span style="color:#059669">\u2191</span>';
+        if (trend === 'decreasing') return '<span style="color:#dc2626">\u2193</span>';
+        return '<span style="color:#9ca3af">\u2192</span>';
     }
 
     function highlightColor(type) {
@@ -2364,7 +2808,7 @@
 
         // Sort chips
         var sorts = [
-            { id:'finish', label:'Finish', icon:'\u{1F3C6}' },
+            { id:'finish', label:'Placement', icon:'\u{1F3C6}' },
             { id:'exploit', label:'Most Exploitable', icon:'\u{1F3AF}' },
             { id:'luck', label:'Luckiest', icon:'\u{1F340}' },
             { id:'skill', label:'Highest Skill', icon:'\u2B50' }
@@ -2419,13 +2863,9 @@
                 var luck = LUCK_SCORES[p.id] || 0;
                 var exploit = calcExploit(stats);
                 var career = CAREERS[p.id] || '';
-
-                // Compute weaknesses count
-                var leakCount = 0;
-                if (stats.foldToSteal > 58) leakCount++;
-                if ((stats.afRiver || 0) < 2.2) leakCount++;
-                if (stats.checkRaiseFlop < 7) leakCount++;
-                if (stats.vpip > 28 && stats.pfr < 20) leakCount++;
+                var identity = PLAYER_IDENTITIES[p.id] || '';
+                var playerLeaks = PLAYER_LEAKS_DATA[p.id] || [];
+                var playerStrengths = PLAYER_STRENGTHS_DATA[p.id] || [];
 
                 // Exploit color
                 var exploitColor = exploit >= 70 ? '#dc2626' : exploit >= 55 ? '#ea580c' : '#059669';
@@ -2448,6 +2888,11 @@
                     '</div>' +
                 '</div>';
 
+                // Identity one-liner
+                if (identity) {
+                    html += '<div class="pcard-identity">\u201C' + identity + '\u201D</div>';
+                }
+
                 // Stats row: compact HUD badges
                 html += '<div class="pcard-stats">' +
                     '<span class="pcard-stat">VPIP <b>' + stats.vpip + '</b></span>' +
@@ -2457,16 +2902,43 @@
                     '<span class="pcard-stat">WSD <b>' + stats.wsd + '</b></span>' +
                 '</div>';
 
+                // Top strength preview
+                if (playerStrengths.length > 0) {
+                    var topS = playerStrengths[0];
+                    html += '<div class="pcard-preview pcard-preview-strength">' +
+                        '<span class="pcard-preview-icon">\u{1F6E1}\uFE0F</span>' +
+                        '<span class="pcard-preview-title">' + topS.title + '</span>' +
+                        '<span class="pcard-preview-stat">' + topS.stat + '</span>' +
+                    '</div>';
+                }
+
+                // Top leak preview
+                if (playerLeaks.length > 0) {
+                    var topL = playerLeaks[0];
+                    var tSevColor = topL.severity === 'critical' ? '#dc2626' : topL.severity === 'moderate' ? '#ea580c' : '#d97706';
+                    html += '<div class="pcard-preview pcard-preview-leak" style="border-left-color:' + tSevColor + '">' +
+                        '<span class="pcard-preview-icon">\u26A0\uFE0F</span>' +
+                        '<span class="pcard-preview-title">' + topL.title + '</span>' +
+                        '<span class="pcard-preview-sev" style="color:' + tSevColor + '">' + topL.severity + '</span>' +
+                    '</div>';
+                }
+
                 // Intelligence row: exploit score + leak count + luck
                 html += '<div class="pcard-intel">' +
-                    '<span class="tcard-intel-badge" style="background:' + exploitColor + '15;color:' + exploitColor + '">\u{1F3AF} ' + exploit + '% Exploit \u00B7 ' + exploitLabel + '</span>';
-                if (leakCount > 0) {
-                    html += '<span class="tcard-intel-badge intel-leaks">\u{1F50D} ' + leakCount + ' Leak' + (leakCount > 1 ? 's' : '') + '</span>';
+                    '<span class="tcard-intel-badge" style="background:' + exploitColor + '15;color:' + exploitColor + '">\u{1F3AF} ' + exploit + '% \u00B7 ' + exploitLabel + '</span>';
+                if (playerLeaks.length > 0) {
+                    html += '<span class="tcard-intel-badge intel-leaks">\u{1F50D} ' + playerLeaks.length + ' Leak' + (playerLeaks.length > 1 ? 's' : '') + '</span>';
+                }
+                if (playerStrengths.length > 0) {
+                    html += '<span class="tcard-intel-badge" style="background:#05966915;color:#059669">\u{1F6E1}\uFE0F ' + playerStrengths.length + '</span>';
                 }
                 var luckSign = luck > 0 ? '+' : '';
                 var luckColor = luck > 5 ? '#059669' : luck < -5 ? '#dc2626' : '#d97706';
-                html += '<span class="tcard-intel-badge" style="background:' + luckColor + '15;color:' + luckColor + '">\u{1F340} ' + luckSign + luck + '% Luck</span>';
+                html += '<span class="tcard-intel-badge" style="background:' + luckColor + '15;color:' + luckColor + '">\u{1F340} ' + luckSign + luck + '%</span>';
                 html += '</div>';
+
+                // View Scout Report CTA
+                html += '<div class="pcard-cta">View Full Scout Report \u2192</div>';
 
                 html += '</div>';
             });
@@ -2774,6 +3246,13 @@
         var rivals = RIVALRIES[pid] || [];
         var luck = LUCK_SCORES[pid] || 0;
         var scoutText = SCOUTING_TEXT[pid] || '';
+        var dims = PLAYER_DIMENSIONS[pid] || PLAYER_DIMENSIONS.p1;
+        var identity = PLAYER_IDENTITIES[pid] || '';
+        var strengths = PLAYER_STRENGTHS_DATA[pid] || [];
+        var leaks = PLAYER_LEAKS_DATA[pid] || [];
+        var trends = PLAYER_TRENDS[pid] || {};
+        var exploit = calcExploit(stats);
+        var exploitColor = exploit >= 70 ? '#dc2626' : exploit >= 55 ? '#ea580c' : '#059669';
 
         var statBubbles = [
             { label:'VPIP', value:stats.vpip, color:statColor(stats.vpip) },
@@ -2784,21 +3263,10 @@
             { label:'WSD', value:stats.wsd, color:statColor(stats.wsd) }
         ];
 
-        var strengths = [];
-        var weaknesses = [];
-        if (stats.wsd > 52) strengths.push('Showdown Warrior');
-        if (stats.steal > 40) strengths.push('Value Bettor');
-        if (stats.cbetFlop > 65) strengths.push('Tight Opener');
-        if (stats.af > 3.0) strengths.push('River Closer');
-        if (stats.foldToSteal > 58) weaknesses.push('Over-folds 3B');
-        if (stats.afRiver < 2.2) weaknesses.push('Passive River');
-        if (stats.checkRaiseFlop < 7) weaknesses.push('Fit-or-Fold Post');
-        if (stats.vpip > 28 && stats.pfr < 20) weaknesses.push('Wide Open Limp');
-
         var html = '<div class="content stagger">';
-        html += '<button class="text-orange fw-700" style="background:none;border:none;font-size:14px;cursor:pointer;margin-bottom:12px" onclick="go(\'tournament\')">\u2190 Tournament</button>';
+        html += '<button class="tournaments-back" onclick="go(\'players\')">\u2190 All Players</button>';
 
-        // Scouting Card
+        // ===== Hero Card: Identity + Avatar + Core Info =====
         html += '<div class="scout-card">' +
             '<div class="scout-header">' +
                 '<div class="player-avatar avatar-lg" style="background:' + player.color + '">' + player.initials + '</div>' +
@@ -2811,9 +3279,15 @@
                     '<div class="text-muted" style="font-size:13px">#' + player.finish + ' \u00B7 ' + player.hands + ' hands \u00B7 ' + player.status + '</div>' +
                     '<div class="career-record mt-sm">' + career + '</div>' +
                 '</div>' +
-            '</div>' +
-            '<div class="scout-stat-row">';
+            '</div>';
 
+        // Identity one-liner
+        if (identity) {
+            html += '<div class="sr-identity">\u201C' + identity + '\u201D</div>';
+        }
+
+        // HUD stat bubbles
+        html += '<div class="scout-stat-row">';
         statBubbles.forEach(function(s) {
             var val = (typeof s.value === 'number' && s.value > 10) ? s.value + '%' : s.value;
             html += '<div style="text-align:center">' +
@@ -2823,52 +3297,115 @@
         });
         html += '</div></div>';
 
-        // Style + Luck row
-        html += '<div style="display:flex;gap:12px;margin-bottom:12px">';
+        // ===== Style + Luck + Exploit row =====
+        html += '<div style="display:flex;gap:10px;margin-bottom:14px">';
 
-        // Style classification
-        html += '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card)">' +
-            '<span style="font-size:28px">' + style.emoji + '</span>' +
+        // Style
+        html += '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:12px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-card)">' +
+            '<span style="font-size:26px">' + style.emoji + '</span>' +
             '<div>' +
-                '<div style="font-weight:700;font-size:15px;color:var(--text-primary)">' + style.label + '</div>' +
-                '<div class="text-muted" style="font-size:12px">' + style.desc + '</div>' +
+                '<div style="font-weight:700;font-size:14px;color:var(--text-primary)">' + style.label + '</div>' +
+                '<div class="text-muted" style="font-size:11px">' + style.desc + '</div>' +
             '</div>' +
         '</div>';
 
-        // Luck gauge
-        html += '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:10px;text-align:center;box-shadow:var(--shadow-card);min-width:90px">' +
-            '<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px">Luck</div>' +
-            luckGaugeSvg(luck, 70) +
+        // Luck
+        html += '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:8px;text-align:center;box-shadow:var(--shadow-card);min-width:72px">' +
+            '<div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px">Luck</div>' +
+            luckGaugeSvg(luck, 56) +
+        '</div>';
+
+        // Exploit score
+        html += '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:8px;text-align:center;box-shadow:var(--shadow-card);min-width:72px">' +
+            '<div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px">Exploit</div>' +
+            '<div style="font-size:22px;font-weight:800;color:' + exploitColor + '">' + exploit + '</div>' +
+            '<div style="font-size:9px;color:' + exploitColor + ';font-weight:600">' + (exploit >= 70 ? 'High' : exploit >= 55 ? 'Medium' : 'Low') + '</div>' +
         '</div>';
 
         html += '</div>';
 
-        // Strength tags
+        // ===== Radar Chart: 6 Dimensions =====
+        html += '<div class="sr-section">' +
+            '<div class="sr-section-title">\u{1F4CA} Player Dimensions</div>' +
+            '<div style="display:flex;justify-content:center">' +
+                radarChartSvg(dims, player.color, 200) +
+            '</div>';
+
+        // Dimension bars below chart
+        html += '<div class="sr-dims-grid">';
+        var dimEntries = [
+            { label:'Aggression', value:dims.aggression, icon:'\u{1F525}' },
+            { label:'Risk', value:dims.risk, icon:'\u26A0\uFE0F' },
+            { label:'ICM', value:dims.icm, icon:'\u{1F6E1}\uFE0F' },
+            { label:'Precision', value:dims.precision, icon:'\u{1F3AF}' },
+            { label:'Adaptability', value:dims.adaptability, icon:'\u{1F500}' },
+            { label:'Clutch', value:dims.clutch, icon:'\u{1F4AA}' }
+        ];
+        dimEntries.forEach(function(d) {
+            var barColor = d.value >= 75 ? '#059669' : d.value >= 50 ? '#2563eb' : d.value >= 30 ? '#d97706' : '#dc2626';
+            html += '<div class="sr-dim-item">' +
+                '<div class="sr-dim-label">' + d.icon + ' ' + d.label + '</div>' +
+                '<div class="sr-dim-bar"><div class="sr-dim-fill" style="width:' + d.value + '%;background:' + barColor + '"></div></div>' +
+                '<div class="sr-dim-value" style="color:' + barColor + '">' + d.value + '</div>' +
+            '</div>';
+        });
+        html += '</div></div>';
+
+        // ===== Strengths (from 48-rule engine) =====
         if (strengths.length > 0) {
-            html += '<div>' +
-                '<div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent-emerald)">Strengths</div>' +
-                '<div class="row wrap" style="gap:6px">';
+            html += '<div class="sr-section">' +
+                '<div class="sr-section-title" style="color:#059669">\u{1F6E1}\uFE0F Strengths <span class="sr-count">' + strengths.length + '</span></div>';
             strengths.forEach(function(s) {
-                html += '<span class="tag-strength">' + s + '</span>';
+                html += '<div class="sr-strength-card">' +
+                    '<div class="sr-rule-header">' +
+                        '<span class="sr-rule-title">' + s.title + '</span>' +
+                        '<span class="sr-rule-stat">' + s.stat + '</span>' +
+                    '</div>' +
+                    '<div class="sr-rule-desc">' + s.desc + '</div>' +
+                '</div>';
             });
-            html += '</div></div>';
+            html += '</div>';
         }
 
-        // Leak tags
-        if (weaknesses.length > 0) {
-            html += '<div>' +
-                '<div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent-red)">Leaks</div>' +
-                '<div class="row wrap" style="gap:6px">';
-            weaknesses.forEach(function(w) {
-                html += '<span class="tag-leak">' + w + '</span>';
+        // ===== Leaks (from 48-rule engine) =====
+        if (leaks.length > 0) {
+            html += '<div class="sr-section">' +
+                '<div class="sr-section-title" style="color:#dc2626">\u26A0\uFE0F Leaks <span class="sr-count">' + leaks.length + '</span></div>';
+            leaks.forEach(function(l) {
+                var sevColor = l.severity === 'critical' ? '#dc2626' : l.severity === 'moderate' ? '#ea580c' : '#d97706';
+                var sevBg = l.severity === 'critical' ? '#fef2f2' : l.severity === 'moderate' ? '#fff7ed' : '#fffbeb';
+                html += '<div class="sr-leak-card" style="border-left:3px solid ' + sevColor + '">' +
+                    '<div class="sr-rule-header">' +
+                        '<span class="sr-rule-title">' + l.title + '</span>' +
+                        '<span class="sr-severity" style="background:' + sevBg + ';color:' + sevColor + '">' + l.severity + '</span>' +
+                    '</div>' +
+                    '<div class="sr-rule-stat" style="display:block;margin:4px 0">' + l.stat + '</div>' +
+                    '<div class="sr-rule-desc">' + l.desc + '</div>' +
+                '</div>';
             });
-            html += '</div></div>';
+            html += '</div>';
         }
 
-        // Rivalries
+        // ===== Career Trends =====
+        if (trends.overall) {
+            html += '<div class="sr-section">' +
+                '<div class="sr-section-title">\u{1F4C8} Career Trend</div>' +
+                '<div class="sr-trends-card">' +
+                    '<div class="sr-trend-row">' +
+                        '<span class="sr-trend-label">VPIP</span>' + trendArrow(trends.vpip) +
+                        '<span class="sr-trend-label" style="margin-left:16px">PFR</span>' + trendArrow(trends.pfr) +
+                        '<span class="sr-trend-label" style="margin-left:16px">AF</span>' + trendArrow(trends.af) +
+                    '</div>' +
+                    '<div class="sr-trend-overall">Overall: <b>' + trends.overall + '</b></div>' +
+                    '<div class="sr-trend-note">' + trends.note + '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        // ===== Rivalries =====
         if (rivals.length > 0) {
-            html += '<div class="mt-sm">' +
-                '<div style="font-size:15px;font-weight:700;margin-bottom:8px">Rivalries</div>';
+            html += '<div class="sr-section">' +
+                '<div class="sr-section-title">\u2694\uFE0F Rivalries</div>';
             rivals.forEach(function(r) {
                 var opp = PLAYERS.find(function(p) { return p.id === r.opponentId; });
                 if (!opp) return;
@@ -2885,12 +3422,15 @@
             html += '</div>';
         }
 
-        // Scouting text
+        // ===== AI Scouting Narrative =====
         if (scoutText) {
-            html += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin-top:8px">' + scoutText + '</div>';
+            html += '<div class="sr-section">' +
+                '<div class="sr-section-title">\u{1F9E0} AI Scouting Analysis</div>' +
+                '<div style="font-size:13px;color:var(--text-secondary);line-height:1.65;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow-card)">' + scoutText + '</div>' +
+            '</div>';
         }
 
-        // Ask AI + Exploit Report
+        // ===== Action Buttons =====
         html += '<div class="search-input-wrap mt-md">' +
             '<span class="search-icon">\u2728</span>' +
             '<input class="search-input" placeholder="Ask about ' + player.name + '..." onkeydown="if(event.key===\'Enter\'){var v=this.value.trim();if(v)go(\'ai\',{q:v,player:\'' + pid + '\'})}">' +
