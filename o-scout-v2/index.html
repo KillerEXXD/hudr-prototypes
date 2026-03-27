@@ -1631,6 +1631,92 @@
             font-size: 13px;
             color: var(--text-muted);
         }
+
+        /* ===================== Player Cards ===================== */
+
+        .pcard {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            padding: 14px;
+            cursor: pointer;
+            transition: transform 0.18s, box-shadow 0.18s;
+            margin-bottom: 10px;
+        }
+
+        .pcard:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-elevated);
+        }
+
+        .pcard:active {
+            transform: scale(0.98);
+        }
+
+        .pcard-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .pcard-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pcard-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+
+        .pcard-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pcard-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .pcard-stats {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .pcard-stat {
+            font-size: 11px;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 3px 7px;
+            white-space: nowrap;
+        }
+
+        .pcard-stat b {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .pcard-intel {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -1921,6 +2007,7 @@
             case 'home': return renderHome();
             case 'search': return renderSearch();
             case 'tournaments': return renderTournaments();
+            case 'players': return renderPlayers();
             case 'tournament': return renderTournament();
             case 'ai': return renderAI();
             case 'player': return renderPlayer();
@@ -2020,7 +2107,7 @@
         html += '<div class="section">' +
             '<div class="section-header">' +
                 '<div class="section-title">Top Players</div>' +
-                '<button class="section-link" onclick="go(\'search\')">All</button>' +
+                '<button class="section-link" onclick="go(\'players\')">All</button>' +
             '</div>' +
             '<div class="h-scroll">';
 
@@ -2244,6 +2331,158 @@
             var app = document.getElementById('app');
             app.innerHTML = renderTopBar() + renderTournaments();
             var newInput = document.getElementById('tourneySearchInput');
+            if (newInput) {
+                newInput.focus();
+                newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+            }
+        }
+    }
+
+    // ===================== Players Roster Screen =====================
+
+    var playersSort = 'finish';
+    var playersSearch = '';
+
+    function renderPlayers() {
+        var sort = currentRoute.params.sort || 'finish';
+        playersSort = sort;
+
+        var html = '<div class="tournaments-page stagger">';
+
+        // Back
+        html += '<button class="tournaments-back" onclick="go(\'home\')">\u2190 Scout Home</button>';
+
+        // Title
+        html += '<div class="tournaments-title">Player Scouting</div>';
+        html += '<div class="tournaments-subtitle">All players \u2014 stats, styles, leaks & exploit scores</div>';
+
+        // Search
+        html += '<div class="tournaments-search-wrap">' +
+            '<span class="tournaments-search-icon">\u{1F50D}</span>' +
+            '<input class="tournaments-search" placeholder="Search players..." id="playerSearchInput" oninput="filterPlayers()" value="' + playersSearch + '">' +
+        '</div>';
+
+        // Sort chips
+        var sorts = [
+            { id:'finish', label:'Finish', icon:'\u{1F3C6}' },
+            { id:'exploit', label:'Most Exploitable', icon:'\u{1F3AF}' },
+            { id:'luck', label:'Luckiest', icon:'\u{1F340}' },
+            { id:'skill', label:'Highest Skill', icon:'\u2B50' }
+        ];
+
+        html += '<div class="filter-chips">';
+        sorts.forEach(function(s) {
+            var active = sort === s.id ? ' active' : '';
+            html += '<button class="filter-chip' + active + '" onclick="go(\'players\',{sort:\'' + s.id + '\'})">' +
+                s.icon + ' ' + s.label +
+            '</button>';
+        });
+        html += '</div>';
+
+        // Sort players
+        var list = PLAYERS.slice();
+        if (sort === 'exploit') {
+            list.sort(function(a, b) { return calcExploit(STATS[b.id]) - calcExploit(STATS[a.id]); });
+        } else if (sort === 'luck') {
+            list.sort(function(a, b) { return LUCK_SCORES[b.id] - LUCK_SCORES[a.id]; });
+        } else if (sort === 'skill') {
+            var gradeOrder = { 'A+':1, 'A':2, 'B':3, 'C':4 };
+            list.sort(function(a, b) {
+                return (gradeOrder[SKILL_RATINGS[a.id].grade] || 5) - (gradeOrder[SKILL_RATINGS[b.id].grade] || 5);
+            });
+        } else {
+            list.sort(function(a, b) { return a.finish - b.finish; });
+        }
+
+        // Apply search
+        if (playersSearch) {
+            var q = playersSearch.toLowerCase();
+            list = list.filter(function(p) {
+                return p.name.toLowerCase().indexOf(q) !== -1;
+            });
+        }
+
+        // Count
+        html += '<div class="tournament-list-count">' + list.length + ' player' + (list.length !== 1 ? 's' : '') + '</div>';
+
+        if (list.length === 0) {
+            html += '<div class="tournaments-empty">' +
+                '<div class="tournaments-empty-icon">\u{1F464}</div>' +
+                '<div class="tournaments-empty-text">No players found</div>' +
+                '<div class="tournaments-empty-sub">Try a different search term</div>' +
+            '</div>';
+        } else {
+            list.forEach(function(p) {
+                var stats = STATS[p.id] || {};
+                var skill = SKILL_RATINGS[p.id] || { grade:'B', color:'#2563eb' };
+                var style = STYLES[p.id] || { label:'TAG', emoji:'\u{1F3AF}' };
+                var luck = LUCK_SCORES[p.id] || 0;
+                var exploit = calcExploit(stats);
+                var career = CAREERS[p.id] || '';
+
+                // Compute weaknesses count
+                var leakCount = 0;
+                if (stats.foldToSteal > 58) leakCount++;
+                if ((stats.afRiver || 0) < 2.2) leakCount++;
+                if (stats.checkRaiseFlop < 7) leakCount++;
+                if (stats.vpip > 28 && stats.pfr < 20) leakCount++;
+
+                // Exploit color
+                var exploitColor = exploit >= 70 ? '#dc2626' : exploit >= 55 ? '#ea580c' : '#059669';
+                var exploitLabel = exploit >= 70 ? 'High' : exploit >= 55 ? 'Medium' : 'Low';
+
+                html += '<div class="pcard" onclick="go(\'player\',{player:\'' + p.id + '\'})">';
+
+                // Top row: avatar + name + skill + style
+                html += '<div class="pcard-header">' +
+                    '<div class="player-avatar avatar-md" style="background:' + p.color + '">' + p.initials + '</div>' +
+                    '<div class="pcard-info">' +
+                        '<div class="pcard-name-row">' +
+                            '<span class="pcard-name">' + p.flag + ' ' + p.name + '</span>' +
+                            '<span class="skill-rating" style="background:' + skill.color + '">' + skill.grade + '</span>' +
+                        '</div>' +
+                        '<div class="pcard-meta">' +
+                            style.emoji + ' ' + style.label + ' \u00B7 #' + p.finish + ' \u00B7 ' + p.hands + ' hands' +
+                        '</div>' +
+                        '<div class="pcard-meta" style="color:var(--text-muted);font-size:11px">' + career + '</div>' +
+                    '</div>' +
+                '</div>';
+
+                // Stats row: compact HUD badges
+                html += '<div class="pcard-stats">' +
+                    '<span class="pcard-stat">VPIP <b>' + stats.vpip + '</b></span>' +
+                    '<span class="pcard-stat">PFR <b>' + stats.pfr + '</b></span>' +
+                    '<span class="pcard-stat">3B <b>' + stats.threeBet + '</b></span>' +
+                    '<span class="pcard-stat">AF <b>' + stats.af + '</b></span>' +
+                    '<span class="pcard-stat">WSD <b>' + stats.wsd + '</b></span>' +
+                '</div>';
+
+                // Intelligence row: exploit score + leak count + luck
+                html += '<div class="pcard-intel">' +
+                    '<span class="tcard-intel-badge" style="background:' + exploitColor + '15;color:' + exploitColor + '">\u{1F3AF} ' + exploit + '% Exploit \u00B7 ' + exploitLabel + '</span>';
+                if (leakCount > 0) {
+                    html += '<span class="tcard-intel-badge intel-leaks">\u{1F50D} ' + leakCount + ' Leak' + (leakCount > 1 ? 's' : '') + '</span>';
+                }
+                var luckSign = luck > 0 ? '+' : '';
+                var luckColor = luck > 5 ? '#059669' : luck < -5 ? '#dc2626' : '#d97706';
+                html += '<span class="tcard-intel-badge" style="background:' + luckColor + '15;color:' + luckColor + '">\u{1F340} ' + luckSign + luck + '% Luck</span>';
+                html += '</div>';
+
+                html += '</div>';
+            });
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    function filterPlayers() {
+        var input = document.getElementById('playerSearchInput');
+        if (input) {
+            playersSearch = input.value;
+            var app = document.getElementById('app');
+            app.innerHTML = renderTopBar() + renderPlayers();
+            var newInput = document.getElementById('playerSearchInput');
             if (newInput) {
                 newInput.focus();
                 newInput.setSelectionRange(newInput.value.length, newInput.value.length);
