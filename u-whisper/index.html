@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUDR Whisper — AI Conversational Poker Intelligence</title>
+    <style>
+        /* =============================================
+           HUDR Prototype U — "Whisper"
+           AI-First Conversational Interface
+           Emerald accent, chat-forward design
+           ============================================= */
+
+        /* ===================== Reset & Variables ===================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-page: #f0f2f5;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fb;
+            --bg-tertiary: #f1f3f6;
+            --bg-card: #ffffff;
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #059669;
+            --accent-light: #34d399;
+            --accent-dark: #047857;
+            --accent-bg: #ecfdf5;
+            --accent-border: #a7f3d0;
+            --accent-red: #dc2626;
+            --accent-blue: #2563eb;
+            --accent-amber: #d97706;
+            --accent-purple: #7c3aed;
+            --accent-pink: #ec4899;
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-elevated: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-xs: 8px;
+            --radius-full: 9999px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+            overflow-y: auto;
+        }
+
+        /* ===================== Phone Frame ===================== */
+        .phone-frame {
+            width: 390px;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 430px) {
+            .phone-frame { width: 100%; box-shadow: none; }
+        }
+
+        /* ===================== Top Bar ===================== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            position: relative;
+            z-index: 40;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-light);
+            flex-shrink: 0;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #059669, #34d399);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .top-bar-center {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .top-bar-title {
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+        }
+
+        .tournament-selector {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+
+        .tournament-selector:hover { color: var(--text-secondary); }
+
+        .tournament-selector .arrow {
+            font-size: 8px;
+            transition: transform 0.2s;
+        }
+
+        .tournament-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: var(--shadow-elevated);
+            z-index: 50;
+            display: none;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .tournament-dropdown.open { display: block; }
+
+        .tournament-dropdown-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--bg-tertiary);
+            transition: background 0.1s;
+        }
+
+        .tournament-dropdown-item:hover { background: var(--accent-bg); }
+        .tournament-dropdown-item.active { color: var(--accent); font-weight: 600; background: var(--accent-bg); }
+        .tournament-dropdown-item:last-child { border-bottom: none; }
+
+        .top-bar-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ===================== Chat Area ===================== */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px 12px 8px;
+            scroll-behavior: smooth;
+        }
+
+        .chat-area::-webkit-scrollbar { width: 4px; }
+        .chat-area::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 4px; }
+
+        /* ===================== Messages ===================== */
+        .message {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            animation: msgIn 0.3s ease-out;
+        }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-items: flex-end;
+        }
+
+        .message.ai {
+            align-items: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 88%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai .message-bubble {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .message-bubble strong { font-weight: 700; }
+        .message-bubble em { font-style: italic; }
+
+        /* ===================== Typing Indicator ===================== */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 16px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            box-shadow: var(--shadow-card);
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+
+        .typing-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            animation: typingBounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        /* ===================== Suggestion Pills ===================== */
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+            max-width: 88%;
+        }
+
+        .pill {
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--accent-border);
+            background: var(--accent-bg);
+            color: var(--accent-dark);
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .pill:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .pill:active { transform: scale(0.96); }
+
+        /* ===================== Rich Cards ===================== */
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            max-width: 88%;
+        }
+
+        .card-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: var(--radius-full);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        /* Tournament Card */
+        .tournament-card {
+            padding: 14px;
+        }
+
+        .tournament-card .card-badge {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .tournament-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .tournament-card .card-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .tournament-card .card-stats {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tournament-card .card-stats span {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: var(--radius-xs);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        /* Player Scout Card */
+        .scout-card {
+            padding: 14px;
+        }
+
+        .scout-card .card-badge {
+            background: var(--accent-bg);
+            color: var(--accent-dark);
+        }
+
+        .scout-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .scout-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .scout-name-block {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .scout-name {
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .scout-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .style-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.5px;
+        }
+
+        .style-tag { background: #fef3c7; color: #92400e; }
+        .style-lag { background: #fee2e2; color: #991b1b; }
+        .style-nit { background: #dbeafe; color: #1e40af; }
+        .style-calling-station { background: #f3e8ff; color: #6b21a8; }
+
+        .scout-radar {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .scout-stats-row {
+            display: flex;
+            gap: 6px;
+            margin: 8px 0;
+        }
+
+        .stat-pill {
+            flex: 1;
+            text-align: center;
+            padding: 6px 4px;
+            border-radius: var(--radius-xs);
+            background: var(--bg-tertiary);
+        }
+
+        .stat-pill .stat-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-pill .stat-value {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .scout-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin: 8px 0;
+        }
+
+        .expand-link {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .expand-link:hover { text-decoration: underline; }
+
+        .scout-expanded {
+            display: none;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .scout-expanded.open { display: block; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .stat-grid-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 4px;
+        }
+
+        .stat-grid-item:nth-child(odd) { background: var(--bg-tertiary); }
+
+        .stat-grid-item .sg-label { color: var(--text-muted); font-weight: 500; }
+        .stat-grid-item .sg-value { font-weight: 700; color: var(--text-primary); }
+
+        /* Hand Card */
+        .hand-card {
+            padding: 12px 14px;
+        }
+
+        .hand-card .card-badge {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .hand-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .hand-number {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .highlight-badge {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            white-space: nowrap;
+        }
+
+        .community-cards {
+            display: flex;
+            gap: 4px;
+            margin: 6px 0;
+            flex-wrap: wrap;
+        }
+
+        .mini-card {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 22px;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid var(--border-light);
+        }
+
+        .mini-card.red { color: #dc2626; }
+        .mini-card.black { color: #1e293b; }
+
+        .hole-cards-section {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 6px 0;
+        }
+
+        .hole-cards-player {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .hole-cards-player .player-tag {
+            font-weight: 600;
+            font-size: 10px;
+        }
+
+        .hand-preview {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 6px 0;
+            line-height: 1.4;
+        }
+
+        .hand-footer {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .hand-footer span {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .hand-btn {
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border-light);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            transition: all 0.15s;
+        }
+
+        .hand-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Comparison Card */
+        .comparison-card {
+            padding: 14px;
+        }
+
+        .comparison-card .card-badge {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .comparison-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .comparison-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .comparison-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .comparison-name {
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .vs-badge {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-muted);
+        }
+
+        .comparison-row {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--bg-tertiary);
+            font-size: 12px;
+        }
+
+        .comparison-row:last-child { border-bottom: none; }
+
+        .comp-val {
+            width: 50px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .comp-val.higher { color: var(--accent); }
+
+        .comp-label {
+            flex: 1;
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        /* Insight Card */
+        .insight-card {
+            padding: 12px 14px;
+            border-left: 3px solid var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .insight-card .insight-icon {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .insight-card .insight-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .insight-card .insight-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Quiz Card */
+        .quiz-card {
+            padding: 14px;
+        }
+
+        .quiz-card .card-badge {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+
+        .quiz-question {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 8px 0 10px;
+            line-height: 1.4;
+        }
+
+        .quiz-option {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            border-radius: var(--radius-xs);
+            border: 1px solid var(--border-light);
+            background: var(--bg-primary);
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.15s;
+        }
+
+        .quiz-option:hover:not(.answered) {
+            border-color: var(--accent);
+            background: var(--accent-bg);
+        }
+
+        .quiz-option.correct {
+            border-color: #059669;
+            background: #ecfdf5;
+            color: #047857;
+            font-weight: 700;
+        }
+
+        .quiz-option.wrong {
+            border-color: #dc2626;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .quiz-option.answered { cursor: default; }
+
+        .quiz-explanation {
+            display: none;
+            margin-top: 8px;
+            padding: 8px 10px;
+            border-radius: var(--radius-xs);
+            background: var(--accent-bg);
+            font-size: 12px;
+            color: var(--accent-dark);
+            line-height: 1.5;
+        }
+
+        .quiz-explanation.show { display: block; }
+
+        .quiz-score {
+            margin-top: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Bluff Card */
+        .bluff-card {
+            padding: 14px;
+        }
+
+        .bluff-card .card-badge {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .bluff-matchup {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .bluff-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            flex: 1;
+        }
+
+        .bluff-player-name {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .bluff-holding {
+            font-size: 13px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: var(--radius-xs);
+            background: var(--bg-tertiary);
+        }
+
+        .bluff-vs {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            padding: 0 6px;
+        }
+
+        .bluff-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .success-badge {
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .success-badge.success { background: #ecfdf5; color: #047857; }
+        .success-badge.caught { background: #fef2f2; color: #b91c1c; }
+
+        /* Story Card */
+        .story-card {
+            padding: 14px;
+        }
+
+        .story-card .card-badge {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .story-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        /* ===================== Input Area ===================== */
+        .input-area {
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border-light);
+            padding: 8px 12px env(safe-area-inset-bottom, 10px);
+        }
+
+        .input-suggestions {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: none;
+        }
+
+        .input-suggestions::-webkit-scrollbar { display: none; }
+
+        .input-suggestions .pill {
+            flex-shrink: 0;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-field {
+            flex: 1;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-full);
+            padding: 10px 16px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: border-color 0.15s;
+        }
+
+        .input-field:focus { border-color: var(--accent); }
+        .input-field::placeholder { color: var(--text-muted); }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.15s;
+        }
+
+        .send-btn:hover { transform: scale(1.05); }
+        .send-btn:active { transform: scale(0.95); }
+
+        .send-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: #fff;
+        }
+
+        /* ===================== Highlight Badges ===================== */
+        .hl-biggest_pot { background: #fef3c7; color: #92400e; }
+        .hl-bluff { background: #f3e8ff; color: #6b21a8; }
+        .hl-hero_call { background: #ecfdf5; color: #047857; }
+        .hl-cooler { background: #dbeafe; color: #1e40af; }
+        .hl-bad_beat { background: #fef2f2; color: #b91c1c; }
+        .hl-elimination { background: #f1f5f9; color: #475569; }
+
+        /* ===================== Hands List ===================== */
+        .hands-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* ===================== Utility ===================== */
+        .text-accent { color: var(--accent); }
+        .fw-700 { font-weight: 700; }
+        .mt-4 { margin-top: 4px; }
+        .mb-4 { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <script src="../shared/data.js"></script>
+
+    <div class="phone-frame">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="logo">H</div>
+            <div class="top-bar-center">
+                <div class="top-bar-title">HUDR WHISPER</div>
+                <div class="tournament-selector" id="tournamentSelector">
+                    <span id="tournamentName">WSOP Main Event 2025</span>
+                    <span class="arrow">&#9660;</span>
+                </div>
+            </div>
+            <div class="top-bar-status">
+                <div class="status-dot"></div>
+                AI Ready
+            </div>
+            <div class="tournament-dropdown" id="tournamentDropdown"></div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area" id="chatArea"></div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-suggestions" id="inputSuggestions"></div>
+            <div class="input-row">
+                <input type="text" class="input-field" id="inputField" placeholder="Ask anything about the tournament..." />
+                <button class="send-btn" id="sendBtn">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =============================================
+           HUDR Whisper — Chat Engine
+           ============================================= */
+
+        // ===================== State =====================
+        let messages = [];
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let currentSuggestions = [];
+        let lastPlayerScouted = null;
+        let dropdownOpen = false;
+
+        const chatArea = document.getElementById('chatArea');
+        const inputField = document.getElementById('inputField');
+        const sendBtn = document.getElementById('sendBtn');
+        const inputSuggestions = document.getElementById('inputSuggestions');
+        const tournamentSelector = document.getElementById('tournamentSelector');
+        const tournamentDropdown = document.getElementById('tournamentDropdown');
+        const tournamentNameEl = document.getElementById('tournamentName');
+
+        // ===================== Helpers =====================
+        function getPlayer(id) { return PLAYERS.find(p => p.id === id); }
+        function getStats(id) { return PLAYER_STATS[id]; }
+
+        function formatChips(n) {
+            if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
+            return '$' + n;
+        }
+
+        function getLastName(name) {
+            const parts = name.split(' ');
+            return parts[parts.length - 1];
+        }
+
+        function cardColor(card) {
+            if (!card) return 'black';
+            const suit = card[card.length - 1];
+            return (suit === 'h' || suit === 'd') ? 'red' : 'black';
+        }
+
+        function formatCard(card) {
+            if (!card) return '';
+            const rank = card.slice(0, -1);
+            const suitMap = { s: '\u2660', h: '\u2665', d: '\u2666', c: '\u2663' };
+            const suit = suitMap[card[card.length - 1]] || card[card.length - 1];
+            return rank + suit;
+        }
+
+        function renderMiniCard(card) {
+            const col = cardColor(card);
+            return `<span class="mini-card ${col}">${formatCard(card)}</span>`;
+        }
+
+        function classifyStyle(stats) {
+            if (!stats) return { label: '?', cls: 'style-tag' };
+            if (stats.vpip <= 20 && stats.pfr <= 16) return { label: 'NIT', cls: 'style-nit' };
+            if (stats.vpip >= 30 && stats.pfr >= 24) return { label: 'LAG', cls: 'style-lag' };
+            if (stats.vpip >= 28 && stats.vpip - stats.pfr >= 10) return { label: 'CALLING STATION', cls: 'style-calling-station' };
+            return { label: 'TAG', cls: 'style-tag' };
+        }
+
+        function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+        function calcDimensions(player) {
+            const s = getStats(player.id);
+            if (!s) return { aggression: 50, risk: 50, icm: 50, precision: 50, adaptability: 50, clutch: 50 };
+            return {
+                aggression: clamp((s.pfr + s.threeBet + s.cbetFlop + s.af * 10) / 4, 0, 100),
+                risk: clamp((s.vpip + s.steal + s.fourBet * 5) / 3, 0, 100),
+                icm: clamp(100 - s.vpip + (s.foldToSteal || 0) / 2, 0, 100),
+                precision: clamp((s.wsd + s.wwsf + s.cbetFlop - (s.vpip - s.pfr) * 2) / 3, 0, 100),
+                adaptability: clamp((s.checkRaiseFlop * 5 + s.coldCall * 3 + (s.bbDefense || 45)) / 3, 0, 100),
+                clutch: clamp((s.wtsd + s.wsd + s.wwsf) / 3, 0, 100)
+            };
+        }
+
+        function renderRadarSVG(dims, color) {
+            const size = 100;
+            const cx = 50, cy = 50, r = 38;
+            const labels = ['AGG', 'RSK', 'ICM', 'PRE', 'ADP', 'CLU'];
+            const values = [dims.aggression, dims.risk, dims.icm, dims.precision, dims.adaptability, dims.clutch];
+
+            function polar(angle, radius) {
+                const a = (angle - 90) * Math.PI / 180;
+                return { x: cx + radius * Math.cos(a), y: cy + radius * Math.sin(a) };
+            }
+
+            let gridLines = '';
+            for (let ring = 1; ring <= 3; ring++) {
+                const rr = r * ring / 3;
+                let pts = [];
+                for (let i = 0; i < 6; i++) {
+                    const p = polar(i * 60, rr);
+                    pts.push(`${p.x},${p.y}`);
+                }
+                gridLines += `<polygon points="${pts.join(' ')}" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>`;
+            }
+
+            let axes = '';
+            for (let i = 0; i < 6; i++) {
+                const p = polar(i * 60, r);
+                axes += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#e5e7eb" stroke-width="0.5"/>`;
+            }
+
+            let dataPoints = [];
+            for (let i = 0; i < 6; i++) {
+                const p = polar(i * 60, r * values[i] / 100);
+                dataPoints.push(`${p.x},${p.y}`);
+            }
+
+            let labelEls = '';
+            for (let i = 0; i < 6; i++) {
+                const p = polar(i * 60, r + 10);
+                labelEls += `<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="middle" font-size="6" font-weight="700" fill="#94a3b8">${labels[i]}</text>`;
+            }
+
+            return `<svg viewBox="0 0 ${size} ${size}" width="110" height="110">
+                ${gridLines}${axes}
+                <polygon points="${dataPoints.join(' ')}" fill="${color}22" stroke="${color}" stroke-width="1.5"/>
+                ${labelEls}
+            </svg>`;
+        }
+
+        function boldText(text) {
+            return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
+
+        // ===================== Tournament Dropdown =====================
+        function buildDropdown() {
+            tournamentDropdown.innerHTML = TOURNAMENTS.map(t =>
+                `<div class="tournament-dropdown-item${t.id === 'wsop-me-2025' ? ' active' : ''}" data-id="${t.id}">${t.name}</div>`
+            ).join('');
+
+            tournamentDropdown.querySelectorAll('.tournament-dropdown-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    tournamentNameEl.textContent = item.textContent;
+                    tournamentDropdown.classList.remove('open');
+                    dropdownOpen = false;
+                });
+            });
+        }
+
+        tournamentSelector.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownOpen = !dropdownOpen;
+            tournamentDropdown.classList.toggle('open', dropdownOpen);
+        });
+
+        document.addEventListener('click', () => {
+            if (dropdownOpen) {
+                tournamentDropdown.classList.remove('open');
+                dropdownOpen = false;
+            }
+        });
+
+        buildDropdown();
+
+        // ===================== Render Functions =====================
+
+        function renderPlayerScoutCard(player) {
+            const stats = getStats(player.id);
+            const style = classifyStyle(stats);
+            const dims = calcDimensions(player);
+            const scouting = AI_CONTENT.playerScouting[player.id] || '';
+            const shortScouting = scouting.split('. ').slice(0, 2).join('. ') + '.';
+            const uid = 'scout_' + player.id + '_' + Date.now();
+
+            const statGrid = stats ? `
+                <div class="stat-grid">
+                    <div class="stat-grid-item"><span class="sg-label">VPIP</span><span class="sg-value">${stats.vpip}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">PFR</span><span class="sg-value">${stats.pfr}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">3-Bet</span><span class="sg-value">${stats.threeBet}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">AF</span><span class="sg-value">${stats.af}</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">C-Bet F</span><span class="sg-value">${stats.cbetFlop}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">C-Bet T</span><span class="sg-value">${stats.cbetTurn}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">Steal</span><span class="sg-value">${stats.steal}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">Fold Steal</span><span class="sg-value">${stats.foldToSteal}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">WTSD</span><span class="sg-value">${stats.wtsd}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">WSD</span><span class="sg-value">${stats.wsd}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">WWSF</span><span class="sg-value">${stats.wwsf}%</span></div>
+                    <div class="stat-grid-item"><span class="sg-label">Check-Raise</span><span class="sg-value">${stats.checkRaiseFlop}%</span></div>
+                </div>` : '';
+
+            lastPlayerScouted = player;
+
+            return `<div class="card scout-card">
+                <div class="card-badge" style="background:var(--accent-bg);color:var(--accent-dark);">&#128269; Player Scout</div>
+                <div class="scout-header">
+                    <div class="scout-avatar" style="background:${player.color}">${player.initials}</div>
+                    <div class="scout-name-block">
+                        <div class="scout-name">${player.name} ${player.countryFlag} <span class="style-badge ${style.cls}">${style.label}</span></div>
+                        <div class="scout-meta">#${player.finishPosition} finish &middot; ${player.handsPlayed} hands &middot; ${formatChips(player.startingStack)} start</div>
+                    </div>
+                </div>
+                <div class="scout-radar">${renderRadarSVG(dims, player.color)}</div>
+                <div class="scout-stats-row">
+                    <div class="stat-pill"><div class="stat-label">VPIP</div><div class="stat-value">${stats ? stats.vpip + '%' : '?'}</div></div>
+                    <div class="stat-pill"><div class="stat-label">PFR</div><div class="stat-value">${stats ? stats.pfr + '%' : '?'}</div></div>
+                    <div class="stat-pill"><div class="stat-label">AF</div><div class="stat-value">${stats ? stats.af : '?'}</div></div>
+                </div>
+                <div class="scout-text">${shortScouting}</div>
+                <span class="expand-link" onclick="toggleExpand('${uid}', this)">View full report &#8599;</span>
+                <div class="scout-expanded" id="${uid}">
+                    <div class="scout-text">${scouting}</div>
+                    ${statGrid}
+                </div>
+            </div>`;
+        }
+
+        function toggleExpand(id, el) {
+            const section = document.getElementById(id);
+            if (section) {
+                const isOpen = section.classList.toggle('open');
+                el.textContent = isOpen ? 'Hide report \u2199' : 'View full report \u2197';
+            }
+        }
+
+        function renderHandCard(hand) {
+            const hlClass = hand.highlightType ? 'hl-' + hand.highlightType : '';
+            const hlBadge = hand.highlightLabel ? `<span class="highlight-badge ${hlClass}">${hand.highlightLabel}</span>` : '';
+
+            const communityHtml = hand.communityCards.map(c => renderMiniCard(c)).join('');
+
+            let holeCardsHtml = '';
+            if (hand.holeCards) {
+                holeCardsHtml = Object.entries(hand.holeCards).map(([pid, cards]) => {
+                    const p = getPlayer(pid);
+                    const name = p ? getLastName(p.name) : pid;
+                    return `<span class="hole-cards-player"><span class="player-tag">${name}:</span> ${cards.map(c => renderMiniCard(c)).join('')}</span>`;
+                }).join('');
+            }
+
+            return `<div class="card hand-card">
+                <div class="hand-card-header">
+                    <span class="hand-number">Hand #${hand.handNumber}</span>
+                    ${hlBadge}
+                </div>
+                <div class="community-cards">${communityHtml}</div>
+                <div class="hole-cards-section">${holeCardsHtml}</div>
+                <div class="hand-preview">${hand.preview}</div>
+                <div class="hand-footer">
+                    <span>Pot: ${formatChips(hand.potTotal)}</span>
+                    <span>&middot;</span>
+                    <span>Winner: ${hand.winnerName}</span>
+                </div>
+            </div>`;
+        }
+
+        function renderComparisonCard(p1, p2) {
+            const s1 = getStats(p1.id);
+            const s2 = getStats(p2.id);
+            if (!s1 || !s2) return renderTextBubble('Stats not available for comparison.');
+
+            const stats = [
+                { label: 'VPIP', v1: s1.vpip, v2: s2.vpip, suffix: '%' },
+                { label: 'PFR', v1: s1.pfr, v2: s2.pfr, suffix: '%' },
+                { label: '3-Bet', v1: s1.threeBet, v2: s2.threeBet, suffix: '%' },
+                { label: 'AF', v1: s1.af, v2: s2.af, suffix: '' },
+                { label: 'C-Bet F', v1: s1.cbetFlop, v2: s2.cbetFlop, suffix: '%' },
+                { label: 'WSD', v1: s1.wsd, v2: s2.wsd, suffix: '%' },
+                { label: 'WWSF', v1: s1.wwsf, v2: s2.wwsf, suffix: '%' },
+            ];
+
+            const rows = stats.map(s => {
+                const h1 = s.v1 > s.v2 ? ' higher' : '';
+                const h2 = s.v2 > s.v1 ? ' higher' : '';
+                return `<div class="comparison-row">
+                    <span class="comp-val${h1}">${s.v1}${s.suffix}</span>
+                    <span class="comp-label">${s.label}</span>
+                    <span class="comp-val${h2}">${s.v2}${s.suffix}</span>
+                </div>`;
+            }).join('');
+
+            return `<div class="card comparison-card">
+                <div class="card-badge" style="background:#dbeafe;color:#1e40af;">&#9878; Head to Head</div>
+                <div class="comparison-header">
+                    <div class="comparison-player">
+                        <div class="comparison-avatar" style="background:${p1.color}">${p1.initials}</div>
+                        <div class="comparison-name">${getLastName(p1.name)}</div>
+                    </div>
+                    <span class="vs-badge">VS</span>
+                    <div class="comparison-player">
+                        <div class="comparison-avatar" style="background:${p2.color}">${p2.initials}</div>
+                        <div class="comparison-name">${getLastName(p2.name)}</div>
+                    </div>
+                </div>
+                ${rows}
+            </div>`;
+        }
+
+        function renderQuizCard() {
+            if (currentQuizIndex >= AI_CONTENT.quiz.length) {
+                currentQuizIndex = 0;
+                quizScore = 0;
+            }
+            const q = AI_CONTENT.quiz[currentQuizIndex];
+            const qId = 'quiz_' + q.id + '_' + Date.now();
+
+            const options = q.options.map((opt, i) =>
+                `<button class="quiz-option" data-qid="${qId}" data-idx="${i}" data-correct="${q.correctIndex}" onclick="answerQuiz(this)">${opt}</button>`
+            ).join('');
+
+            return `<div class="card quiz-card">
+                <div class="card-badge" style="background:#fce7f3;color:#9d174d;">&#129504; Quiz Time!</div>
+                <div class="quiz-question">${q.question}</div>
+                ${options}
+                <div class="quiz-explanation" id="${qId}_exp">${q.explanation}</div>
+                <div class="quiz-score">Score: ${quizScore}/${AI_CONTENT.quiz.length}</div>
+            </div>`;
+        }
+
+        function answerQuiz(btn) {
+            const qId = btn.dataset.qid;
+            const idx = parseInt(btn.dataset.idx);
+            const correct = parseInt(btn.dataset.correct);
+
+            // Mark all buttons as answered
+            document.querySelectorAll(`[data-qid="${qId}"]`).forEach(b => {
+                b.classList.add('answered');
+                const bIdx = parseInt(b.dataset.idx);
+                if (bIdx === correct) b.classList.add('correct');
+                else if (bIdx === idx && idx !== correct) b.classList.add('wrong');
+            });
+
+            if (idx === correct) quizScore++;
+            currentQuizIndex++;
+
+            // Show explanation
+            const exp = document.getElementById(qId + '_exp');
+            if (exp) exp.classList.add('show');
+
+            // Update score
+            const scoreEl = btn.closest('.quiz-card').querySelector('.quiz-score');
+            if (scoreEl) scoreEl.textContent = `Score: ${quizScore}/${AI_CONTENT.quiz.length}`;
+
+            // Add follow-up suggestions
+            setSuggestions(['Another question', 'Scout the winner', 'Tournament highlights']);
+        }
+
+        function renderBluffReport() {
+            return AI_CONTENT.bluffReport.map(b => {
+                const bluffer = getPlayer(b.bluffer);
+                const victim = getPlayer(b.victim);
+                return `<div class="card bluff-card">
+                    <div class="card-badge" style="background:#f3e8ff;color:#6b21a8;">&#127917; Bluff Detected</div>
+                    <div class="bluff-matchup">
+                        <div class="bluff-player">
+                            <div class="scout-avatar" style="background:${bluffer ? bluffer.color : '#999'};width:32px;height:32px;font-size:11px;">${bluffer ? bluffer.initials : '?'}</div>
+                            <div class="bluff-player-name">${b.blufferName}</div>
+                            <div class="bluff-holding">${b.holding}</div>
+                        </div>
+                        <span class="bluff-vs">vs</span>
+                        <div class="bluff-player">
+                            <div class="scout-avatar" style="background:${victim ? victim.color : '#999'};width:32px;height:32px;font-size:11px;">${victim ? victim.initials : '?'}</div>
+                            <div class="bluff-player-name">${b.victimName}</div>
+                            <div class="bluff-holding">${b.victimHolding}</div>
+                        </div>
+                    </div>
+                    <div class="bluff-meta">
+                        <span>Street: ${b.street} &middot; Pot: ${formatChips(b.potSize)}</span>
+                        <span class="success-badge ${b.success ? 'success' : 'caught'}">${b.success ? '\u2705 Successful' : '\u274C Caught'}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderInsightCards() {
+            return AI_CONTENT.insights.map(ins =>
+                `<div class="card insight-card">
+                    <div class="insight-icon">${ins.icon}</div>
+                    <div class="insight-title">${ins.title}</div>
+                    <div class="insight-text">${ins.text}</div>
+                </div>`
+            ).join('');
+        }
+
+        function renderStoryMessage() {
+            return `<div class="card story-card">
+                <div class="card-badge" style="background:#fef3c7;color:#92400e;">&#128214; Tournament Story</div>
+                <div class="story-text">${AI_CONTENT.story}</div>
+            </div>`;
+        }
+
+        function renderTextBubble(text) {
+            return `<div class="message-bubble">${boldText(text)}</div>`;
+        }
+
+        function renderHandsList() {
+            const highlighted = HANDS.filter(h => h.highlightType).sort((a, b) => b.handNumber - a.handNumber).slice(0, 6);
+            return `<div class="hands-list">${highlighted.map(h => renderHandCard(h)).join('')}</div>`;
+        }
+
+        // ===================== Chat Logic =====================
+
+        function processInput(text) {
+            const lower = text.toLowerCase().trim();
+
+            // Scout a specific player
+            const scoutMatch = PLAYERS.find(p => {
+                const lastName = p.name.split(' ').pop().toLowerCase();
+                return lower.includes(lastName);
+            });
+
+            if ((lower.includes('scout') || lower.includes('tell me about') || lower.includes('who is') || lower.includes('report') || lower.includes('profile')) && scoutMatch) {
+                return {
+                    html: renderPlayerScoutCard(scoutMatch),
+                    suggestions: getSuggestionsAfterScout(scoutMatch)
+                };
+            }
+
+            // Compare two players
+            if (lower.includes('compare') || lower.includes('vs') || lower.includes('versus') || lower.includes('head to head')) {
+                const matches = PLAYERS.filter(p => {
+                    const lastName = p.name.split(' ').pop().toLowerCase();
+                    return lower.includes(lastName);
+                });
+                if (matches.length >= 2) {
+                    return {
+                        html: renderComparisonCard(matches[0], matches[1]),
+                        suggestions: ['Scout ' + getLastName(matches[0].name), 'Scout ' + getLastName(matches[1].name), 'Key hands']
+                    };
+                }
+            }
+
+            // Just a player name (treat as scout)
+            if (scoutMatch && lower.split(/\s+/).length <= 3) {
+                return {
+                    html: renderPlayerScoutCard(scoutMatch),
+                    suggestions: getSuggestionsAfterScout(scoutMatch)
+                };
+            }
+
+            // Quiz
+            if (lower.includes('quiz') || lower.includes('test') || lower.includes('another question')) {
+                return {
+                    html: renderQuizCard(),
+                    suggestions: ['Scout the winner', 'Key hands', 'Bluff report']
+                };
+            }
+
+            // Bluff report
+            if (lower.includes('bluff')) {
+                return {
+                    html: renderBluffReport(),
+                    suggestions: ['Scout the bluffer', 'Who bluffed most?', 'Show key hands']
+                };
+            }
+
+            // Story
+            if (lower.includes('story') || lower.includes('what happened') || lower.includes('narrative') || lower.includes('full story')) {
+                return {
+                    html: renderStoryMessage(),
+                    suggestions: ['Quiz me', 'Scout the winner', 'Bluff report']
+                };
+            }
+
+            // Hands / highlights / key
+            if (lower.includes('hand') || lower.includes('highlight') || lower.includes('key')) {
+                return {
+                    html: renderHandsList(),
+                    suggestions: ['Show biggest bluff', 'Quiz me', 'Full story']
+                };
+            }
+
+            // Insights / tournament overview
+            if (lower.includes('insight') || lower.includes('analysis') || lower.includes('overview')) {
+                return {
+                    html: renderInsightCards(),
+                    suggestions: ['Tell me more', 'Scout the MVP', 'Show key hands']
+                };
+            }
+
+            // Tournament
+            if (lower.includes('tournament') && !lower.includes('highlight')) {
+                const t = TOURNAMENTS[0];
+                return {
+                    html: `<div class="card tournament-card">
+                        <div class="card-badge" style="background:#fef3c7;color:#92400e;">&#127942; Tournament</div>
+                        <h3>${t.name}</h3>
+                        <div class="card-meta">${t.date} &middot; ${t.venue} &middot; ${t.playerCount} players</div>
+                        <div class="card-stats">
+                            <span>Prize Pool: ${formatChips(t.prizePool)}</span>
+                            <span>Hands: ${t.handCount}</span>
+                            <span>Winner: ${getLastName(PLAYERS[0].name)}</span>
+                        </div>
+                    </div>`,
+                    suggestions: ['Scout a player', 'Key hands', 'Tournament insights', 'Quiz me']
+                };
+            }
+
+            // Leaks
+            if (lower.includes('leak') && lastPlayerScouted) {
+                const s = getStats(lastPlayerScouted.id);
+                const leaks = [];
+                if (s) {
+                    if (s.vpip - s.pfr > 8) leaks.push(`Wide VPIP/PFR gap (${s.vpip}/${s.pfr}) suggests too much passive calling preflop.`);
+                    if (s.foldToCbetFlop > 50) leaks.push(`Folds to flop c-bet ${s.foldToCbetFlop}% of the time - exploitable by frequent continuation bets.`);
+                    if (s.wtsd > 35) leaks.push(`Goes to showdown ${s.wtsd}% - may be calling too much on later streets.`);
+                    if (s.af < 2.0) leaks.push(`Low aggression factor (${s.af}) - tends to call rather than raise, making them predictable.`);
+                    if (s.steal < 35) leaks.push(`Steal frequency only ${s.steal}% - missing profitable steal opportunities.`);
+                }
+                if (leaks.length === 0) leaks.push('No major leaks detected in this sample. Solid fundamental play.');
+                const text = `**Leak Analysis for ${lastPlayerScouted.name}:**\n\n` + leaks.map((l, i) => `${i + 1}. ${l}`).join('\n');
+                return {
+                    html: renderTextBubble(text.replace(/\n/g, '<br>')),
+                    suggestions: ['Compare with Ivey', 'Show their hands', 'Scout another player']
+                };
+            }
+
+            // Check pre-built responses
+            const chatMatch = AI_CONTENT.chatResponses.find(r => {
+                const words = r.query.toLowerCase().split(' ');
+                return words.some(w => w.length > 3 && lower.includes(w));
+            });
+            if (chatMatch) {
+                return {
+                    html: renderTextBubble(chatMatch.response.replace(/\n/g, '<br>')),
+                    suggestions: ['Scout a player', 'Key hands', 'Quiz me']
+                };
+            }
+
+            // Default
+            return {
+                html: renderTextBubble("I can help you with: <strong>scouting players</strong>, <strong>viewing key hands</strong>, <strong>tournament insights</strong>, <strong>quizzes</strong>, <strong>bluff reports</strong>, and the <strong>full story</strong>. Try asking about a specific player or topic!"),
+                suggestions: ['Scout Negreanu', 'Key hands', 'Quiz me', 'Bluff report', 'Full story']
+            };
+        }
+
+        function getSuggestionsAfterScout(player) {
+            const others = PLAYERS.filter(p => p.id !== player.id).slice(0, 2);
+            return [
+                'Compare with ' + getLastName(others[0].name),
+                'Show their hands',
+                'What are their leaks?'
+            ];
+        }
+
+        // ===================== Message Rendering =====================
+
+        function addUserMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'message user';
+            div.innerHTML = `<div class="message-bubble">${escapeHtml(text)}</div>`;
+            chatArea.appendChild(div);
+            scrollToBottom();
+        }
+
+        function addAIMessage(html, suggestions) {
+            const div = document.createElement('div');
+            div.className = 'message ai';
+            div.innerHTML = html;
+            if (suggestions && suggestions.length) {
+                const sugDiv = document.createElement('div');
+                sugDiv.className = 'suggestions';
+                suggestions.forEach(s => {
+                    const pill = document.createElement('span');
+                    pill.className = 'pill';
+                    pill.textContent = s;
+                    pill.addEventListener('click', () => handleInput(s));
+                    sugDiv.appendChild(pill);
+                });
+                div.appendChild(sugDiv);
+            }
+            chatArea.appendChild(div);
+            setSuggestions(suggestions || []);
+            scrollToBottom();
+        }
+
+        function showTypingIndicator() {
+            const div = document.createElement('div');
+            div.className = 'message ai';
+            div.id = 'typingIndicator';
+            div.innerHTML = `<div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>`;
+            chatArea.appendChild(div);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+        }
+
+        function scrollToBottom() {
+            requestAnimationFrame(() => {
+                chatArea.scrollTop = chatArea.scrollHeight;
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function setSuggestions(suggestions) {
+            currentSuggestions = suggestions;
+            inputSuggestions.innerHTML = '';
+            suggestions.forEach(s => {
+                const pill = document.createElement('span');
+                pill.className = 'pill';
+                pill.textContent = s;
+                pill.addEventListener('click', () => handleInput(s));
+                inputSuggestions.appendChild(pill);
+            });
+        }
+
+        // ===================== Input Handling =====================
+
+        function handleInput(text) {
+            if (!text || !text.trim()) return;
+            addUserMessage(text.trim());
+            inputField.value = '';
+
+            showTypingIndicator();
+
+            const delay = 400 + Math.random() * 600;
+            setTimeout(() => {
+                removeTypingIndicator();
+                const result = processInput(text);
+                addAIMessage(result.html, result.suggestions);
+            }, delay);
+        }
+
+        sendBtn.addEventListener('click', () => handleInput(inputField.value));
+        inputField.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleInput(inputField.value);
+            }
+        });
+
+        // ===================== Initial State =====================
+
+        function init() {
+            const t = TOURNAMENTS[0];
+            const welcomeHtml = `<div class="message-bubble" style="box-shadow:none;padding:0;">
+                <p style="margin-bottom:8px;">&#128075; Welcome to <strong>HUDR Whisper</strong>! I've analyzed the <strong>${t.name}</strong> Final Table &mdash; ${t.handCount} hands, ${t.playerCount} players, ${formatChips(t.prizePool)} prize pool.</p>
+                <p>What would you like to know?</p>
+            </div>`;
+
+            const initialSuggestions = ['Scout a player', 'Tournament highlights', 'Key hands', 'Quiz me', 'Bluff report', 'Full story'];
+
+            addAIMessage(welcomeHtml, initialSuggestions);
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUDR Focus — Player Dossier</title>
+    <style>
+        /* =============================================
+           HUDR Prototype S — "Focus"
+           Player-Centric Swipe Dossier
+           Indigo accent, light theme
+           ============================================= */
+
+        /* ===================== Reset & Variables ===================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-page: #f0f2f5;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fb;
+            --bg-tertiary: #f1f3f6;
+            --bg-card: #ffffff;
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #4f46e5;
+            --accent-light: #818cf8;
+            --accent-bg: #eef2ff;
+            --accent-bg-deep: #e0e7ff;
+            --accent-red: #ef4444;
+            --accent-orange: #f59e0b;
+            --accent-green: #10b981;
+            --accent-gray: #9ca3af;
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-elevated: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-full: 9999px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+            overflow-y: auto;
+        }
+
+        /* ===================== Phone Frame ===================== */
+        .phone-frame {
+            width: 390px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background: var(--bg-secondary);
+            position: relative;
+            overflow-x: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.08);
+            padding-bottom: 80px;
+        }
+
+        @media (max-width: 430px) {
+            .phone-frame { width: 100%; box-shadow: none; }
+        }
+
+        /* ===================== Top Bar ===================== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .top-bar-center {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .top-bar-title {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: var(--accent);
+        }
+
+        .top-bar-version {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+        }
+
+        .top-bar-right {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        /* ===================== Bottom Tab Bar ===================== */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 390px;
+            z-index: 100;
+            display: flex;
+            background: rgba(255,255,255,0.96);
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border-light);
+            padding: 6px 0 env(safe-area-inset-bottom, 8px);
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+        }
+
+        @media (max-width: 430px) {
+            .tab-bar { width: 100%; left: 0; transform: none; }
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 6px 0;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+            transition: color 0.15s;
+        }
+
+        .tab-item.active { color: var(--accent); }
+        .tab-item .tab-icon { font-size: 20px; }
+
+        /* ===================== Navigation Arrows ===================== */
+        .player-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 14px 16px 6px;
+        }
+
+        .nav-arrow {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-secondary);
+            transition: all 0.15s;
+            box-shadow: var(--shadow-card);
+        }
+
+        .nav-arrow:hover { border-color: var(--accent); color: var(--accent); }
+        .nav-arrow:active { transform: scale(0.92); }
+
+        .player-counter {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .player-counter span { color: var(--accent); }
+
+        /* ===================== Content ===================== */
+        .content { padding: 0 16px 20px; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* ===================== Section Spacing ===================== */
+        .section { margin-bottom: 16px; }
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-left: 2px;
+        }
+
+        /* ===================== Card ===================== */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+
+        .card-body { padding: 16px; }
+
+        /* ===================== Player Header ===================== */
+        .player-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px 16px;
+            text-align: center;
+        }
+
+        .avatar-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 12px;
+        }
+
+        .avatar-ring svg {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 88px;
+            height: 88px;
+        }
+
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 24px;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .player-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .player-country {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .badge-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-finish {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .badge-finish.winner {
+            background: linear-gradient(135deg, #fde68a, #fbbf24);
+            color: #78350f;
+        }
+
+        .badge-style {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+        .badge-grade {
+            font-size: 12px;
+            font-weight: 800;
+            padding: 4px 10px;
+        }
+
+        .badge-grade.grade-a { background: #fef2f2; color: #dc2626; }
+        .badge-grade.grade-b { background: #fff7ed; color: #ea580c; }
+        .badge-grade.grade-c { background: #fefce8; color: #ca8a04; }
+        .badge-grade.grade-d { background: #f3f4f6; color: #6b7280; }
+
+        /* ===================== Radar Chart ===================== */
+        .radar-container {
+            display: flex;
+            justify-content: center;
+            padding: 16px 8px;
+        }
+
+        .radar-svg { overflow: visible; }
+
+        .radar-axis-label {
+            font-size: 10px;
+            font-weight: 700;
+            fill: var(--text-secondary);
+        }
+
+        .radar-value-label {
+            font-size: 9px;
+            font-weight: 600;
+            fill: var(--text-muted);
+        }
+
+        /* ===================== Scouting Summary ===================== */
+        .scouting-text {
+            border-left: 3px solid var(--accent);
+            padding-left: 14px;
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* ===================== Exploit Plan ===================== */
+        .exploit-section { margin-bottom: 14px; }
+        .exploit-section:last-child { margin-bottom: 0; }
+
+        .exploit-header {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .exploit-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .exploit-item:last-child { border-bottom: none; }
+
+        .exploit-bullet {
+            flex-shrink: 0;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-top: 7px;
+        }
+
+        .exploit-bullet.attack { background: var(--accent-red); }
+        .exploit-bullet.defend { background: var(--accent); }
+
+        /* ===================== HUD Stats Grid ===================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            background: var(--border-light);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .stat-cell {
+            background: var(--bg-primary);
+            padding: 10px 6px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===================== Full Stats Table ===================== */
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stats-table tr { border-bottom: 1px solid var(--border-light); }
+        .stats-table tr:last-child { border-bottom: none; }
+
+        .stats-table td {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .stats-table td:first-child {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stats-table td:last-child {
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .stats-table .cat-header td {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-top: 16px;
+            background: var(--bg-secondary);
+        }
+
+        /* ===================== Hand Cards ===================== */
+        .hand-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .hand-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            cursor: pointer;
+        }
+
+        .hand-card-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hand-num {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .hand-highlight-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .hand-highlight-badge.elimination { background: #fef2f2; color: #dc2626; }
+        .hand-highlight-badge.bluff { background: #f0fdf4; color: #16a34a; }
+        .hand-highlight-badge.hero_call { background: #eff6ff; color: #2563eb; }
+        .hand-highlight-badge.cooler { background: #faf5ff; color: #7c3aed; }
+        .hand-highlight-badge.bad_beat { background: #fef2f2; color: #dc2626; }
+
+        .hand-pot {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .hand-card-body {
+            padding: 0 14px 14px;
+            display: none;
+        }
+
+        .hand-card.expanded .hand-card-body { display: block; }
+
+        .hand-preview {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .community-cards, .hole-cards-display {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .cards-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 4px;
+        }
+
+        .mini-card {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 42px;
+            border-radius: 5px;
+            background: #fff;
+            border: 1.5px solid var(--border-medium);
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+            flex-direction: column;
+            gap: 0;
+            line-height: 1;
+        }
+
+        .mini-card .rank { font-size: 12px; }
+        .mini-card .suit { font-size: 11px; margin-top: -2px; }
+        .mini-card.red { color: #dc2626; }
+
+        .hand-actions-list {
+            margin-top: 10px;
+            border-top: 1px solid var(--border-light);
+            padding-top: 10px;
+        }
+
+        .action-street {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .action-street:first-child { margin-top: 0; }
+
+        .action-line {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 2px 0;
+        }
+
+        .action-line .player-name-inline { font-weight: 700; color: var(--text-primary); }
+
+        .hand-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .hand-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            background: var(--bg-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+
+        .hand-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* ===================== Players Grid ===================== */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 16px 0;
+        }
+
+        .player-grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 12px 8px;
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            box-shadow: var(--shadow-card);
+            transition: all 0.15s;
+        }
+
+        .player-grid-item:hover { box-shadow: var(--shadow-elevated); transform: translateY(-1px); }
+        .player-grid-item.active { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+        .player-grid-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .player-grid-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .player-grid-pos {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* ===================== AI Chat ===================== */
+        .chat-input-bar {
+            position: fixed;
+            bottom: 62px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 390px;
+            z-index: 90;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border-light);
+            display: none;
+        }
+
+        .chat-input-bar.visible { display: flex; gap: 8px; }
+
+        @media (max-width: 430px) {
+            .chat-input-bar { width: 100%; left: 0; transform: none; }
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-light);
+            background: var(--bg-tertiary);
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .chat-input:focus { border-color: var(--accent); }
+
+        .chat-send-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .chat-send-btn:hover { background: #4338ca; }
+
+        .chat-response-panel {
+            position: fixed;
+            bottom: 110px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            width: 366px;
+            z-index: 95;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-elevated);
+            padding: 16px;
+            max-height: 240px;
+            overflow-y: auto;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .chat-response-panel.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 430px) {
+            .chat-response-panel { width: calc(100% - 24px); }
+        }
+
+        .chat-response-q {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .chat-response-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .chat-close-btn {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        /* ===================== Transitions ===================== */
+        .fade-in {
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-left {
+            animation: slideLeft 0.25s ease-out;
+        }
+
+        @keyframes slideLeft {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .slide-right {
+            animation: slideRight 0.25s ease-out;
+        }
+
+        @keyframes slideRight {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ===================== Scrollbar ===================== */
+        .phone-frame::-webkit-scrollbar { width: 0; }
+
+        /* ===================== Empty State ===================== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state-text { font-size: 14px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame" id="app">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="logo">H</div>
+            <div class="top-bar-center">
+                <span class="top-bar-title">FOCUS</span>
+                <span class="top-bar-version">PROTO</span>
+            </div>
+            <div class="top-bar-right">&#9881;</div>
+        </div>
+
+        <!-- Screen: Players Grid -->
+        <div class="screen" id="screen-players">
+            <div class="content fade-in">
+                <div style="padding-top:12px;">
+                    <div class="section-title">Final Table Players</div>
+                </div>
+                <div class="players-grid" id="players-grid"></div>
+            </div>
+        </div>
+
+        <!-- Screen: Focus (Main Dossier) -->
+        <div class="screen active" id="screen-focus">
+            <div class="player-nav" id="player-nav">
+                <button class="nav-arrow" id="nav-prev" onclick="navigate(-1)">&larr;</button>
+                <div class="player-counter"><span id="nav-current">1</span> / <span id="nav-total">9</span></div>
+                <button class="nav-arrow" id="nav-next" onclick="navigate(1)">&rarr;</button>
+            </div>
+            <div class="content" id="focus-content"></div>
+        </div>
+
+        <!-- Screen: Stats -->
+        <div class="screen" id="screen-stats">
+            <div class="player-nav">
+                <button class="nav-arrow" onclick="navigate(-1)">&larr;</button>
+                <div class="player-counter"><span id="stats-nav-current">1</span> / <span id="stats-nav-total">9</span></div>
+                <button class="nav-arrow" onclick="navigate(1)">&rarr;</button>
+            </div>
+            <div class="content" id="stats-content"></div>
+        </div>
+
+        <!-- Screen: Hands -->
+        <div class="screen" id="screen-hands">
+            <div class="player-nav">
+                <button class="nav-arrow" onclick="navigate(-1)">&larr;</button>
+                <div class="player-counter"><span id="hands-nav-current">1</span> / <span id="hands-nav-total">9</span></div>
+                <button class="nav-arrow" onclick="navigate(1)">&rarr;</button>
+            </div>
+            <div class="content" id="hands-content"></div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-bar" id="chat-bar">
+            <input class="chat-input" id="chat-input" type="text" placeholder="Ask about..." />
+            <button class="chat-send-btn" onclick="handleChat()">&#8593;</button>
+        </div>
+
+        <!-- Chat Response Panel -->
+        <div class="chat-response-panel" id="chat-panel">
+            <button class="chat-close-btn" onclick="closeChatPanel()">&times;</button>
+            <div class="chat-response-q" id="chat-q"></div>
+            <div class="chat-response-text" id="chat-a"></div>
+        </div>
+
+        <!-- Bottom Tab Bar -->
+        <div class="tab-bar">
+            <button class="tab-item" data-tab="players" onclick="switchTab('players')">
+                <span class="tab-icon">&#128101;</span>
+                Players
+            </button>
+            <button class="tab-item active" data-tab="focus" onclick="switchTab('focus')">
+                <span class="tab-icon">&#127919;</span>
+                Focus
+            </button>
+            <button class="tab-item" data-tab="stats" onclick="switchTab('stats')">
+                <span class="tab-icon">&#128202;</span>
+                Stats
+            </button>
+            <button class="tab-item" data-tab="hands" onclick="switchTab('hands')">
+                <span class="tab-icon">&#127139;</span>
+                Hands
+            </button>
+        </div>
+    </div>
+
+    <script src="../shared/data.js"></script>
+    <script>
+        /* =============================================
+           HUDR Focus — State & Logic
+           ============================================= */
+
+        let currentPlayerIndex = 0;
+        let currentTab = 'focus';
+        let slideDirection = 'left';
+
+        // ===================== Navigation =====================
+
+        function navigate(delta) {
+            slideDirection = delta > 0 ? 'left' : 'right';
+            currentPlayerIndex = (currentPlayerIndex + delta + PLAYERS.length) % PLAYERS.length;
+            render();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-item').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === tab);
+            });
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + tab).classList.add('active');
+
+            // Show chat bar only on focus/hands tabs
+            const chatBar = document.getElementById('chat-bar');
+            chatBar.classList.toggle('visible', tab === 'focus' || tab === 'hands');
+
+            // Adjust padding for chat bar
+            const frame = document.querySelector('.phone-frame');
+            frame.style.paddingBottom = (tab === 'focus' || tab === 'hands') ? '130px' : '80px';
+
+            closeChatPanel();
+            render();
+        }
+
+        function selectPlayer(index) {
+            currentPlayerIndex = index;
+            switchTab('focus');
+        }
+
+        // ===================== Data Helpers =====================
+
+        function getPlayerStyle(stats) {
+            const { vpip, pfr } = stats;
+            if (vpip >= 35) return { label: 'Maniac', emoji: '' };
+            if (vpip >= 28 && pfr >= 22) return { label: 'LAG', emoji: '' };
+            if (vpip >= 28 && pfr < 22) return { label: 'Calling Station', emoji: '' };
+            if (vpip < 22 && pfr < 18) return { label: 'Nit', emoji: '' };
+            return { label: 'TAG', emoji: '' };
+        }
+
+        function getSkillGrade(stats) {
+            let score = 0;
+            // Reward balanced VPIP/PFR gap
+            const gap = stats.vpip - stats.pfr;
+            if (gap >= 3 && gap <= 8) score += 20; else if (gap < 12) score += 10;
+            // Reward high WSD
+            if (stats.wsd >= 52) score += 15; else if (stats.wsd >= 45) score += 8;
+            // Reward high WWSF
+            if (stats.wwsf >= 48) score += 15; else if (stats.wwsf >= 40) score += 8;
+            // Reward AF in good range
+            if (stats.af >= 2.0 && stats.af <= 3.5) score += 15; else if (stats.af >= 1.5) score += 8;
+            // Reward good c-bet
+            if (stats.cbetFlop >= 55 && stats.cbetFlop <= 75) score += 15; else if (stats.cbetFlop >= 45) score += 8;
+            // Reward check-raise presence
+            if (stats.checkRaiseFlop >= 6 && stats.checkRaiseFlop <= 12) score += 10; else if (stats.checkRaiseFlop >= 3) score += 5;
+            // Reward good steal
+            if (stats.steal >= 30 && stats.steal <= 48) score += 10; else if (stats.steal >= 20) score += 5;
+
+            if (score >= 80) return { grade: 'A+', cls: 'grade-a' };
+            if (score >= 65) return { grade: 'A', cls: 'grade-a' };
+            if (score >= 50) return { grade: 'B+', cls: 'grade-b' };
+            if (score >= 40) return { grade: 'B', cls: 'grade-b' };
+            if (score >= 30) return { grade: 'C+', cls: 'grade-c' };
+            if (score >= 20) return { grade: 'C', cls: 'grade-c' };
+            return { grade: 'D', cls: 'grade-d' };
+        }
+
+        function getThreatColor(grade) {
+            if (grade.startsWith('A')) return '#ef4444';
+            if (grade.startsWith('B')) return '#f97316';
+            if (grade.startsWith('C')) return '#eab308';
+            return '#9ca3af';
+        }
+
+        function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+        function getRadarDimensions(stats) {
+            const agg = clamp((stats.pfr + stats.threeBet + stats.cbetFlop + stats.af * 10) / 4, 0, 100);
+            const risk = clamp((stats.vpip + stats.steal + stats.fourBet * 5) / 3, 0, 100);
+            const icm = clamp(100 - stats.vpip + (stats.foldToSteal || 0) / 2, 0, 100);
+            const precision = clamp((stats.wsd + stats.wwsf + stats.cbetFlop - (stats.vpip - stats.pfr) * 2) / 3, 0, 100);
+            const adapt = clamp((stats.checkRaiseFlop * 5 + stats.coldCall * 3 + (stats.bbDefense || 40)) / 3, 0, 100);
+            const clutch = clamp((stats.wtsd + stats.wsd + stats.wwsf) / 3, 0, 100);
+            return [
+                { label: 'Aggression', value: agg },
+                { label: 'Risk', value: risk },
+                { label: 'ICM', value: icm },
+                { label: 'Precision', value: precision },
+                { label: 'Adaptability', value: adapt },
+                { label: 'Clutch', value: clutch },
+            ];
+        }
+
+        function getStatColorClass(stat, value) {
+            const c = getStatColor(stat, value);
+            if (c === '#10b981') return 'color:#10b981';
+            if (c === '#f59e0b') return 'color:#f59e0b';
+            if (c === '#ef4444') return 'color:#ef4444';
+            return 'color:#6b7280';
+        }
+
+        function getExploits(stats) {
+            const attacks = [];
+            const avoids = [];
+
+            // Attacks
+            if (stats.foldToCbetFlop > 38) attacks.push(`Bluff flop c-bets freely -- they fold ${stats.foldToCbetFlop}% of the time`);
+            if (stats.foldToSteal > 60) attacks.push(`Steal their blinds relentlessly -- ${stats.foldToSteal}% fold-to-steal rate`);
+            if (stats.vpip - stats.pfr > 8) attacks.push(`Isolate their limps -- VPIP/PFR gap of ${stats.vpip - stats.pfr}% means too much passive entering`);
+            if (stats.wtsd > 35) attacks.push(`Value bet thin -- they go to showdown ${stats.wtsd}% of the time`);
+            if (stats.foldToCbetTurn > 45) attacks.push(`Fire second barrels -- ${stats.foldToCbetTurn}% fold to turn c-bets`);
+            if (stats.bbDefense && stats.bbDefense < 42) attacks.push(`Attack their big blind -- only ${stats.bbDefense}% defense rate`);
+            if (stats.checkRaiseFlop < 5) attacks.push(`Bet flops wide -- they almost never check-raise (${stats.checkRaiseFlop}%)`);
+            if (stats.af < 2.0) attacks.push(`Call them down light -- low aggression factor (${stats.af}) means they rarely bluff`);
+
+            // Avoids
+            if (stats.cbetFlop > 65) avoids.push(`Don't float their c-bets lightly -- ${stats.cbetFlop}% flop c-bet rate`);
+            if (stats.threeBet > 9) avoids.push(`Beware their 3-bets -- ${stats.threeBet}% frequency means they're active`);
+            if (stats.checkRaiseFlop > 9) avoids.push(`Don't c-bet into them on dry boards -- ${stats.checkRaiseFlop}% check-raise rate`);
+            if (stats.steal > 42) avoids.push(`Don't fold blinds easily -- they steal ${stats.steal}% from late position`);
+            if (stats.af > 3.0) avoids.push(`Don't bluff them -- AF of ${stats.af} means they bet/raise aggressively`);
+            if (stats.wsd > 55) avoids.push(`They win at showdown ${stats.wsd}% -- don't bluff-catch without strong hands`);
+            if (stats.wwsf > 50) avoids.push(`They win ${stats.wwsf}% when seeing flop -- play only premium hands against them`);
+            if (stats.fourBet > 5) avoids.push(`Respect their 4-bets -- ${stats.fourBet}% rate is very aggressive`);
+
+            return { attacks: attacks.slice(0, 3), avoids: avoids.slice(0, 3) };
+        }
+
+        function getPlayerHands(playerId) {
+            return HANDS.filter(h => h.playersInvolved.includes(playerId))
+                .sort((a, b) => b.handNumber - a.handNumber);
+        }
+
+        function getPlayerName(id) {
+            const p = PLAYERS.find(pl => pl.id === id);
+            return p ? p.name.split(' ').pop() : id;
+        }
+
+        // ===================== Render: Radar SVG =====================
+
+        function renderRadar(dims) {
+            const cx = 130, cy = 120, r = 85;
+            const angles = dims.map((_, i) => (Math.PI * 2 * i / dims.length) - Math.PI / 2);
+
+            function polarToCart(angle, radius) {
+                return { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
+            }
+
+            // Grid rings
+            let gridLines = '';
+            [0.25, 0.5, 0.75, 1.0].forEach(pct => {
+                const pts = angles.map(a => {
+                    const p = polarToCart(a, r * pct);
+                    return `${p.x},${p.y}`;
+                }).join(' ');
+                gridLines += `<polygon points="${pts}" fill="none" stroke="#e5e7eb" stroke-width="1"/>`;
+            });
+
+            // Axis lines
+            let axisLines = '';
+            angles.forEach(a => {
+                const p = polarToCart(a, r);
+                axisLines += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#e5e7eb" stroke-width="1"/>`;
+            });
+
+            // Data polygon
+            const dataPoints = dims.map((d, i) => {
+                const p = polarToCart(angles[i], r * d.value / 100);
+                return `${p.x},${p.y}`;
+            }).join(' ');
+
+            // Labels
+            let labels = '';
+            dims.forEach((d, i) => {
+                const labelR = r + 18;
+                const p = polarToCart(angles[i], labelR);
+                let anchor = 'middle';
+                if (p.x < cx - 10) anchor = 'end';
+                if (p.x > cx + 10) anchor = 'start';
+                let dy = 4;
+                if (p.y < cy - 30) dy = 0;
+                if (p.y > cy + 30) dy = 10;
+                labels += `<text x="${p.x}" y="${p.y}" dy="${dy}" text-anchor="${anchor}" class="radar-axis-label">${d.label}</text>`;
+                // Value
+                const valP = polarToCart(angles[i], labelR + 12);
+                labels += `<text x="${valP.x}" y="${valP.y}" dy="${dy}" text-anchor="${anchor}" class="radar-value-label">${Math.round(d.value)}</text>`;
+            });
+
+            // Dots
+            let dots = '';
+            dims.forEach((d, i) => {
+                const p = polarToCart(angles[i], r * d.value / 100);
+                dots += `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#4f46e5"/>`;
+            });
+
+            return `<svg class="radar-svg" width="260" height="260" viewBox="0 0 260 260">
+                ${gridLines}${axisLines}
+                <polygon points="${dataPoints}" fill="rgba(79,70,229,0.15)" stroke="#4f46e5" stroke-width="2"/>
+                ${dots}${labels}
+            </svg>`;
+        }
+
+        // ===================== Render: Mini Card =====================
+
+        function renderMiniCard(card) {
+            const rank = getCardRank(card);
+            const suit = getCardSuit(card);
+            const red = isRedSuit(card);
+            return `<div class="mini-card${red ? ' red' : ''}"><span class="rank">${rank}</span><span class="suit">${suit}</span></div>`;
+        }
+
+        // ===================== Render: Focus Screen =====================
+
+        function renderFocus() {
+            const player = PLAYERS[currentPlayerIndex];
+            const stats = PLAYER_STATS[player.id];
+            const style = getPlayerStyle(stats);
+            const grade = getSkillGrade(stats);
+            const threatColor = getThreatColor(grade.grade);
+            const dims = getRadarDimensions(stats);
+            const exploits = getExploits(stats);
+            const scouting = AI_CONTENT.playerScouting[player.id] || '';
+            const hands = getPlayerHands(player.id);
+            const animClass = slideDirection === 'left' ? 'slide-left' : 'slide-right';
+
+            // Finish badge
+            const ordinal = n => n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : n + 'th';
+            const isWinner = player.finishPosition === 1;
+
+            let html = `<div class="${animClass}">`;
+
+            // 1. Player Header
+            html += `<div class="player-header">
+                <div class="avatar-ring">
+                    <svg viewBox="0 0 88 88">
+                        <circle cx="44" cy="44" r="40" fill="none" stroke="${threatColor}" stroke-width="3.5" stroke-dasharray="4 3" opacity="0.7"/>
+                    </svg>
+                    <div class="avatar-circle" style="background:${player.color}">${player.initials}</div>
+                </div>
+                <div class="player-name">${player.name}</div>
+                <div class="player-country">${player.countryFlag} ${player.country}</div>
+                <div class="badge-row">
+                    <span class="badge badge-finish${isWinner ? ' winner' : ''}">${isWinner ? '&#127942; ' : '#'}${isWinner ? 'Champion' : ordinal(player.finishPosition)}</span>
+                    <span class="badge badge-style">${style.label}</span>
+                    <span class="badge badge-grade ${grade.cls}">${grade.grade}</span>
+                </div>
+            </div>`;
+
+            // 2. Radar Chart
+            html += `<div class="section"><div class="card"><div class="radar-container">${renderRadar(dims)}</div></div></div>`;
+
+            // 3. Scouting Summary
+            html += `<div class="section"><div class="section-title">AI Scouting Report</div><div class="card"><div class="card-body"><div class="scouting-text">${scouting}</div></div></div></div>`;
+
+            // 4. Exploit Plan
+            html += `<div class="section"><div class="section-title">Exploit Plan</div><div class="card"><div class="card-body">`;
+            html += `<div class="exploit-section"><div class="exploit-header">&#9889; How to Beat Them</div>`;
+            exploits.attacks.forEach(a => {
+                html += `<div class="exploit-item"><div class="exploit-bullet attack"></div><div>${a}</div></div>`;
+            });
+            if (exploits.attacks.length === 0) html += `<div class="exploit-item"><div class="exploit-bullet attack"></div><div>No clear exploitable weaknesses detected</div></div>`;
+            html += `</div>`;
+            html += `<div class="exploit-section"><div class="exploit-header">&#128737;&#65039; What to Avoid</div>`;
+            exploits.avoids.forEach(a => {
+                html += `<div class="exploit-item"><div class="exploit-bullet defend"></div><div>${a}</div></div>`;
+            });
+            if (exploits.avoids.length === 0) html += `<div class="exploit-item"><div class="exploit-bullet defend"></div><div>No notable strengths to avoid</div></div>`;
+            html += `</div></div></div></div>`;
+
+            // 5. HUD Stats Grid
+            const gridStats = [
+                { key: 'vpip', label: 'VPIP', val: stats.vpip, fmt: v => v + '%' },
+                { key: 'pfr', label: 'PFR', val: stats.pfr, fmt: v => v + '%' },
+                { key: 'threeBet', label: '3-Bet', val: stats.threeBet, fmt: v => v + '%' },
+                { key: 'af', label: 'AF', val: stats.af, fmt: v => v.toFixed(1) },
+                { key: 'cbetFlop', label: 'C-Bet F', val: stats.cbetFlop, fmt: v => v + '%' },
+                { key: 'foldToCbetFlop', label: 'Fold CB', val: stats.foldToCbetFlop, fmt: v => v + '%' },
+                { key: 'wtsd', label: 'WTSD', val: stats.wtsd, fmt: v => v + '%' },
+                { key: 'wsd', label: 'WSD', val: stats.wsd, fmt: v => v + '%' },
+                { key: 'wwsf', label: 'WWSF', val: stats.wwsf, fmt: v => v + '%' },
+                { key: 'steal', label: 'Steal', val: stats.steal, fmt: v => v + '%' },
+                { key: 'foldToSteal', label: 'Fld Stl', val: stats.foldToSteal, fmt: v => v + '%' },
+                { key: 'checkRaiseFlop', label: 'C/R Flop', val: stats.checkRaiseFlop, fmt: v => v + '%' },
+            ];
+
+            html += `<div class="section"><div class="section-title">Key Stats</div><div class="stats-grid">`;
+            gridStats.forEach(s => {
+                html += `<div class="stat-cell"><div class="stat-value" style="${getStatColorClass(s.key, s.val)}">${s.fmt(s.val)}</div><div class="stat-label">${s.label}</div></div>`;
+            });
+            html += `</div></div>`;
+
+            // 6. Key Hands (max 5)
+            const displayHands = hands.slice(0, 5);
+            if (displayHands.length > 0) {
+                html += `<div class="section"><div class="section-title">Key Hands (${hands.length})</div>`;
+                displayHands.forEach(h => {
+                    html += renderHandCard(h, player.id);
+                });
+                if (hands.length > 5) {
+                    html += `<div style="text-align:center;padding:8px;"><span style="font-size:12px;color:var(--text-muted);cursor:pointer;" onclick="switchTab('hands')">View all ${hands.length} hands &rarr;</span></div>`;
+                }
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+
+            document.getElementById('focus-content').innerHTML = html;
+
+            // Update chat placeholder
+            const firstName = player.name.split(' ')[0];
+            document.getElementById('chat-input').placeholder = `Ask about ${firstName}...`;
+        }
+
+        // ===================== Render: Hand Card =====================
+
+        function renderHandCard(hand, playerId) {
+            const highlightBadgeClass = hand.highlightType || '';
+            let html = `<div class="hand-card" id="hand-${hand.id}">`;
+            html += `<div class="hand-card-header" onclick="toggleHandCard('${hand.id}')">`;
+            html += `<div class="hand-card-left">`;
+            html += `<span class="hand-num">#${hand.handNumber}</span>`;
+            if (hand.highlightType) {
+                html += `<span class="hand-highlight-badge ${highlightBadgeClass}">${hand.highlightLabel || hand.highlightType}</span>`;
+            }
+            html += `</div>`;
+            html += `<span class="hand-pot">${formatChips(hand.potTotal)}</span>`;
+            html += `</div>`;
+
+            // Expandable body
+            html += `<div class="hand-card-body">`;
+            html += `<div class="hand-preview">${hand.preview}</div>`;
+
+            // Community cards
+            if (hand.communityCards && hand.communityCards.length) {
+                html += `<div class="community-cards"><span class="cards-label">Board</span>`;
+                hand.communityCards.forEach(c => { html += renderMiniCard(c); });
+                html += `</div>`;
+            }
+
+            // Hole cards
+            if (hand.holeCards && hand.holeCards[playerId]) {
+                html += `<div class="hole-cards-display"><span class="cards-label">Hole</span>`;
+                hand.holeCards[playerId].forEach(c => { html += renderMiniCard(c); });
+                html += `</div>`;
+            }
+
+            // Actions
+            if (hand.actions && hand.actions.length) {
+                html += `<div class="hand-actions-list">`;
+                let currentStreet = '';
+                hand.actions.forEach(a => {
+                    if (a.street !== currentStreet) {
+                        currentStreet = a.street;
+                        html += `<div class="action-street">${currentStreet}</div>`;
+                    }
+                    const pName = getPlayerName(a.player);
+                    const actionText = a.action === 'allin' ? 'all-in' : a.action;
+                    const amtText = a.amount > 0 ? ' ' + formatChips(a.amount) : '';
+                    html += `<div class="action-line"><span class="player-name-inline">${pName}</span> ${actionText}${amtText}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            // Buttons
+            html += `<div class="hand-card-actions">`;
+            if (hand.hasVideo) {
+                html += `<button class="hand-btn" onclick="event.stopPropagation()">&#9654; Watch ${hand.videoTimestamp || ''}</button>`;
+            }
+            html += `<button class="hand-btn" onclick="event.stopPropagation()">&#9851; Replay</button>`;
+            html += `</div>`;
+
+            html += `</div></div>`;
+            return html;
+        }
+
+        function toggleHandCard(handId) {
+            const el = document.getElementById('hand-' + handId);
+            if (el) el.classList.toggle('expanded');
+        }
+
+        // ===================== Render: Stats Screen =====================
+
+        function renderStats() {
+            const player = PLAYERS[currentPlayerIndex];
+            const stats = PLAYER_STATS[player.id];
+            const grade = getSkillGrade(stats);
+            const style = getPlayerStyle(stats);
+
+            let html = `<div class="fade-in">`;
+            html += `<div style="text-align:center;padding:16px 0 10px;">
+                <div style="font-size:18px;font-weight:800;">${player.name}</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${style.label} | Grade: ${grade.grade} | ${stats.totalHands} hands</div>
+            </div>`;
+
+            const rows = [
+                { cat: 'Preflop' },
+                { label: 'VPIP', key: 'vpip', val: stats.vpip, unit: '%' },
+                { label: 'PFR', key: 'pfr', val: stats.pfr, unit: '%' },
+                { label: '3-Bet', key: 'threeBet', val: stats.threeBet, unit: '%' },
+                { label: '4-Bet', key: 'fourBet', val: stats.fourBet, unit: '%' },
+                { label: 'Cold Call', key: 'coldCall', val: stats.coldCall, unit: '%' },
+                { label: 'Steal', key: 'steal', val: stats.steal, unit: '%' },
+                { label: 'Fold to Steal', key: 'foldToSteal', val: stats.foldToSteal, unit: '%' },
+                { label: 'BB Defense', val: stats.bbDefense, unit: '%' },
+                { cat: 'Postflop' },
+                { label: 'C-Bet Flop', key: 'cbetFlop', val: stats.cbetFlop, unit: '%' },
+                { label: 'C-Bet Turn', key: 'cbetTurn', val: stats.cbetTurn, unit: '%' },
+                { label: 'C-Bet River', key: 'cbetRiver', val: stats.cbetRiver, unit: '%' },
+                { label: 'Fold to C-Bet Flop', key: 'foldToCbetFlop', val: stats.foldToCbetFlop, unit: '%' },
+                { label: 'Fold to C-Bet Turn', key: 'foldToCbetTurn', val: stats.foldToCbetTurn, unit: '%' },
+                { label: 'Fold to C-Bet River', key: 'foldToCbetRiver', val: stats.foldToCbetRiver, unit: '%' },
+                { label: 'Check-Raise Flop', key: 'checkRaiseFlop', val: stats.checkRaiseFlop, unit: '%' },
+                { label: 'Check-Raise Turn', key: 'checkRaiseTurn', val: stats.checkRaiseTurn, unit: '%' },
+                { label: 'Donk Bet Flop', val: stats.donkBetFlop, unit: '%' },
+                { cat: 'Aggression' },
+                { label: 'AF (Overall)', key: 'af', val: stats.af, unit: '' },
+                { label: 'AF Flop', val: stats.afFlop, unit: '' },
+                { label: 'AF Turn', val: stats.afTurn, unit: '' },
+                { label: 'AF River', val: stats.afRiver, unit: '' },
+                { cat: 'Showdown' },
+                { label: 'WTSD', key: 'wtsd', val: stats.wtsd, unit: '%' },
+                { label: 'W$SD', key: 'wsd', val: stats.wsd, unit: '%' },
+                { label: 'WWSF', key: 'wwsf', val: stats.wwsf, unit: '%' },
+                { label: 'Won Without SD', val: stats.wonWithoutShowdown, unit: '%' },
+            ];
+
+            html += `<div class="card"><table class="stats-table">`;
+            rows.forEach(row => {
+                if (row.cat) {
+                    html += `<tr class="cat-header"><td colspan="2">${row.cat}</td></tr>`;
+                } else {
+                    const colorStyle = row.key ? getStatColorClass(row.key, row.val) : 'color:var(--text-primary)';
+                    const display = typeof row.val === 'number' ? (Number.isInteger(row.val) ? row.val : row.val.toFixed(1)) : row.val;
+                    html += `<tr><td>${row.label}</td><td style="${colorStyle}">${display}${row.unit}</td></tr>`;
+                }
+            });
+            html += `</table></div>`;
+            html += `</div>`;
+
+            document.getElementById('stats-content').innerHTML = html;
+        }
+
+        // ===================== Render: Hands Screen =====================
+
+        function renderHands() {
+            const player = PLAYERS[currentPlayerIndex];
+            const hands = getPlayerHands(player.id);
+
+            let html = `<div class="fade-in">`;
+            html += `<div style="text-align:center;padding:16px 0 10px;">
+                <div style="font-size:18px;font-weight:800;">${player.name}</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${hands.length} hands at the final table</div>
+            </div>`;
+
+            if (hands.length === 0) {
+                html += `<div class="empty-state"><div class="empty-state-icon">&#127139;</div><div class="empty-state-text">No recorded hands for this player</div></div>`;
+            } else {
+                hands.forEach(h => {
+                    html += renderHandCard(h, player.id);
+                });
+            }
+
+            html += `</div>`;
+            document.getElementById('hands-content').innerHTML = html;
+        }
+
+        // ===================== Render: Players Grid =====================
+
+        function renderPlayersGrid() {
+            let html = '';
+            PLAYERS.forEach((p, i) => {
+                const grade = getSkillGrade(PLAYER_STATS[p.id]);
+                const isActive = i === currentPlayerIndex;
+                const ordinal = n => n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : n + 'th';
+                html += `<div class="player-grid-item${isActive ? ' active' : ''}" onclick="selectPlayer(${i})">
+                    <div class="player-grid-avatar" style="background:${p.color}">${p.initials}</div>
+                    <div class="player-grid-name">${p.name}</div>
+                    <div class="player-grid-pos">${p.finishPosition === 1 ? '&#127942; Champion' : ordinal(p.finishPosition)} | ${grade.grade}</div>
+                </div>`;
+            });
+            document.getElementById('players-grid').innerHTML = html;
+        }
+
+        // ===================== Chat =====================
+
+        function handleChat() {
+            const input = document.getElementById('chat-input');
+            const query = input.value.trim();
+            if (!query) return;
+
+            const player = PLAYERS[currentPlayerIndex];
+            const firstName = player.name.split(' ')[0];
+            const lastName = player.name.split(' ').pop();
+
+            // Try to match chat responses
+            let bestMatch = null;
+            let bestScore = 0;
+            const queryLower = query.toLowerCase();
+
+            AI_CONTENT.chatResponses.forEach(cr => {
+                const keywords = cr.query.toLowerCase().split(' ');
+                let score = 0;
+                keywords.forEach(k => {
+                    if (queryLower.includes(k) && k.length > 2) score++;
+                });
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMatch = cr;
+                }
+            });
+
+            // Player-specific fallback
+            let answer;
+            if (bestMatch && bestScore >= 2) {
+                answer = bestMatch.response;
+            } else {
+                const stats = PLAYER_STATS[player.id];
+                const style = getPlayerStyle(stats);
+                answer = `${player.name} is classified as a ${style.label} with VPIP ${stats.vpip}%, PFR ${stats.pfr}%, and AF ${stats.af}. They went to showdown ${stats.wtsd}% of the time and won ${stats.wsd}% at showdown. Their c-bet rate is ${stats.cbetFlop}% on the flop. They finished in position #${player.finishPosition}.`;
+            }
+
+            document.getElementById('chat-q').textContent = query;
+            document.getElementById('chat-a').textContent = answer;
+            document.getElementById('chat-panel').classList.add('visible');
+            input.value = '';
+        }
+
+        function closeChatPanel() {
+            document.getElementById('chat-panel').classList.remove('visible');
+        }
+
+        // ===================== Render Orchestrator =====================
+
+        function render() {
+            // Update counters
+            const idx = currentPlayerIndex + 1;
+            const total = PLAYERS.length;
+            document.getElementById('nav-current').textContent = idx;
+            document.getElementById('nav-total').textContent = total;
+            document.getElementById('stats-nav-current').textContent = idx;
+            document.getElementById('stats-nav-total').textContent = total;
+            document.getElementById('hands-nav-current').textContent = idx;
+            document.getElementById('hands-nav-total').textContent = total;
+
+            renderFocus();
+            renderStats();
+            renderHands();
+            renderPlayersGrid();
+            closeChatPanel();
+        }
+
+        // ===================== Touch Swipe =====================
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 60) {
+                if (diff > 0) navigate(1);  // swipe left = next
+                else navigate(-1);           // swipe right = prev
+            }
+        }, false);
+
+        // ===================== Keyboard Navigation =====================
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') navigate(1);
+            if (e.key === 'ArrowLeft') navigate(-1);
+        });
+
+        // ===================== Chat Enter Key =====================
+
+        document.getElementById('chat-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleChat();
+            }
+        });
+
+        // ===================== Init =====================
+        render();
+        // Show chat bar on focus tab by default
+        document.getElementById('chat-bar').classList.add('visible');
+        document.querySelector('.phone-frame').style.paddingBottom = '130px';
+    </script>
+</body>
+</html>

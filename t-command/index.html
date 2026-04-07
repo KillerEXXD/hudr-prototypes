@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUDR Command — Tournament Command Center</title>
+    <style>
+        /* =============================================
+           HUDR Prototype T — "Command"
+           Bloomberg Terminal inspired, Amber accent
+           Split-screen tournament command center
+           ============================================= */
+
+        /* ===================== Reset & Variables ===================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-page: #f0f2f5;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fb;
+            --bg-tertiary: #f1f3f6;
+            --bg-card: #ffffff;
+            --bg-surface: #fafbfc;
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #d97706;
+            --accent-light: #fbbf24;
+            --accent-bg: #fffbeb;
+            --accent-border: #fde68a;
+            --accent-red: #dc2626;
+            --accent-green: #059669;
+            --accent-blue: #2563eb;
+            --accent-purple: #7c3aed;
+            --accent-pink: #ec4899;
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-elevated: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-sheet: 0 -8px 30px rgba(0,0,0,0.15);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --radius-full: 9999px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+            overflow-y: auto;
+        }
+
+        /* ===================== Phone Frame ===================== */
+        .phone-frame {
+            width: 390px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background: var(--bg-secondary);
+            position: relative;
+            overflow-x: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.08);
+            padding-bottom: 80px;
+        }
+
+        @media (max-width: 430px) {
+            .phone-frame { width: 100%; box-shadow: none; }
+        }
+
+        /* ===================== Top Bar ===================== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .top-bar-title {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: var(--accent);
+        }
+
+        .top-bar-version {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            margin-left: 4px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-muted);
+            transition: all 0.15s;
+        }
+
+        .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* ===================== Bottom Tab Bar ===================== */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 390px;
+            z-index: 100;
+            display: flex;
+            background: rgba(255,255,255,0.96);
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border-light);
+            padding: 6px 0 env(safe-area-inset-bottom, 8px);
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+        }
+
+        @media (max-width: 430px) {
+            .tab-bar { width: 100%; left: 0; transform: none; }
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 6px 0;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+            transition: color 0.15s;
+        }
+
+        .tab-item.active { color: var(--accent); }
+        .tab-item .tab-icon { font-size: 20px; }
+
+        /* ===================== Content / Screens ===================== */
+        .content { padding: 0; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* ===================== Tournament Header ===================== */
+        .tourney-header {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tourney-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+        }
+
+        .tourney-name {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .tourney-meta {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        .tourney-kpis {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .kpi-pill {
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            background: rgba(255,255,255,0.12);
+            font-size: 11px;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ===================== Chip Stack Mini Chart ===================== */
+        .chip-chart-container {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-light);
+            padding: 8px 0 4px;
+            position: relative;
+        }
+
+        .chip-chart-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0 16px 4px;
+        }
+
+        .chip-chart-svg {
+            width: 100%;
+            height: 100px;
+            display: block;
+        }
+
+        .chart-marker {
+            stroke: var(--accent);
+            stroke-width: 1.5;
+            stroke-dasharray: 3 3;
+        }
+
+        /* ===================== Timeline Event List ===================== */
+        .timeline-list {
+            padding: 0 16px 16px;
+        }
+
+        .timeline-event {
+            display: flex;
+            gap: 12px;
+            position: relative;
+            cursor: pointer;
+            padding: 8px 0;
+            transition: background 0.15s;
+        }
+
+        .timeline-event:hover {
+            background: var(--bg-tertiary);
+            margin: 0 -16px;
+            padding: 8px 16px;
+            border-radius: var(--radius-xs);
+        }
+
+        .timeline-track {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 28px;
+            flex-shrink: 0;
+        }
+
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-medium);
+            flex-shrink: 0;
+            z-index: 2;
+            border: 2px solid var(--bg-secondary);
+        }
+
+        .timeline-dot.highlight {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 2px solid var(--bg-secondary);
+            background: var(--bg-card);
+        }
+
+        .timeline-line {
+            width: 2px;
+            flex: 1;
+            background: var(--border-light);
+            min-height: 8px;
+        }
+
+        .timeline-body {
+            flex: 1;
+            min-width: 0;
+            padding-bottom: 4px;
+        }
+
+        .timeline-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .timeline-preview {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-top: 2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .timeline-meta {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .timeline-pot {
+            color: var(--accent);
+        }
+
+        .event-highlight {
+            border-left: 3px solid transparent;
+            margin-left: -3px;
+            padding-left: 3px;
+        }
+
+        .event-highlight.elimination { border-left-color: var(--accent-red); }
+        .event-highlight.biggest_pot { border-left-color: #f59e0b; }
+        .event-highlight.bluff { border-left-color: var(--accent-purple); }
+        .event-highlight.hero_call { border-left-color: var(--accent-green); }
+        .event-highlight.cooler { border-left-color: var(--accent-blue); }
+        .event-highlight.bad_beat { border-left-color: var(--accent-red); }
+
+        .dot-elimination { background: var(--accent-red) !important; }
+        .dot-biggest_pot { background: #f59e0b !important; }
+        .dot-bluff { background: var(--accent-purple) !important; }
+        .dot-hero_call { background: var(--accent-green) !important; }
+        .dot-cooler { background: var(--accent-blue) !important; }
+        .dot-bad_beat { background: var(--accent-red) !important; }
+
+        /* ===================== Bottom Sheet ===================== */
+        .sheet-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sheet-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            width: 390px;
+            max-height: 70vh;
+            background: var(--bg-card);
+            border-radius: 20px 20px 0 0;
+            z-index: 210;
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-sheet);
+        }
+
+        @media (max-width: 430px) {
+            .bottom-sheet { width: 100%; left: 0; transform: translateX(0) translateY(100%); }
+            .bottom-sheet.open { transform: translateX(0) translateY(0); }
+        }
+
+        .bottom-sheet.open {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .sheet-handle {
+            width: 36px;
+            height: 4px;
+            background: var(--border-medium);
+            border-radius: 2px;
+            margin: 10px auto 0;
+            flex-shrink: 0;
+        }
+
+        .sheet-header {
+            padding: 12px 16px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .sheet-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .sheet-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .sheet-body {
+            padding: 0 16px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* ===================== Detail — Hand View ===================== */
+        .detail-blinds {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .community-cards {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .card-mini {
+            width: 36px;
+            height: 50px;
+            border-radius: 6px;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+
+        .card-rank { font-size: 13px; }
+        .card-suit { font-size: 12px; margin-top: -1px; }
+        .suit-h, .suit-d { color: #dc2626; }
+        .suit-s, .suit-c { color: #1e293b; }
+
+        .hole-cards-section {
+            margin-bottom: 14px;
+        }
+
+        .hole-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .hole-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .hole-player {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 80px;
+        }
+
+        .hole-player-cards {
+            display: flex;
+            gap: 4px;
+        }
+
+        .card-tiny {
+            width: 28px;
+            height: 38px;
+            border-radius: 4px;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .card-tiny .card-rank { font-size: 10px; }
+        .card-tiny .card-suit { font-size: 10px; }
+
+        .winner-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            background: #ecfdf5;
+            color: var(--accent-green);
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        /* ===================== Action Timeline ===================== */
+        .action-timeline {
+            margin-bottom: 14px;
+        }
+
+        .action-street {
+            margin-bottom: 10px;
+        }
+
+        .street-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            margin-bottom: 4px;
+            padding: 3px 8px;
+            background: var(--accent-bg);
+            border-radius: var(--radius-xs);
+            display: inline-block;
+        }
+
+        .action-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 3px 0;
+            font-size: 12px;
+        }
+
+        .action-player {
+            font-weight: 700;
+            min-width: 70px;
+            color: var(--text-primary);
+        }
+
+        .action-type {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .action-type.fold { color: var(--text-muted); }
+        .action-type.raise, .action-type.allin { color: var(--accent-red); }
+        .action-type.bet { color: var(--accent); }
+        .action-type.call { color: var(--accent-green); }
+        .action-type.check { color: var(--text-muted); }
+
+        .action-amount {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-left: auto;
+        }
+
+        .detail-pot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: var(--accent-bg);
+            border: 1px solid var(--accent-border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
+        }
+
+        .pot-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .pot-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .ai-commentary {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .ai-commentary-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .ai-commentary-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .video-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            background: var(--accent);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.15s;
+        }
+
+        .video-btn:hover { background: #b45309; }
+
+        /* ===================== Detail — Elimination ===================== */
+        .elim-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .player-avatar {
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .avatar-lg { width: 56px; height: 56px; font-size: 22px; }
+        .avatar-md { width: 40px; height: 40px; font-size: 16px; }
+        .avatar-sm { width: 32px; height: 32px; font-size: 13px; }
+
+        .elim-info h3 {
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .elim-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .elim-finish {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            background: #fef2f2;
+            color: var(--accent-red);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .quick-stat {
+            text-align: center;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-xs);
+        }
+
+        .quick-stat-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .quick-stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* ===================== Commentary Ticker ===================== */
+        .commentary-ticker {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            min-height: 36px;
+        }
+
+        .ticker-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .ticker-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+
+        .ticker-text.scrolling {
+            animation: tickerScroll 20s linear infinite;
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ===================== Insights Tab ===================== */
+        .insights-list {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .insight-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .insight-card:nth-child(1)::before { background: var(--accent); }
+        .insight-card:nth-child(2)::before { background: var(--accent-purple); }
+        .insight-card:nth-child(3)::before { background: var(--accent-green); }
+        .insight-card:nth-child(4)::before { background: var(--accent-blue); }
+        .insight-card:nth-child(5)::before { background: var(--accent-red); }
+
+        .insight-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .insight-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .insight-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ===================== Players Tab ===================== */
+        .players-grid {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .player-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s;
+            box-shadow: var(--shadow-card);
+        }
+
+        .player-card:hover {
+            transform: scale(1.03);
+            border-color: var(--accent);
+        }
+
+        .player-card .player-avatar {
+            margin: 0 auto 6px;
+        }
+
+        .player-card-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .style-badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: var(--radius-full);
+            font-size: 9px;
+            font-weight: 800;
+            margin-top: 3px;
+        }
+
+        .style-tag { background: #dbeafe; color: #1d4ed8; }
+        .style-lag { background: #fce7f3; color: #be185d; }
+        .style-nit { background: #f3f4f6; color: #6b7280; }
+        .style-cs { background: #fef3c7; color: #92400e; }
+        .style-maniac { background: #fee2e2; color: #991b1b; }
+
+        .player-finish {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .player-finish .winner { color: #f59e0b; }
+        .player-finish .eliminated { color: var(--accent-red); }
+
+        .stack-change {
+            font-size: 10px;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        .stack-up { color: var(--accent-green); }
+        .stack-down { color: var(--accent-red); }
+
+        /* ===================== Player Detail Sheet ===================== */
+        .scouting-report {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            margin-top: 12px;
+        }
+
+        .scouting-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .scouting-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .stat-cell {
+            text-align: center;
+            padding: 8px 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xs);
+        }
+
+        .stat-cell-value {
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .stat-cell-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* ===================== Quiz Tab ===================== */
+        .quiz-container {
+            padding: 16px;
+        }
+
+        .quiz-score {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: var(--shadow-card);
+        }
+
+        .quiz-score-num {
+            color: var(--accent);
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .quiz-progress {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .quiz-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-light);
+        }
+
+        .quiz-dot.active { background: var(--accent); }
+        .quiz-dot.correct { background: var(--accent-green); }
+        .quiz-dot.wrong { background: var(--accent-red); }
+
+        .quiz-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .quiz-question {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quiz-option {
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-light);
+            background: var(--bg-card);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .quiz-option:hover:not(.disabled) {
+            border-color: var(--accent);
+            background: var(--accent-bg);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--accent-green);
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .quiz-option.wrong {
+            border-color: var(--accent-red);
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .quiz-option.disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .quiz-explanation {
+            margin-top: 14px;
+            padding: 12px;
+            background: var(--accent-bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--accent-border);
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            display: none;
+        }
+
+        .quiz-explanation.show { display: block; }
+
+        .quiz-next {
+            margin-top: 14px;
+            padding: 10px 20px;
+            border-radius: var(--radius-full);
+            background: var(--accent);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            display: none;
+            width: 100%;
+            transition: background 0.15s;
+        }
+
+        .quiz-next.show { display: block; }
+        .quiz-next:hover { background: #b45309; }
+
+        .quiz-complete {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .quiz-complete-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .quiz-complete-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .quiz-complete-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .quiz-restart {
+            margin-top: 16px;
+            padding: 10px 24px;
+            border-radius: var(--radius-full);
+            background: var(--accent);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* ===================== Section Labels ===================== */
+        .section-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            padding: 12px 16px 6px;
+        }
+
+        /* ===================== Separator ===================== */
+        .separator {
+            height: 1px;
+            background: var(--border-light);
+            margin: 0 16px;
+        }
+    </style>
+</head>
+<body>
+    <script src="../shared/data.js"></script>
+
+    <div class="phone-frame">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <div class="logo">H</div>
+                <span class="top-bar-title">COMMAND</span>
+                <span class="top-bar-version">v1.0</span>
+            </div>
+            <div class="top-bar-right">
+                <button class="icon-btn" title="Share">&#8599;</button>
+            </div>
+        </div>
+
+        <!-- Tournament Header -->
+        <div class="tourney-header">
+            <div class="tourney-name" id="tourneyName"></div>
+            <div class="tourney-meta" id="tourneyMeta"></div>
+            <div class="tourney-kpis" id="tourneyKpis"></div>
+        </div>
+
+        <!-- Screens -->
+        <div class="content">
+            <!-- Timeline Tab -->
+            <div class="screen active" id="screen-timeline">
+                <div class="chip-chart-container">
+                    <div class="chip-chart-label">Chip Stacks</div>
+                    <svg class="chip-chart-svg" id="chipChart"></svg>
+                </div>
+                <div class="commentary-ticker" id="commentaryTicker">
+                    <span class="ticker-icon">AI</span>
+                    <span class="ticker-text" id="tickerText">Select an event to see AI commentary...</span>
+                </div>
+                <div class="section-label">Tournament Timeline</div>
+                <div class="timeline-list" id="timelineList"></div>
+            </div>
+
+            <!-- Insights Tab -->
+            <div class="screen" id="screen-insights">
+                <div class="section-label">AI-Powered Insights</div>
+                <div class="insights-list" id="insightsList"></div>
+            </div>
+
+            <!-- Players Tab -->
+            <div class="screen" id="screen-players">
+                <div class="section-label">Final Table Players</div>
+                <div class="players-grid" id="playersGrid"></div>
+            </div>
+
+            <!-- Quiz Tab -->
+            <div class="screen" id="screen-quiz">
+                <div class="quiz-container" id="quizContainer"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Tab Bar -->
+        <div class="tab-bar">
+            <button class="tab-item active" data-tab="timeline">
+                <span class="tab-icon">&#9201;</span>
+                <span>Timeline</span>
+            </button>
+            <button class="tab-item" data-tab="insights">
+                <span class="tab-icon">&#9889;</span>
+                <span>Insights</span>
+            </button>
+            <button class="tab-item" data-tab="players">
+                <span class="tab-icon">&#128101;</span>
+                <span>Players</span>
+            </button>
+            <button class="tab-item" data-tab="quiz">
+                <span class="tab-icon">&#10067;</span>
+                <span>Quiz</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Sheet Backdrop -->
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+
+    <!-- Bottom Sheet -->
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+            <span class="sheet-title" id="sheetTitle"></span>
+            <button class="sheet-close" id="sheetClose">&times;</button>
+        </div>
+        <div class="sheet-body" id="sheetBody"></div>
+    </div>
+
+    <script>
+        /* =============================================================
+           HUDR Command — State & Logic
+           ============================================================= */
+
+        // ===================== State =====================
+        let activeTab = 'timeline';
+        let selectedEvent = null;
+        let detailOpen = false;
+        let quizIndex = 0;
+        let quizScore = 0;
+        let quizAnswered = {};
+        let chartMarkerX = null;
+
+        const tournament = TOURNAMENTS[0];
+        const playerMap = {};
+        PLAYERS.forEach(p => playerMap[p.id] = p);
+
+        // ===================== Helpers =====================
+        function getEventIcon(type) {
+            const icons = {
+                elimination: '\uD83D\uDC80',
+                biggest_pot: '\u2B50',
+                bluff: '\uD83C\uDFAD',
+                hero_call: '\uD83E\uDDB8',
+                cooler: '\u2744\uFE0F',
+                bad_beat: '\uD83D\uDE29',
+            };
+            return icons[type] || '\uD83C\uDCCF';
+        }
+
+        function getPlayerName(id) {
+            const p = playerMap[id];
+            return p ? p.name.split(' ').pop() : id;
+        }
+
+        function getPlayerFullName(id) {
+            const p = playerMap[id];
+            return p ? p.name : id;
+        }
+
+        function classifyStyle(stats) {
+            if (!stats) return { label: '?', cls: 'nit' };
+            const { vpip, pfr } = stats;
+            if (vpip >= 35) return { label: 'Maniac', cls: 'maniac' };
+            if (vpip >= 28 && pfr >= 22) return { label: 'LAG', cls: 'lag' };
+            if (vpip >= 28 && pfr < 22) return { label: 'CS', cls: 'cs' };
+            if (vpip < 22 && pfr < 18) return { label: 'Nit', cls: 'nit' };
+            return { label: 'TAG', cls: 'tag' };
+        }
+
+        function cardToHTML(card, cls) {
+            if (!card) return '';
+            const rank = card.slice(0, -1);
+            const suitChar = card.slice(-1);
+            const suitMap = { h: '\u2665', d: '\u2666', s: '\u2660', c: '\u2663' };
+            const suitClass = 'suit-' + suitChar;
+            return `<div class="${cls}"><span class="card-rank">${rank}</span><span class="card-suit ${suitClass}">${suitMap[suitChar]}</span></div>`;
+        }
+
+        function formatAction(action) {
+            const labels = { raise: 'Raises', call: 'Calls', bet: 'Bets', fold: 'Folds', check: 'Checks', allin: 'All-in' };
+            return labels[action] || action;
+        }
+
+        // ===================== Build Events =====================
+        const events = HANDS.map(h => ({
+            handNumber: h.handNumber,
+            type: h.highlightType || 'hand',
+            icon: getEventIcon(h.highlightType),
+            label: h.highlightLabel || `Hand #${h.handNumber}`,
+            preview: h.preview,
+            pot: h.potTotal,
+            players: h.playersInvolved,
+            winner: h.winnerName,
+            hand: h,
+        })).sort((a, b) => b.handNumber - a.handNumber);
+
+        // ===================== Init =====================
+        function init() {
+            renderTourneyHeader();
+            renderChipChart();
+            renderTimeline();
+            renderInsights();
+            renderPlayers();
+            renderQuiz();
+            bindTabs();
+            bindSheet();
+        }
+
+        // ===================== Tournament Header =====================
+        function renderTourneyHeader() {
+            document.getElementById('tourneyName').textContent = tournament.name;
+            document.getElementById('tourneyMeta').textContent = `${tournament.event} \u2022 ${tournament.venue}`;
+            const kpis = document.getElementById('tourneyKpis');
+            kpis.innerHTML = `
+                <span class="kpi-pill">${tournament.handCount} Hands</span>
+                <span class="kpi-pill">${tournament.playerCount} Players</span>
+                <span class="kpi-pill">${tournament.blindLevel}</span>
+                <span class="kpi-pill">$${(tournament.prizePool / 1e6).toFixed(1)}M</span>
+            `;
+        }
+
+        // ===================== Chip Stack Chart =====================
+        function renderChipChart(markerHand) {
+            const svg = document.getElementById('chipChart');
+            const W = 390;
+            const H = 100;
+            const PAD_L = 6;
+            const PAD_R = 6;
+            const PAD_T = 6;
+            const PAD_B = 6;
+            const data = CHIP_TIMELINE;
+
+            // Find max stack value
+            let maxStack = 0;
+            data.forEach(d => {
+                Object.values(d.stacks).forEach(v => { if (v > maxStack) maxStack = v; });
+            });
+
+            const xScale = (i) => PAD_L + (i / (data.length - 1)) * (W - PAD_L - PAD_R);
+            const yScale = (v) => PAD_T + (1 - v / maxStack) * (H - PAD_T - PAD_B);
+
+            // Collect all player IDs
+            const allPlayerIds = new Set();
+            data.forEach(d => Object.keys(d.stacks).forEach(id => allPlayerIds.add(id)));
+
+            let paths = '';
+            allPlayerIds.forEach(pid => {
+                const player = playerMap[pid];
+                if (!player) return;
+                const color = player.color;
+
+                let d = '';
+                let started = false;
+                data.forEach((snap, i) => {
+                    if (snap.stacks[pid] !== undefined) {
+                        const x = xScale(i);
+                        const y = yScale(snap.stacks[pid]);
+                        if (!started) {
+                            d += `M${x},${y}`;
+                            started = true;
+                        } else {
+                            d += ` L${x},${y}`;
+                        }
+                    }
+                });
+
+                if (d) {
+                    paths += `<path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.75"/>`;
+                }
+            });
+
+            // Marker line for selected hand
+            let marker = '';
+            if (markerHand) {
+                // Find closest data point
+                let closest = 0;
+                let closestDist = Infinity;
+                data.forEach((d, i) => {
+                    const dist = Math.abs(d.handNumber - markerHand);
+                    if (dist < closestDist) { closestDist = dist; closest = i; }
+                });
+                const mx = xScale(closest);
+                marker = `<line x1="${mx}" y1="${PAD_T}" x2="${mx}" y2="${H - PAD_B}" class="chart-marker"/>`;
+                // Dots at that x
+                const snap = data[closest];
+                Object.entries(snap.stacks).forEach(([pid, val]) => {
+                    const player = playerMap[pid];
+                    if (!player) return;
+                    marker += `<circle cx="${mx}" cy="${yScale(val)}" r="3.5" fill="${player.color}" stroke="#fff" stroke-width="1.5"/>`;
+                });
+            }
+
+            svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+            svg.innerHTML = paths + marker;
+        }
+
+        // ===================== Timeline =====================
+        function renderTimeline() {
+            const list = document.getElementById('timelineList');
+            let html = '';
+
+            events.forEach((evt, i) => {
+                const isHighlight = evt.type !== 'hand';
+                const highlightCls = isHighlight ? `event-highlight ${evt.type}` : '';
+                const dotCls = isHighlight ? `timeline-dot highlight dot-${evt.type}` : 'timeline-dot';
+                const dotContent = isHighlight ? evt.icon : '';
+                const isLast = i === events.length - 1;
+
+                html += `
+                    <div class="timeline-event ${highlightCls}" data-idx="${i}" onclick="openEventDetail(${i})">
+                        <div class="timeline-track">
+                            <div class="${dotCls}">${dotContent}</div>
+                            ${!isLast ? '<div class="timeline-line"></div>' : ''}
+                        </div>
+                        <div class="timeline-body">
+                            <div class="timeline-label">${evt.label}</div>
+                            ${isHighlight ? `<div class="timeline-preview">${evt.preview}</div>` : ''}
+                            <div class="timeline-meta">
+                                <span>Hand #${evt.handNumber}</span>
+                                <span class="timeline-pot">${formatChips(evt.pot)}</span>
+                                <span>${evt.winner}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+        }
+
+        // ===================== Event Detail =====================
+        function openEventDetail(idx) {
+            const evt = events[idx];
+            selectedEvent = evt;
+
+            // Update chart marker
+            renderChipChart(evt.handNumber);
+
+            // Update ticker
+            const commentary = AI_CONTENT.commentary.find(c => c.handId === evt.hand.id);
+            const tickerEl = document.getElementById('tickerText');
+            if (commentary) {
+                tickerEl.textContent = commentary.text;
+            } else {
+                tickerEl.textContent = evt.preview;
+            }
+
+            // Build detail
+            const h = evt.hand;
+            const isElimination = evt.type === 'elimination';
+
+            let html = '';
+
+            if (isElimination) {
+                // Find eliminated player
+                const elimPlayer = h.playersInvolved.find(pid => pid !== h.winnerId);
+                const ep = playerMap[elimPlayer];
+                const wp = playerMap[h.winnerId];
+                const stats = PLAYER_STATS[elimPlayer];
+
+                html += `
+                    <div class="elim-header">
+                        <div class="player-avatar avatar-lg" style="background:${ep ? ep.color : '#999'}">${ep ? ep.initials : '?'}</div>
+                        <div class="elim-info">
+                            <h3>${ep ? ep.name : 'Unknown'}</h3>
+                            <p>Eliminated by ${wp ? wp.name : 'Unknown'}</p>
+                            <span class="elim-finish">${getOrdinal(ep.finishPosition)} Place</span>
+                        </div>
+                    </div>
+                `;
+
+                if (stats) {
+                    html += `
+                        <div class="quick-stats">
+                            <div class="quick-stat"><div class="quick-stat-value">${stats.vpip}%</div><div class="quick-stat-label">VPIP</div></div>
+                            <div class="quick-stat"><div class="quick-stat-value">${stats.pfr}%</div><div class="quick-stat-label">PFR</div></div>
+                            <div class="quick-stat"><div class="quick-stat-value">${stats.af}</div><div class="quick-stat-label">AF</div></div>
+                        </div>
+                    `;
+                }
+            }
+
+            // Blinds
+            html += `<div class="detail-blinds">Blinds ${h.blinds} \u2022 Ante ${formatChips(h.ante)}</div>`;
+
+            // Community cards
+            if (h.communityCards && h.communityCards.length) {
+                html += '<div class="community-cards">';
+                h.communityCards.forEach(c => { html += cardToHTML(c, 'card-mini'); });
+                html += '</div>';
+            }
+
+            // Hole cards
+            html += '<div class="hole-cards-section"><div class="hole-label">Hole Cards</div>';
+            Object.entries(h.holeCards).forEach(([pid, cards]) => {
+                const pname = getPlayerName(pid);
+                const isWinner = pid === h.winnerId;
+                html += `
+                    <div class="hole-row">
+                        <span class="hole-player">${pname}${isWinner ? '<span class="winner-badge">Winner</span>' : ''}</span>
+                        <div class="hole-player-cards">${cards.map(c => cardToHTML(c, 'card-tiny')).join('')}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            // Action timeline
+            const streets = {};
+            h.actions.forEach(a => {
+                if (!streets[a.street]) streets[a.street] = [];
+                streets[a.street].push(a);
+            });
+
+            html += '<div class="action-timeline">';
+            Object.entries(streets).forEach(([street, actions]) => {
+                html += `<div class="action-street"><div class="street-label">${street}</div>`;
+                actions.forEach(a => {
+                    const actionCls = a.action;
+                    const amt = a.amount > 0 ? formatChips(a.amount) : '';
+                    html += `
+                        <div class="action-row">
+                            <span class="action-player">${getPlayerName(a.player)}</span>
+                            <span class="action-type ${actionCls}">${formatAction(a.action)}</span>
+                            <span class="action-amount">${amt}</span>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            });
+            html += '</div>';
+
+            // Pot
+            html += `
+                <div class="detail-pot">
+                    <span class="pot-label">Total Pot</span>
+                    <span class="pot-value">${formatChips(h.potTotal)}</span>
+                </div>
+            `;
+
+            // AI Commentary
+            if (commentary) {
+                html += `
+                    <div class="ai-commentary">
+                        <div class="ai-commentary-label">AI Commentary</div>
+                        <div class="ai-commentary-text">${commentary.text}</div>
+                    </div>
+                `;
+            }
+
+            // Video button
+            if (h.hasVideo) {
+                html += `<button class="video-btn" onclick="window.open('${tournament.youtubeUrl}','_blank')">&#9654; Watch on YouTube (${h.videoTimestamp})</button>`;
+            }
+
+            document.getElementById('sheetTitle').textContent = evt.label;
+            document.getElementById('sheetBody').innerHTML = html;
+            openSheet();
+        }
+
+        function getOrdinal(n) {
+            const s = ['th', 'st', 'nd', 'rd'];
+            const v = n % 100;
+            return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        }
+
+        // ===================== Player Detail =====================
+        function openPlayerDetail(pid) {
+            const p = playerMap[pid];
+            const stats = PLAYER_STATS[pid];
+            const scouting = AI_CONTENT.playerScouting[pid];
+            const style = classifyStyle(stats);
+
+            let html = `
+                <div class="elim-header">
+                    <div class="player-avatar avatar-lg" style="background:${p.color}">${p.initials}</div>
+                    <div class="elim-info">
+                        <h3>${p.name} ${p.countryFlag}</h3>
+                        <p>Seat ${p.seatNumber} \u2022 ${p.handsPlayed} hands</p>
+                        <span class="style-badge style-${style.cls}">${style.label}</span>
+                        ${p.finishPosition === 1 ? '<span class="winner-badge" style="margin-left:6px">Winner</span>' : `<span class="elim-finish" style="margin-left:6px">${getOrdinal(p.finishPosition)}</span>`}
+                    </div>
+                </div>
+            `;
+
+            // Stack change
+            const stackDiff = p.endingStack - p.startingStack;
+            const stackColor = stackDiff >= 0 ? 'stack-up' : 'stack-down';
+            html += `
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:12px;">
+                    <span style="color:var(--text-muted);font-weight:600;">Stack:</span>
+                    <span style="font-weight:700;">${formatChips(p.startingStack)}</span>
+                    <span style="color:var(--text-muted);">&rarr;</span>
+                    <span style="font-weight:700;">${formatChips(p.endingStack)}</span>
+                    <span class="${stackColor}" style="font-weight:800;">(${stackDiff >= 0 ? '+' : ''}${formatChips(stackDiff)})</span>
+                </div>
+            `;
+
+            if (stats) {
+                html += `
+                    <div class="stat-grid">
+                        <div class="stat-cell"><div class="stat-cell-value">${stats.vpip}%</div><div class="stat-cell-label">VPIP</div></div>
+                        <div class="stat-cell"><div class="stat-cell-value">${stats.pfr}%</div><div class="stat-cell-label">PFR</div></div>
+                        <div class="stat-cell"><div class="stat-cell-value">${stats.threeBet}%</div><div class="stat-cell-label">3-Bet</div></div>
+                        <div class="stat-cell"><div class="stat-cell-value">${stats.af}</div><div class="stat-cell-label">AF</div></div>
+                        <div class="stat-cell"><div class="stat-cell-value">${stats.cbetFlop}%</div><div class="stat-cell-label">C-Bet F</div></div>
+                        <div class="stat-cell"><div class="stat-cell-value">${stats.wtsd}%</div><div class="stat-cell-label">WTSD</div></div>
+                        <div class="stat-cell"><div class="stat-cell-value">${stats.wsd}%</div><div class="stat-cell-label">W$SD</div></div>
+                        <div class="stat-cell"><div class="stat-cell-value">${stats.wwsf}%</div><div class="stat-cell-label">WWSF</div></div>
+                        <div class="stat-cell"><div class="stat-cell-value">${stats.steal}%</div><div class="stat-cell-label">Steal</div></div>
+                    </div>
+                `;
+            }
+
+            if (scouting) {
+                html += `
+                    <div class="scouting-report">
+                        <div class="scouting-label">AI Scouting Report</div>
+                        <div class="scouting-text">${scouting}</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('sheetTitle').textContent = p.name;
+            document.getElementById('sheetBody').innerHTML = html;
+            openSheet();
+        }
+
+        // ===================== Sheet =====================
+        function openSheet() {
+            detailOpen = true;
+            document.getElementById('sheetBackdrop').classList.add('open');
+            document.getElementById('bottomSheet').classList.add('open');
+        }
+
+        function closeSheet() {
+            detailOpen = false;
+            document.getElementById('sheetBackdrop').classList.remove('open');
+            document.getElementById('bottomSheet').classList.remove('open');
+        }
+
+        function bindSheet() {
+            document.getElementById('sheetBackdrop').addEventListener('click', closeSheet);
+            document.getElementById('sheetClose').addEventListener('click', closeSheet);
+        }
+
+        // ===================== Tab Navigation =====================
+        function bindTabs() {
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+                    if (target === activeTab) return;
+                    activeTab = target;
+
+                    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                    document.getElementById('screen-' + target).classList.add('active');
+                });
+            });
+        }
+
+        // ===================== Insights =====================
+        function renderInsights() {
+            const list = document.getElementById('insightsList');
+            let html = '';
+            AI_CONTENT.insights.forEach(ins => {
+                html += `
+                    <div class="insight-card">
+                        <div class="insight-icon">${ins.icon}</div>
+                        <div class="insight-title">${ins.title}</div>
+                        <div class="insight-text">${ins.text}</div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        // ===================== Players =====================
+        function renderPlayers() {
+            const grid = document.getElementById('playersGrid');
+            let html = '';
+
+            // Sort by finish position
+            const sorted = [...PLAYERS].sort((a, b) => a.finishPosition - b.finishPosition);
+
+            sorted.forEach(p => {
+                const stats = PLAYER_STATS[p.id];
+                const style = classifyStyle(stats);
+                const stackDiff = p.endingStack - p.startingStack;
+                const isWinner = p.finishPosition === 1;
+                const stackCls = stackDiff >= 0 ? 'stack-up' : 'stack-down';
+                const finishHTML = isWinner
+                    ? '<span class="winner">1st</span>'
+                    : `<span class="eliminated">${getOrdinal(p.finishPosition)}</span>`;
+
+                html += `
+                    <div class="player-card" onclick="openPlayerDetail('${p.id}')">
+                        <div class="player-avatar avatar-md" style="background:${p.color}">${p.initials}</div>
+                        <div class="player-card-name">${p.name.split(' ').pop()}</div>
+                        <div class="style-badge style-${style.cls}">${style.label}</div>
+                        <div class="player-finish">${finishHTML}</div>
+                        <div class="stack-change ${stackCls}">
+                            ${formatChips(p.startingStack)} &rarr; ${p.endingStack > 0 ? formatChips(p.endingStack) : '0'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        // ===================== Quiz =====================
+        function renderQuiz() {
+            const container = document.getElementById('quizContainer');
+            const quizData = AI_CONTENT.quiz;
+
+            if (quizIndex >= quizData.length) {
+                renderQuizComplete();
+                return;
+            }
+
+            const q = quizData[quizIndex];
+            const answered = quizAnswered[quizIndex] !== undefined;
+            const userAnswer = quizAnswered[quizIndex];
+
+            let html = `
+                <div class="quiz-score">
+                    <span class="quiz-score-num">${quizScore}</span>
+                    <span>/ ${quizData.length} correct</span>
+                </div>
+                <div class="quiz-progress">
+            `;
+
+            quizData.forEach((_, i) => {
+                let cls = 'quiz-dot';
+                if (i === quizIndex) cls += ' active';
+                if (quizAnswered[i] !== undefined) {
+                    cls += quizAnswered[i] === quizData[i].correctIndex ? ' correct' : ' wrong';
+                }
+                html += `<div class="${cls}"></div>`;
+            });
+
+            html += `</div><div class="quiz-card"><div class="quiz-question">${q.question}</div><div class="quiz-options">`;
+
+            q.options.forEach((opt, i) => {
+                let cls = 'quiz-option';
+                if (answered) {
+                    cls += ' disabled';
+                    if (i === q.correctIndex) cls += ' correct';
+                    else if (i === userAnswer && i !== q.correctIndex) cls += ' wrong';
+                }
+                html += `<button class="${cls}" ${answered ? 'disabled' : `onclick="answerQuiz(${i})"`}>${opt}</button>`;
+            });
+
+            html += `</div>`;
+            html += `<div class="quiz-explanation ${answered ? 'show' : ''}">${q.explanation}</div>`;
+
+            const isLast = quizIndex === quizData.length - 1;
+            const nextLabel = isLast ? 'See Results' : 'Next Question &rarr;';
+            html += `<button class="quiz-next ${answered ? 'show' : ''}" onclick="nextQuiz()">${nextLabel}</button>`;
+            html += `</div>`;
+
+            container.innerHTML = html;
+        }
+
+        function answerQuiz(optIndex) {
+            const q = AI_CONTENT.quiz[quizIndex];
+            quizAnswered[quizIndex] = optIndex;
+            if (optIndex === q.correctIndex) quizScore++;
+            renderQuiz();
+        }
+
+        function nextQuiz() {
+            quizIndex++;
+            renderQuiz();
+        }
+
+        function renderQuizComplete() {
+            const container = document.getElementById('quizContainer');
+            const total = AI_CONTENT.quiz.length;
+            const pct = Math.round((quizScore / total) * 100);
+            let icon, msg;
+            if (pct >= 80) { icon = '\uD83C\uDFC6'; msg = 'Outstanding! You know this final table inside out.'; }
+            else if (pct >= 60) { icon = '\uD83D\uDC4D'; msg = 'Great job! You clearly followed the action.'; }
+            else { icon = '\uD83D\uDCDA'; msg = 'Good try! Review the timeline to improve.'; }
+
+            container.innerHTML = `
+                <div class="quiz-complete">
+                    <div class="quiz-complete-icon">${icon}</div>
+                    <div class="quiz-complete-title">${quizScore} / ${total} Correct (${pct}%)</div>
+                    <div class="quiz-complete-sub">${msg}</div>
+                    <button class="quiz-restart" onclick="restartQuiz()">Play Again</button>
+                </div>
+            `;
+        }
+
+        function restartQuiz() {
+            quizIndex = 0;
+            quizScore = 0;
+            quizAnswered = {};
+            renderQuiz();
+        }
+
+        // ===================== Init =====================
+        init();
+    </script>
+</body>
+</html>
