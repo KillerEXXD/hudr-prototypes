@@ -12,7 +12,7 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename="/v-hudr-v2-demo">
         <App />
       </BrowserRouter>
     </QueryClientProvider>
