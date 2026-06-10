@@ -1,15 +1,16 @@
-import { useMemo, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Radio, MessageSquare, Table2, ChevronRight, Crown, Loader2, History, Flame } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
-import { useTournament, useTournamentPlayers, useTournamentProfiles, useTournamentHighlights, useTournamentHands } from '@/hooks'
+import { useTournament, useTournamentPlayers, useProfiles, useTournamentHighlights, useTournamentHands } from '@/hooks'
 import { STAT_DEFS } from '@/engine'
-import type { PlayerProfile, StatKey } from '@/engine'
+import type { PlayerProfile, StatKey, StatFilters } from '@/engine'
 import type { Player, Tournament, Highlight, HandSummary } from '@/lib/api/domain'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui'
 import PlayerAvatar from '@/components/player/PlayerAvatar'
 import ArchetypeBadge from '@/components/common/ArchetypeBadge'
 import AIChat from '@/components/scout/AIChat'
+import ScopeFilters from '@/components/scout/ScopeFilters'
 import HandViewerButton from '@/components/scout/HandViewer'
 import MiniCard from '@/components/common/MiniCard'
 import { cn, fmtChips } from '@/lib/utils'
@@ -36,7 +37,10 @@ export default function TournamentPage() {
   const { data: highlights = [] } = useTournamentHighlights(id)
   const { data: hands = [] } = useTournamentHands(id)
   const rosterIds = useMemo(() => players.map((p) => p.id), [players])
-  const { profiles } = useTournamentProfiles(id, rosterIds)
+  // Tournament-level filter: scope is fixed to THIS event; table size + depth re-segment the roster.
+  const [filters, setFilters] = useState<StatFilters>({ scope: 'event', tournamentId: id, tableSize: 'all', depth: 'all' })
+  const { profiles } = useProfiles(rosterIds, filters)
+  const playerQuery = `?t=${id}&ts=${filters.tableSize}&depth=${filters.depth}`
 
   const rows: Row[] = useMemo(() => {
     const byId = Object.fromEntries(players.map((p) => [p.id, p]))
@@ -67,6 +71,12 @@ export default function TournamentPage() {
         </div>
       </div>
 
+      {/* Tournament filter — re-segments every player's read for this event */}
+      <div className="mt-4">
+        <ScopeFilters filters={filters} onChange={setFilters} eventAvailable showScope={false} />
+        <p className="mt-1 px-1 text-[11px] text-text-muted">Filters every player below by table size &amp; stack depth (this event). Modeled.</p>
+      </div>
+
       {/* Roster */}
       <h2 className="mb-2 mt-4 text-sm font-semibold text-text-secondary">Players &amp; reads</h2>
       <div className="space-y-2">
@@ -76,7 +86,7 @@ export default function TournamentPage() {
           return (
             <Link
               key={profile.playerId}
-              to={`/player/${profile.playerId}?t=${t.id}`}
+              to={`/player/${profile.playerId}${playerQuery}`}
               className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
             >
               <PlayerAvatar initials={player?.initials ?? '?'} color={player?.color ?? '#444'} />
@@ -112,7 +122,7 @@ export default function TournamentPage() {
         <TabsContent value="highlights"><HighlightsList items={highlights} /></TabsContent>
         <TabsContent value="chat"><AIChat profiles={profiles} /></TabsContent>
         <TabsContent value="stats">
-          {isPro ? <ProStatsTable rows={rows} tournamentId={t.id} /> : <PlainTableRead rows={rows} tournamentId={t.id} />}
+          {isPro ? <ProStatsTable rows={rows} linkQuery={playerQuery} /> : <PlainTableRead rows={rows} linkQuery={playerQuery} />}
         </TabsContent>
       </Tabs>
     </div>
@@ -168,7 +178,7 @@ function HighlightsList({ items }: { items: Highlight[] }) {
   )
 }
 
-function ProStatsTable({ rows, tournamentId }: { rows: Row[]; tournamentId: string }) {
+function ProStatsTable({ rows, linkQuery }: { rows: Row[]; linkQuery: string }) {
   return (
     <div className="overflow-x-auto rounded-xl border border-border scrollbar-thin">
       <table className="w-full min-w-[420px] text-sm">
@@ -183,7 +193,7 @@ function ProStatsTable({ rows, tournamentId }: { rows: Row[]; tournamentId: stri
           {rows.map(({ profile }) => (
             <tr key={profile.playerId} className="border-b border-border/50 last:border-0 hover:bg-bg-surface/40">
               <td className="px-3 py-2">
-                <Link to={`/player/${profile.playerId}?t=${tournamentId}`} className="font-medium text-accent-blue hover:underline">{profile.name.split(' ').slice(-1)[0]}</Link>
+                <Link to={`/player/${profile.playerId}${linkQuery}`} className="font-medium text-accent-blue hover:underline">{profile.name.split(' ').slice(-1)[0]}</Link>
               </td>
               {TABLE_COLS.map((c) => {
                 const s = profile.stats.find((x) => x.key === c)!
@@ -203,11 +213,11 @@ function ProStatsTable({ rows, tournamentId }: { rows: Row[]; tournamentId: stri
   )
 }
 
-function PlainTableRead({ rows, tournamentId }: { rows: Row[]; tournamentId: string }) {
+function PlainTableRead({ rows, linkQuery }: { rows: Row[]; linkQuery: string }) {
   return (
     <div className="space-y-2">
       {rows.map(({ profile }) => (
-        <Link key={profile.playerId} to={`/player/${profile.playerId}?t=${tournamentId}`} className="block rounded-xl border border-border bg-bg-card p-3 hover:bg-bg-surface cursor-pointer transition-colors">
+        <Link key={profile.playerId} to={`/player/${profile.playerId}${linkQuery}`} className="block rounded-xl border border-border bg-bg-card p-3 hover:bg-bg-surface cursor-pointer transition-colors">
           <div className="flex items-center justify-between gap-2">
             <span className="font-semibold text-text-primary">{profile.name}</span>
             <ArchetypeBadge archetype={profile.typing.archetype} plain size="sm" />

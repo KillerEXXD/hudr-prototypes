@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import {
   Brain, Target, ClipboardList, Activity, MapPin, BarChart3, ShieldCheck, Quote,
-  Crosshair, Gauge, Loader2, Database,
+  Crosshair, Gauge, Loader2, Database, MessageSquare,
 } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
 import { usePlayer, usePlayerProfile } from '@/hooks'
-import type { StatFilters, StatKey } from '@/engine'
+import type { StatFilters, StatKey, TableSizeBucket, DepthBucket } from '@/engine'
 import { PLAYER_DIMENSIONS } from '@/data'
 import RadarChart from '@/components/charts/RadarChart'
 import PlayerAvatar from '@/components/player/PlayerAvatar'
@@ -17,6 +17,7 @@ import StatList from '@/components/scout/StatList'
 import BoundaryTrace from '@/components/scout/BoundaryTrace'
 import PositionalOpens from '@/components/scout/PositionalOpens'
 import ScopeFilters from '@/components/scout/ScopeFilters'
+import PlayerChat from '@/components/scout/PlayerChat'
 import { cn } from '@/lib/utils'
 import type { ReactNode } from 'react'
 
@@ -63,12 +64,14 @@ export default function ScoutingPage() {
   const [search] = useSearchParams()
   const { isPro } = useMode()
   const tournamentId = search.get('t')
+  const tsParam = search.get('ts')
+  const dpParam = search.get('depth')
 
   const [filters, setFilters] = useState<StatFilters>({
     scope: tournamentId ? 'event' : 'career',
     tournamentId: tournamentId ?? null,
-    tableSize: 'all',
-    depth: 'all',
+    tableSize: (['short', 'full'].includes(tsParam ?? '') ? tsParam : 'all') as TableSizeBucket,
+    depth: (['short', 'mid', 'deep'].includes(dpParam ?? '') ? dpParam : 'all') as DepthBucket,
   })
 
   const { data: player } = usePlayer(id)
@@ -137,6 +140,11 @@ export default function ScoutingPage() {
           </p>
         </div>
       )}
+
+      {/* ---- Ask AI about this player ---- */}
+      <Section icon={<MessageSquare className="h-4 w-4" />} title={`Ask AI about ${player.name.split(' ')[0]}`}>
+        <PlayerChat profile={profile} />
+      </Section>
 
       {/* ---- Layer 2: typing ---- */}
       <Section icon={<Brain className="h-4 w-4" />} title={isPro ? 'Player type' : 'How they play'}>

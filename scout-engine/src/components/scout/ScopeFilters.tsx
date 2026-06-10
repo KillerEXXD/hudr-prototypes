@@ -11,20 +11,20 @@ function PillGroup<T extends string>({ label, value, options, onChange }: {
   onChange: (v: T) => void
 }) {
   return (
-    <div>
-      <div className="mb-1 text-[10px] font-medium uppercase tracking-wide text-text-muted">{label}</div>
-      <div className="flex gap-1 overflow-x-auto no-scrollbar">
+    <div className="flex items-center gap-2">
+      <div className="w-16 shrink-0 text-[10px] font-medium uppercase tracking-wide text-text-muted">{label}</div>
+      <div className="flex flex-1 gap-1 rounded-lg bg-bg-surface/50 p-0.5">
         {options.map((o) => (
           <button
             key={o.v}
             disabled={o.disabled}
             onClick={() => onChange(o.v)}
             className={cn(
-              'shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer',
+              'flex-1 whitespace-nowrap rounded-md px-1 py-1.5 text-center text-xs font-medium transition-colors cursor-pointer',
               o.disabled && 'opacity-40 cursor-not-allowed',
               value === o.v
-                ? 'border-accent-blue bg-accent-blue/15 text-accent-blue'
-                : 'border-border bg-bg-surface/60 text-text-secondary hover:text-text-primary',
+                ? 'bg-accent-blue text-white shadow-sm'
+                : 'text-text-secondary hover:text-text-primary',
             )}
           >
             {o.label}
@@ -35,23 +35,27 @@ function PillGroup<T extends string>({ label, value, options, onChange }: {
   )
 }
 
-export default function ScopeFilters({ filters, onChange, eventAvailable }: {
+export default function ScopeFilters({ filters, onChange, eventAvailable, showScope = true }: {
   filters: StatFilters
   onChange: (f: StatFilters) => void
   eventAvailable: boolean
+  /** hide the event/career row (e.g. on a tournament, scope is fixed to that event). */
+  showScope?: boolean
 }) {
   const set = (patch: Partial<StatFilters>) => onChange({ ...filters, ...patch })
   return (
-    <div className="grid grid-cols-1 gap-3 rounded-xl border border-border bg-bg-card p-3 sm:grid-cols-3">
-      <PillGroup<Scope>
-        label="Scope"
-        value={filters.scope}
-        onChange={(v) => set({ scope: v })}
-        options={[
-          { v: 'event', label: 'This event', disabled: !eventAvailable },
-          { v: 'career', label: 'Career' },
-        ]}
-      />
+    <div className="space-y-2 rounded-xl border border-border bg-bg-card p-3">
+      {showScope && (
+        <PillGroup<Scope>
+          label="Scope"
+          value={filters.scope}
+          onChange={(v) => set({ scope: v })}
+          options={[
+            { v: 'event', label: 'This event', disabled: !eventAvailable },
+            { v: 'career', label: 'Career' },
+          ]}
+        />
+      )}
       <PillGroup<TableSizeBucket>
         label="Table size"
         value={filters.tableSize}
