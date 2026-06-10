@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Trophy, Users, ChevronRight, Radio, Layers, Target, Brain, Loader2 } from 'lucide-react'
+import { Search, Trophy, Users, ChevronRight, Radio, Layers, Target, Brain, Loader2, X } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
 import { useTournaments, usePlayers, useProfiles, careerFilters } from '@/hooks'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui'
@@ -8,27 +8,59 @@ import PlayerAvatar from '@/components/player/PlayerAvatar'
 import ArchetypeBadge from '@/components/common/ArchetypeBadge'
 import { cn, fmtChips } from '@/lib/utils'
 
+const PIPELINE_STEPS = [
+  { icon: Layers, label: 'Stats', tint: 'text-accent-blue', title: 'Layer 1 · Stat engine', desc: 'We compute ~20 poker stats (VPIP, PFR, 3-bet, c-bet, WTSD…) from the hands — each gated by sample size into Reliable / Tentative / hidden, so a read off 12 hands is never treated like one off 1,200.' },
+  { icon: Users, label: 'Type', tint: 'text-accent-purple', title: 'Layer 2 · Player typing', desc: 'The reliable stats map to an archetype (TAG, LAG, Nit, Calling Station, Maniac…) via explicit boundaries, with a confidence score. No clean match → "Unclassified" rather than a forced label.' },
+  { icon: Target, label: 'Exploits', tint: 'text-accent-amber', title: 'Layer 3 · Exploit matrix', desc: 'Every leak that crosses a threshold becomes a ranked exploit with a concrete counter-strategy and a confirmation stat to watch — fired only from Reliable reads.' },
+  { icon: Brain, label: 'Report', tint: 'text-accent-emerald', title: 'Layer 4 · Narrated report', desc: 'Everything is narrated into a plain-English scouting report — nickname, how they play, how to beat them, a game plan — composed only from the computed numbers, never invented.' },
+]
+
 function PipelineStrip() {
-  const steps = [
-    { icon: Layers, label: 'Stats', tint: 'text-accent-blue' },
-    { icon: Users, label: 'Type', tint: 'text-accent-purple' },
-    { icon: Target, label: 'Exploits', tint: 'text-accent-amber' },
-    { icon: Brain, label: 'Report', tint: 'text-accent-emerald' },
-  ]
+  const [open, setOpen] = useState<number | null>(null)
   return (
-    <div className="mb-4 flex items-center justify-between rounded-xl border border-border bg-bg-card px-3 py-2.5">
-      {steps.map((s, i) => (
-        <div key={s.label} className="flex items-center">
-          <div className="flex flex-col items-center gap-1">
-            <span className={cn('flex h-7 w-7 items-center justify-center rounded-lg bg-bg-surface', s.tint)}>
-              <s.icon className="h-3.5 w-3.5" />
-            </span>
-            <span className="text-[10px] font-medium text-text-muted">{s.label}</span>
+    <>
+      <div className="mb-4 flex items-center justify-between rounded-xl border border-border bg-bg-card px-2 py-2.5">
+        {PIPELINE_STEPS.map((s, i) => (
+          <div key={s.label} className="flex items-center">
+            <button
+              onClick={() => setOpen(i)}
+              aria-label={`How ${s.label} works`}
+              className="flex flex-col items-center gap-1 rounded-lg px-1.5 py-1 transition-colors hover:bg-bg-surface cursor-pointer"
+            >
+              <span className={cn('flex h-7 w-7 items-center justify-center rounded-lg bg-bg-surface', s.tint)}>
+                <s.icon className="h-3.5 w-3.5" />
+              </span>
+              <span className="text-[10px] font-medium text-text-muted">{s.label}</span>
+            </button>
+            {i < PIPELINE_STEPS.length - 1 && <ChevronRight className="mx-0.5 h-3.5 w-3.5 text-text-muted/50" />}
           </div>
-          {i < steps.length - 1 && <ChevronRight className="mx-0.5 h-3.5 w-3.5 text-text-muted/50" />}
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      {open !== null && (() => {
+        const s = PIPELINE_STEPS[open]
+        const Icon = s.icon
+        return (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center" onClick={() => setOpen(null)}>
+            <div className="w-full max-w-md rounded-t-2xl border border-border bg-bg-card p-4 sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className={cn('flex h-8 w-8 items-center justify-center rounded-lg bg-bg-surface', s.tint)}><Icon className="h-4 w-4" /></span>
+                  <h3 className="text-sm font-bold text-text-primary">{s.title}</h3>
+                </div>
+                <button onClick={() => setOpen(null)} className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer" aria-label="Close"><X className="h-4 w-4" /></button>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-text-secondary">{s.desc}</p>
+              <div className="mt-4 flex items-center gap-1">
+                {PIPELINE_STEPS.map((st, i) => (
+                  <button key={st.label} onClick={() => setOpen(i)} className={cn('h-1.5 flex-1 rounded-full transition-colors cursor-pointer', i === open ? 'bg-accent-blue' : 'bg-bg-surface hover:bg-border-light')} aria-label={st.label} />
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+    </>
   )
 }
 
