@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { Search, Trophy, Users, ChevronRight, Radio, Layers, Target, Brain, Loader2, X } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
@@ -37,12 +38,12 @@ function PipelineStrip() {
         ))}
       </div>
 
-      {open !== null && (() => {
+      {open !== null && createPortal((() => {
         const s = PIPELINE_STEPS[open]
         const Icon = s.icon
         return (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center" onClick={() => setOpen(null)}>
-            <div className="w-full max-w-md rounded-t-2xl border border-border bg-bg-card p-4 sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => setOpen(null)}>
+            <div className="animate-fade-up w-full max-w-sm rounded-2xl border border-border bg-bg-card p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <span className={cn('flex h-8 w-8 items-center justify-center rounded-lg bg-bg-surface', s.tint)}><Icon className="h-4 w-4" /></span>
@@ -59,7 +60,7 @@ function PipelineStrip() {
             </div>
           </div>
         )
-      })()}
+      })(), document.body)}
     </>
   )
 }
