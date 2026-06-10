@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Send, Sparkles, Bot, User } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
-import { getProfile } from '@/engine'
 import type { PlayerProfile } from '@/engine'
-import { PLAYERS } from '@/data'
 import { cn } from '@/lib/utils'
+
+const lastName = (name: string) => name.split(' ').slice(-1)[0]
 
 interface Msg { role: 'user' | 'ai'; text: string }
 
@@ -14,8 +14,6 @@ const SUGGESTIONS = [
   'Who plays the most hands?',
   'Who can I bluff?',
 ]
-
-function nameOf(id: string) { return PLAYERS.find((p) => p.id === id)?.name.split(' ').slice(-1)[0] ?? id }
 
 // Deterministic mock "AI" — answers are composed ONLY from computed profiles,
 // mirroring the spec rule that the narrative layer never invents numbers.
@@ -56,23 +54,18 @@ function answer(q: string, profiles: PlayerProfile[], isPro: boolean): string {
       : `${folder.name.split(' ')[0]} folds to bets a lot — fire a bet on the flop and you’ll often just take the pot.`
   }
   // fallback summary
-  const archetypes = profiles.map((p) => `${nameOf(p.playerId)}: ${p.typing.archetype}`).join(', ')
+  const archetypes = profiles.map((p) => `${lastName(p.name)}: ${p.typing.archetype}`).join(', ')
   return isPro
     ? `Table read — ${archetypes}. Ask about a specific player or "who is most exploitable" to drill in.`
     : `I’ve sized up the table. Ask me who to target, who to avoid, or who you can bluff.`
 }
 
-export default function AIChat({ playerIds }: { playerIds: string[] }) {
+export default function AIChat({ profiles }: { profiles: PlayerProfile[] }) {
   const { isPro } = useMode()
   const [messages, setMessages] = useState<Msg[]>([])
   const [input, setInput] = useState('')
   const [pulse, setPulse] = useState(0)
   const endRef = useRef<HTMLDivElement>(null)
-
-  const profiles = useMemo(
-    () => playerIds.map(getProfile).filter((p): p is PlayerProfile => !!p),
-    [playerIds],
-  )
 
   useEffect(() => {
     if (messages.length > 0) return

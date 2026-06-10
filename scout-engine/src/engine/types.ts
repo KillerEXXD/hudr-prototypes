@@ -89,5 +89,51 @@ export interface PlayerProfile {
   positional: PositionalStat[]
   typing: TypingResult
   exploits: Exploit[]
+  /** 0–100 — how beatable this player is (aggregated exploit severities). */
+  exploitability: number
+  /** how strong they are overall. */
+  skill: SkillRating
   narrative: Narrative
+}
+
+// ---- Analysis-scope filter dimensions ----
+export type Scope = 'event' | 'career'
+export type TableSizeBucket = 'all' | 'short' | 'full'   // short = ≤4 players, full = ≥5
+export type DepthBucket = 'all' | 'short' | 'mid' | 'deep' // <15bb / 15–40bb / 40+bb
+
+export interface StatFilters {
+  scope: Scope
+  tournamentId: string | null
+  tableSize: TableSizeBucket
+  depth: DepthBucket
+}
+
+export interface SkillRating {
+  score: number   // 0–100
+  grade: string   // 'A+' … 'F', or '—' when insufficient data
+}
+
+/** Raw per-player stat values fed into the engine (Layer 1 input, domain shape). */
+export interface RawPlayerStatValues {
+  totalHands: number
+  vpip: number
+  pfr: number
+  threeBet: number
+  foldTo3Bet: number
+  fourBet: number
+  coldCall: number
+  steal: number
+  foldToSteal: number
+  cbetFlop: number
+  cbetTurn: number
+  foldToCbetFlop: number
+  foldToCbetTurn: number
+  checkRaise: number
+  donk: number
+  wtsd: number
+  wsd: number
+  wwsf: number
+  af: number
+  afq: number
+  riverBet: number
 }

@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Trophy, Users, ChevronRight, Radio, Layers, Target, Brain } from 'lucide-react'
+import { Search, Trophy, Users, ChevronRight, Radio, Layers, Target, Brain, Loader2 } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
-import { TOURNAMENTS_LIST, PLAYERS } from '@/data'
-import { getProfile } from '@/engine'
+import { useTournaments, usePlayers, useProfiles, careerFilters } from '@/hooks'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui'
 import PlayerAvatar from '@/components/player/PlayerAvatar'
 import ArchetypeBadge from '@/components/common/ArchetypeBadge'
@@ -37,13 +36,18 @@ export default function FindPage() {
   const { isPro } = useMode()
   const [q, setQ] = useState('')
 
-  const tournaments = useMemo(
-    () => TOURNAMENTS_LIST.filter((t) => (t.name + t.event + t.venue).toLowerCase().includes(q.toLowerCase())),
-    [q],
+  const { data: tournaments = [], isLoading: tLoading } = useTournaments()
+  const { data: players = [], isLoading: pLoading } = usePlayers()
+  const { profiles } = useProfiles(players.map((p) => p.id), careerFilters())
+  const profileByPlayer = useMemo(() => Object.fromEntries(profiles.map((p) => [p.playerId, p])), [profiles])
+
+  const tournamentMatches = useMemo(
+    () => tournaments.filter((t) => (t.name + t.event + t.venue).toLowerCase().includes(q.toLowerCase())),
+    [tournaments, q],
   )
-  const players = useMemo(
-    () => PLAYERS.filter((p) => p.name.toLowerCase().includes(q.toLowerCase())),
-    [q],
+  const playerMatches = useMemo(
+    () => players.filter((p) => p.name.toLowerCase().includes(q.toLowerCase())),
+    [players, q],
   )
 
   return (
@@ -72,71 +76,75 @@ export default function FindPage() {
         </TabsList>
 
         <TabsContent value="tournaments">
-          <div className="space-y-2">
-            {tournaments.map((t) => (
-              <Link
-                key={t.id}
-                to={`/tournament/${t.id}`}
-                className="block rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="truncate font-semibold text-text-primary">{t.name}</h3>
-                      {t.status === 'live' && (
-                        <span className="flex items-center gap-1 rounded-full bg-accent-red/15 px-1.5 py-0.5 text-[10px] font-bold text-accent-red">
-                          <Radio className="h-2.5 w-2.5" />LIVE
-                        </span>
-                      )}
+          {tLoading ? <Loading /> : (
+            <div className="space-y-2">
+              {tournamentMatches.map((t) => (
+                <Link
+                  key={t.id}
+                  to={`/tournament/${t.id}`}
+                  className="block rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="truncate font-semibold text-text-primary">{t.name}</h3>
+                        {t.isLive && (
+                          <span className="flex items-center gap-1 rounded-full bg-accent-red/15 px-1.5 py-0.5 text-[10px] font-bold text-accent-red">
+                            <Radio className="h-2.5 w-2.5" />LIVE
+                          </span>
+                        )}
+                      </div>
+                      <p className="truncate text-xs text-text-muted">{t.event} · {t.venue} · {t.date}</p>
                     </div>
-                    <p className="truncate text-xs text-text-muted">{t.event} · {t.venue} · {t.date}</p>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
                   </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-text-secondary nums">
-                  <span>{t.players} players</span>
-                  <span>{t.hands} hands</span>
-                  <span>{fmtChips(t.prize)}</span>
-                  {t.exploitable > 0 && (
-                    <span className="rounded-full bg-accent-amber/10 px-1.5 py-0.5 font-semibold text-accent-amber">
-                      {t.exploitable} exploitable
-                    </span>
-                  )}
-                </div>
-              </Link>
-            ))}
-            {tournaments.length === 0 && <Empty />}
-          </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-text-secondary nums">
+                    <span>{t.playerCount} players</span>
+                    <span>{t.handCount} hands</span>
+                    <span>{fmtChips(t.prizePool)}</span>
+                    {t.exploitableCount > 0 && (
+                      <span className="rounded-full bg-accent-amber/10 px-1.5 py-0.5 font-semibold text-accent-amber">
+                        {t.exploitableCount} exploitable
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+              {tournamentMatches.length === 0 && <Empty />}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="players">
-          <div className="space-y-2">
-            {players.map((p) => {
-              const prof = getProfile(p.id)
-              return (
-                <Link
-                  key={p.id}
-                  to={`/player/${p.id}`}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
-                >
-                  <PlayerAvatar initials={p.initials} color={p.color} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="truncate font-semibold text-text-primary">{p.name} <span aria-hidden>{p.flag}</span></h3>
+          {pLoading ? <Loading /> : (
+            <div className="space-y-2">
+              {playerMatches.map((p) => {
+                const prof = profileByPlayer[p.id]
+                return (
+                  <Link
+                    key={p.id}
+                    to={`/player/${p.id}`}
+                    className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
+                  >
+                    <PlayerAvatar initials={p.initials} color={p.color} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="truncate font-semibold text-text-primary">{p.name} <span aria-hidden>{p.flag}</span></h3>
+                      </div>
+                      <div className="mt-1 flex items-center gap-2">
+                        {prof && <ArchetypeBadge archetype={prof.typing.archetype} plain={!isPro} size="sm" />}
+                        {prof && prof.exploits.length > 0 && (
+                          <span className="text-[11px] text-text-muted nums">{prof.exploits.length} leak{prof.exploits.length > 1 ? 's' : ''}</span>
+                        )}
+                      </div>
                     </div>
-                    <div className="mt-1 flex items-center gap-2">
-                      {prof && <ArchetypeBadge archetype={prof.typing.archetype} plain={!isPro} size="sm" />}
-                      {prof && prof.exploits.length > 0 && (
-                        <span className="text-[11px] text-text-muted nums">{prof.exploits.length} leak{prof.exploits.length > 1 ? 's' : ''}</span>
-                      )}
-                    </div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
-                </Link>
-              )
-            })}
-            {players.length === 0 && <Empty />}
-          </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
+                  </Link>
+                )
+              })}
+              {playerMatches.length === 0 && <Empty />}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
@@ -145,4 +153,12 @@ export default function FindPage() {
 
 function Empty() {
   return <div className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-text-muted">No matches.</div>
+}
+
+function Loading() {
+  return (
+    <div className="flex items-center justify-center gap-2 py-10 text-sm text-text-muted">
+      <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+    </div>
+  )
 }
