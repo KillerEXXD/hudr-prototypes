@@ -30,7 +30,7 @@ export default function ModeToggle({ className }: { className?: string }) {
           !isPro ? 'text-white' : 'text-text-muted hover:text-text-secondary',
         )}
       >
-        <MessageCircle className="h-3.5 w-3.5" /> Plain English
+        <MessageCircle className="h-3.5 w-3.5" /> Amateur
       </button>
       <button
         role="tab"
@@ -41,7 +41,7 @@ export default function ModeToggle({ className }: { className?: string }) {
           isPro ? 'text-white' : 'text-text-muted hover:text-text-secondary',
         )}
       >
-        <BarChart3 className="h-3.5 w-3.5" /> Pro Stats
+        <BarChart3 className="h-3.5 w-3.5" /> Pro
       </button>
     </div>
   )
