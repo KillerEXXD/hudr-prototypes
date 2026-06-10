@@ -139,13 +139,17 @@
       color: #4b5563;
       font-size: 13px;
     }
+    /* Show only today's Scout prototypes; hide the rest of the gallery. */
+    .card:not([href^="scout-engine-demo"]):not([href^="scout-clarivue-demo"]):not([href^="scout-terminal-demo"]):not([href^="scout-felt-demo"]):not([href^="scout-pulse-demo"]):not([href^="scout-edge-demo"]) {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="hero">
       <h1>HUDR Prototypes</h1>
-      <p>32 radically different UX designs for poker tournament intelligence. Same data, completely different experiences.</p>
+      <p>Scout — the poker opponent-analysis engine, shown in six visual directions. Same data and features, different looks.</p>
       <span class="badge">Mobile-First PWA • Dark + Light Themes • Mock Data</span>
     </div>
 
@@ -734,7 +738,7 @@
     </div>
 
     <div class="footer">
-      HUDR Prototypes • 37 designs (27 HTML + 10 React) • Shared mock data • Mobile-first PWA
+      HUDR Prototypes • Scout Engine + 5 visual directions • Shared mock data • Mobile-first PWA
     </div>
   </div>
 </body>
