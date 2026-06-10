@@ -40,3 +40,14 @@ export interface Highlight {
   videoSeconds: number
   videoUrl: string
 }
+
+export interface HandSummary {
+  handNumber: number
+  board: string[]
+  pot: number
+  playerIds: string[]
+  result: string
+  videoSeconds: number
+  videoUrl: string | null   // YouTube view option
+  hasReplay: boolean        // replayer view option
+}

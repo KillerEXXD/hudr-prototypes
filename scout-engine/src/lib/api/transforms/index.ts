@@ -1,5 +1,5 @@
-import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight } from '../types'
-import type { Tournament, Player, Highlight } from '../domain'
+import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand } from '../types'
+import type { Tournament, Player, Highlight, HandSummary } from '../domain'
 import type { RawPlayerStatValues } from '@/engine'
 import { YT_BASE } from '@/data'
 
@@ -37,5 +37,12 @@ export function transformHighlight(a: ApiHighlight): Highlight {
     id: a.id, handNumber: a.hand_number, type: a.type, tier: a.tier, board: a.board,
     preview: a.preview, pot: a.pot, playerIds: a.player_ids, videoSeconds: a.video_seconds,
     videoUrl: `${YT_BASE}${a.video_seconds}`,
+  }
+}
+
+export function transformHand(a: ApiHand): HandSummary {
+  return {
+    handNumber: a.hand_number, board: a.board, pot: a.pot, playerIds: a.player_ids,
+    result: a.result, videoSeconds: a.video_seconds, videoUrl: a.video_url, hasReplay: a.has_replay,
   }
 }

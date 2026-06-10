@@ -1,4 +1,4 @@
-import { apiTournaments, apiPlayers, apiPlayerStats, apiHighlights } from './fixtures'
+import { apiTournaments, apiPlayers, apiPlayerStats, apiHighlights, buildTournamentHands } from './fixtures'
 import { applyFilters } from './segment'
 
 type Params = Record<string, string | number | undefined> | undefined
@@ -36,6 +36,9 @@ export function resolveMock<T>(endpoint: string, params?: Params): T {
     }
     case 'tournament-highlights': {
       return apiHighlights as T
+    }
+    case 'tournament-hands': {
+      return buildTournamentHands(String(params?.tournament_id ?? '')) as T
     }
     default:
       throw new Error(`No mock for endpoint: ${endpoint}`)

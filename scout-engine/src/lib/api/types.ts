@@ -75,3 +75,15 @@ export interface ApiHighlight {
   player_ids: string[]
   video_seconds: number
 }
+
+export interface ApiHand {
+  hand_number: number
+  board: string[]
+  pot: number
+  player_ids: string[]
+  video_seconds: number
+  result: string
+  // each hand can be viewed two ways (integration later):
+  video_url: string | null   // YouTube deep link w/ timestamp
+  has_replay: boolean         // backend has replay actions → replayer available
+}

@@ -1,15 +1,17 @@
 import { useMemo, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Radio, MessageSquare, Table2, ChevronRight, Crown, Loader2 } from 'lucide-react'
+import { Radio, MessageSquare, Table2, ChevronRight, Crown, Loader2, History, Flame } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
-import { useTournament, useTournamentPlayers, useTournamentProfiles } from '@/hooks'
+import { useTournament, useTournamentPlayers, useTournamentProfiles, useTournamentHighlights, useTournamentHands } from '@/hooks'
 import { STAT_DEFS } from '@/engine'
 import type { PlayerProfile, StatKey } from '@/engine'
-import type { Player, Tournament } from '@/lib/api/domain'
+import type { Player, Tournament, Highlight, HandSummary } from '@/lib/api/domain'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui'
 import PlayerAvatar from '@/components/player/PlayerAvatar'
 import ArchetypeBadge from '@/components/common/ArchetypeBadge'
 import AIChat from '@/components/scout/AIChat'
+import HandViewerButton from '@/components/scout/HandViewer'
+import MiniCard from '@/components/common/MiniCard'
 import { cn, fmtChips } from '@/lib/utils'
 
 const TABLE_COLS: StatKey[] = ['vpip', 'pfr', 'threeBet', 'af', 'wtsd']
@@ -31,6 +33,8 @@ export default function TournamentPage() {
   const { isPro } = useMode()
   const { data: t, isLoading: tLoading } = useTournament(id)
   const { data: players = [] } = useTournamentPlayers(id)
+  const { data: highlights = [] } = useTournamentHighlights(id)
+  const { data: hands = [] } = useTournamentHands(id)
   const rosterIds = useMemo(() => players.map((p) => p.id), [players])
   const { profiles } = useTournamentProfiles(id, rosterIds)
 
@@ -95,16 +99,18 @@ export default function TournamentPage() {
         {rows.length === 0 && <Centered><Loader2 className="h-4 w-4 animate-spin" /> Reading players…</Centered>}
       </div>
 
-      {/* Analysis tools */}
-      <h2 className="mb-2 mt-5 text-sm font-semibold text-text-secondary">Analyze this tournament</h2>
-      <Tabs defaultValue="chat">
+      {/* Explore */}
+      <h2 className="mb-2 mt-5 text-sm font-semibold text-text-secondary">Explore this tournament</h2>
+      <Tabs defaultValue="hands">
         <TabsList>
-          <TabsTrigger value="chat"><span className="flex items-center justify-center gap-1.5"><MessageSquare className="h-3.5 w-3.5" />AI Chat</span></TabsTrigger>
-          <TabsTrigger value="stats"><span className="flex items-center justify-center gap-1.5"><Table2 className="h-3.5 w-3.5" />{isPro ? 'Stats Table' : 'Table Read'}</span></TabsTrigger>
+          <TabsTrigger value="hands"><span className="flex items-center justify-center gap-1"><History className="h-3.5 w-3.5" />Hands</span></TabsTrigger>
+          <TabsTrigger value="highlights"><span className="flex items-center justify-center gap-1"><Flame className="h-3.5 w-3.5" />Highlights</span></TabsTrigger>
+          <TabsTrigger value="chat"><span className="flex items-center justify-center gap-1"><MessageSquare className="h-3.5 w-3.5" />Chat</span></TabsTrigger>
+          <TabsTrigger value="stats"><span className="flex items-center justify-center gap-1"><Table2 className="h-3.5 w-3.5" />Stats</span></TabsTrigger>
         </TabsList>
-        <TabsContent value="chat">
-          <AIChat profiles={profiles} />
-        </TabsContent>
+        <TabsContent value="hands"><HandsList hands={hands} /></TabsContent>
+        <TabsContent value="highlights"><HighlightsList items={highlights} /></TabsContent>
+        <TabsContent value="chat"><AIChat profiles={profiles} /></TabsContent>
         <TabsContent value="stats">
           {isPro ? <ProStatsTable rows={rows} tournamentId={t.id} /> : <PlainTableRead rows={rows} tournamentId={t.id} />}
         </TabsContent>
@@ -115,6 +121,51 @@ export default function TournamentPage() {
 
 function Centered({ children }: { children: ReactNode }) {
   return <div className="flex items-center justify-center gap-2 py-10 text-sm text-text-muted">{children}</div>
+}
+
+function HandsList({ hands }: { hands: HandSummary[] }) {
+  if (!hands.length) return <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading hands…</Centered>
+  return (
+    <div className="space-y-2">
+      <p className="text-[11px] text-text-muted">Full hand history — each hand opens in a YouTube clip or the replayer. (Modeled list)</p>
+      {hands.map((h) => (
+        <div key={h.handNumber} className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-3">
+          <div className="flex shrink-0 gap-1">{h.board.slice(0, 3).map((c, i) => <MiniCard key={i} card={c} />)}</div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-text-primary">Hand #{h.handNumber}</span>
+              <span className="nums text-[11px] text-text-muted">{fmtChips(h.pot)}</span>
+            </div>
+            <p className="truncate text-xs text-text-muted">{h.result}</p>
+          </div>
+          <HandViewerButton hand={{ handNumber: h.handNumber, title: h.result, board: h.board, videoSeconds: h.videoSeconds, hasReplay: h.hasReplay }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function HighlightsList({ items }: { items: Highlight[] }) {
+  if (!items.length) return <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading highlights…</Centered>
+  return (
+    <div className="space-y-2">
+      {items.map((h) => (
+        <div key={h.id} className="rounded-xl border border-border bg-bg-card p-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-accent-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent-amber">{h.type.replace(/_/g, ' ')}</span>
+                <span className="nums text-[11px] text-text-muted">{fmtChips(h.pot)}</span>
+              </div>
+              <p className="mt-1 text-sm leading-snug text-text-primary">{h.preview}</p>
+              <p className="text-[11px] text-text-muted">Hand #{h.handNumber} · {h.board}</p>
+            </div>
+            <HandViewerButton className="shrink-0" hand={{ handNumber: h.handNumber, title: h.preview, note: h.board, videoSeconds: h.videoSeconds, hasReplay: true }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 function ProStatsTable({ rows, tournamentId }: { rows: Row[]; tournamentId: string }) {
