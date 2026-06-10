@@ -76,6 +76,14 @@ export interface ApiHighlight {
   video_seconds: number
 }
 
+export interface ApiPlayerTournament {
+  tournament_id: string
+  name: string
+  event: string
+  date: string
+  hands: number
+}
+
 export interface ApiSuggestedQuestion {
   text: string
   asked_count: number

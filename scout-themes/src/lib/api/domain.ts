@@ -46,6 +46,14 @@ export interface SuggestedQuestion {
   askedCount: number   // times other users asked this (social proof)
 }
 
+export interface PlayerTournament {
+  tournamentId: string
+  name: string
+  event: string
+  date: string
+  hands: number
+}
+
 export interface HandSummary {
   handNumber: number
   board: string[]

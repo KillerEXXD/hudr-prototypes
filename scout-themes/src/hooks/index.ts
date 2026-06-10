@@ -2,7 +2,7 @@ import { useQuery, useQueries } from '@tanstack/react-query'
 import {
   getTournaments, getTournament, getTournamentPlayers,
   getPlayers, getPlayer, getPlayerProfile, getTournamentHighlights, getTournamentHands,
-  getSuggestedQuestions,
+  getSuggestedQuestions, getPlayerTournaments,
 } from '@/lib/api/services'
 import type { PlayerProfile, StatFilters } from '@/engine'
 
@@ -22,6 +22,9 @@ export function usePlayers() {
 }
 export function usePlayer(id: string) {
   return useQuery({ queryKey: ['players', id], queryFn: () => getPlayer(id), enabled: !!id, ...STATIC })
+}
+export function usePlayerTournaments(id: string) {
+  return useQuery({ queryKey: ['players', id, 'tournaments'], queryFn: () => getPlayerTournaments(id), enabled: !!id, ...STATIC })
 }
 export function usePlayerProfile(id: string, filters: StatFilters) {
   return useQuery({

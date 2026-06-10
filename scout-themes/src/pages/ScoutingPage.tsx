@@ -20,6 +20,7 @@ import PositionalOpens from '@/components/scout/PositionalOpens'
 import ScopeFilters from '@/components/scout/ScopeFilters'
 import PlayerChat from '@/components/scout/PlayerChat'
 import Strengths from '@/components/scout/Strengths'
+import PlayerTournaments from '@/components/scout/PlayerTournaments'
 import { cn } from '@/lib/utils'
 import type { ReactNode } from 'react'
 
@@ -132,6 +133,11 @@ export default function ScoutingPage() {
         </div>
 
         <p className="mt-3 text-sm leading-snug text-text-secondary">{narrative.summary}</p>
+      </div>
+
+      {/* ---- Tournaments in DB (hands per tournament) ---- */}
+      <div className="mt-3">
+        <PlayerTournaments playerId={id} firstName={player.name.split(' ')[0]} />
       </div>
 
       {/* ---- Filters ---- */}

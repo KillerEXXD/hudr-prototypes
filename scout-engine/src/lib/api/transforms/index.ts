@@ -1,5 +1,5 @@
-import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand, ApiSuggestedQuestion } from '../types'
-import type { Tournament, Player, Highlight, HandSummary, SuggestedQuestion } from '../domain'
+import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand, ApiSuggestedQuestion, ApiPlayerTournament } from '../types'
+import type { Tournament, Player, Highlight, HandSummary, SuggestedQuestion, PlayerTournament } from '../domain'
 import type { RawPlayerStatValues } from '@/engine'
 import { YT_BASE } from '@/data'
 
@@ -42,6 +42,10 @@ export function transformHighlight(a: ApiHighlight): Highlight {
 
 export function transformSuggestedQuestion(a: ApiSuggestedQuestion): SuggestedQuestion {
   return { text: a.text, askedCount: a.asked_count }
+}
+
+export function transformPlayerTournament(a: ApiPlayerTournament): PlayerTournament {
+  return { tournamentId: a.tournament_id, name: a.name, event: a.event, date: a.date, hands: a.hands }
 }
 
 export function transformHand(a: ApiHand): HandSummary {

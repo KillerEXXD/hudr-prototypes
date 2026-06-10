@@ -6,7 +6,7 @@
 // =====================================================================
 import { PLAYERS, STATS, TOURNAMENTS_LIST, HIGHLIGHTS, YT_BASE } from '@/data'
 import { EXTRA_STATS } from '@/engine'
-import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand, ApiSuggestedQuestion } from '../types'
+import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand, ApiSuggestedQuestion, ApiPlayerTournament } from '../types'
 
 export const apiTournaments: ApiTournament[] = TOURNAMENTS_LIST.map((t) => ({
   id: t.id,
@@ -106,6 +106,19 @@ export const suggestedQuestions: Record<'tournament' | 'player', ApiSuggestedQue
     { text: 'Should I value bet thin against them?', asked_count: 410 },
     { text: "What's their game plan against me?", asked_count: 280 },
   ],
+}
+
+// Tournaments this player appears in, with modeled hands per tournament.
+export function buildPlayerTournaments(playerId: string): ApiPlayerTournament[] {
+  return apiTournaments
+    .filter((t) => t.hand_count > 0 && (t.id === 't1' || t.top_player_ids.includes(playerId)))
+    .map((t, i) => {
+      const seed = ((playerId.charCodeAt(1) || 1) * 7 + i * 3) % 10
+      const hands = t.id === 't1'
+        ? (STATS[playerId]?.totalHands ?? 0)
+        : Math.max(8, Math.round(t.hand_count * (0.45 + 0.5 * (seed / 10))))
+      return { tournament_id: t.id, name: t.name, event: t.event, date: t.date, hands }
+    })
 }
 
 export function buildTournamentHands(tournamentId: string): ApiHand[] {
