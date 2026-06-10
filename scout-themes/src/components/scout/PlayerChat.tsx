@@ -54,7 +54,8 @@ export default function PlayerChat({ profile }: { profile: PlayerProfile }) {
   const [messages, setMessages] = useState<Msg[]>([])
   const [input, setInput] = useState('')
   const [pulse, setPulse] = useState(0)
-  const endRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const first = profile.name.split(' ')[0]
   const { data: raw = [] } = useSuggestedQuestions('player')
   const [bumps, setBumps] = useState<Record<string, number>>({})
@@ -69,18 +70,25 @@ export default function PlayerChat({ profile }: { profile: PlayerProfile }) {
     const t = setInterval(() => setPulse((p) => (p + 1) % questions.length), 1800)
     return () => clearInterval(t)
   }, [messages.length, questions.length])
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, showSuggest])
+  // Pin the latest message to the bottom of the chat's OWN scroll container.
+  // Never call scrollIntoView here — it scrolls the whole page and shoves the
+  // mid-page chat box off the top of the viewport.
+  useEffect(() => {
+    const el = listRef.current
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+  }, [messages, showSuggest])
 
   function ask(q: string) {
     if (!q.trim()) return
     setMessages((m) => [...m, { role: 'user', text: q }, { role: 'ai', text: answer(q, profile, isPro) }])
     setInput(''); setShowSuggest(false)
+    inputRef.current?.focus()
   }
   function pick(q: string) { setBumps((b) => ({ ...b, [q]: (b[q] || 0) + 1 })); ask(q) }
 
   return (
     <div className="flex flex-col rounded-xl border border-border bg-bg-card">
-      <div className="max-h-[44vh] min-h-[180px] flex-1 overflow-y-auto scrollbar-thin p-3">
+      <div ref={listRef} className="max-h-[44vh] min-h-[180px] flex-1 overflow-y-auto scrollbar-thin p-3">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center px-2 py-5 text-center">
             <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-accent-blue/15">
@@ -111,7 +119,6 @@ export default function PlayerChat({ profile }: { profile: PlayerProfile }) {
                 )}
               </div>
             ))}
-            <div ref={endRef} />
           </div>
         )}
       </div>
@@ -139,6 +146,7 @@ export default function PlayerChat({ profile }: { profile: PlayerProfile }) {
           </button>
         )}
         <input
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={`Ask about ${first}…`}
