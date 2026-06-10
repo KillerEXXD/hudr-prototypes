@@ -1,16 +1,15 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Radio, MessageSquare, Table2, ChevronRight, Crown, Loader2, History, Flame } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
-import { useTournament, useTournamentPlayers, useProfiles, useTournamentHighlights, useTournamentHands } from '@/hooks'
+import { useTournament, useTournamentPlayers, useTournamentProfiles, useTournamentHighlights, useTournamentHands } from '@/hooks'
 import { STAT_DEFS } from '@/engine'
-import type { PlayerProfile, StatKey, StatFilters } from '@/engine'
+import type { PlayerProfile, StatKey } from '@/engine'
 import type { Player, Tournament, Highlight, HandSummary } from '@/lib/api/domain'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui'
 import PlayerAvatar from '@/components/player/PlayerAvatar'
 import ArchetypeBadge from '@/components/common/ArchetypeBadge'
 import AIChat from '@/components/scout/AIChat'
-import ScopeFilters from '@/components/scout/ScopeFilters'
 import HandViewerButton from '@/components/scout/HandViewer'
 import MiniCard from '@/components/common/MiniCard'
 import { cn, fmtChips } from '@/lib/utils'
@@ -37,10 +36,9 @@ export default function TournamentPage() {
   const { data: highlights = [] } = useTournamentHighlights(id)
   const { data: hands = [] } = useTournamentHands(id)
   const rosterIds = useMemo(() => players.map((p) => p.id), [players])
-  // Tournament-level filter: scope is fixed to THIS event; table size + depth re-segment the roster.
-  const [filters, setFilters] = useState<StatFilters>({ scope: 'event', tournamentId: id, tableSize: 'all', depth: 'all' })
-  const { profiles } = useProfiles(rosterIds, filters)
-  const playerQuery = `?t=${id}&ts=${filters.tableSize}&depth=${filters.depth}`
+  const { profiles } = useTournamentProfiles(id, rosterIds)
+  // Filtering (scope / table size / depth) lives on the player report, not here.
+  const playerQuery = `?t=${id}`
 
   const rows: Row[] = useMemo(() => {
     const byId = Object.fromEntries(players.map((p) => [p.id, p]))
@@ -69,12 +67,6 @@ export default function TournamentPage() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Tournament filter — re-segments every player's read for this event */}
-      <div className="mt-4">
-        <ScopeFilters filters={filters} onChange={setFilters} eventAvailable showScope={false} />
-        <p className="mt-1 px-1 text-[11px] text-text-muted">Filters every player below by table size &amp; stack depth (this event). Modeled.</p>
       </div>
 
       {/* Roster */}
