@@ -35,6 +35,12 @@ class ApiClient {
     const body = (await res.json()) as ApiResponse<T>
     return body
   }
+
+  // Stub — the ported replayer's bug-report modal references apiClient.post.
+  // That feature isn't wired in the prototype; this just prevents a crash.
+  async post<T>(_endpoint: string, _body?: unknown): Promise<ApiResponse<T>> {
+    return { success: false, error: 'Not implemented in prototype' }
+  }
 }
 
 export const apiClient = new ApiClient()

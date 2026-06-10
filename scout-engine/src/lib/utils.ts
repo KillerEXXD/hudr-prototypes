@@ -12,6 +12,11 @@ export function fmtChips(n: number | null | undefined): string {
   return '$' + n
 }
 
+export function fmtCount(n: number): string {
+  if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k'
+  return String(n)
+}
+
 export function statColor(v: number): string {
   if (v >= 55) return 'text-accent-emerald'
   if (v >= 30) return 'text-accent-amber'

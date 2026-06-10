@@ -6,7 +6,7 @@
 // =====================================================================
 import { PLAYERS, STATS, TOURNAMENTS_LIST, HIGHLIGHTS, YT_BASE } from '@/data'
 import { EXTRA_STATS } from '@/engine'
-import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand } from '../types'
+import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand, ApiSuggestedQuestion } from '../types'
 
 export const apiTournaments: ApiTournament[] = TOURNAMENTS_LIST.map((t) => ({
   id: t.id,
@@ -83,6 +83,30 @@ export const apiHighlights: ApiHighlight[] = HIGHLIGHTS.map((h) => ({
 // MODELED hand-history list per tournament (placeholder data — integration later).
 const BOARDS = ['Kd Qh Ks', '9h 6h 2h', 'As Kh 7c', 'Th 8d 3c', 'Jc Jd 4s', 'Qs 9s 5h', 'Ad 7d 2c', '8c 8h 5d']
 const RESULTS = ['Bet flop, took it down', 'All-in preflop, called', 'Triple-barrel, called', 'C-bet, opponent folded', 'Check-raise on the turn', 'Showdown — top pair wins', 'River bluff picked off', 'Set over set cooler']
+
+// Popular questions per context, with how many times other users asked them.
+export const suggestedQuestions: Record<'tournament' | 'player', ApiSuggestedQuestion[]> = {
+  tournament: [
+    { text: 'Who is the most exploitable player?', asked_count: 2380 },
+    { text: 'Who should I avoid tangling with?', asked_count: 1640 },
+    { text: 'Who plays the most hands?', asked_count: 1290 },
+    { text: 'Who can I bluff?', asked_count: 1120 },
+    { text: 'Who is the toughest player here?', asked_count: 870 },
+    { text: 'Who steals blinds the most?', asked_count: 540 },
+    { text: 'Who calls down too light?', asked_count: 430 },
+    { text: 'Give me a quick read on the whole table', asked_count: 360 },
+  ],
+  player: [
+    { text: "What's their biggest weakness?", asked_count: 3120 },
+    { text: 'How do I beat them?', asked_count: 2010 },
+    { text: 'Can I bluff them?', asked_count: 1450 },
+    { text: "What's their playing style?", asked_count: 980 },
+    { text: 'Do they fold to 3-bets?', asked_count: 760 },
+    { text: 'Are they aggressive postflop?', asked_count: 520 },
+    { text: 'Should I value bet thin against them?', asked_count: 410 },
+    { text: "What's their game plan against me?", asked_count: 280 },
+  ],
+}
 
 export function buildTournamentHands(tournamentId: string): ApiHand[] {
   const t = apiTournaments.find((x) => x.id === tournamentId)

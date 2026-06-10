@@ -1,19 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
-import { Send, Sparkles, Bot, User } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Send, Sparkles, Bot, User, Lightbulb } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
+import { useSuggestedQuestions } from '@/hooks'
 import type { PlayerProfile } from '@/engine'
+import SuggestedQuestions from './SuggestedQuestions'
 import { cn } from '@/lib/utils'
-
-const lastName = (name: string) => name.split(' ').slice(-1)[0]
 
 interface Msg { role: 'user' | 'ai'; text: string }
 
-const SUGGESTIONS = [
-  'Who is the most exploitable player?',
-  'Who should I avoid tangling with?',
-  'Who plays the most hands?',
-  'Who can I bluff?',
-]
+const lastName = (name: string) => name.split(' ').slice(-1)[0]
 
 // Deterministic mock "AI" — answers are composed ONLY from computed profiles,
 // mirroring the spec rule that the narrative layer never invents numbers.
@@ -39,7 +34,7 @@ function answer(q: string, profiles: PlayerProfile[], isPro: boolean): string {
       ? `${solid.name} (${solid.typing.archetype}, confidence ${Math.round(solid.typing.confidence * 100)}%) shows the fewest RELIABLE leaks — play straightforward and avoid bloating pots out of position.`
       : `Be careful with ${first} — they don’t give much away. Don’t try anything fancy; only play big pots with strong hands.`
   }
-  if (/(most hands|loose|wide|vpip)/.test(ql)) {
+  if (/(most hands|loose|wide|vpip|steal)/.test(ql)) {
     const loosest = [...profiles].sort((a, b) => (b.stats.find(s => s.key === 'vpip')?.value ?? 0) - (a.stats.find(s => s.key === 'vpip')?.value ?? 0))[0]
     const vp = loosest.stats.find((s) => s.key === 'vpip')!
     return isPro
@@ -53,7 +48,13 @@ function answer(q: string, profiles: PlayerProfile[], isPro: boolean): string {
       ? `${folder.name} folds to flop c-bets ${f.value}% (${f.tier}). Bluff-bet flops in position; back off if the sample is only TENTATIVE.`
       : `${folder.name.split(' ')[0]} folds to bets a lot — fire a bet on the flop and you’ll often just take the pot.`
   }
-  // fallback summary
+  if (/(call|station|showdown|light)/.test(ql)) {
+    const station = [...profiles].sort((a, b) => (b.stats.find(s => s.key === 'wtsd')?.value ?? 0) - (a.stats.find(s => s.key === 'wtsd')?.value ?? 0))[0]
+    const w = station.stats.find((s) => s.key === 'wtsd')!
+    return isPro
+      ? `${station.name} has the highest WTSD (${w.value}%). Value bet thin, never triple-barrel bluff.`
+      : `${station.name.split(' ')[0]} calls down the most — bet your good hands for value and skip the bluffs.`
+  }
   const archetypes = profiles.map((p) => `${lastName(p.name)}: ${p.typing.archetype}`).join(', ')
   return isPro
     ? `Table read — ${archetypes}. Ask about a specific player or "who is most exploitable" to drill in.`
@@ -62,24 +63,32 @@ function answer(q: string, profiles: PlayerProfile[], isPro: boolean): string {
 
 export default function AIChat({ profiles }: { profiles: PlayerProfile[] }) {
   const { isPro } = useMode()
+  const { data: raw = [] } = useSuggestedQuestions('tournament')
   const [messages, setMessages] = useState<Msg[]>([])
   const [input, setInput] = useState('')
   const [pulse, setPulse] = useState(0)
+  const [bumps, setBumps] = useState<Record<string, number>>({})
+  const [showSuggest, setShowSuggest] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (messages.length > 0) return
-    const t = setInterval(() => setPulse((p) => (p + 1) % SUGGESTIONS.length), 1800)
-    return () => clearInterval(t)
-  }, [messages.length])
+  const questions = useMemo(
+    () => raw.map((q) => ({ ...q, askedCount: q.askedCount + (bumps[q.text] || 0) })).sort((a, b) => b.askedCount - a.askedCount),
+    [raw, bumps],
+  )
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+  useEffect(() => {
+    if (messages.length > 0 || questions.length === 0) return
+    const t = setInterval(() => setPulse((p) => (p + 1) % questions.length), 1800)
+    return () => clearInterval(t)
+  }, [messages.length, questions.length])
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, showSuggest])
 
   function ask(q: string) {
     if (!q.trim()) return
     setMessages((m) => [...m, { role: 'user', text: q }, { role: 'ai', text: answer(q, profiles, isPro) }])
-    setInput('')
+    setInput(''); setShowSuggest(false)
   }
+  function pick(q: string) { setBumps((b) => ({ ...b, [q]: (b[q] || 0) + 1 })); ask(q) }
 
   return (
     <div className="flex flex-col rounded-xl border border-border bg-bg-card">
@@ -89,49 +98,58 @@ export default function AIChat({ profiles }: { profiles: PlayerProfile[] }) {
             <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-accent-blue/15">
               <Sparkles className="h-5 w-5 text-accent-blue" />
             </span>
-            <h3 className="text-base font-bold text-text-primary">Ask anything or tap a question below</h3>
+            <h3 className="text-base font-bold text-text-primary">Ask anything or tap a popular question</h3>
             <p className="mt-1 max-w-xs text-xs text-text-muted">
-              {isPro
-                ? 'Answers are composed only from computed stats & exploits — no invented reads.'
-                : 'Get plain-English answers about who to target and how to play this table.'}
+              {isPro ? 'Answers are composed only from computed stats & exploits — no invented reads.' : 'Get plain-English answers about who to target and how to play this table.'}
             </p>
-            <div className="mt-4 grid w-full gap-2">
-              {SUGGESTIONS.map((s, i) => (
-                <button
-                  key={s}
-                  onClick={() => ask(s)}
-                  className={cn(
-                    'rounded-lg border px-3 py-2 text-left text-sm transition-all cursor-pointer',
-                    pulse === i
-                      ? 'border-accent-amber/50 bg-accent-amber/10 text-text-primary scale-[1.02]'
-                      : 'border-border bg-bg-surface/60 text-text-secondary hover:text-text-primary hover:border-border-light',
-                  )}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
+            <SuggestedQuestions className="mt-4 w-full" questions={questions} onPick={pick} pulseIndex={pulse} />
           </div>
         ) : (
           <div className="space-y-3">
             {messages.map((m, i) => (
-              <div key={i} className={cn('flex gap-2', m.role === 'user' ? 'flex-row-reverse' : '')}>
-                <span className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-full', m.role === 'user' ? 'bg-accent-purple/20 text-accent-purple' : 'bg-accent-blue/15 text-accent-blue')}>
-                  {m.role === 'user' ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
-                </span>
-                <div className={cn('max-w-[80%] rounded-2xl px-3 py-2 text-sm leading-snug', m.role === 'user' ? 'bg-accent-blue text-white' : 'bg-bg-surface text-text-primary')}>
-                  {m.text}
+              <div key={i}>
+                <div className={cn('flex gap-2', m.role === 'user' ? 'flex-row-reverse' : '')}>
+                  <span className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-full', m.role === 'user' ? 'bg-accent-purple/20 text-accent-purple' : 'bg-accent-blue/15 text-accent-blue')}>
+                    {m.role === 'user' ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
+                  </span>
+                  <div className={cn('max-w-[80%] rounded-2xl px-3 py-2 text-sm leading-snug', m.role === 'user' ? 'bg-accent-blue text-white' : 'bg-bg-surface text-text-primary')}>
+                    {m.text}
+                  </div>
                 </div>
+                {m.role === 'ai' && (
+                  <button type="button" onClick={() => setShowSuggest(true)} className="ml-9 mt-1 flex items-center gap-1 text-[11px] font-medium text-accent-blue hover:underline cursor-pointer">
+                    <Lightbulb className="h-3 w-3" /> Suggested questions
+                  </button>
+                )}
               </div>
             ))}
             <div ref={endRef} />
           </div>
         )}
       </div>
-      <form
-        onSubmit={(e) => { e.preventDefault(); ask(input) }}
-        className="flex items-center gap-2 border-t border-border p-2.5"
-      >
+
+      {showSuggest && messages.length > 0 && (
+        <div className="border-t border-border p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-semibold text-text-secondary">Popular questions</span>
+            <button onClick={() => setShowSuggest(false)} className="text-xs text-text-muted hover:text-text-primary cursor-pointer">Close</button>
+          </div>
+          <SuggestedQuestions questions={questions} onPick={pick} />
+        </div>
+      )}
+
+      <form onSubmit={(e) => { e.preventDefault(); ask(input) }} className="flex items-center gap-2 border-t border-border p-2.5">
+        {messages.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowSuggest((s) => !s)}
+            title="Suggested questions"
+            aria-label="Suggested questions"
+            className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border transition-colors cursor-pointer', showSuggest ? 'bg-accent-blue/15 text-accent-blue' : 'text-text-muted hover:text-text-primary')}
+          >
+            <Lightbulb className="h-4 w-4" />
+          </button>
+        )}
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}

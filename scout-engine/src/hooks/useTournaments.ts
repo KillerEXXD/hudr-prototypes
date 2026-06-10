@@ -1,13 +1,14 @@
-import { useMemo } from 'react'
-import { TOURNAMENTS_LIST, TOURNAMENT } from '@/data'
-
-export function useTournaments() {
-  const tournaments = useMemo(() => TOURNAMENTS_LIST, [])
-  return { tournaments }
-}
-
-export function useTournament(id: string) {
-  const tournament = useMemo(() => TOURNAMENTS_LIST.find(t => t.id === id), [id])
-  const detail = useMemo(() => (id === 't1' ? TOURNAMENT : undefined), [id])
-  return { tournament, detail }
+// NOTE: This legacy v-hudr-v2 hook file is no longer used by the app
+// (the app's hooks live in src/hooks/index.ts). It now only provides the
+// `useInfiniteHands` stub the ported replayer's HandHistoryPanel imports —
+// that panel is not opened in this prototype (no tournamentId passed).
+export function useInfiniteHands(..._args: unknown[]) {
+  return {
+    data: undefined as { pages: { data: unknown[] }[] } | undefined,
+    fetchNextPage: () => {},
+    hasNextPage: false,
+    isFetchingNextPage: false,
+    isLoading: false,
+    isError: false,
+  }
 }

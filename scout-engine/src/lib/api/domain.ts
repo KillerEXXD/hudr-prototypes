@@ -41,6 +41,11 @@ export interface Highlight {
   videoUrl: string
 }
 
+export interface SuggestedQuestion {
+  text: string
+  askedCount: number   // times other users asked this (social proof)
+}
+
 export interface HandSummary {
   handNumber: number
   board: string[]

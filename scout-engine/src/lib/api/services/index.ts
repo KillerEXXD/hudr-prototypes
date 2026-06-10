@@ -2,4 +2,5 @@ export { getTournaments, getTournament, getTournamentPlayers } from './tournamen
 export { getPlayers, getPlayer, getPlayerStats } from './players'
 export { getTournamentHighlights } from './highlights'
 export { getTournamentHands } from './hands'
+export { getSuggestedQuestions } from './suggestions'
 export { getPlayerProfile } from './profiles'

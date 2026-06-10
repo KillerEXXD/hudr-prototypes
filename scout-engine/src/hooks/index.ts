@@ -2,6 +2,7 @@ import { useQuery, useQueries } from '@tanstack/react-query'
 import {
   getTournaments, getTournament, getTournamentPlayers,
   getPlayers, getPlayer, getPlayerProfile, getTournamentHighlights, getTournamentHands,
+  getSuggestedQuestions,
 } from '@/lib/api/services'
 import type { PlayerProfile, StatFilters } from '@/engine'
 
@@ -35,6 +36,9 @@ export function useTournamentHighlights(id: string) {
 }
 export function useTournamentHands(id: string) {
   return useQuery({ queryKey: ['tournaments', id, 'hands'], queryFn: () => getTournamentHands(id), enabled: !!id, ...STATIC })
+}
+export function useSuggestedQuestions(context: 'tournament' | 'player') {
+  return useQuery({ queryKey: ['suggested-questions', context], queryFn: () => getSuggestedQuestions(context), ...STATIC })
 }
 
 /** Profiles for a set of players under one filter (roster cards, AI chat, lists). */

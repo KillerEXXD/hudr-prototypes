@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Play, X, ExternalLink, Film, Clapperboard } from 'lucide-react'
 import MiniCard from '@/components/common/MiniCard'
+import { CanvasPokerReplayer } from '@/components/poker-canvas'
+import { sampleHandReplay } from '@/data/sampleHandReplay'
 import { cn } from '@/lib/utils'
 
 // Placeholder YouTube video id used by the mock dataset.
@@ -56,9 +58,9 @@ function Modal({ hand, onClose }: { hand: ViewableHand; onClose: () => void }) {
 
         {/* pane */}
         <div className="p-3">
-          <div className="relative overflow-hidden rounded-xl border border-border bg-black" style={{ aspectRatio: '16 / 9' }}>
-            {view === 'youtube' ? (
-              hasClip ? (
+          {view === 'youtube' ? (
+            <div className="relative overflow-hidden rounded-xl border border-border bg-black" style={{ aspectRatio: '16 / 9' }}>
+              {hasClip ? (
                 <iframe
                   className="absolute inset-0 h-full w-full"
                   src={`https://www.youtube.com/embed/${VIDEO_ID}?start=${hand.videoSeconds}`}
@@ -68,11 +70,24 @@ function Modal({ hand, onClose }: { hand: ViewableHand; onClose: () => void }) {
                 />
               ) : (
                 <Slot label="No clip linked to this hand yet" sub="Video URL will come from the per-hand capture." />
-              )
-            ) : (
-              <ReplayerSlot board={hand.board} />
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-black/40 p-2">
+              <CanvasPokerReplayer
+                handData={sampleHandReplay}
+                layoutMode="portrait"
+                width={368}
+                height={540}
+                showControls
+                allowFullscreen={false}
+                autoplay={false}
+                soundEnabled={false}
+                initialSpeed={1.5}
+              />
+              <span className="text-center text-[10px] text-text-muted">Demo hand in the real hudr replayer · live, this loads hand #{hand.handNumber}.</span>
+            </div>
+          )}
 
           {hand.note && <p className="mt-2 text-xs leading-snug text-text-secondary">{hand.note}</p>}
 

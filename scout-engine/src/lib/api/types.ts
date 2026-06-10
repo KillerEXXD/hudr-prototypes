@@ -76,6 +76,11 @@ export interface ApiHighlight {
   video_seconds: number
 }
 
+export interface ApiSuggestedQuestion {
+  text: string
+  asked_count: number
+}
+
 export interface ApiHand {
   hand_number: number
   board: string[]

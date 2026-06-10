@@ -49,3 +49,35 @@ export interface BluffReport {
   result: 'fold' | 'call'
   success: boolean
 }
+
+// ---- Card model (used by the ported poker-canvas replayer) ----
+export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades'
+export type Rank = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K' | 'A' | '?'
+
+export interface Card {
+  rank: Rank
+  suit: Suit
+}
+
+export interface Hand {
+  id: string
+  position: number
+  playerName: string
+  cards: [Card, Card]
+  isActive?: boolean
+}
+
+export const getSuitSymbol = (suit: Suit): string => {
+  switch (suit) {
+    case 'hearts': return '♥'
+    case 'diamonds': return '♦'
+    case 'clubs': return '♣'
+    case 'spades': return '♠'
+  }
+}
+
+export const getSuitColor = (suit: Suit): string =>
+  suit === 'hearts' || suit === 'diamonds' ? '#ef4444' : '#ffffff'
+
+export const getSuitColorForPlayingCard = (suit: Suit): string =>
+  suit === 'hearts' || suit === 'diamonds' ? '#ef4444' : '#000000'
