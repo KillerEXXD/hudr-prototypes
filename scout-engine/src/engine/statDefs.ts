@@ -176,3 +176,13 @@ export const STAT_ORDER: StatKey[] = [
   'cbetFlop', 'cbetTurn', 'foldToCbetFlop', 'foldToCbetTurn', 'checkRaise', 'donk',
   'wtsd', 'wsd', 'wwsf', 'af', 'afq', 'riverBet',
 ]
+
+// Typical population range [low, high] per stat — powers the "vs typical"
+// context bar and the Player/Population/Deviation grid on leak cards.
+export const STAT_TYPICAL: Record<StatKey, [number, number]> = {
+  vpip: [18, 32], pfr: [14, 26], gap: [2, 10], threeBet: [4, 13], foldTo3Bet: [35, 75],
+  fourBet: [2, 9], coldCall: [3, 15], steal: [25, 55], foldToSteal: [40, 80],
+  cbetFlop: [50, 80], cbetTurn: [40, 65], foldToCbetFlop: [40, 60], foldToCbetTurn: [45, 70],
+  checkRaise: [4, 12], donk: [2, 10], wtsd: [26, 34], wsd: [48, 56], wwsf: [44, 52],
+  af: [1.5, 4], afq: [40, 60], riverBet: [30, 55],
+}

@@ -178,7 +178,7 @@ export const STAT_ORDER: StatKey[] = [
 ]
 
 // Typical population range [low, high] per stat — powers the "vs typical"
-// context bar (the headline addition from the design brief).
+// context bar and the Player/Population/Deviation grid on leak cards.
 export const STAT_TYPICAL: Record<StatKey, [number, number]> = {
   vpip: [18, 32], pfr: [14, 26], gap: [2, 10], threeBet: [4, 13], foldTo3Bet: [35, 75],
   fourBet: [2, 9], coldCall: [3, 15], steal: [25, 55], foldToSteal: [40, 80],

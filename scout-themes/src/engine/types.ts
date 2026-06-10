@@ -93,7 +93,24 @@ export interface PlayerProfile {
   exploitability: number
   /** how strong they are overall. */
   skill: SkillRating
+  /** deterministically-computed positive traits (mirror of exploits). */
+  strengths: Strength[]
+  /** actionable plan grouped by phase. */
+  plan: ExploitPlan
   narrative: Narrative
+}
+
+export interface Strength {
+  id: string
+  title: string
+  detail: string
+}
+
+export interface PlanItem { plain: string; pro: string }
+export interface ExploitPlan {
+  preflop: PlanItem
+  postflop: PlanItem
+  icm: PlanItem
 }
 
 // ---- Analysis-scope filter dimensions ----

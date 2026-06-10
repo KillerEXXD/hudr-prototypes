@@ -5,6 +5,8 @@ import { classifyPlayer, getBoundaries } from './typing'
 import { buildExploits } from './exploits'
 import { buildNarrative } from './narrative'
 import { exploitabilityScore, skillRating } from './scores'
+import { buildStrengths } from './strengths'
+import { buildExploitPlan } from './plan'
 import { SAMPLE_HANDS } from './mockSource'
 import type { SampleHand } from './mockSource'
 
@@ -80,8 +82,10 @@ export function buildProfile(
   const exploits = buildExploits(stats)
   const exploitability = exploitabilityScore(exploits)
   const skill = skillRating(stats, typing, exploitability)
+  const strengths = buildStrengths(stats, typing)
+  const plan = buildExploitPlan(exploits, typing, stats)
   const narrative = buildNarrative({ name: player.name, typing, exploits, stats })
-  return { playerId: player.id, name: player.name, totalHands: raw.totalHands, stats, positional, typing, exploits, exploitability, skill, narrative }
+  return { playerId: player.id, name: player.name, totalHands: raw.totalHands, stats, positional, typing, exploits, exploitability, skill, strengths, plan, narrative }
 }
 
 export function getSampleHand(id: string | null): SampleHand | null {

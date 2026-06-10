@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import {
   Brain, Target, ClipboardList, Activity, MapPin, BarChart3, ShieldCheck, Quote,
-  Crosshair, Gauge, Loader2, Database, MessageSquare,
+  Crosshair, Gauge, Loader2, Database, MessageSquare, Award,
 } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
 import { usePlayer, usePlayerProfile } from '@/hooks'
@@ -18,6 +18,7 @@ import BoundaryTrace from '@/components/scout/BoundaryTrace'
 import PositionalOpens from '@/components/scout/PositionalOpens'
 import ScopeFilters from '@/components/scout/ScopeFilters'
 import PlayerChat from '@/components/scout/PlayerChat'
+import Strengths from '@/components/scout/Strengths'
 import { cn } from '@/lib/utils'
 import type { ReactNode } from 'react'
 
@@ -185,16 +186,21 @@ export default function ScoutingPage() {
         )}
       </Section>
 
-      {/* ---- Layer 4: game plan ---- */}
-      <Section icon={<ClipboardList className="h-4 w-4" />} title="Game plan" sub={isPro ? 'Three things to do at the table.' : 'Your simple three-step plan.'}>
-        <ol className="space-y-2">
-          {(isPro ? narrative.gamePlanPro : narrative.gamePlanPlain).map((g, i) => (
-            <li key={i} className="flex items-start gap-3 rounded-xl border border-border bg-bg-card p-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-blue/15 text-xs font-bold text-accent-blue nums">{i + 1}</span>
-              <span className="text-sm leading-snug text-text-primary">{g}</span>
-            </li>
+      {/* ---- Strengths ---- */}
+      <Section icon={<Award className="h-4 w-4" />} title={isPro ? 'Strengths' : 'What they do well'}>
+        <Strengths strengths={profile.strengths} />
+      </Section>
+
+      {/* ---- Layer 4: exploit plan (by phase) ---- */}
+      <Section icon={<ClipboardList className="h-4 w-4" />} title={isPro ? 'Exploit plan' : 'Your game plan'} sub={isPro ? 'Actionable, by phase.' : 'What to do, by stage of the hand.'}>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {([['Preflop', profile.plan.preflop], ['Postflop', profile.plan.postflop], ['ICM', profile.plan.icm]] as const).map(([label, item]) => (
+            <div key={label} className="rounded-xl border border-accent-emerald/25 bg-accent-emerald/5 p-3">
+              <div className="text-[10px] font-bold uppercase tracking-wide text-accent-emerald">{label}</div>
+              <p className="mt-1 text-sm leading-snug text-text-primary">{isPro ? item.pro : item.plain}</p>
+            </div>
           ))}
-        </ol>
+        </div>
       </Section>
 
       {/* ---- Stats ---- */}
