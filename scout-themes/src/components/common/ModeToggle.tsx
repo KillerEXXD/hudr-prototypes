@@ -10,7 +10,7 @@ export default function ModeToggle({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'relative inline-flex items-center rounded-full border border-border bg-bg-card/80 p-0.5 backdrop-blur select-none',
+        'relative inline-grid grid-cols-2 rounded-full border border-border bg-bg-card/80 p-0.5 backdrop-blur select-none',
         className,
       )}
       role="tablist"
@@ -26,7 +26,7 @@ export default function ModeToggle({ className }: { className?: string }) {
         aria-selected={!isPro}
         onClick={() => setMode('plain')}
         className={cn(
-          'relative z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-200 cursor-pointer',
+          'relative z-10 flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-200 cursor-pointer',
           !isPro ? 'text-white' : 'text-text-muted hover:text-text-secondary',
         )}
       >
@@ -37,7 +37,7 @@ export default function ModeToggle({ className }: { className?: string }) {
         aria-selected={isPro}
         onClick={() => setMode('pro')}
         className={cn(
-          'relative z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-200 cursor-pointer',
+          'relative z-10 flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-200 cursor-pointer',
           isPro ? 'text-white' : 'text-text-muted hover:text-text-secondary',
         )}
       >
