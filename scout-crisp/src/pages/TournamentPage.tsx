@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Radio, MessageSquare, Table2, ChevronRight, Crown, Loader2, History, Flame } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
@@ -147,26 +147,74 @@ function HandsList({ hands }: { hands: HandSummary[] }) {
   )
 }
 
+const titleCase = (t: string) => t.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+
 function HighlightsList({ items }: { items: Highlight[] }) {
+  // Categories present (in first-seen order) with counts, for the filter chips.
+  const categories = useMemo(() => {
+    const order: string[] = []
+    const count: Record<string, number> = {}
+    for (const h of items) {
+      if (!(h.type in count)) { count[h.type] = 0; order.push(h.type) }
+      count[h.type]++
+    }
+    return order.map((type) => ({ type, count: count[type] }))
+  }, [items])
+
+  const [active, setActive] = useState<string>('all')
+
+  // Filter to the active category, then sort by pot (biggest first).
+  const shown = useMemo(
+    () => items.filter((h) => active === 'all' || h.type === active).slice().sort((a, b) => b.pot - a.pot),
+    [items, active],
+  )
+
   if (!items.length) return <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading highlights…</Centered>
+
   return (
-    <div className="space-y-2">
-      {items.map((h) => (
-        <div key={h.id} className="rounded-xl border border-border bg-bg-card p-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-accent-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent-amber">{h.type.replace(/_/g, ' ')}</span>
-                <span className="nums text-[11px] text-text-muted">{fmtChips(h.pot)}</span>
+    <div>
+      {/* Category filter chips with counts — biggest pots first within each */}
+      <div className="-mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1 pb-1 no-scrollbar">
+        <Chip label="All" count={items.length} active={active === 'all'} onClick={() => setActive('all')} />
+        {categories.map((c) => (
+          <Chip key={c.type} label={titleCase(c.type)} count={c.count} active={active === c.type} onClick={() => setActive(c.type)} />
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        {shown.map((h) => (
+          <div key={h.id} className="rounded-xl border border-border bg-bg-card p-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-accent-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent-amber">{h.type.replace(/_/g, ' ')}</span>
+                  <span className="nums text-[11px] text-text-muted">{fmtChips(h.pot)}</span>
+                </div>
+                <p className="mt-1 text-sm leading-snug text-text-primary">{h.preview}</p>
+                <p className="text-[11px] text-text-muted">Hand #{h.handNumber} · {h.board}</p>
               </div>
-              <p className="mt-1 text-sm leading-snug text-text-primary">{h.preview}</p>
-              <p className="text-[11px] text-text-muted">Hand #{h.handNumber} · {h.board}</p>
+              <HandViewerButton className="shrink-0" hand={{ handNumber: h.handNumber, title: h.preview, note: h.board, videoSeconds: h.videoSeconds, hasReplay: true }} />
             </div>
-            <HandViewerButton className="shrink-0" hand={{ handNumber: h.handNumber, title: h.preview, note: h.board, videoSeconds: h.videoSeconds, hasReplay: true }} />
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
+  )
+}
+
+function Chip({ label, count, active, onClick }: { label: string; count: number; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer',
+        active ? 'border-accent-blue bg-accent-blue text-white' : 'border-border bg-bg-surface/50 text-text-secondary hover:text-text-primary',
+      )}
+    >
+      {label}
+      <span className={cn('nums rounded-full px-1.5 text-[10px] font-bold', active ? 'bg-white/20 text-white' : 'bg-bg-card text-text-muted')}>{count}</span>
+    </button>
   )
 }
 

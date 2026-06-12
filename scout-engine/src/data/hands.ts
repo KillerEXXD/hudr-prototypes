@@ -7,6 +7,22 @@ export const HIGHLIGHTS: Highlight[] = [
   { id: 'h4', hand: 55, type: 'hero_call', tier: 'medium', board: 'Monotone', preview: 'Selbst makes incredible hero call with second pair', pot: 28000000, players: ['p5', 'p7'], ytTime: 2800 },
   { id: 'h5', hand: 42, type: 'cooler', tier: 'monster', board: 'Wet Flop', preview: 'Holz flops the nut flush, Kenney flops a set', pot: 24000000, players: ['p6', 'p7'], ytTime: 2100 },
   { id: 'h6', hand: 31, type: 'bad_beat', tier: 'strong', board: 'Dry Board', preview: 'Konnikova gets unlucky on the river vs Seidel', pot: 18500000, players: ['p8', 'p9'], ytTime: 1500 },
+  // --- additional highlights: several per category ---
+  { id: 'h7', hand: 84, type: 'biggest_pot', tier: 'monster', board: 'Two-tone', preview: 'Ivey stacks Holz in a massive 4-bet pot', pot: 76200000, players: ['p2', 'p6'], ytTime: 4650 },
+  { id: 'h8', hand: 69, type: 'biggest_pot', tier: 'strong', board: 'Rainbow', preview: "Kenney's aces hold vs Negreanu's flush draw", pot: 61500000, players: ['p7', 'p1'], ytTime: 3800 },
+  { id: 'h9', hand: 79, type: 'cooler', tier: 'monster', board: 'Paired Board', preview: "Ivey's quads run into Negreanu's full house", pot: 58900000, players: ['p2', 'p1'], ytTime: 4400 },
+  { id: 'h10', hand: 58, type: 'elimination', tier: 'strong', board: 'Connected', preview: 'Konnikova busts Seidel with a rivered straight', pot: 33100000, players: ['p8', 'p9'], ytTime: 3000 },
+  { id: 'h11', hand: 50, type: 'bluff', tier: 'air', board: 'Dry Board', preview: 'Ivey snap c-bets Selbst off top pair', pot: 31800000, players: ['p2', 'p5'], ytTime: 2600 },
+  { id: 'h12', hand: 47, type: 'elimination', tier: 'strong', board: 'Rainbow', preview: 'Hellmuth eliminates Bonomo, kings vs queens', pot: 29700000, players: ['p3', 'p4'], ytTime: 2400 },
+  { id: 'h13', hand: 44, type: 'bluff', tier: 'air', board: 'Two-tone', preview: 'Holz five-bet bluffs Kenney pre-flop', pot: 27400000, players: ['p6', 'p7'], ytTime: 2250 },
+  { id: 'h14', hand: 40, type: 'hero_call', tier: 'medium', board: 'Wet Flop', preview: 'Negreanu calls down Ivey with ace-high', pot: 26400000, players: ['p1', 'p2'], ytTime: 2050 },
+  { id: 'h15', hand: 38, type: 'cooler', tier: 'monster', board: 'Wet Flop', preview: "Kenney's overpair flips into Holz's set", pot: 22700000, players: ['p7', 'p6'], ytTime: 1950 },
+  { id: 'h16', hand: 36, type: 'elimination', tier: 'strong', board: 'Paired Board', preview: 'Selbst KOs Holz, set over top pair', pot: 21300000, players: ['p5', 'p6'], ytTime: 1820 },
+  { id: 'h17', hand: 34, type: 'bad_beat', tier: 'strong', board: 'Monotone', preview: 'Holz two-outered by Konnikova on the river', pot: 20100000, players: ['p6', 'p8'], ytTime: 1700 },
+  { id: 'h18', hand: 29, type: 'hero_call', tier: 'medium', board: 'Dry Board', preview: "Seidel snaps off Kenney's river jam", pot: 19800000, players: ['p9', 'p7'], ytTime: 1400 },
+  { id: 'h19', hand: 27, type: 'cooler', tier: 'monster', board: 'Two-tone', preview: "Selbst's nut flush loses to Bonomo's boat", pot: 17500000, players: ['p5', 'p4'], ytTime: 1300 },
+  { id: 'h20', hand: 24, type: 'bluff', tier: 'air', board: 'Rainbow', preview: 'Bonomo barrels three streets on a brick runout', pot: 16900000, players: ['p4', 'p3'], ytTime: 1150 },
+  { id: 'h21', hand: 19, type: 'bad_beat', tier: 'strong', board: 'Connected', preview: "Bonomo's aces cracked by Seidel's runner-runner", pot: 14300000, players: ['p4', 'p9'], ytTime: 980 },
 ]
 
 export const QUIZ_HANDS: QuizHand[] = [
