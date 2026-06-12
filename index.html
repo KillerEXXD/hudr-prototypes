@@ -11,7 +11,9 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0a0a0a;
+      background:
+        radial-gradient(900px 480px at 50% -8%, rgba(249, 115, 22, 0.16), transparent 70%),
+        #0a0a0a;
       color: #ffffff;
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
@@ -52,17 +54,45 @@
       font-size: 13px;
       color: #6b7280;
     }
+    /* Single-product showcase: center the one visible card. */
     .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      margin-top: 32px;
+      display: flex;
+      justify-content: center;
+      margin-top: 36px;
     }
-    @media (min-width: 640px) {
-      .grid { grid-template-columns: 1fr 1fr; }
+    .grid > .card { max-width: 480px; width: 100%; }
+    .skins {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid #2a2a2a;
     }
-    @media (min-width: 1024px) {
-      .grid { grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .skin {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #cbd5e1;
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      padding: 4px 9px;
+      border-radius: 9999px;
+    }
+    .skin i { width: 9px; height: 9px; border-radius: 9999px; display: inline-block; }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 11px 18px;
+      background: linear-gradient(135deg, #dc2626, #f97316);
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: 10px;
     }
     .card {
       background: #141414;
@@ -149,8 +179,8 @@
   <div class="container">
     <div class="hero">
       <h1>HUDR Prototypes</h1>
-      <p>Scout — the poker opponent-analysis engine, shown in six visual directions. Same data and features, different looks.</p>
-      <span class="badge">Mobile-First PWA • Dark + Light Themes • Mock Data</span>
+      <p>Scout — the poker opponent-analysis engine. One mobile-first app with six selectable skins; switch them from the header or your profile.</p>
+      <span class="badge">Mobile-First PWA • 6 Skins (Dark + Light) • Mock Data</span>
     </div>
 
     <div class="grid">
@@ -610,8 +640,17 @@
           <span class="tag">React + TS</span>
           <span class="tag">Exploits + scores</span>
           <span class="tag">Dual-mode</span>
-          <span class="tag">6 skins</span>
+          <span class="tag">Bottom-nav + AI</span>
         </div>
+        <div class="skins">
+          <span class="skin"><i style="background:#3b82f6"></i>Scout Engine</span>
+          <span class="skin"><i style="background:#2563EB"></i>Clarivue</span>
+          <span class="skin"><i style="background:#4F46E5"></i>Terminal</span>
+          <span class="skin"><i style="background:#1B5E47"></i>Felt</span>
+          <span class="skin"><i style="background:#7C5CFC"></i>Pulse</span>
+          <span class="skin"><i style="background:#FF4D2E"></i>Edge</span>
+        </div>
+        <span class="cta">Open Scout Engine →</span>
       </a>
 
       <a href="#" onclick="alert('V7 Beacon — Coming Soon. Prototype not yet built.');return false;" class="card" style="opacity:0.7">
@@ -673,7 +712,7 @@
     </div>
 
     <div class="footer">
-      HUDR Prototypes • Scout Engine + 5 visual directions • Shared mock data • Mobile-first PWA
+      HUDR Prototypes • Scout Engine • 6 selectable skins • Shared mock data • Mobile-first PWA
     </div>
   </div>
 </body>
