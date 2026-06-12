@@ -1,13 +1,12 @@
 import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
-import { Search, Trophy, Users, ChevronRight, Radio, Layers, Target, Brain, Loader2, X } from 'lucide-react'
+import { Search, Trophy, Users, ChevronRight, Layers, Target, Brain, Loader2, X, ArrowRight } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
 import { useTournaments, usePlayers, useProfiles, careerFilters } from '@/hooks'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui'
-import PlayerAvatar from '@/components/player/PlayerAvatar'
-import ArchetypeBadge from '@/components/common/ArchetypeBadge'
-import { cn, fmtChips } from '@/lib/utils'
+import TournamentListItem from '@/components/scout/TournamentListItem'
+import PlayerListItem from '@/components/scout/PlayerListItem'
+import { cn } from '@/lib/utils'
 
 const PIPELINE_STEPS = [
   { icon: Layers, label: 'Stats', tint: 'text-accent-blue', title: 'Layer 1 · Stat engine', desc: 'We compute ~20 poker stats (VPIP, PFR, 3-bet, c-bet, WTSD…) from the hands — each gated by sample size into Reliable / Tentative / hidden, so a read off 12 hands is never treated like one off 1,200.' },
@@ -65,6 +64,21 @@ function PipelineStrip() {
   )
 }
 
+function SectionHeader({ icon, title, count, seeAll }: { icon: React.ReactNode; title: string; count: number; seeAll: string }) {
+  return (
+    <div className="mb-2 flex items-center gap-2">
+      <span className="text-accent-blue">{icon}</span>
+      <h2 className="text-sm font-semibold text-text-primary">{title}</h2>
+      <span className="nums text-xs text-text-muted">{count}</span>
+      <Link to={seeAll} className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-accent-blue hover:underline cursor-pointer">
+        See all <ArrowRight className="h-3 w-3" />
+      </Link>
+    </div>
+  )
+}
+
+const PREVIEW = 3
+
 export default function FindPage() {
   const { isPro } = useMode()
   const [q, setQ] = useState('')
@@ -74,6 +88,7 @@ export default function FindPage() {
   const { profiles } = useProfiles(players.map((p) => p.id), careerFilters())
   const profileByPlayer = useMemo(() => Object.fromEntries(profiles.map((p) => [p.playerId, p])), [profiles])
 
+  const searching = q.trim().length > 0
   const tournamentMatches = useMemo(
     () => tournaments.filter((t) => (t.name + t.event + t.venue).toLowerCase().includes(q.toLowerCase())),
     [tournaments, q],
@@ -82,6 +97,10 @@ export default function FindPage() {
     () => players.filter((p) => p.name.toLowerCase().includes(q.toLowerCase())),
     [players, q],
   )
+
+  // Idle: lead with live tournaments. Searching: show matches.
+  const tList = searching ? tournamentMatches : [...tournaments].sort((a, b) => Number(b.isLive) - Number(a.isLive))
+  const pList = searching ? playerMatches : players
 
   return (
     <div className="animate-fade-up">
@@ -102,96 +121,33 @@ export default function FindPage() {
         />
       </div>
 
-      <Tabs defaultValue="tournaments">
-        <TabsList>
-          <TabsTrigger value="tournaments"><span className="flex items-center justify-center gap-1.5"><Trophy className="h-3.5 w-3.5" />Tournaments</span></TabsTrigger>
-          <TabsTrigger value="players"><span className="flex items-center justify-center gap-1.5"><Users className="h-3.5 w-3.5" />Players</span></TabsTrigger>
-        </TabsList>
+      {tLoading || pLoading ? (
+        <div className="flex items-center justify-center gap-2 py-10 text-sm text-text-muted"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
+      ) : (
+        <div className="space-y-5">
+          <section>
+            <SectionHeader icon={<Trophy className="h-4 w-4" />} title={searching ? 'Tournaments' : 'Live & recent'} count={tList.length} seeAll="/tournaments" />
+            {tList.length === 0 ? (
+              <p className="rounded-xl border border-dashed border-border py-6 text-center text-xs text-text-muted">No matching tournaments.</p>
+            ) : (
+              <div className="space-y-2">
+                {tList.slice(0, PREVIEW).map((t) => <TournamentListItem key={t.id} tournament={t} />)}
+              </div>
+            )}
+          </section>
 
-        <TabsContent value="tournaments">
-          {tLoading ? <Loading /> : (
-            <div className="space-y-2">
-              {tournamentMatches.map((t) => (
-                <Link
-                  key={t.id}
-                  to={`/tournament/${t.id}`}
-                  className="block rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="truncate font-semibold text-text-primary">{t.name}</h3>
-                        {t.isLive && (
-                          <span className="flex items-center gap-1 rounded-full bg-accent-red/15 px-1.5 py-0.5 text-[10px] font-bold text-accent-red">
-                            <Radio className="h-2.5 w-2.5" />LIVE
-                          </span>
-                        )}
-                      </div>
-                      <p className="truncate text-xs text-text-muted">{t.event} · {t.venue} · {t.date}</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
-                  </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-text-secondary nums">
-                    <span>{t.playerCount} players</span>
-                    <span>{t.handCount} hands</span>
-                    <span>{fmtChips(t.prizePool)}</span>
-                    {t.exploitableCount > 0 && (
-                      <span className="rounded-full bg-accent-amber/10 px-1.5 py-0.5 font-semibold text-accent-amber">
-                        {t.exploitableCount} exploitable
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              ))}
-              {tournamentMatches.length === 0 && <Empty />}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="players">
-          {pLoading ? <Loading /> : (
-            <div className="space-y-2">
-              {playerMatches.map((p) => {
-                const prof = profileByPlayer[p.id]
-                return (
-                  <Link
-                    key={p.id}
-                    to={`/player/${p.id}`}
-                    className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
-                  >
-                    <PlayerAvatar initials={p.initials} color={p.color} />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="truncate font-semibold text-text-primary">{p.name} <span aria-hidden>{p.flag}</span></h3>
-                      </div>
-                      <div className="mt-1 flex items-center gap-2">
-                        {prof && <ArchetypeBadge archetype={prof.typing.archetype} plain={!isPro} size="sm" />}
-                        {prof && prof.exploits.length > 0 && (
-                          <span className="text-[11px] text-text-muted nums">{prof.exploits.length} leak{prof.exploits.length > 1 ? 's' : ''}</span>
-                        )}
-                      </div>
-                    </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
-                  </Link>
-                )
-              })}
-              {playerMatches.length === 0 && <Empty />}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
-}
-
-function Empty() {
-  return <div className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-text-muted">No matches.</div>
-}
-
-function Loading() {
-  return (
-    <div className="flex items-center justify-center gap-2 py-10 text-sm text-text-muted">
-      <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+          <section>
+            <SectionHeader icon={<Users className="h-4 w-4" />} title={searching ? 'Players' : 'Featured players'} count={pList.length} seeAll="/players" />
+            {pList.length === 0 ? (
+              <p className="rounded-xl border border-dashed border-border py-6 text-center text-xs text-text-muted">No matching players.</p>
+            ) : (
+              <div className="space-y-2">
+                {pList.slice(0, PREVIEW).map((p) => <PlayerListItem key={p.id} player={p} profile={profileByPlayer[p.id]} plain={!isPro} />)}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   )
 }

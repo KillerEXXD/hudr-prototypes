@@ -54,6 +54,35 @@ export interface PlayerTournament {
   hands: number
 }
 
+export interface CurrentUser {
+  id: string
+  name: string
+  email: string
+  initials: string
+  color: string
+  memberSince: string
+  planId: string
+  savedPlayerIds: string[]
+  savedTournamentIds: string[]
+}
+
+export interface TrendingQuery {
+  id: string
+  kind: 'player' | 'tournament'
+  targetId: string
+  question: string
+  votes: number
+}
+
+export interface SubscriptionPlan {
+  id: string
+  name: string
+  priceMonthly: number
+  tagline: string
+  features: string[]
+  highlight: boolean       // featured / current tier
+}
+
 export interface HandSummary {
   handNumber: number
   board: string[]

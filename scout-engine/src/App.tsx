@@ -4,6 +4,12 @@ import AppShell from './components/layout/AppShell'
 import FindPage from './pages/FindPage'
 import TournamentPage from './pages/TournamentPage'
 import ScoutingPage from './pages/ScoutingPage'
+import PlayersPage from './pages/PlayersPage'
+import TournamentsPage from './pages/TournamentsPage'
+import AskAIPage from './pages/AskAIPage'
+import ProfilePage from './pages/ProfilePage'
+import SavedPage from './pages/SavedPage'
+import SubscriptionPage from './pages/SubscriptionPage'
 
 export default function App() {
   return (
@@ -11,8 +17,14 @@ export default function App() {
       <Routes>
         <Route element={<AppShell />}>
           <Route path="/" element={<FindPage />} />
+          <Route path="/players" element={<PlayersPage />} />
+          <Route path="/tournaments" element={<TournamentsPage />} />
+          <Route path="/ai" element={<AskAIPage />} />
           <Route path="/tournament/:id" element={<TournamentPage />} />
           <Route path="/player/:id" element={<ScoutingPage />} />
+          <Route path="/me" element={<ProfilePage />} />
+          <Route path="/saved" element={<SavedPage />} />
+          <Route path="/subscription" element={<SubscriptionPage />} />
         </Route>
       </Routes>
     </ModeProvider>

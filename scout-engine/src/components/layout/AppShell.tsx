@@ -1,6 +1,8 @@
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import { ChevronLeft, Spade } from 'lucide-react'
 import ModeToggle from '@/components/common/ModeToggle'
+import ProfileMenu from '@/components/layout/ProfileMenu'
+import BottomNav from '@/components/layout/BottomNav'
 
 export default function AppShell() {
   const navigate = useNavigate()
@@ -9,7 +11,7 @@ export default function AppShell() {
 
   return (
     <div className="min-h-screen bg-bg-primary flex justify-center">
-      <div className="relative w-full max-w-md min-h-screen bg-bg-secondary shadow-2xl">
+      <div className="relative flex w-full max-w-md flex-col min-h-screen bg-bg-secondary shadow-2xl">
         <header className="sticky top-0 z-30 border-b border-border bg-bg-secondary/85 backdrop-blur supports-[backdrop-filter]:bg-bg-secondary/70">
           <div className="flex items-center justify-between gap-2 px-3 py-2.5">
             <div className="flex min-w-0 items-center gap-2">
@@ -29,12 +31,16 @@ export default function AppShell() {
                 </button>
               )}
             </div>
-            <ModeToggle />
+            <div className="flex items-center gap-2">
+              <ModeToggle />
+              <ProfileMenu />
+            </div>
           </div>
         </header>
-        <main className="px-4 pb-24 pt-4">
+        <main className="flex-1 px-4 pb-24 pt-4">
           <Outlet />
         </main>
+        <BottomNav />
       </div>
     </div>
   )

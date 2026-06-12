@@ -6,7 +6,7 @@
 // =====================================================================
 import { PLAYERS, STATS, TOURNAMENTS_LIST, HIGHLIGHTS, YT_BASE } from '@/data'
 import { EXTRA_STATS } from '@/engine'
-import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand, ApiSuggestedQuestion, ApiPlayerTournament } from '../types'
+import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand, ApiSuggestedQuestion, ApiPlayerTournament, ApiCurrentUser, ApiSubscriptionPlan, ApiTrendingQuery } from '../types'
 
 export const apiTournaments: ApiTournament[] = TOURNAMENTS_LIST.map((t) => ({
   id: t.id,
@@ -107,6 +107,58 @@ export const suggestedQuestions: Record<'tournament' | 'player', ApiSuggestedQue
     { text: "What's their game plan against me?", asked_count: 280 },
   ],
 }
+
+// Signed-in user (mock). Drives the top-right profile menu, Saved, and which
+// subscription tier is current.
+export const apiCurrentUser: ApiCurrentUser = {
+  id: 'u1',
+  name: 'Alex Carter',
+  email: 'alex.carter@hudr.ai',
+  initials: 'AC',
+  color: '#6366f1',
+  member_since: 'Jan 2025',
+  plan: 'shark',
+  saved_player_ids: ['p1', 'p3', 'p5'],
+  saved_tournament_ids: ['t1', 't2'],
+}
+
+// Subscription tiers (poker-themed, mirroring hudr-pwa: Free / Fish / Shark / Whale).
+export const apiSubscriptionPlans: ApiSubscriptionPlan[] = [
+  {
+    id: 'free', name: 'Free', price_monthly: 0, tagline: 'Dip your toes in',
+    features: ['Browse tournaments & players', 'Plain-English reads', '3 scouting reports / day'],
+    highlight: false,
+  },
+  {
+    id: 'fish', name: 'Fish', price_monthly: 9, tagline: 'For the casual grinder',
+    features: ['Everything in Free', 'Unlimited scouting reports', 'Pro stats mode', 'Save up to 25 players'],
+    highlight: false,
+  },
+  {
+    id: 'shark', name: 'Shark', price_monthly: 29, tagline: 'For the serious player',
+    features: ['Everything in Fish', 'Full exploit matrix & game plans', 'AI assistant (unlimited)', 'Unlimited Saved', 'Hand replayer'],
+    highlight: true,
+  },
+  {
+    id: 'whale', name: 'Whale', price_monthly: 99, tagline: 'For the high roller & coach',
+    features: ['Everything in Shark', 'Multi-table live tracking', 'Priority data refresh', 'Team / staking seats'],
+    highlight: false,
+  },
+]
+
+// Trending AI questions — what other users recently asked, each anchored to a
+// specific player or tournament (never generic), with community upvotes. Powers
+// the AI tab's empty state. Sorted by votes on display.
+export const apiTrendingQueries: ApiTrendingQuery[] = [
+  { id: 'tq1', kind: 'player', target_id: 'p1', question: 'Can I bluff Daniel Negreanu?', votes: 312 },
+  { id: 'tq2', kind: 'player', target_id: 'p3', question: "What's Phil Hellmuth's biggest leak?", votes: 287 },
+  { id: 'tq3', kind: 'tournament', target_id: 't1', question: 'Who has the softest field at the WSOP Main Event?', votes: 254 },
+  { id: 'tq4', kind: 'player', target_id: 'p2', question: 'How do I beat Phil Ivey?', votes: 241 },
+  { id: 'tq5', kind: 'player', target_id: 'p5', question: 'How aggressive is Vanessa Selbst postflop?', votes: 198 },
+  { id: 'tq6', kind: 'tournament', target_id: 't4', question: 'Which Triton Million player should I avoid?', votes: 165 },
+  { id: 'tq7', kind: 'player', target_id: 'p6', question: 'Does Fedor Holz fold to 3-bets?', votes: 142 },
+  { id: 'tq8', kind: 'player', target_id: 'p7', question: 'Can I value bet thin against Bryn Kenney?', votes: 119 },
+]
 
 // Tournaments this player appears in, with modeled hands per tournament.
 export function buildPlayerTournaments(playerId: string): ApiPlayerTournament[] {

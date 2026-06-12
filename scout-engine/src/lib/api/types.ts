@@ -89,6 +89,35 @@ export interface ApiSuggestedQuestion {
   asked_count: number
 }
 
+export interface ApiCurrentUser {
+  id: string
+  name: string
+  email: string
+  initials: string
+  color: string
+  member_since: string
+  plan: string                 // plan id, e.g. 'shark'
+  saved_player_ids: string[]
+  saved_tournament_ids: string[]
+}
+
+export interface ApiTrendingQuery {
+  id: string
+  kind: 'player' | 'tournament'
+  target_id: string
+  question: string
+  votes: number
+}
+
+export interface ApiSubscriptionPlan {
+  id: string
+  name: string
+  price_monthly: number
+  tagline: string
+  features: string[]
+  highlight: boolean
+}
+
 export interface ApiHand {
   hand_number: number
   board: string[]

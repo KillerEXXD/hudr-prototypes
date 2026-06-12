@@ -1,4 +1,4 @@
-import { apiTournaments, apiPlayers, apiPlayerStats, apiHighlights, buildTournamentHands, buildPlayerTournaments, suggestedQuestions } from './fixtures'
+import { apiTournaments, apiPlayers, apiPlayerStats, apiHighlights, buildTournamentHands, buildPlayerTournaments, suggestedQuestions, apiCurrentUser, apiSubscriptionPlans, apiTrendingQueries } from './fixtures'
 import { applyFilters } from './segment'
 
 type Params = Record<string, string | number | undefined> | undefined
@@ -42,6 +42,15 @@ export function resolveMock<T>(endpoint: string, params?: Params): T {
     }
     case 'player-tournaments': {
       return buildPlayerTournaments(String(params?.player_id ?? '')) as T
+    }
+    case 'me': {
+      return apiCurrentUser as T
+    }
+    case 'subscription-plans': {
+      return apiSubscriptionPlans as T
+    }
+    case 'trending-queries': {
+      return apiTrendingQueries as T
     }
     case 'suggested-questions': {
       const ctx = (String(params?.context ?? 'tournament') === 'player' ? 'player' : 'tournament')

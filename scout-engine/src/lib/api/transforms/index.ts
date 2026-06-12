@@ -1,5 +1,5 @@
-import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand, ApiSuggestedQuestion, ApiPlayerTournament } from '../types'
-import type { Tournament, Player, Highlight, HandSummary, SuggestedQuestion, PlayerTournament } from '../domain'
+import type { ApiTournament, ApiPlayer, ApiPlayerStats, ApiHighlight, ApiHand, ApiSuggestedQuestion, ApiPlayerTournament, ApiCurrentUser, ApiSubscriptionPlan, ApiTrendingQuery } from '../types'
+import type { Tournament, Player, Highlight, HandSummary, SuggestedQuestion, PlayerTournament, CurrentUser, SubscriptionPlan, TrendingQuery } from '../domain'
 import type { RawPlayerStatValues } from '@/engine'
 import { YT_BASE } from '@/data'
 
@@ -46,6 +46,25 @@ export function transformSuggestedQuestion(a: ApiSuggestedQuestion): SuggestedQu
 
 export function transformPlayerTournament(a: ApiPlayerTournament): PlayerTournament {
   return { tournamentId: a.tournament_id, name: a.name, event: a.event, date: a.date, hands: a.hands }
+}
+
+export function transformCurrentUser(a: ApiCurrentUser): CurrentUser {
+  return {
+    id: a.id, name: a.name, email: a.email, initials: a.initials, color: a.color,
+    memberSince: a.member_since, planId: a.plan,
+    savedPlayerIds: a.saved_player_ids, savedTournamentIds: a.saved_tournament_ids,
+  }
+}
+
+export function transformSubscriptionPlan(a: ApiSubscriptionPlan): SubscriptionPlan {
+  return {
+    id: a.id, name: a.name, priceMonthly: a.price_monthly, tagline: a.tagline,
+    features: a.features, highlight: a.highlight,
+  }
+}
+
+export function transformTrendingQuery(a: ApiTrendingQuery): TrendingQuery {
+  return { id: a.id, kind: a.kind, targetId: a.target_id, question: a.question, votes: a.votes }
 }
 
 export function transformHand(a: ApiHand): HandSummary {
