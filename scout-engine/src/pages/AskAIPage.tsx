@@ -171,6 +171,10 @@ export default function AskAIPage() {
     // appear only when the user taps the field themselves.
   }
 
+  // Follow-up suggestions shown under the latest answer (top trending not yet asked).
+  const askedTexts = useMemo(() => new Set(messages.filter((m) => m.role === 'user').map((m) => m.text)), [messages])
+  const followUps = useMemo(() => trending.filter((t) => !askedTexts.has(t.question)).slice(0, 3), [trending, askedTexts])
+
   return (
     <div className="animate-fade-up">
       <h1 className="text-xl font-bold tracking-tight">Ask AI</h1>
@@ -250,10 +254,31 @@ export default function AskAIPage() {
                       {m.text}
                     </div>
                   </div>
-                  {m.role === 'ai' && m.link && (
-                    <Link to={m.link.to} className="ml-9 mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-accent-blue hover:underline cursor-pointer">
-                      {m.link.label} <ArrowRight className="h-3 w-3" />
-                    </Link>
+                  {m.role === 'ai' && (m.link || (i === messages.length - 1 && followUps.length > 0)) && (
+                    <div className="ml-9 mt-1.5 flex flex-col items-start gap-1.5">
+                      {m.link && (
+                        <Link to={m.link.to} className="inline-flex w-fit items-center gap-1 text-[11px] font-semibold text-accent-blue hover:underline cursor-pointer">
+                          {m.link.label} <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      )}
+                      {i === messages.length - 1 && followUps.length > 0 && (
+                        <div className="flex flex-col gap-1 pt-0.5">
+                          <span className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">Ask next</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {followUps.map((f) => (
+                              <button
+                                key={f.id}
+                                type="button"
+                                onClick={() => ask(f.question, { kind: f.kind, id: f.targetId })}
+                                className="rounded-full border border-border bg-bg-surface/50 px-2.5 py-1 text-left text-[11px] text-text-secondary transition-colors hover:border-border-light hover:text-text-primary cursor-pointer"
+                              >
+                                {f.question}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               ))}
