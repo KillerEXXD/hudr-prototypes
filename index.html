@@ -171,8 +171,8 @@
       color: #4b5563;
       font-size: 13px;
     }
-    /* Show the Scout prototypes (Engine + Crisp); hide the rest of the gallery. */
-    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]) {
+    /* Show the Scout prototypes (Engine + Crisp + Stats); hide the rest of the gallery. */
+    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]):not([href^="scout-stats-demo"]) {
       display: none !important;
     }
   </style>
@@ -668,6 +668,20 @@
           <span class="tag">6 skins</span>
         </div>
         <span class="cta" style="background: linear-gradient(135deg, #10b981, #34d399)">Open Scout Crisp →</span>
+      </a>
+
+      <a href="scout-stats-demo/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #6366f1, #a855f7)"></div>
+        <div class="card-letter" style="background: rgba(99,102,241,0.15); color: #818cf8;">ST</div>
+        <h2>Scout Stats</h2>
+        <div class="subtitle">React + TS • Stats → hands drill-down</div>
+        <p>The hudr-pwa flow: <strong>Tournament → player → tap a stat → the exact hands behind it</strong>, split into <strong>Executed / Folded</strong>, each viewable in YouTube or the replayer. 21 stats, grouped by street.</p>
+        <div class="tags">
+          <span class="tag">Stat → hands</span>
+          <span class="tag">Executed / Folded</span>
+          <span class="tag">YouTube + replayer</span>
+        </div>
+        <span class="cta" style="background: linear-gradient(135deg, #6366f1, #a855f7)">Open Scout Stats →</span>
       </a>
 
       <a href="#" onclick="alert('V7 Beacon — Coming Soon. Prototype not yet built.');return false;" class="card" style="opacity:0.7">
