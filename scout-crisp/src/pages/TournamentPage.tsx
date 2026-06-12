@@ -174,7 +174,7 @@ function HighlightsList({ items }: { items: Highlight[] }) {
   return (
     <div>
       {/* Category filter chips with counts — biggest pots first within each */}
-      <div className="-mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1 pb-1 no-scrollbar">
+      <div className="mb-3 flex flex-wrap gap-1.5">
         <Chip label="All" count={items.length} active={active === 'all'} onClick={() => setActive('all')} />
         {categories.map((c) => (
           <Chip key={c.type} label={titleCase(c.type)} count={c.count} active={active === c.type} onClick={() => setActive(c.type)} />
