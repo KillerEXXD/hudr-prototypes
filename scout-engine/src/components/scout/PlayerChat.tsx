@@ -82,7 +82,9 @@ export default function PlayerChat({ profile }: { profile: PlayerProfile }) {
     if (!q.trim()) return
     setMessages((m) => [...m, { role: 'user', text: q }, { role: 'ai', text: answer(q, profile, isPro) }])
     setInput(''); setShowSuggest(false)
-    inputRef.current?.focus()
+    // NB: don't focus the input here — on iOS that pops the keyboard + scrolls the
+    // page when the user only TAPPED a suggested question. Keyboard opens only when
+    // the user taps the field.
   }
   function pick(q: string) { setBumps((b) => ({ ...b, [q]: (b[q] || 0) + 1 })); ask(q) }
 

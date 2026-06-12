@@ -166,7 +166,9 @@ export default function AskAIPage() {
     if (!q.trim()) return
     setMessages((m) => [...m, { role: 'user', text: q }, answer(q, players, tournaments, profByPlayer, isPro, target)])
     setInput('')
-    inputRef.current?.focus()
+    // NB: never call inputRef.focus() here — on iOS that opens the keyboard and
+    // scrolls the page when the user only TAPPED a suggestion. The keyboard must
+    // appear only when the user taps the field themselves.
   }
 
   return (
