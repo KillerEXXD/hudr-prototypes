@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { Bookmark, Crown, Mail, CalendarDays, ChevronRight, Loader2 } from 'lucide-react'
+import { Bookmark, Crown, Mail, CalendarDays, ChevronRight, Loader2, Palette } from 'lucide-react'
 import { useCurrentUser } from '@/hooks'
 import PlayerAvatar from '@/components/player/PlayerAvatar'
+import SkinPicker from '@/components/common/SkinPicker'
 
 export default function ProfilePage() {
   const { data: user, isLoading } = useCurrentUser()
@@ -57,6 +58,17 @@ export default function ProfilePage() {
           </Link>
         ))}
       </div>
+
+      {/* Appearance — pick a skin (re-skins the whole app, remembered) */}
+      <section className="mt-5">
+        <div className="mb-2 flex items-center gap-2">
+          <Palette className="h-4 w-4 text-accent-blue" />
+          <h2 className="text-sm font-semibold text-text-primary">Appearance</h2>
+        </div>
+        <div className="rounded-xl border border-border bg-bg-card p-3">
+          <SkinPicker columns={3} />
+        </div>
+      </section>
     </div>
   )
 }

@@ -139,8 +139,8 @@
       color: #4b5563;
       font-size: 13px;
     }
-    /* Show only today's Scout prototypes; hide the rest of the gallery. */
-    .card:not([href^="scout-engine-demo"]):not([href^="scout-clarivue-demo"]):not([href^="scout-terminal-demo"]):not([href^="scout-felt-demo"]):not([href^="scout-pulse-demo"]):not([href^="scout-edge-demo"]) {
+    /* Show only the Scout Engine prototype (skins are selectable inside the app). */
+    .card:not([href^="scout-engine-demo"]) {
       display: none !important;
     }
   </style>
@@ -605,77 +605,12 @@
         <div class="card-letter" style="background: rgba(14,165,233,0.15); color: #0ea5e9;">SE</div>
         <h2>Scout Engine</h2>
         <div class="subtitle">React + TS • 4-Layer Analysis Engine</div>
-        <p>Deterministic poker analysis: reliability-tiered stats → archetype typing → ranked exploits → narrated scouting report. Dual Plain-English / Pro-Stats mode, scope &amp; table-size &amp; stack-depth filters, per-hand YouTube/replayer. hudr-pwa-style mock→API architecture.</p>
+        <p>Deterministic poker analysis: reliability-tiered stats → archetype typing → ranked exploits → narrated scouting report. Dual Amateur / Pro mode, bottom-nav + AI assistant, and <strong>6 selectable skins</strong> (Scout Engine dark default · Clarivue · Terminal · Felt · Pulse · Edge) you switch from the header or your profile.</p>
         <div class="tags">
           <span class="tag">React + TS</span>
           <span class="tag">Exploits + scores</span>
           <span class="tag">Dual-mode</span>
-          <span class="tag">Scouting report</span>
-        </div>
-      </a>
-
-      <a href="scout-clarivue-demo/index.html" class="card">
-        <div class="card-gradient" style="background: linear-gradient(90deg, #2563EB, #60a5fa)"></div>
-        <div class="card-letter" style="background: rgba(37,99,235,0.12); color: #2563EB;">C</div>
-        <h2>Scout · Clarivue</h2>
-        <div class="subtitle">Visual study • Calm analytical SaaS</div>
-        <p>Same Scout Engine, light Linear/Stripe identity: whitespace, Inter, blue accent, soft borders. The strong safe default. Adds the "vs typical" context bar + confidence-as-opacity.</p>
-        <div class="tags">
-          <span class="tag">Light / SaaS</span>
-          <span class="tag">Inter</span>
-          <span class="tag">vs-typical bar</span>
-        </div>
-      </a>
-
-      <a href="scout-terminal-demo/index.html" class="card">
-        <div class="card-gradient" style="background: linear-gradient(90deg, #4F46E5, #818cf8)"></div>
-        <div class="card-letter" style="background: rgba(79,70,229,0.12); color: #4F46E5;">T</div>
-        <h2>Scout · Terminal</h2>
-        <div class="subtitle">Visual study • Pro data-tool, light</div>
-        <p>Trading-desk density for grinders: IBM Plex + monospace numbers, indigo accent, and a Compact / Comfortable density toggle. Light, not the dark cliché.</p>
-        <div class="tags">
-          <span class="tag">Mono numbers</span>
-          <span class="tag">Density toggle</span>
-          <span class="tag">IBM Plex</span>
-        </div>
-      </a>
-
-      <a href="scout-felt-demo/index.html" class="card">
-        <div class="card-gradient" style="background: linear-gradient(90deg, #1B5E47, #B08A3E)"></div>
-        <div class="card-letter" style="background: rgba(27,94,71,0.12); color: #1B5E47;">F</div>
-        <h2>Scout · Felt</h2>
-        <div class="subtitle">Visual study • Premium poker, modernized</div>
-        <p>Poker heritage rendered premium: warm off-white, deep-felt green, hairline gold, Fraunces serif headline. The report reads like a printed dossier.</p>
-        <div class="tags">
-          <span class="tag">Serif headline</span>
-          <span class="tag">Felt green + gold</span>
-          <span class="tag">Editorial</span>
-        </div>
-      </a>
-
-      <a href="scout-pulse-demo/index.html" class="card">
-        <div class="card-gradient" style="background: linear-gradient(90deg, #7C5CFC, #c4b5fd)"></div>
-        <div class="card-letter" style="background: rgba(124,92,252,0.12); color: #7C5CFC;">P</div>
-        <h2>Scout · Pulse</h2>
-        <div class="subtitle">Visual study • Friendly, rec-player-first</div>
-        <p>Warm and approachable for the recreational user: violet + coral, Plus Jakarta Sans, rounded, with large screenshot-ready hero exploit cards.</p>
-        <div class="tags">
-          <span class="tag">Friendly</span>
-          <span class="tag">Hero exploits</span>
-          <span class="tag">Plus Jakarta</span>
-        </div>
-      </a>
-
-      <a href="scout-edge-demo/index.html" class="card">
-        <div class="card-gradient" style="background: linear-gradient(90deg, #FF4D2E, #101010)"></div>
-        <div class="card-letter" style="background: rgba(255,77,46,0.12); color: #FF4D2E;">E</div>
-        <h2>Scout · Edge</h2>
-        <div class="subtitle">Visual study • High-contrast, one accent</div>
-        <p>Sharp and opinionated: near-monochrome with one vermilion accent that carries only the top leak. Space Grotesk + mono, hairline rules.</p>
-        <div class="tags">
-          <span class="tag">Mono + 1 accent</span>
-          <span class="tag">High-contrast</span>
-          <span class="tag">Space Grotesk</span>
+          <span class="tag">6 skins</span>
         </div>
       </a>
 

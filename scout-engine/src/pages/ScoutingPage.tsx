@@ -5,6 +5,7 @@ import {
   Crosshair, Gauge, Loader2, Database, MessageSquare, Award,
 } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import { usePlayer, usePlayerProfile } from '@/hooks'
 import type { StatFilters, StatKey, TableSizeBucket, DepthBucket } from '@/engine'
 import { PLAYER_DIMENSIONS } from '@/data'
@@ -65,6 +66,7 @@ export default function ScoutingPage() {
   const { id = '' } = useParams()
   const [search] = useSearchParams()
   const { isPro } = useMode()
+  const { flags } = useTheme()
   const tournamentId = search.get('t')
   const tsParam = search.get('ts')
   const dpParam = search.get('depth')
@@ -105,9 +107,15 @@ export default function ScoutingPage() {
               <span aria-hidden>{player.flag}</span>
             </div>
             <div className="mt-0.5 flex items-center gap-1.5 text-accent-amber">
-              <Quote className="h-3 w-3" />
-              <span className="text-sm font-semibold italic">{narrative.nickname}</span>
+              <Quote className="h-3 w-3 shrink-0" />
+              <span
+                className={cn('font-semibold italic', flags.serifHeadline ? 'text-xl not-italic' : 'text-sm')}
+                style={flags.serifHeadline ? { fontFamily: 'var(--font-family-display)' } : undefined}
+              >
+                {narrative.nickname}
+              </span>
             </div>
+            {flags.goldRule && <div className="mt-2 h-px w-full bg-accent-amber/50" />}
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <ArchetypeBadge archetype={typing.archetype} plain={!isPro} size="md" />
               <ConfidenceMeter value={typing.confidence} plain={!isPro} />

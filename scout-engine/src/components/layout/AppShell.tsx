@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import { ChevronLeft, Spade } from 'lucide-react'
 import ModeToggle from '@/components/common/ModeToggle'
 import ProfileMenu from '@/components/layout/ProfileMenu'
+import ThemeChip from '@/components/layout/ThemeChip'
 import BottomNav from '@/components/layout/BottomNav'
 
 export default function AppShell() {
@@ -16,11 +17,10 @@ export default function AppShell() {
           <div className="flex items-center justify-between gap-2 px-3 py-2.5">
             <div className="flex min-w-0 items-center gap-2">
               {atHome ? (
-                <Link to="/" className="flex items-center gap-2">
+                <Link to="/" aria-label="Scout Engine home" className="flex items-center">
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-blue to-accent-purple">
                     <Spade className="h-4 w-4 text-white" />
                   </span>
-                  <span className="text-sm font-bold tracking-tight">Scout<span className="text-accent-blue">Engine</span></span>
                 </Link>
               ) : (
                 <button
@@ -30,6 +30,7 @@ export default function AppShell() {
                   <ChevronLeft className="h-4 w-4" /> Back
                 </button>
               )}
+              <ThemeChip />
             </div>
             <div className="flex items-center gap-2">
               <ModeToggle />
