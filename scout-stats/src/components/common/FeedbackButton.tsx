@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { MessageSquarePlus, X, Send, CheckCircle2 } from 'lucide-react'
+import { MessageSquarePlus, X, Send, CheckCircle2, ClipboardList, ArrowRight } from 'lucide-react'
 import { captureFeedback, PROTOTYPE } from '@/lib/analytics'
+import ReviewWizard from '@/components/common/ReviewWizard'
 
 // Floating "Give feedback" launcher + a short in-context form. Captures the
 // current screen automatically and sends a structured PostHog event (which
@@ -13,6 +14,7 @@ const EASE_LABEL: Record<number, string> = { 1: 'Very hard', 2: 'Hard', 3: 'OK',
 
 export default function FeedbackButton() {
   const [open, setOpen] = useState(false)
+  const [reviewOpen, setReviewOpen] = useState(false)
   const [sent, setSent] = useState(false)
   const [ease, setEase] = useState(0)
   const [improve, setImprove] = useState('')
@@ -64,6 +66,24 @@ export default function FeedbackButton() {
                     <p className="text-[11px] text-text-muted">on the <span className="font-semibold capitalize">{PROTOTYPE}</span> prototype · {(window.location.hash || '#/').replace('#', '')}</p>
                   </div>
                   <button type="button" onClick={() => setOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer" aria-label="Close"><X className="h-4 w-4" /></button>
+                </div>
+
+                {/* upsell to the full guided review */}
+                <button
+                  type="button"
+                  onClick={() => { setOpen(false); setReviewOpen(true) }}
+                  className="mt-3 flex w-full items-center gap-2.5 rounded-xl border border-accent-blue/30 bg-accent-blue/10 px-3 py-2.5 text-left transition-colors hover:bg-accent-blue/20 cursor-pointer"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-blue/20 text-accent-blue"><ClipboardList className="h-4 w-4" /></span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-bold text-accent-blue">Take the 3‑min guided review</span>
+                    <span className="block text-[11px] text-text-muted">Rate each feature — the most useful feedback</span>
+                  </span>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-accent-blue" />
+                </button>
+
+                <div className="my-3 flex items-center gap-2 text-[10px] uppercase tracking-wide text-text-muted">
+                  <span className="h-px flex-1 bg-border" /> or a quick note <span className="h-px flex-1 bg-border" />
                 </div>
 
                 {/* ease (SEQ) */}
@@ -122,6 +142,8 @@ export default function FeedbackButton() {
         </div>,
         document.body,
       )}
+
+      <ReviewWizard open={reviewOpen} onClose={() => setReviewOpen(false)} />
     </>
   )
 }

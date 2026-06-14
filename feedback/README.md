@@ -8,7 +8,8 @@ improvements.
 
 | Channel | What it captures | Where it lands |
 |---|---|---|
-| **In‑app "Give feedback" button** | Ease rating (1–5), what to improve, what worked, optional email — auto‑tagged with the prototype + screen | PostHog event `feedback_submitted` |
+| **In‑app guided review** (the main one) | A ~12‑step, feature‑by‑feature scored review — score 1–5 + liked + disliked per feature, ending in would‑use / would‑pay / NPS | PostHog event `prototype_review_submitted` |
+| **In‑app "Give feedback" button** | Quick note: ease rating (1–5), what to improve, what worked, optional email | PostHog event `feedback_submitted` |
 | **PostHog autocapture** | Every click/tap, route change (`$pageview`) | PostHog (project 316669) |
 | **PostHog session replay** | Full screen recordings of real sessions | PostHog → Replays |
 | **Moderated usability sessions** | The *why* behind behaviour (think‑aloud) | Notes + the script below |
@@ -30,6 +31,46 @@ and `surface = "scout-prototype"`.
    and a table of the `improve` text. Break down by `prototype` + `screen`.
 4. **Replays:** Replays → filter `surface = scout-prototype`; jump straight from a
    low `ease` feedback event to that person's recording.
+
+## The guided review (main feedback channel)
+
+Each prototype has a **"Take the 3‑min guided review"** flow — launched from the
+floating Feedback button. It walks the tester through every feature area (Browse
+tournaments, Tournament overview, Highlights, Stats & the hands behind them, Asking
+the AI, Watching replays, the Player scouting report, plus Navigation / UI / Trust),
+asking for a **1–5 score + what you liked + what you didn't** on each, then an
+**overall** step (would‑use 1–5, would‑pay, NPS, free note). Each step has an
+"↗ Open this feature to try it" deep link. Section list + deep links adapt per
+prototype (e.g. sharp's Stats step points at the in‑report drill).
+
+**Process:** give each tester **one** prototype link (different people → different
+prototypes) and aggregate per prototype — avoids 60‑question fatigue.
+
+### Event shape — `prototype_review_submitted`
+One event per completed review, tagged `prototype` + `surface`, with flattened
+properties so PostHog can average per‑feature scores:
+`score_<key>`, `liked_<key>`, `disliked_<key>` for each feature
+(`first_impression`, `discover`, `tournament`, `highlights`, `stats`, `ai`,
+`replays`, `player_report`, `navigation`, `design`, `trust`), plus `would_use`
+(1–5), `would_pay` (no/maybe/yes), `would_pay_amount`, `nps` (0–10), `overall_note`.
+
+### Reviewing it
+**Live (PostHog):** new insight filtered to `event = prototype_review_submitted`,
+broken down by `prototype`:
+- a **bar of average `score_*`** per feature (one series per feature) → see exactly
+  which feature each prototype wins/loses on;
+- **NPS** (promoters 9–10 minus detractors 0–6) and **would‑pay** distribution;
+- a **table/events view** of the `liked_*` / `disliked_*` / `overall_note` text.
+
+**Offline (consolidated per‑prototype markdown):**
+```
+POSTHOG_PERSONAL_KEY=phx_...  node feedback/pull-reviews.cjs
+```
+(`POSTHOG_PERSONAL_KEY` is the read‑only PostHog "Query Read" personal key — the
+same one the `/posthog` command uses; it's a secret, so it's passed via env, never
+committed.) Pulls all reviews via the PostHog query API and writes `feedback/reviews-<date>.md`
+— one section per prototype with an average‑score table, NPS / would‑pay, and every
+verbatim like/dislike. (Generated reports are git‑ignored.)
 
 ## The kit
 

@@ -51,3 +51,41 @@ export interface FeedbackPayload {
 export function captureFeedback(data: FeedbackPayload): void {
   posthog.capture('feedback_submitted', { prototype: PROTOTYPE, surface: 'scout-prototype', ...data })
 }
+
+// ---- Guided per-prototype review (the ReviewWizard) ----
+
+export interface ReviewPayload {
+  sections: Record<string, { score: number; liked?: string; disliked?: string }>
+  would_use: number              // 1–5
+  would_pay: 'no' | 'maybe' | 'yes'
+  would_pay_amount?: string
+  nps: number                    // 0–10
+  overall_note?: string
+  email?: string
+}
+
+/**
+ * Flattens the guided review into a single `prototype_review_submitted` event:
+ * `score_<key>` / `liked_<key>` / `disliked_<key>` per feature section, plus the
+ * overall fields — so PostHog can average per-feature scores broken down by prototype.
+ */
+export function captureReview(p: ReviewPayload): void {
+  const flat: Record<string, unknown> = {
+    prototype: PROTOTYPE,
+    surface: 'scout-prototype',
+    completed: true,
+    sections_count: Object.keys(p.sections).length,
+    would_use: p.would_use,
+    would_pay: p.would_pay,
+    would_pay_amount: p.would_pay_amount,
+    nps: p.nps,
+    overall_note: p.overall_note,
+    email: p.email,
+  }
+  for (const [k, v] of Object.entries(p.sections)) {
+    if (v.score) flat[`score_${k}`] = v.score
+    if (v.liked && v.liked.trim()) flat[`liked_${k}`] = v.liked.trim()
+    if (v.disliked && v.disliked.trim()) flat[`disliked_${k}`] = v.disliked.trim()
+  }
+  posthog.capture('prototype_review_submitted', flat)
+}
