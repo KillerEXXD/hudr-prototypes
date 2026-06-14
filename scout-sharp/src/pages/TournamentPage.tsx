@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Radio, Table2, ChevronRight, Crown, Loader2, History, Flame, Sparkles, ArrowRight } from 'lucide-react'
+import { Radio, Table2, ChevronRight, Crown, Loader2, History, Flame, Sparkles, ArrowRight, Trophy } from 'lucide-react'
 import { useTournament, useTournamentPlayers, useTournamentProfiles, useTournamentHighlights, useTournamentHands } from '@/hooks'
 import { STAT_DEFS } from '@/engine'
 import type { PlayerProfile, StatKey } from '@/engine'
@@ -10,6 +10,7 @@ import PlayerAvatar from '@/components/player/PlayerAvatar'
 import ArchetypeBadge from '@/components/common/ArchetypeBadge'
 import HandViewerButton from '@/components/scout/HandViewer'
 import TournamentChatSheet from '@/components/scout/TournamentChatSheet'
+import TournamentResults from '@/components/scout/TournamentResults'
 import MiniCard from '@/components/common/MiniCard'
 import { cn, fmtChips } from '@/lib/utils'
 
@@ -119,12 +120,14 @@ export default function TournamentPage() {
 
       {/* Explore */}
       <h2 className="mb-2 mt-5 text-sm font-semibold text-text-secondary">Explore this tournament</h2>
-      <Tabs defaultValue="hands">
+      <Tabs defaultValue={t.winnerId ? 'results' : 'hands'}>
         <TabsList>
+          <TabsTrigger value="results"><span className="flex items-center justify-center gap-1"><Trophy className="h-3.5 w-3.5" />Results</span></TabsTrigger>
           <TabsTrigger value="hands"><span className="flex items-center justify-center gap-1"><History className="h-3.5 w-3.5" />Hands</span></TabsTrigger>
           <TabsTrigger value="highlights"><span className="flex items-center justify-center gap-1"><Flame className="h-3.5 w-3.5" />Highlights</span></TabsTrigger>
           <TabsTrigger value="stats"><span className="flex items-center justify-center gap-1"><Table2 className="h-3.5 w-3.5" />Stats</span></TabsTrigger>
         </TabsList>
+        <TabsContent value="results"><TournamentResults tournament={t} players={players} /></TabsContent>
         <TabsContent value="hands"><HandsList hands={hands} loading={handsLoading} /></TabsContent>
         <TabsContent value="highlights"><HighlightsList items={highlights} loading={highlightsLoading} /></TabsContent>
         <TabsContent value="stats">
