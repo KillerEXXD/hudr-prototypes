@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Radio, MessageSquare, Table2, ChevronRight, Crown, Loader2, History, Flame } from 'lucide-react'
+import { Radio, Sparkles, Table2, ChevronRight, Crown, Loader2, History, Flame } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
 import { useTournament, useTournamentPlayers, useTournamentProfiles, useTournamentHighlights, useTournamentHands } from '@/hooks'
 import { STAT_DEFS } from '@/engine'
@@ -106,7 +106,7 @@ export default function TournamentPage() {
         <TabsList>
           <TabsTrigger value="hands"><span className="flex items-center justify-center gap-1"><History className="h-3.5 w-3.5" />Hands</span></TabsTrigger>
           <TabsTrigger value="highlights"><span className="flex items-center justify-center gap-1"><Flame className="h-3.5 w-3.5" />Highlights</span></TabsTrigger>
-          <TabsTrigger value="chat"><span className="flex items-center justify-center gap-1"><MessageSquare className="h-3.5 w-3.5" />Chat</span></TabsTrigger>
+          <TabsTrigger value="chat"><span className="flex items-center justify-center gap-1"><Sparkles className="h-3.5 w-3.5" />AI</span></TabsTrigger>
           <TabsTrigger value="stats"><span className="flex items-center justify-center gap-1"><Table2 className="h-3.5 w-3.5" />Stats</span></TabsTrigger>
         </TabsList>
         <TabsContent value="hands"><HandsList hands={hands} /></TabsContent>
