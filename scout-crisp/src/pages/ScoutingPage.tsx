@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useParams, useSearchParams } from 'react-router-dom'
 import {
   Brain, Target, ClipboardList, Activity, MapPin, BarChart3, ShieldCheck, Quote,
-  Crosshair, Gauge, Loader2, Database, Award, Sparkles, ArrowRight,
+  Crosshair, Gauge, Loader2, Database, Award, Sparkles, ArrowRight, SlidersHorizontal, ChevronUp,
 } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -79,9 +80,23 @@ export default function ScoutingPage() {
   })
 
   const [chatOpen, setChatOpen] = useState(false)
+  const filtersRef = useRef<HTMLDivElement>(null)
+  const [showScopeChip, setShowScopeChip] = useState(false)
   const { data: player } = usePlayer(id)
   const { data: profile, isLoading } = usePlayerProfile(id, filters)
   const dims = PLAYER_DIMENSIONS[id]
+
+  // Show a sticky scope summary once the filters scroll up under the header.
+  useEffect(() => {
+    const el = filtersRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => setShowScopeChip(entry.boundingClientRect.bottom <= 56),
+      { rootMargin: '-56px 0px 0px 0px', threshold: [0, 1] },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [profile])
 
   if (isLoading || !profile || !player) {
     return (
@@ -95,6 +110,11 @@ export default function ScoutingPage() {
   const reliableCount = profile.stats.filter((s) => s.tier === 'RELIABLE').length
   const thin = reliableCount < 3
   const scopeLabel = filters.scope === 'event' ? 'This event' : 'Career'
+  const scopeText = [
+    scopeLabel,
+    filters.tableSize === 'short' ? 'Short ≤4' : filters.tableSize === 'full' ? 'Full ≥5' : null,
+    filters.depth === 'short' ? '<15bb' : filters.depth === 'mid' ? '15–40' : filters.depth === 'deep' ? '40+' : null,
+  ].filter(Boolean).join(' · ')
 
   return (
     <div className="animate-fade-up">
@@ -156,7 +176,7 @@ export default function ScoutingPage() {
       </div>
 
       {/* ---- Filters ---- */}
-      <div className="mt-3">
+      <div ref={filtersRef} className="mt-3">
         <ScopeFilters filters={filters} onChange={setFilters} eventAvailable={!!tournamentId} />
       </div>
 
@@ -247,6 +267,23 @@ export default function ScoutingPage() {
       </p>
 
       <PlayerChatSheet open={chatOpen} onClose={() => setChatOpen(false)} profile={profile} />
+
+      {/* Sticky scope summary — pinned under the header so you always know what the report below is showing */}
+      {showScopeChip && createPortal(
+        <div className="pointer-events-none fixed inset-x-0 top-[52px] z-20 mx-auto flex max-w-md justify-center px-4">
+          <button
+            type="button"
+            onClick={() => filtersRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="animate-fade-up pointer-events-auto flex items-center gap-2 rounded-full border border-border bg-bg-card/95 px-3 py-1.5 text-xs shadow-lg backdrop-blur cursor-pointer"
+            aria-label="Active scope — tap to change the filters"
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5 shrink-0 text-accent-blue" />
+            <span className="text-text-primary"><span className="font-semibold">{scopeText}</span> · <span className="nums text-text-muted">{profile.totalHands}</span> <span className="text-text-muted">hands</span></span>
+            <ChevronUp className="h-3.5 w-3.5 shrink-0 text-text-muted" />
+          </button>
+        </div>,
+        document.body,
+      )}
     </div>
   )
 }
