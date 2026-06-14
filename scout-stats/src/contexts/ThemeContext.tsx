@@ -4,8 +4,11 @@ import { THEMES, THEME_LIST, DEFAULT_THEME, type ThemeName, type ThemeFlags, typ
 // Runtime skin system. The selected skin overrides the CSS-variable tokens on
 // <html>, so the whole app re-skins instantly. Persisted to localStorage and
 // applied at module load (before first paint) to avoid a flash of the default.
+// The key is namespaced per prototype (build base) so each one defaults to
+// Scout Engine independently and a skin picked in one demo never bleeds into the
+// others (they share the same origin).
 
-const STORAGE_KEY = 'scout-skin'
+const STORAGE_KEY = `scout-skin:${import.meta.env.BASE_URL}`
 
 function readStored(): ThemeName {
   try {
