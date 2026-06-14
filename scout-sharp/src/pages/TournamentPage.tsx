@@ -1,10 +1,10 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Radio, Table2, ChevronRight, Crown, Loader2, History, Flame, Sparkles, ArrowRight, Trophy } from 'lucide-react'
+import { Radio, Table2, ChevronRight, Loader2, History, Flame, Sparkles, ArrowRight, Trophy } from 'lucide-react'
 import { useTournament, useTournamentPlayers, useTournamentProfiles, useTournamentHighlights, useTournamentHands, useProfiles } from '@/hooks'
 import { STAT_DEFS } from '@/engine'
 import type { PlayerProfile, StatKey } from '@/engine'
-import type { Player, Tournament, Highlight, HandSummary } from '@/lib/api/domain'
+import type { Player, Highlight, HandSummary } from '@/lib/api/domain'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui'
 import PlayerAvatar from '@/components/player/PlayerAvatar'
 import ArchetypeBadge from '@/components/common/ArchetypeBadge'
@@ -18,36 +18,24 @@ const TABLE_COLS: StatKey[] = ['vpip', 'pfr', 'threeBet', 'af', 'wtsd']
 
 interface Row { profile: PlayerProfile; player: Player | undefined }
 
-function statusFor(t: Tournament, p: Player | undefined) {
-  if (t.winnerId === p?.id) return { label: 'Winner', cls: 'text-accent-amber bg-accent-amber/15', icon: true }
-  if (t.isLive) return { label: 'In play', cls: 'text-accent-emerald bg-accent-emerald/15', icon: false }
-  if (t.id === 't1' && p) {
-    if (p.status === 'runner-up') return { label: '2nd', cls: 'text-text-secondary bg-bg-surface', icon: false }
-    if (p.status === 'eliminated' && p.finish) return { label: `${p.finish}th`, cls: 'text-text-muted bg-bg-surface', icon: false }
-  }
-  return { label: 'Field', cls: 'text-text-muted bg-bg-surface', icon: false }
-}
-
 export default function TournamentPage() {
   const { id = '' } = useParams()
   const [chatOpen, setChatOpen] = useState(false)
   const { data: t, isLoading: tLoading } = useTournament(id)
-  const { data: players = [], isLoading: playersLoading } = useTournamentPlayers(id)
+  const { data: players = [] } = useTournamentPlayers(id)
   const { data: highlights = [], isLoading: highlightsLoading } = useTournamentHighlights(id)
   const { data: hands = [], isLoading: handsLoading } = useTournamentHands(id)
   const rosterIds = useMemo(() => players.map((p) => p.id), [players])
-  // Roster / AI read each player from their full (career) sample — who they are.
-  const { profiles, isLoading: profilesLoading } = useTournamentProfiles(id, rosterIds)
+  // Career profiles label the stat cards with who each player is overall + their top leak.
+  const { profiles } = useTournamentProfiles(id, rosterIds)
   // Stats tab reads THIS EVENT's stat lines, matching where a tapped player lands.
   const { profiles: eventProfiles, isLoading: eventLoading } = useProfiles(rosterIds, { scope: 'event', tournamentId: id, tableSize: 'all', depth: 'all' })
-  const rosterLoading = playersLoading || (rosterIds.length > 0 && profilesLoading)
   // Tapping a player opens their report scoped to THIS event (?t=).
   const playerQuery = `?t=${id}`
 
   const byId = useMemo(() => Object.fromEntries(players.map((p) => [p.id, p])), [players])
-  const rows: Row[] = useMemo(() => profiles.map((profile) => ({ profile, player: byId[profile.playerId] })), [profiles, byId])
   const eventRows: Row[] = useMemo(() => eventProfiles.map((profile) => ({ profile, player: byId[profile.playerId] })), [eventProfiles, byId])
-  // Career archetype (who they are overall) to label the event stat cards.
+  // Career profile per player (archetype + top leak) to enrich the event stat cards.
   const careerByPlayer = useMemo(() => Object.fromEntries(profiles.map((p) => [p.playerId, p])), [profiles])
 
   if (tLoading) return <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading tournament…</Centered>
@@ -88,42 +76,8 @@ export default function TournamentPage() {
         </button>
       </div>
 
-      {/* Roster */}
-      <h2 className="mb-2 mt-4 text-sm font-semibold text-text-secondary">Players &amp; reads</h2>
-      <div className="space-y-2">
-        {rows.map(({ profile, player }) => {
-          const st = statusFor(t, player)
-          const top = profile.exploits[0]
-          return (
-            <Link
-              key={profile.playerId}
-              to={`/player/${profile.playerId}${playerQuery}`}
-              className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
-            >
-              <PlayerAvatar initials={player?.initials ?? '?'} color={player?.color ?? '#444'} photoUrl={player?.photoUrl} />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="truncate font-semibold text-text-primary">{profile.name}</span>
-                  <span className={cn('flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold', st.cls)}>
-                    {st.icon && <Crown className="h-2.5 w-2.5" />}{st.label}
-                  </span>
-                </div>
-                <div className="mt-1 flex items-center gap-2">
-                  <ArchetypeBadge archetype={profile.typing.archetype} size="sm" />
-                  {top && <span className="truncate text-[11px] text-text-muted">{top.title}</span>}
-                </div>
-              </div>
-              <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
-            </Link>
-          )
-        })}
-        {rows.length === 0 && (rosterLoading
-          ? <Centered><Loader2 className="h-4 w-4 animate-spin" /> Reading players…</Centered>
-          : <EmptyNote>No player reads yet — this event hasn't been played.</EmptyNote>)}
-      </div>
-
-      {/* Explore */}
-      <h2 className="mb-2 mt-5 text-sm font-semibold text-text-secondary">Explore this tournament</h2>
+      {/* Explore — one player list lives in the Stats tab (no duplicate roster) */}
+      <h2 className="mb-2 mt-4 text-sm font-semibold text-text-secondary">Explore this tournament</h2>
       <Tabs defaultValue={t.winnerId ? 'results' : 'hands'}>
         <TabsList>
           <TabsTrigger value="results"><span className="flex items-center justify-center gap-1"><Trophy className="h-3.5 w-3.5" />Results</span></TabsTrigger>
@@ -259,7 +213,10 @@ function EventStatCards({ rows, linkQuery, careerByPlayer }: { rows: Row[]; link
     <div>
       <p className="mb-2 text-[11px] text-text-muted">This event's stat lines — tap a player to open their report &amp; the hands behind each stat for this event.</p>
       <div className="space-y-2">
-        {rows.map(({ profile, player }) => (
+        {rows.map(({ profile, player }) => {
+          const career = careerByPlayer[profile.playerId] ?? profile
+          const topLeak = career.exploits[0]
+          return (
           <Link
             key={profile.playerId}
             to={`/player/${profile.playerId}${linkQuery}`}
@@ -272,7 +229,10 @@ function EventStatCards({ rows, linkQuery, careerByPlayer }: { rows: Row[]; link
                   <span className="truncate font-semibold text-text-primary">{profile.name}</span>
                   {player?.flag && <span aria-hidden>{player.flag}</span>}
                 </div>
-                <div className="mt-0.5"><ArchetypeBadge archetype={(careerByPlayer[profile.playerId] ?? profile).typing.archetype} size="sm" /></div>
+                <div className="mt-0.5 flex items-center gap-1.5">
+                  <ArchetypeBadge archetype={career.typing.archetype} size="sm" />
+                  {topLeak && <span className="truncate text-[11px] text-text-muted">{topLeak.title}</span>}
+                </div>
               </div>
               <span className="flex shrink-0 items-center gap-0.5 text-[11px] font-semibold text-accent-blue">
                 This event <ChevronRight className="h-3.5 w-3.5" />
@@ -291,7 +251,8 @@ function EventStatCards({ rows, linkQuery, careerByPlayer }: { rows: Row[]; link
               })}
             </div>
           </Link>
-        ))}
+          )
+        })}
       </div>
       <p className="mt-2 text-[10px] text-text-muted">Amber = small sample · grey = too few hands. Numbers are for this event; open a player to switch to Career.</p>
     </div>

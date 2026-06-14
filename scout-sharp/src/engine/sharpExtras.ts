@@ -50,7 +50,10 @@ const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n
 export function buildSharpExtras(profile: PlayerProfile): SharpExtras {
   const get = (k: StatKey) => profile.stats.find((s) => s.key === k)
 
-  // ---- Bet-sizing tendencies (derived from c-bet / barrel / river stats) ----
+  // ---- Bet-sizing tendencies ----
+  // ESTIMATED: the sizing string is chosen from c-bet/barrel FREQUENCY, which is
+  // not the same as sizing. REAL DATA: replace with avg(bet_amount / pot_before)
+  // bucketed by street from hand_actions, and stamp the real sizing sample tier.
   const sizing: SizingRead[] = []
   const cF = get('cbetFlop')
   if (cF) sizing.push({
@@ -91,7 +94,10 @@ export function buildSharpExtras(profile: PlayerProfile): SharpExtras {
     freq: afq.value, tier: afq.tier, opportunities: afq.opportunities,
   })
 
-  // ---- Position-resolved ranges (open% from positional + 3-bet scaled by seat) ----
+  // ---- Position-resolved ranges ----
+  // ESTIMATED: open% is PFR scaled by a seat multiplier and 3-bet is the aggregate
+  // threeBet scaled by seat — neither is measured per-seat. REAL DATA: count real
+  // opens / 3-bets per seat from hand_actions grouped by position.
   const tb = get('threeBet')?.value ?? 6
   const posMul: Record<string, number> = { UTG: 0.5, HJ: 0.7, CO: 1.0, BTN: 1.45, SB: 1.15 }
   const positions: PositionRange[] = profile.positional.map((ps) => ({
@@ -102,7 +108,10 @@ export function buildSharpExtras(profile: PlayerProfile): SharpExtras {
     opportunities: ps.opportunities,
   }))
 
-  // ---- Showdown ranges ("what they show up with") from WTSD + W$SD ----
+  // ---- Showdown ranges ("what they show up with") ----
+  // ESTIMATED: band composition is a formula on WTSD + W$SD, not real holdings.
+  // REAL DATA: aggregate actual shown-down hands (hand_player_cards at showdown)
+  // into strength buckets.
   const wtsd = get('wtsd')
   const wsd = get('wsd')
   const reach = wtsd?.value ?? 28

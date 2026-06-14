@@ -1,25 +1,20 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useParams, useSearchParams } from 'react-router-dom'
 import {
-  Brain, Target, ClipboardList, BarChart3, ShieldCheck, Activity,
-  Loader2, Award, Sparkles, ArrowRight, SlidersHorizontal, ChevronUp,
+  Brain, Target, BarChart3, ShieldCheck, Activity, Loader2,
+  SlidersHorizontal, ChevronUp, ChevronDown,
 } from 'lucide-react'
 import { usePlayer, usePlayerProfile } from '@/hooks'
 import { buildSharpExtras } from '@/engine'
 import type { StatFilters, TableSizeBucket, DepthBucket } from '@/engine'
-import PlayerAvatar from '@/components/player/PlayerAvatar'
-import ArchetypeBadge from '@/components/common/ArchetypeBadge'
-import ConfidenceMeter from '@/components/common/ConfidenceMeter'
 import ExploitCard from '@/components/scout/ExploitCard'
 import StatHandsExplorer from '@/components/scout/StatHandsExplorer'
 import { TldrCard, BetSizingSection, PositionRangesSection, ShowdownSection } from '@/components/scout/SharpSections'
 import BoundaryTrace from '@/components/scout/BoundaryTrace'
 import ScopeFilters from '@/components/scout/ScopeFilters'
 import PlayerChatSheet from '@/components/scout/PlayerChatSheet'
-import Strengths from '@/components/scout/Strengths'
 import PlayerTournaments from '@/components/scout/PlayerTournaments'
-import type { ReactNode } from 'react'
 
 function Section({ icon, title, sub, children }: { icon: ReactNode; title: string; sub?: string; children: ReactNode }) {
   return (
@@ -40,19 +35,21 @@ export default function ScoutingPage() {
   const tournamentId = search.get('t')
   const tsParam = search.get('ts')
   const dpParam = search.get('depth')
+  const fromEvent = !!tournamentId
 
   const [filters, setFilters] = useState<StatFilters>({
-    // Opened from a tournament (?t=) → land on THIS EVENT's stats (the user
-    // clicked in from that event). Standalone (from the Players list) → career.
-    // Either way the scope filter lets them switch; thin event samples surface
-    // the sample-size banner honestly.
-    scope: tournamentId ? 'event' : 'career',
+    // Default to the full (career) sample — even from a tournament — so the READ
+    // is trustworthy instead of a thin/empty single-event slice. The hands drill
+    // still scopes to this event via tournamentId, and "This event" stays
+    // selectable for event-only stats.
+    scope: 'career',
     tournamentId: tournamentId ?? null,
     tableSize: (['short', 'full'].includes(tsParam ?? '') ? tsParam : 'all') as TableSizeBucket,
     depth: (['short', 'mid', 'deep'].includes(dpParam ?? '') ? dpParam : 'all') as DepthBucket,
   })
 
   const [chatOpen, setChatOpen] = useState(false)
+  const [showMore, setShowMore] = useState(false)
   const filtersRef = useRef<HTMLDivElement>(null)
   const [showScopeChip, setShowScopeChip] = useState(false)
   const { data: player } = usePlayer(id)
@@ -78,7 +75,7 @@ export default function ScoutingPage() {
     )
   }
 
-  const { narrative, typing, exploits } = profile
+  const { typing, exploits } = profile
   const extras = buildSharpExtras(profile)
   const reliableCount = profile.stats.filter((s) => s.tier === 'RELIABLE').length
   const thin = reliableCount < 3
@@ -89,52 +86,24 @@ export default function ScoutingPage() {
     filters.depth === 'short' ? '<15bb' : filters.depth === 'mid' ? '15–40' : filters.depth === 'deep' ? '40+' : null,
   ].filter(Boolean).join(' · ')
   const first = player.name.split(' ')[0]
+  const strengthLine = profile.strengths.slice(0, 3).map((s) => s.title).join(' · ')
+  const eventHands = fromEvent && filters.scope === 'career'
 
   return (
     <div className="animate-fade-up">
-      {/* ---- Header (slim, Pro-first: no nickname, no opaque scores) ---- */}
-      <div className="rounded-2xl border border-border bg-gradient-to-br from-bg-card to-bg-surface p-4">
-        <div className="flex items-start gap-3">
-          <PlayerAvatar initials={player.initials} color={player.color} photoUrl={player.photoUrl} size="lg" />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h1 className="truncate text-lg font-bold leading-tight">{player.name}</h1>
-              <span aria-hidden>{player.flag}</span>
-            </div>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <ArchetypeBadge archetype={typing.archetype} size="md" />
-              <ConfidenceMeter value={typing.confidence} unclassified={typing.archetype === 'UNCLASSIFIED'} />
-            </div>
-          </div>
-        </div>
-
-        {/* Ask-AI launcher — the single AI surface */}
-        <button
-          type="button"
-          onClick={() => setChatOpen(true)}
-          className="mt-3 flex w-full items-center gap-2.5 rounded-xl border border-accent-blue/30 bg-accent-blue/10 px-3 py-2.5 text-sm font-semibold text-accent-blue transition-colors hover:bg-accent-blue/20 cursor-pointer"
-        >
-          <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-blue/20">
-            <Sparkles className="h-4 w-4" />
-            <span className="skin-dot absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-accent-blue ring-2 ring-bg-card" />
-          </span>
-          Ask AI about {first}
-          <ArrowRight className="ml-auto h-4 w-4" />
-        </button>
-      </div>
-
-      {/* ---- 5-second TL;DR read (above the fold) ---- */}
-      <TldrCard profile={profile} scopeLabel={scopeLabel} />
-
-      {/* ---- Tournaments in DB (hands per tournament) ---- */}
-      <div className="mt-3">
-        <PlayerTournaments playerId={id} firstName={first} />
-      </div>
+      {/* ---- Identity + 5-second read (merged header) ---- */}
+      <TldrCard profile={profile} player={player} scopeLabel={scopeLabel} onAskAI={() => setChatOpen(true)} />
 
       {/* ---- Filters ---- */}
       <div ref={filtersRef} className="mt-3">
         <ScopeFilters filters={filters} onChange={setFilters} eventAvailable={!!tournamentId} />
       </div>
+
+      {eventHands && (
+        <p className="mt-2 text-[11px] leading-snug text-text-muted">
+          Showing the <span className="font-semibold text-text-secondary">career</span> read (reliable); the hands drill below is scoped to this event. Switch to <span className="font-semibold text-text-secondary">This event</span> above for event-only stats.
+        </p>
+      )}
 
       {thin && (
         <div className="mt-3 flex items-start gap-2 rounded-xl border border-accent-amber/30 bg-accent-amber/10 p-3">
@@ -146,21 +115,11 @@ export default function ScoutingPage() {
         </div>
       )}
 
-      {/* ---- Typing (no radar — boundary trace is the honest "why") ---- */}
-      <Section icon={<Brain className="h-4 w-4" />} title="Player type">
-        <div className="rounded-xl border border-border bg-bg-card p-4">
-          <p className="text-sm leading-relaxed text-text-primary">{narrative.proSummary}</p>
-          <div className="mt-3 border-t border-border pt-3">
-            <BoundaryTrace typing={typing} />
-          </div>
-        </div>
-      </Section>
-
-      {/* ---- Exploits ---- */}
+      {/* ---- Exploits (the lead) ---- */}
       <Section
         icon={<Target className="h-4 w-4" />}
         title="Exploits (ranked by severity)"
-        sub="Only RELIABLE-tier leaks fire. Each pairs a counter with a confirmation stat."
+        sub="Only RELIABLE-tier leaks fire. Each pairs a counter with a confirmation stat and a real hand."
       >
         {exploits.length > 0 ? (
           <div className="space-y-3">
@@ -174,50 +133,60 @@ export default function ScoutingPage() {
             </p>
           </div>
         )}
+        {strengthLine && (
+          <p className="mt-2 flex items-start gap-1.5 px-1 text-[11px] leading-snug text-text-muted">
+            <ShieldCheck className="mt-0.5 h-3 w-3 shrink-0 text-accent-emerald" />
+            <span><span className="font-medium text-text-secondary">Solid at:</span> {strengthLine} — don’t spew into these.</span>
+          </p>
+        )}
       </Section>
 
-      {/* ---- Strengths ---- */}
-      <Section icon={<Award className="h-4 w-4" />} title="Strengths">
-        <Strengths strengths={profile.strengths} />
-      </Section>
-
-      {/* ---- Exploit plan (by phase) ---- */}
-      <Section icon={<ClipboardList className="h-4 w-4" />} title="Exploit plan" sub="Actionable, by phase.">
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-          {([['Preflop', profile.plan.preflop], ['Postflop', profile.plan.postflop], ['ICM', profile.plan.icm]] as const).map(([label, item]) => (
-            <div key={label} className="rounded-xl border border-accent-emerald/25 bg-accent-emerald/5 p-3">
-              <div className="text-[10px] font-bold uppercase tracking-wide text-accent-emerald">{label}</div>
-              <p className="mt-1 text-sm leading-snug text-text-primary">{item.pro}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* ---- Bet-sizing tendencies (new) ---- */}
-      <BetSizingSection sizing={extras.sizing} />
-
-      {/* ---- Position-resolved ranges (new) ---- */}
-      <PositionRangesSection positions={extras.positions} />
-
-      {/* ---- Showdown range (new) ---- */}
-      <ShowdownSection showdown={extras.showdown} />
-
-      {/* ---- Stats with evidence drill (tap a stat → its hands) ---- */}
+      {/* ---- Full stat profile + evidence drill (promoted) ---- */}
       <Section
         icon={<BarChart3 className="h-4 w-4" />}
         title="Full stat profile"
-        sub={`${profile.totalHands} hands · ${scopeLabel} · tap any stat to see the hands behind it`}
+        sub={`${profile.totalHands} hands · ${scopeLabel} · tap a stat to see ${eventHands ? "this event's" : 'the'} hands behind it`}
       >
         <StatHandsExplorer stats={profile.stats} playerId={id} tournamentId={filters.tournamentId} first={first} />
       </Section>
 
+      {/* ---- Tournaments in DB (hands per tournament) ---- */}
+      <div className="mt-4">
+        <PlayerTournaments playerId={id} firstName={first} />
+      </div>
+
+      {/* ---- Deeper reads (estimated + typing detail) behind a toggle ---- */}
+      <button
+        type="button"
+        onClick={() => setShowMore((s) => !s)}
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-bg-card px-3 py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:bg-bg-surface cursor-pointer"
+      >
+        {showMore ? 'Hide' : 'Show'} deeper reads
+        <span className="text-[11px] font-normal text-text-muted">type · sizing · positions · showdown</span>
+        <ChevronDown className={`h-4 w-4 transition-transform ${showMore ? 'rotate-180' : ''}`} />
+      </button>
+
+      {showMore && (
+        <div className="animate-fade-up">
+          <Section icon={<Brain className="h-4 w-4" />} title="Why this type" sub="The explicit boundary the archetype matched (or didn’t).">
+            <div className="rounded-xl border border-border bg-bg-card p-4">
+              <BoundaryTrace typing={typing} />
+            </div>
+          </Section>
+
+          <BetSizingSection sizing={extras.sizing} />
+          <PositionRangesSection positions={extras.positions} />
+          <ShowdownSection showdown={extras.showdown} />
+        </div>
+      )}
+
       <p className="mt-4 text-center text-[11px] text-text-muted">
-        Prototype · stats segmented by scope/table-size/depth are modeled; typing, exploits &amp; derived reads are computed deterministically and gated by sample size.
+        Prototype · stats are sample-gated; exploits are computed deterministically. Sizing / positions / showdown are <span className="text-accent-amber">estimated</span> until real measured data is wired in.
       </p>
 
       <PlayerChatSheet open={chatOpen} onClose={() => setChatOpen(false)} profile={profile} />
 
-      {/* Sticky scope summary — pinned under the header so you always know what the report below is showing */}
+      {/* Sticky scope summary — pinned under the header so you always know the active scope */}
       {showScopeChip && createPortal(
         <div className="pointer-events-none fixed inset-x-0 top-[52px] z-20 mx-auto flex max-w-md justify-center px-4">
           <button
