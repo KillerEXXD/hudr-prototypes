@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import {
   Brain, Target, ClipboardList, Activity, MapPin, BarChart3, ShieldCheck, Quote,
-  Crosshair, Gauge, Loader2, Database, MessageSquare, Award,
+  Crosshair, Gauge, Loader2, Database, Award, Sparkles, ArrowRight,
 } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -18,7 +18,7 @@ import StatList from '@/components/scout/StatList'
 import BoundaryTrace from '@/components/scout/BoundaryTrace'
 import PositionalOpens from '@/components/scout/PositionalOpens'
 import ScopeFilters from '@/components/scout/ScopeFilters'
-import PlayerChat from '@/components/scout/PlayerChat'
+import PlayerChatSheet from '@/components/scout/PlayerChatSheet'
 import Strengths from '@/components/scout/Strengths'
 import PlayerTournaments from '@/components/scout/PlayerTournaments'
 import { cn } from '@/lib/utils'
@@ -78,6 +78,7 @@ export default function ScoutingPage() {
     depth: (['short', 'mid', 'deep'].includes(dpParam ?? '') ? dpParam : 'all') as DepthBucket,
   })
 
+  const [chatOpen, setChatOpen] = useState(false)
   const { data: player } = usePlayer(id)
   const { data: profile, isLoading } = usePlayerProfile(id, filters)
   const dims = PLAYER_DIMENSIONS[id]
@@ -133,6 +134,20 @@ export default function ScoutingPage() {
         </div>
 
         <p className="mt-3 text-sm leading-snug text-text-secondary">{narrative.summary}</p>
+
+        {/* Ask-AI launcher — opens the full-screen chat */}
+        <button
+          type="button"
+          onClick={() => setChatOpen(true)}
+          className="mt-3 flex w-full items-center gap-2.5 rounded-xl border border-accent-blue/30 bg-accent-blue/10 px-3 py-2.5 text-sm font-semibold text-accent-blue transition-colors hover:bg-accent-blue/20 cursor-pointer"
+        >
+          <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-blue/20">
+            <Sparkles className="h-4 w-4" />
+            <span className="skin-dot absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-accent-blue ring-2 ring-bg-card" />
+          </span>
+          Ask AI about {player.name.split(' ')[0]}
+          <ArrowRight className="ml-auto h-4 w-4" />
+        </button>
       </div>
 
       {/* ---- Tournaments in DB (hands per tournament) ---- */}
@@ -155,11 +170,6 @@ export default function ScoutingPage() {
           </p>
         </div>
       )}
-
-      {/* ---- Ask AI about this player ---- */}
-      <Section icon={<MessageSquare className="h-4 w-4" />} title={`Ask AI about ${player.name.split(' ')[0]}`}>
-        <PlayerChat profile={profile} />
-      </Section>
 
       {/* ---- Layer 2: typing ---- */}
       <Section icon={<Brain className="h-4 w-4" />} title={isPro ? 'Player type' : 'How they play'}>
@@ -234,6 +244,8 @@ export default function ScoutingPage() {
       <p className="mt-4 text-center text-[11px] text-text-muted">
         Prototype · stats segmented by scope/table-size/depth are modeled; typing, exploits &amp; scores are computed deterministically.
       </p>
+
+      <PlayerChatSheet open={chatOpen} onClose={() => setChatOpen(false)} profile={profile} />
     </div>
   )
 }
