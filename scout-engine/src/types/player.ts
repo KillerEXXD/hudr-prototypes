@@ -9,6 +9,7 @@ export interface Player {
   hands: number
   startStack: number
   endStack: number
+  photoUrl?: string
 }
 
 export interface PlayerDimensions {

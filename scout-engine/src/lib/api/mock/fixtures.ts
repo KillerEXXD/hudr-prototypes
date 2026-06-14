@@ -23,6 +23,7 @@ export const apiTournaments: ApiTournament[] = TOURNAMENTS_LIST.map((t) => ({
   duration: t.duration,
   top_player_ids: t.topPlayers,
   exploitable_count: t.exploitable,
+  youtube_id: t.youtubeId ?? null,
 }))
 
 export const apiPlayers: ApiPlayer[] = PLAYERS.map((p) => ({
@@ -34,6 +35,7 @@ export const apiPlayers: ApiPlayer[] = PLAYERS.map((p) => ({
   finish: p.finish,
   status: p.status,
   hands_played: p.hands,
+  photo_url: p.photoUrl ?? null,
 }))
 
 export const apiPlayerStats: Record<string, ApiPlayerStats> = Object.fromEntries(

@@ -1,15 +1,18 @@
 import type { Player, PlayerDimensions, PlayerStyle, SkillRating, Rivalry, PlayerStrength, PlayerLeak, PlayerTrend, CareerSparkline } from '@/types'
 
+// Real headshots bundled under public/players/ (served same-origin — no hotlink/rate-limit
+// issues). PlayerAvatar falls back to the initials circle if an image is missing.
+const IMG = (id: string) => `${import.meta.env.BASE_URL}players/${id}.jpg`
 export const PLAYERS: Player[] = [
-  { id: 'p1', name: 'Daniel Negreanu', flag: '\u{1F1E8}\u{1F1E6}', initials: 'DN', color: '#ea580c', finish: 1, status: 'winner', hands: 87, startStack: 4500000, endStack: 9350000 },
-  { id: 'p2', name: 'Phil Ivey', flag: '\u{1F1FA}\u{1F1F8}', initials: 'PI', color: '#2563eb', finish: 2, status: 'runner-up', hands: 87, startStack: 3200000, endStack: 0 },
-  { id: 'p3', name: 'Phil Hellmuth', flag: '\u{1F1FA}\u{1F1F8}', initials: 'PH', color: '#7c3aed', finish: 3, status: 'eliminated', hands: 72, startStack: 2800000, endStack: 0 },
-  { id: 'p4', name: 'Justin Bonomo', flag: '\u{1F1FA}\u{1F1F8}', initials: 'JB', color: '#059669', finish: 4, status: 'eliminated', hands: 65, startStack: 2100000, endStack: 0 },
-  { id: 'p5', name: 'Vanessa Selbst', flag: '\u{1F1FA}\u{1F1F8}', initials: 'VS', color: '#dc2626', finish: 5, status: 'eliminated', hands: 58, startStack: 1800000, endStack: 0 },
-  { id: 'p6', name: 'Fedor Holz', flag: '\u{1F1E9}\u{1F1EA}', initials: 'FH', color: '#0891b2', finish: 6, status: 'eliminated', hands: 52, startStack: 1500000, endStack: 0 },
-  { id: 'p7', name: 'Bryn Kenney', flag: '\u{1F1FA}\u{1F1F8}', initials: 'BK', color: '#d97706', finish: 7, status: 'eliminated', hands: 44, startStack: 1200000, endStack: 0 },
-  { id: 'p8', name: 'Maria Konnikova', flag: '\u{1F1FA}\u{1F1F8}', initials: 'MK', color: '#e11d48', finish: 8, status: 'eliminated', hands: 35, startStack: 900000, endStack: 0 },
-  { id: 'p9', name: 'Erik Seidel', flag: '\u{1F1FA}\u{1F1F8}', initials: 'ES', color: '#6366f1', finish: 9, status: 'eliminated', hands: 28, startStack: 600000, endStack: 0 },
+  { id: 'p1', name: 'Daniel Negreanu', flag: '\u{1F1E8}\u{1F1E6}', initials: 'DN', color: '#ea580c', finish: 1, status: 'winner', hands: 87, startStack: 4500000, endStack: 9350000, photoUrl: IMG('p1') },
+  { id: 'p2', name: 'Phil Ivey', flag: '\u{1F1FA}\u{1F1F8}', initials: 'PI', color: '#2563eb', finish: 2, status: 'runner-up', hands: 87, startStack: 3200000, endStack: 0, photoUrl: IMG('p2') },
+  { id: 'p3', name: 'Phil Hellmuth', flag: '\u{1F1FA}\u{1F1F8}', initials: 'PH', color: '#7c3aed', finish: 3, status: 'eliminated', hands: 72, startStack: 2800000, endStack: 0, photoUrl: IMG('p3') },
+  { id: 'p4', name: 'Justin Bonomo', flag: '\u{1F1FA}\u{1F1F8}', initials: 'JB', color: '#059669', finish: 4, status: 'eliminated', hands: 65, startStack: 2100000, endStack: 0, photoUrl: IMG('p4') },
+  { id: 'p5', name: 'Vanessa Selbst', flag: '\u{1F1FA}\u{1F1F8}', initials: 'VS', color: '#dc2626', finish: 5, status: 'eliminated', hands: 58, startStack: 1800000, endStack: 0, photoUrl: IMG('p5') },
+  { id: 'p6', name: 'Fedor Holz', flag: '\u{1F1E9}\u{1F1EA}', initials: 'FH', color: '#0891b2', finish: 6, status: 'eliminated', hands: 52, startStack: 1500000, endStack: 0, photoUrl: IMG('p6') },
+  { id: 'p7', name: 'Bryn Kenney', flag: '\u{1F1FA}\u{1F1F8}', initials: 'BK', color: '#d97706', finish: 7, status: 'eliminated', hands: 44, startStack: 1200000, endStack: 0, photoUrl: IMG('p7') },
+  { id: 'p8', name: 'Maria Konnikova', flag: '\u{1F1FA}\u{1F1F8}', initials: 'MK', color: '#e11d48', finish: 8, status: 'eliminated', hands: 35, startStack: 900000, endStack: 0, photoUrl: IMG('p8') },
+  { id: 'p9', name: 'Erik Seidel', flag: '\u{1F1FA}\u{1F1F8}', initials: 'ES', color: '#6366f1', finish: 9, status: 'eliminated', hands: 28, startStack: 600000, endStack: 0, photoUrl: IMG('p9') },
 ]
 
 export const PLAYER_DIMENSIONS: Record<string, PlayerDimensions> = {

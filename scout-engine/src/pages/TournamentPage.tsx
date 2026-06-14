@@ -81,7 +81,7 @@ export default function TournamentPage() {
               to={`/player/${profile.playerId}${playerQuery}`}
               className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
             >
-              <PlayerAvatar initials={player?.initials ?? '?'} color={player?.color ?? '#444'} />
+              <PlayerAvatar initials={player?.initials ?? '?'} color={player?.color ?? '#444'} photoUrl={player?.photoUrl} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="truncate font-semibold text-text-primary">{profile.name}</span>

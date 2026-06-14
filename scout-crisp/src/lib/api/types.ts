@@ -24,6 +24,7 @@ export interface ApiTournament {
   duration: string | null
   top_player_ids: string[]
   exploitable_count: number
+  youtube_id: string | null
 }
 
 export interface ApiPlayer {
@@ -35,6 +36,7 @@ export interface ApiPlayer {
   finish: number | null
   status: string
   hands_played: number
+  photo_url: string | null
 }
 
 export interface ApiPlayerStats {

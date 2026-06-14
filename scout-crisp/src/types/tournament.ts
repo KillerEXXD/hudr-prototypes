@@ -16,6 +16,7 @@ export interface Tournament {
   topPlayers: string[]
   winner: string | null
   duration: string | null
+  youtubeId?: string
 }
 
 export interface TournamentDetail {

@@ -1,10 +1,10 @@
 import type { Tournament, TournamentDetail, StoryArc } from '@/types'
 
 export const TOURNAMENT: TournamentDetail = {
-  name: 'WSOP Main Event 2025',
+  name: '$25K WSOP Super Main Event',
   event: 'World Series of Poker',
-  venue: 'Horseshoe Las Vegas',
-  date: 'July 2025',
+  venue: 'Atlantis, Bahamas',
+  date: 'Dec 2024',
   playerCount: 9,
   handCount: 87,
   prizePool: 93500000,
@@ -12,11 +12,11 @@ export const TOURNAMENT: TournamentDetail = {
 }
 
 export const TOURNAMENTS_LIST: Tournament[] = [
-  { id: 't1', name: 'WSOP Main Event 2025', event: 'World Series of Poker', venue: 'Horseshoe Las Vegas', date: 'July 2025', players: 9, hands: 87, prize: 93500000, live: false, status: 'completed', aiReports: ['insights', 'players', 'story', 'quiz', 'commentary'], exploitable: 4, leaks: 48, rivalries: 6, topPlayers: ['p1', 'p2', 'p3', 'p5'], winner: 'p1', duration: '4h 23m' },
+  { id: 't1', name: '$25K WSOP Super Main Event', event: 'World Series of Poker', venue: 'Atlantis, Bahamas', date: 'Dec 2024', players: 9, hands: 87, prize: 93500000, live: false, status: 'completed', aiReports: ['insights', 'players', 'story', 'quiz', 'commentary'], exploitable: 4, leaks: 48, rivalries: 6, topPlayers: ['p1', 'p2', 'p3', 'p5'], winner: 'p1', duration: '4h 23m', youtubeId: '-bNvm2hx3MQ' },
   { id: 't2', name: 'WPT Legends', event: 'World Poker Tour', venue: 'Commerce Casino', date: 'March 2025', players: 8, hands: 62, prize: 25000000, live: true, status: 'live', aiReports: ['insights', 'players', 'story'], exploitable: 3, leaks: 31, rivalries: 4, topPlayers: ['p2', 'p4', 'p6', 'p7'], winner: null, duration: '2h 48m' },
   { id: 't3', name: 'EPT Barcelona', event: 'European Poker Tour', venue: 'Casino Barcelona', date: 'August 2025', players: 9, hands: 95, prize: 42000000, live: false, status: 'completed', aiReports: ['insights', 'players', 'story', 'commentary'], exploitable: 5, leaks: 52, rivalries: 8, topPlayers: ['p5', 'p3', 'p9', 'p1'], winner: 'p5', duration: '5h 10m' },
-  { id: 't4', name: 'Triton Million', event: 'Triton Poker', venue: 'Montenegro', date: 'September 2025', players: 6, hands: 45, prize: 18000000, live: false, status: 'completed', aiReports: [], exploitable: 0, leaks: 0, rivalries: 0, topPlayers: ['p6', 'p2', 'p4'], winner: 'p6', duration: '2h 15m' },
-  { id: 't5', name: 'Super High Roller Bowl', event: 'PokerGO', venue: 'Aria Las Vegas', date: 'June 2025', players: 7, hands: 71, prize: 51000000, live: false, status: 'completed', aiReports: ['insights', 'players'], exploitable: 2, leaks: 22, rivalries: 3, topPlayers: ['p2', 'p1', 'p6', 'p4'], winner: 'p2', duration: '3h 42m' },
+  { id: 't4', name: '$100K NLH Main Event — Triton SHRS', event: 'Triton Poker', venue: 'Maestral, Montenegro', date: 'Jun 2026', players: 6, hands: 45, prize: 18000000, live: false, status: 'completed', aiReports: [], exploitable: 0, leaks: 0, rivalries: 0, topPlayers: ['p6', 'p2', 'p4'], winner: 'p6', duration: '2h 15m', youtubeId: 'fp1OWmFkD1k' },
+  { id: 't5', name: 'PokerGO Cup Event #4 — $10K NLH', event: 'PokerGO', venue: 'ARIA, Las Vegas', date: 'Feb 2025', players: 7, hands: 71, prize: 51000000, live: false, status: 'completed', aiReports: ['insights', 'players'], exploitable: 2, leaks: 22, rivalries: 3, topPlayers: ['p2', 'p1', 'p6', 'p4'], winner: 'p2', duration: '3h 42m', youtubeId: 'zNvu8ZmTGB0' },
   { id: 't6', name: 'PCA Main Event', event: 'PokerStars', venue: 'Atlantis Bahamas', date: 'January 2026', players: 9, hands: 0, prize: 35000000, live: false, status: 'upcoming', aiReports: [], exploitable: 0, leaks: 0, rivalries: 0, topPlayers: [], winner: null, duration: null },
   { id: 't7', name: 'Aussie Millions', event: 'Crown Melbourne', venue: 'Melbourne', date: 'February 2026', players: 8, hands: 0, prize: 28000000, live: false, status: 'upcoming', aiReports: [], exploitable: 0, leaks: 0, rivalries: 0, topPlayers: [], winner: null, duration: null },
   { id: 't8', name: 'WSOP Europe', event: 'World Series of Poker', venue: "King's Casino Rozvadov", date: 'October 2025', players: 9, hands: 82, prize: 31000000, live: false, status: 'completed', aiReports: ['insights', 'players', 'story', 'quiz'], exploitable: 3, leaks: 36, rivalries: 5, topPlayers: ['p9', 'p3', 'p7', 'p1'], winner: 'p9', duration: '4h 05m' },

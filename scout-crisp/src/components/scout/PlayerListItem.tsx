@@ -17,7 +17,7 @@ export default function PlayerListItem({ player: p, profile: prof, plain }: {
       to={`/player/${p.id}`}
       className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-border-light hover:bg-bg-surface cursor-pointer"
     >
-      <PlayerAvatar initials={p.initials} color={p.color} />
+      <PlayerAvatar initials={p.initials} color={p.color} photoUrl={p.photoUrl} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h3 className="truncate font-semibold text-text-primary">{p.name} <span aria-hidden>{p.flag}</span></h3>

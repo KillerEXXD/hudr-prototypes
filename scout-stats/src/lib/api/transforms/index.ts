@@ -10,7 +10,7 @@ export function transformTournament(a: ApiTournament): Tournament {
     id: a.id, name: a.name, event: a.event, venue: a.venue, date: a.date,
     playerCount: a.player_count, handCount: a.hand_count, prizePool: a.prize_pool,
     status: a.status, isLive: a.is_live, winnerId: a.winner_id, duration: a.duration,
-    topPlayerIds: a.top_player_ids, exploitableCount: a.exploitable_count,
+    topPlayerIds: a.top_player_ids, exploitableCount: a.exploitable_count, youtubeId: a.youtube_id,
   }
 }
 
@@ -18,6 +18,7 @@ export function transformPlayer(a: ApiPlayer): Player {
   return {
     id: a.player_id, name: a.name, flag: a.flag, initials: a.initials,
     color: a.color, finish: a.finish, status: a.status, handsPlayed: a.hands_played,
+    photoUrl: a.photo_url,
   }
 }
 

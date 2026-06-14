@@ -15,6 +15,7 @@ export interface Tournament {
   duration: string | null
   topPlayerIds: string[]
   exploitableCount: number
+  youtubeId: string | null
 }
 
 export interface Player {
@@ -26,6 +27,7 @@ export interface Player {
   finish: number | null
   status: string
   handsPlayed: number
+  photoUrl: string | null
 }
 
 export interface Highlight {

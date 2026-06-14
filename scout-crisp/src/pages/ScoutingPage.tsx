@@ -121,7 +121,7 @@ export default function ScoutingPage() {
       {/* ---- Header ---- */}
       <div className="rounded-2xl border border-border bg-gradient-to-br from-bg-card to-bg-surface p-4">
         <div className="flex items-start gap-3">
-          <PlayerAvatar initials={player.initials} color={player.color} size="lg" />
+          <PlayerAvatar initials={player.initials} color={player.color} photoUrl={player.photoUrl} size="lg" />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h1 className="truncate text-lg font-bold leading-tight">{player.name}</h1>
