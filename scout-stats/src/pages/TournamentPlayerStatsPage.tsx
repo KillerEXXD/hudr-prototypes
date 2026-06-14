@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ChevronLeft, Loader2, CheckCheck, XCircle, BarChart3, Database } from 'lucide-react'
+import { ChevronDown, Loader2, CheckCheck, XCircle, BarChart3, Database } from 'lucide-react'
 import { useMode } from '@/contexts/ModeContext'
 import { usePlayer, useTournament, usePlayerProfile, usePlayerStatHands } from '@/hooks'
 import { STAT_DEFS } from '@/engine'
@@ -19,20 +19,22 @@ function eventFilters(tid: string): StatFilters {
 
 const fmtStat = (s: StatWithTier) => (s.unit === 'ratio' ? s.value.toFixed(1) : `${s.value}%`)
 
+function chunk<T>(arr: T[], n: number): T[][] {
+  const out: T[][] = []
+  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n))
+  return out
+}
+
 export default function TournamentPlayerStatsPage() {
   const { tid = '', pid = '' } = useParams()
   const { isPro } = useMode()
   const { data: tournament } = useTournament(tid)
   const { data: player } = usePlayer(pid)
   const { data: profile, isLoading } = usePlayerProfile(pid, eventFilters(tid))
-  const [selected, setSelected] = useState<string | null>(null)
-
-  // Default to VPIP (or the first stat) so hands show immediately.
-  const effective = useMemo(() => {
-    if (!profile) return null
-    if (selected && profile.stats.some((s) => s.key === selected)) return selected
-    return profile.stats.find((s) => s.key === 'vpip')?.key ?? profile.stats[0]?.key ?? null
-  }, [profile, selected])
+  // Which stat's hands are expanded (accordion). One open by default to show the pattern.
+  const [open, setOpen] = useState<string | null>('vpip')
+  const panelRef = useRef<HTMLDivElement>(null)
+  const mounted = useRef(false)
 
   const groups = useMemo(() => {
     const stats = profile?.stats ?? []
@@ -42,12 +44,18 @@ export default function TournamentPlayerStatsPage() {
     ].filter((g) => g.items.length)
   }, [profile])
 
+  // Bring the freshly-opened panel into view — but never on the initial mount (no load jump).
+  useEffect(() => {
+    if (!mounted.current) { mounted.current = true; return }
+    if (open && panelRef.current) panelRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [open])
+
   if (isLoading || !profile || !player) {
     return <div className="flex items-center justify-center gap-2 py-16 text-sm text-text-muted"><Loader2 className="h-4 w-4 animate-spin" /> Loading player stats…</div>
   }
 
-  const selectedStat = profile.stats.find((s) => s.key === effective)
   const first = player.name.split(' ')[0]
+  const toggle = (key: string) => setOpen((cur) => (cur === key ? null : key))
 
   return (
     <div className="animate-fade-up">
@@ -71,63 +79,79 @@ export default function TournamentPlayerStatsPage() {
         </div>
       </div>
 
-      {/* ---- Stat grid ---- */}
+      {/* ---- Stat grid (tap a stat → its hands expand right below the row) ---- */}
       <div className="mt-4 mb-2 flex items-center gap-2">
         <BarChart3 className="h-4 w-4 text-accent-blue" />
         <h2 className="text-sm font-semibold text-text-primary">{isPro ? 'Stats' : 'Their tendencies'}</h2>
-        <span className="text-[11px] text-text-muted">tap one to see the hands behind it</span>
+        <span className="text-[11px] text-text-muted">tap a stat to expand its hands</span>
       </div>
       <div className="space-y-3">
         {groups.map((g) => (
           <div key={g.label}>
             <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-text-muted">{g.label}</div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {g.items.map((s) => {
-                const active = s.key === effective
+            <div className="space-y-2">
+              {chunk(g.items, 2).map((row, ri) => {
+                const activeStat = row.find((s) => s.key === open)
                 return (
-                  <button
-                    key={s.key}
-                    type="button"
-                    onClick={() => setSelected(s.key)}
-                    className={cn(
-                      'flex flex-col items-start rounded-xl border p-2.5 text-left transition-colors cursor-pointer',
-                      active ? 'border-accent-blue bg-accent-blue/10' : 'border-border bg-bg-card hover:border-border-light hover:bg-bg-surface',
-                    )}
-                  >
-                    <div className="flex w-full items-center justify-between gap-1">
-                      <span className="truncate text-xs font-medium text-text-secondary">{isPro ? s.label : STAT_DEFS[s.key].plainName}</span>
-                      <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', tierDot(s.tier))} title={s.tier} />
+                  <div key={ri}>
+                    <div className="grid grid-cols-2 gap-2">
+                      {row.map((s) => {
+                        const active = s.key === open
+                        return (
+                          <button
+                            key={s.key}
+                            type="button"
+                            onClick={() => toggle(s.key)}
+                            aria-expanded={active}
+                            className={cn(
+                              'flex flex-col items-start rounded-xl border p-2.5 text-left transition-colors cursor-pointer',
+                              active ? 'border-accent-blue bg-accent-blue/10 ring-1 ring-accent-blue/40' : 'border-border bg-bg-card hover:border-border-light hover:bg-bg-surface',
+                            )}
+                          >
+                            <div className="flex w-full items-center justify-between gap-1">
+                              <span className="truncate text-xs font-medium text-text-secondary">{isPro ? s.label : STAT_DEFS[s.key].plainName}</span>
+                              <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', tierDot(s.tier))} title={s.tier} />
+                            </div>
+                            <div className="mt-0.5 flex w-full items-center justify-between gap-1">
+                              <span className={cn('nums text-base font-bold', active ? 'text-accent-blue' : 'text-text-primary')}>{fmtStat(s)}</span>
+                              <span className={cn('flex items-center gap-0.5 text-[10px] font-semibold', active ? 'text-accent-blue' : 'text-text-muted')}>
+                                hands <ChevronDown className={cn('h-3.5 w-3.5 transition-transform duration-200', active && 'rotate-180')} />
+                              </span>
+                            </div>
+                          </button>
+                        )
+                      })}
                     </div>
-                    <span className={cn('nums mt-0.5 text-base font-bold', active ? 'text-accent-blue' : 'text-text-primary')}>{fmtStat(s)}</span>
-                  </button>
+                    {activeStat && (
+                      <div ref={panelRef} className="animate-fade-up mt-2 rounded-xl border border-accent-blue/40 bg-bg-surface/30">
+                        <StatHandsPanel
+                          key={activeStat.key}
+                          playerId={pid}
+                          tournamentId={tid}
+                          statKey={activeStat.key}
+                          statLabel={isPro ? activeStat.label : STAT_DEFS[activeStat.key].plainName}
+                          plainMeaning={STAT_DEFS[activeStat.key].plain}
+                          isPro={isPro}
+                          first={first}
+                          onClose={() => setOpen(null)}
+                        />
+                      </div>
+                    )}
+                  </div>
                 )
               })}
             </div>
           </div>
         ))}
       </div>
-
-      {/* ---- Hands for the selected stat ---- */}
-      {effective && selectedStat && (
-        <StatHandsPanel
-          key={effective}
-          playerId={pid}
-          tournamentId={tid}
-          statKey={effective}
-          statLabel={isPro ? selectedStat.label : STAT_DEFS[effective].plainName}
-          plainMeaning={STAT_DEFS[effective].plain}
-          isPro={isPro}
-          first={first}
-        />
-      )}
     </div>
   )
 }
 
 type ActionFilter = 'executed' | 'folded' | 'all'
 
-function StatHandsPanel({ playerId, tournamentId, statKey, statLabel, plainMeaning, isPro, first }: {
-  playerId: string; tournamentId: string; statKey: string; statLabel: string; plainMeaning: string; isPro: boolean; first: string
+function StatHandsPanel({ playerId, tournamentId, statKey, statLabel, plainMeaning, isPro, first, onClose }: {
+  playerId: string; tournamentId: string; statKey: string; statLabel: string; plainMeaning: string; isPro: boolean; first: string; onClose: () => void
 }) {
   const { data: hands = [], isLoading } = usePlayerStatHands(playerId, statKey, tournamentId)
   const [filter, setFilter] = useState<ActionFilter>('executed')
@@ -140,10 +164,14 @@ function StatHandsPanel({ playerId, tournamentId, statKey, statLabel, plainMeani
   }, [hands, filter])
 
   return (
-    <section className="mt-5">
+    <section className="p-3">
       <div className="mb-1 flex items-center gap-2">
+        <span className="h-3.5 w-1 rounded-full bg-accent-blue" />
         <h2 className="text-sm font-semibold text-text-primary">{statLabel}</h2>
         <span className="text-[11px] text-text-muted">{isPro ? 'hands behind this stat' : `${first}'s hands`}</span>
+        <button type="button" onClick={onClose} className="ml-auto flex items-center gap-0.5 text-[11px] font-medium text-text-muted hover:text-text-primary cursor-pointer" aria-label="Collapse">
+          Hide <ChevronDown className="h-3.5 w-3.5 rotate-180" />
+        </button>
       </div>
       {!isPro && <p className="mb-2 text-xs leading-snug text-text-muted">{plainMeaning}</p>}
 
