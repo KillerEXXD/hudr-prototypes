@@ -4,6 +4,7 @@ import ModeToggle from '@/components/common/ModeToggle'
 import ProfileMenu from '@/components/layout/ProfileMenu'
 import ThemeChip from '@/components/layout/ThemeChip'
 import BottomNav from '@/components/layout/BottomNav'
+import FeedbackButton from '@/components/common/FeedbackButton'
 
 export default function AppShell() {
   const navigate = useNavigate()
@@ -42,6 +43,7 @@ export default function AppShell() {
           <Outlet />
         </main>
         <BottomNav />
+        <FeedbackButton />
       </div>
     </div>
   )

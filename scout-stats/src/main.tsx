@@ -4,7 +4,10 @@ import { HashRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { initAnalytics } from './lib/analytics'
 import './index.css'
+
+initAnalytics()
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 5 * 60 * 1000, refetchOnWindowFocus: false } }

@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import { ChevronLeft, Spade } from 'lucide-react'
 import ProfileMenu from '@/components/layout/ProfileMenu'
 import BottomNav from '@/components/layout/BottomNav'
+import FeedbackButton from '@/components/common/FeedbackButton'
 
 export default function AppShell() {
   const navigate = useNavigate()
@@ -39,6 +40,7 @@ export default function AppShell() {
           <Outlet />
         </main>
         <BottomNav />
+        <FeedbackButton />
       </div>
     </div>
   )
