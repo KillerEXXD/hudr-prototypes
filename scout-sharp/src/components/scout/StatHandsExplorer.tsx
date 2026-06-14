@@ -22,12 +22,12 @@ function chunk<T>(arr: T[], n: number): T[][] {
   return out
 }
 
-export default function StatHandsExplorer({ stats, playerId, tournamentId, first, defaultOpen = 'vpip' }: {
+export default function StatHandsExplorer({ stats, playerId, tournamentId, first, defaultOpen = null }: {
   stats: StatWithTier[]
   playerId: string
   tournamentId: string | null
   first: string
-  defaultOpen?: string
+  defaultOpen?: string | null
 }) {
   const [open, setOpen] = useState<string | null>(defaultOpen)
   const panelRef = useRef<HTMLDivElement>(null)

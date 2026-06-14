@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Radio, Table2, ChevronRight, Crown, Loader2, History, Flame, Sparkles, ArrowRight, Trophy } from 'lucide-react'
-import { useTournament, useTournamentPlayers, useTournamentProfiles, useTournamentHighlights, useTournamentHands } from '@/hooks'
+import { useTournament, useTournamentPlayers, useTournamentProfiles, useTournamentHighlights, useTournamentHands, useProfiles } from '@/hooks'
 import { STAT_DEFS } from '@/engine'
 import type { PlayerProfile, StatKey } from '@/engine'
 import type { Player, Tournament, Highlight, HandSummary } from '@/lib/api/domain'
@@ -36,15 +36,19 @@ export default function TournamentPage() {
   const { data: highlights = [], isLoading: highlightsLoading } = useTournamentHighlights(id)
   const { data: hands = [], isLoading: handsLoading } = useTournamentHands(id)
   const rosterIds = useMemo(() => players.map((p) => p.id), [players])
+  // Roster / AI read each player from their full (career) sample — who they are.
   const { profiles, isLoading: profilesLoading } = useTournamentProfiles(id, rosterIds)
+  // Stats tab reads THIS EVENT's stat lines, matching where a tapped player lands.
+  const { profiles: eventProfiles, isLoading: eventLoading } = useProfiles(rosterIds, { scope: 'event', tournamentId: id, tableSize: 'all', depth: 'all' })
   const rosterLoading = playersLoading || (rosterIds.length > 0 && profilesLoading)
-  // Filtering (scope / table size / depth) lives on the player report, not here.
+  // Tapping a player opens their report scoped to THIS event (?t=).
   const playerQuery = `?t=${id}`
 
-  const rows: Row[] = useMemo(() => {
-    const byId = Object.fromEntries(players.map((p) => [p.id, p]))
-    return profiles.map((profile) => ({ profile, player: byId[profile.playerId] }))
-  }, [profiles, players])
+  const byId = useMemo(() => Object.fromEntries(players.map((p) => [p.id, p])), [players])
+  const rows: Row[] = useMemo(() => profiles.map((profile) => ({ profile, player: byId[profile.playerId] })), [profiles, byId])
+  const eventRows: Row[] = useMemo(() => eventProfiles.map((profile) => ({ profile, player: byId[profile.playerId] })), [eventProfiles, byId])
+  // Career archetype (who they are overall) to label the event stat cards.
+  const careerByPlayer = useMemo(() => Object.fromEntries(profiles.map((p) => [p.playerId, p])), [profiles])
 
   if (tLoading) return <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading tournament…</Centered>
   if (!t) return <div className="py-10 text-center text-text-muted">Tournament not found.</div>
@@ -131,7 +135,11 @@ export default function TournamentPage() {
         <TabsContent value="hands"><HandsList hands={hands} loading={handsLoading} /></TabsContent>
         <TabsContent value="highlights"><HighlightsList items={highlights} loading={highlightsLoading} /></TabsContent>
         <TabsContent value="stats">
-          <ProStatsTable rows={rows} linkQuery={playerQuery} />
+          {eventRows.length === 0
+            ? (eventLoading
+                ? <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading event stats…</Centered>
+                : <EmptyNote>No stats yet — this event hasn't been played.</EmptyNote>)
+            : <EventStatCards rows={eventRows} linkQuery={playerQuery} careerByPlayer={careerByPlayer} />}
         </TabsContent>
       </Tabs>
 
@@ -243,37 +251,49 @@ function Chip({ label, count, active, onClick }: { label: string; count: number;
   )
 }
 
-function ProStatsTable({ rows, linkQuery }: { rows: Row[]; linkQuery: string }) {
+// This event's stat lines as clickable player cards. Tapping one opens that
+// player's report scoped to THIS event — where the full card grid + the hands
+// behind each stat live.
+function EventStatCards({ rows, linkQuery, careerByPlayer }: { rows: Row[]; linkQuery: string; careerByPlayer: Record<string, PlayerProfile> }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border scrollbar-thin">
-      <table className="w-full min-w-[420px] text-sm">
-        <thead>
-          <tr className="border-b border-border bg-bg-surface/60 text-left text-[11px] uppercase tracking-wide text-text-muted">
-            <th className="px-3 py-2 font-semibold">Player</th>
-            {TABLE_COLS.map((c) => <th key={c} className="px-2 py-2 text-right font-semibold">{STAT_DEFS[c].label}</th>)}
-            <th className="px-3 py-2 font-semibold">Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(({ profile }) => (
-            <tr key={profile.playerId} className="border-b border-border/50 last:border-0 hover:bg-bg-surface/40">
-              <td className="px-3 py-2">
-                <Link to={`/player/${profile.playerId}${linkQuery}`} className="font-medium text-accent-blue hover:underline">{profile.name.split(' ').slice(-1)[0]}</Link>
-              </td>
+    <div>
+      <p className="mb-2 text-[11px] text-text-muted">This event's stat lines — tap a player to open their report &amp; the hands behind each stat for this event.</p>
+      <div className="space-y-2">
+        {rows.map(({ profile, player }) => (
+          <Link
+            key={profile.playerId}
+            to={`/player/${profile.playerId}${linkQuery}`}
+            className="block rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-accent-blue/50 hover:bg-bg-surface cursor-pointer"
+          >
+            <div className="flex items-center gap-2.5">
+              <PlayerAvatar initials={player?.initials ?? '?'} color={player?.color ?? '#444'} photoUrl={player?.photoUrl} size="sm" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate font-semibold text-text-primary">{profile.name}</span>
+                  {player?.flag && <span aria-hidden>{player.flag}</span>}
+                </div>
+                <div className="mt-0.5"><ArchetypeBadge archetype={(careerByPlayer[profile.playerId] ?? profile).typing.archetype} size="sm" /></div>
+              </div>
+              <span className="flex shrink-0 items-center gap-0.5 text-[11px] font-semibold text-accent-blue">
+                This event <ChevronRight className="h-3.5 w-3.5" />
+              </span>
+            </div>
+            <div className="mt-2.5 grid grid-cols-5 gap-1.5 border-t border-border/60 pt-2.5">
               {TABLE_COLS.map((c) => {
                 const s = profile.stats.find((x) => x.key === c)!
+                const tone = s.tier === 'NOISE' ? 'text-text-muted' : s.tier === 'TENTATIVE' ? 'text-accent-amber' : 'text-text-primary'
                 return (
-                  <td key={c} className={cn('nums px-2 py-2 text-right', s.tier === 'NOISE' ? 'text-text-muted' : s.tier === 'TENTATIVE' ? 'text-accent-amber' : 'text-text-primary')}>
-                    {s.unit === 'ratio' ? s.value.toFixed(1) : s.value}
-                  </td>
+                  <div key={c} className="text-center">
+                    <div className={cn('nums text-sm font-bold', tone)}>{s.unit === 'ratio' ? s.value.toFixed(1) : `${s.value}%`}</div>
+                    <div className="text-[9px] uppercase tracking-wide text-text-muted">{STAT_DEFS[c].label}</div>
+                  </div>
                 )
               })}
-              <td className="px-3 py-2"><ArchetypeBadge archetype={profile.typing.archetype} size="sm" /></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p className="px-3 py-2 text-[11px] text-text-muted">Amber = small sample (TENTATIVE), grey = too few hands (NOISE). Tap a name for the full report.</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+      <p className="mt-2 text-[10px] text-text-muted">Amber = small sample · grey = too few hands. Numbers are for this event; open a player to switch to Career.</p>
     </div>
   )
 }

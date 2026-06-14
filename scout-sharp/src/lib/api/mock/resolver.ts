@@ -17,8 +17,24 @@ export function resolveMock<T>(endpoint: string, params?: Params): T {
     case 'tournament-players': {
       const tid = String(params?.tournament_id ?? '')
       const t = apiTournaments.find((x) => x.id === tid)
-      const ids = tid === 't1' ? apiPlayers.map((p) => p.player_id) : (t?.top_player_ids ?? apiPlayers.map((p) => p.player_id))
-      return apiPlayers.filter((p) => ids.includes(p.player_id)) as T
+      // t1 (the WSOP demo) has a real, full 9-handed final table with true finishes.
+      if (tid === 't1') return apiPlayers as T
+
+      const featured = t?.top_player_ids ?? apiPlayers.map((p) => p.player_id)
+      if (t?.status === 'completed') {
+        // Build a full per-event field: the known top finishers (in order) first,
+        // then fill the remaining seats from the rest of the pool. Each player's
+        // `finish` is overridden to their position IN THIS EVENT (1 = winner),
+        // so standings/eliminations are correct per tournament — not t1's globals.
+        const rest = apiPlayers.map((p) => p.player_id).filter((id) => !featured.includes(id))
+        const order = [...featured, ...rest].slice(0, t.player_count ?? featured.length)
+        return order.map((id, i) => {
+          const base = apiPlayers.find((p) => p.player_id === id)!
+          return { ...base, finish: i + 1, status: i === 0 ? 'winner' : i === 1 ? 'runner-up' : 'eliminated' }
+        }) as T
+      }
+      // Live / upcoming: just the featured players, no finishing positions yet.
+      return apiPlayers.filter((p) => featured.includes(p.player_id)).map((p) => ({ ...p, finish: null })) as T
     }
     case 'players': {
       if (seg[1]) return apiPlayers.find((p) => p.player_id === seg[1]) as T
