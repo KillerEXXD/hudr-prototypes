@@ -32,11 +32,12 @@ export default function TournamentPage() {
   const { id = '' } = useParams()
   const { isPro } = useMode()
   const { data: t, isLoading: tLoading } = useTournament(id)
-  const { data: players = [] } = useTournamentPlayers(id)
-  const { data: highlights = [] } = useTournamentHighlights(id)
-  const { data: hands = [] } = useTournamentHands(id)
+  const { data: players = [], isLoading: playersLoading } = useTournamentPlayers(id)
+  const { data: highlights = [], isLoading: highlightsLoading } = useTournamentHighlights(id)
+  const { data: hands = [], isLoading: handsLoading } = useTournamentHands(id)
   const rosterIds = useMemo(() => players.map((p) => p.id), [players])
-  const { profiles } = useTournamentProfiles(id, rosterIds)
+  const { profiles, isLoading: profilesLoading } = useTournamentProfiles(id, rosterIds)
+  const rosterLoading = playersLoading || (rosterIds.length > 0 && profilesLoading)
   // Filtering (scope / table size / depth) lives on the player report, not here.
   const playerQuery = `?t=${id}`
 
@@ -98,7 +99,9 @@ export default function TournamentPage() {
             </Link>
           )
         })}
-        {rows.length === 0 && <Centered><Loader2 className="h-4 w-4 animate-spin" /> Reading players…</Centered>}
+        {rows.length === 0 && (rosterLoading
+          ? <Centered><Loader2 className="h-4 w-4 animate-spin" /> Reading players…</Centered>
+          : <EmptyNote>No player reads yet — this event hasn't been played.</EmptyNote>)}
       </div>
 
       {/* Explore */}
@@ -110,8 +113,8 @@ export default function TournamentPage() {
           <TabsTrigger value="chat"><span className="flex items-center justify-center gap-1"><Sparkles className="h-3.5 w-3.5" />AI</span></TabsTrigger>
           <TabsTrigger value="stats"><span className="flex items-center justify-center gap-1"><Table2 className="h-3.5 w-3.5" />Stats</span></TabsTrigger>
         </TabsList>
-        <TabsContent value="hands"><HandsList hands={hands} /></TabsContent>
-        <TabsContent value="highlights"><HighlightsList items={highlights} /></TabsContent>
+        <TabsContent value="hands"><HandsList hands={hands} loading={handsLoading} /></TabsContent>
+        <TabsContent value="highlights"><HighlightsList items={highlights} loading={highlightsLoading} /></TabsContent>
         <TabsContent value="chat"><AIChat profiles={profiles} /></TabsContent>
         <TabsContent value="stats">
           {isPro ? <ProStatsTable rows={rows} linkQuery={playerQuery} /> : <PlainTableRead rows={rows} linkQuery={playerQuery} />}
@@ -125,8 +128,13 @@ function Centered({ children }: { children: ReactNode }) {
   return <div className="flex items-center justify-center gap-2 py-10 text-sm text-text-muted">{children}</div>
 }
 
-function HandsList({ hands }: { hands: HandSummary[] }) {
-  if (!hands.length) return <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading hands…</Centered>
+function EmptyNote({ children }: { children: ReactNode }) {
+  return <div className="rounded-xl border border-dashed border-border py-8 text-center text-sm text-text-muted">{children}</div>
+}
+
+function HandsList({ hands, loading }: { hands: HandSummary[]; loading: boolean }) {
+  if (loading) return <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading hands…</Centered>
+  if (!hands.length) return <EmptyNote>No hands yet — this event hasn't been played.</EmptyNote>
   return (
     <div className="space-y-2">
       <p className="text-[11px] text-text-muted">Full hand history — each hand opens in a YouTube clip or the replayer. (Modeled list)</p>
@@ -149,7 +157,7 @@ function HandsList({ hands }: { hands: HandSummary[] }) {
 
 const titleCase = (t: string) => t.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
-function HighlightsList({ items }: { items: Highlight[] }) {
+function HighlightsList({ items, loading }: { items: Highlight[]; loading: boolean }) {
   // Categories present (in first-seen order) with counts, for the filter chips.
   const categories = useMemo(() => {
     const order: string[] = []
@@ -169,7 +177,8 @@ function HighlightsList({ items }: { items: Highlight[] }) {
     [items, active],
   )
 
-  if (!items.length) return <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading highlights…</Centered>
+  if (loading) return <Centered><Loader2 className="h-4 w-4 animate-spin" /> Loading highlights…</Centered>
+  if (!items.length) return <EmptyNote>No highlights yet — this event hasn't been played.</EmptyNote>
 
   return (
     <div>
