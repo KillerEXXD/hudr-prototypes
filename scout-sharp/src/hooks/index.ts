@@ -79,7 +79,12 @@ export function useProfiles(ids: string[], filters: StatFilters) {
 const CAREER: StatFilters = { scope: 'career', tournamentId: null, tableSize: 'all', depth: 'all' }
 export const careerFilters = (): StatFilters => CAREER
 
-/** Event-scoped profiles for a tournament roster. */
+/**
+ * Tournament roster profiles. Scout Sharp reads each player from their FULL
+ * (career) sample — scouting a lineup, you use everything you know about a
+ * player, not the ~80 hands of one event (which the strict tiers would treat
+ * as NOISE). The event just defines who's at the table.
+ */
 export function useTournamentProfiles(tournamentId: string, ids: string[]) {
-  return useProfiles(ids, { scope: 'event', tournamentId, tableSize: 'all', depth: 'all' })
+  return useProfiles(ids, { scope: 'career', tournamentId, tableSize: 'all', depth: 'all' })
 }

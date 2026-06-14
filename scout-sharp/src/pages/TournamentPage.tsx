@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Radio, Table2, ChevronRight, Crown, Loader2, History, Flame } from 'lucide-react'
+import { Radio, Table2, ChevronRight, Crown, Loader2, History, Flame, Sparkles, ArrowRight } from 'lucide-react'
 import { useTournament, useTournamentPlayers, useTournamentProfiles, useTournamentHighlights, useTournamentHands } from '@/hooks'
 import { STAT_DEFS } from '@/engine'
 import type { PlayerProfile, StatKey } from '@/engine'
@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui'
 import PlayerAvatar from '@/components/player/PlayerAvatar'
 import ArchetypeBadge from '@/components/common/ArchetypeBadge'
 import HandViewerButton from '@/components/scout/HandViewer'
+import TournamentChatSheet from '@/components/scout/TournamentChatSheet'
 import MiniCard from '@/components/common/MiniCard'
 import { cn, fmtChips } from '@/lib/utils'
 
@@ -28,6 +29,7 @@ function statusFor(t: Tournament, p: Player | undefined) {
 
 export default function TournamentPage() {
   const { id = '' } = useParams()
+  const [chatOpen, setChatOpen] = useState(false)
   const { data: t, isLoading: tLoading } = useTournament(id)
   const { data: players = [], isLoading: playersLoading } = useTournamentPlayers(id)
   const { data: highlights = [], isLoading: highlightsLoading } = useTournamentHighlights(id)
@@ -65,6 +67,20 @@ export default function TournamentPage() {
             </div>
           ))}
         </div>
+
+        {/* Ask-AI launcher — tournament-scoped assistant */}
+        <button
+          type="button"
+          onClick={() => setChatOpen(true)}
+          className="mt-3 flex w-full items-center gap-2.5 rounded-xl border border-accent-blue/30 bg-accent-blue/10 px-3 py-2.5 text-sm font-semibold text-accent-blue transition-colors hover:bg-accent-blue/20 cursor-pointer"
+        >
+          <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-blue/20">
+            <Sparkles className="h-4 w-4" />
+            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 animate-pulse rounded-full bg-accent-blue ring-2 ring-bg-card" />
+          </span>
+          Ask AI about this event
+          <ArrowRight className="ml-auto h-4 w-4" />
+        </button>
       </div>
 
       {/* Roster */}
@@ -115,6 +131,8 @@ export default function TournamentPage() {
           <ProStatsTable rows={rows} linkQuery={playerQuery} />
         </TabsContent>
       </Tabs>
+
+      <TournamentChatSheet open={chatOpen} onClose={() => setChatOpen(false)} profiles={profiles} tournamentName={t.name} />
     </div>
   )
 }

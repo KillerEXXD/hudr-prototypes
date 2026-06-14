@@ -42,7 +42,10 @@ export default function ScoutingPage() {
   const dpParam = search.get('depth')
 
   const [filters, setFilters] = useState<StatFilters>({
-    scope: tournamentId ? 'event' : 'career',
+    // Default to the full (career) sample even when opened from a tournament —
+    // strict tiers make a single event too thin to trust. "This event" stays
+    // selectable to surface the sample-size honesty on demand.
+    scope: 'career',
     tournamentId: tournamentId ?? null,
     tableSize: (['short', 'full'].includes(tsParam ?? '') ? tsParam : 'all') as TableSizeBucket,
     depth: (['short', 'mid', 'deep'].includes(dpParam ?? '') ? dpParam : 'all') as DepthBucket,
