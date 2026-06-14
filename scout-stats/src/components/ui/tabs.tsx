@@ -30,7 +30,7 @@ interface TabsListProps {
 
 export function TabsList({ children, className }: TabsListProps) {
   return (
-    <div className={cn('flex gap-1 rounded-lg bg-bg-surface p-1', className)}>
+    <div className={cn('flex gap-1 rounded-xl border border-border bg-bg-surface p-1', className)}>
       {children}
     </div>
   )
@@ -48,9 +48,12 @@ export function TabsTrigger({ value, children, className }: TabsTriggerProps) {
   return (
     <button
       onClick={() => setActiveTab(value)}
+      aria-selected={isActive}
       className={cn(
-        'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-        isActive ? 'bg-bg-card text-text-primary shadow-sm' : 'text-text-muted hover:text-text-secondary',
+        'flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-all',
+        isActive
+          ? 'bg-bg-card text-accent-blue font-semibold shadow-sm ring-1 ring-inset ring-accent-blue/40'
+          : 'text-text-muted hover:bg-bg-card/40 hover:text-text-secondary',
         className
       )}
     >
