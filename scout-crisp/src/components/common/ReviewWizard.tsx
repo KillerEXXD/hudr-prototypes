@@ -6,29 +6,27 @@ import { getReviewSections } from '@/lib/reviewSections'
 import { cn } from '@/lib/utils'
 
 // Guided, feature-by-feature review of one prototype. One step per feature area
-// (score 1–5 + liked + disliked, with a "try it" deep link), ending in an overall
-// step (would-use / would-pay / NPS). Submits one structured PostHog event.
+// (score 1–5 + liked/disliked quick-pick chips + free text, with a "try it" deep
+// link), ending in an overall step (would-use / would-pay / NPS + required
+// name & email). Submits one structured PostHog event.
 
-interface Answer { score: number; liked: string; disliked: string }
-const EMPTY: Answer = { score: 0, liked: '', disliked: '' }
+interface Answer { score: number; liked: string; disliked: string; likedTags: string[]; dislikedTags: string[] }
+const EMPTY: Answer = { score: 0, liked: '', disliked: '', likedTags: [], dislikedTags: [] }
 
 const SCORE = [1, 2, 3, 4, 5]
 const SCORE_LABEL: Record<number, string> = { 1: 'Poor', 2: 'Weak', 3: 'OK', 4: 'Good', 5: 'Great' }
 const USE_LABEL: Record<number, string> = { 1: 'Never', 2: 'Unlikely', 3: 'Maybe', 4: 'Likely', 5: 'Definitely' }
 const NPS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+const isEmail = (s: string) => /.+@.+\..+/.test(s.trim())
 
 function ScoreRow({ value, onChange, labels = SCORE_LABEL }: { value: number; onChange: (n: number) => void; labels?: Record<number, string> }) {
   return (
     <div>
       <div className="flex gap-1.5">
         {SCORE.map((n) => (
-          <button
-            key={n}
-            type="button"
-            onClick={() => onChange(n)}
+          <button key={n} type="button" onClick={() => onChange(n)}
             className={cn('flex h-10 flex-1 items-center justify-center rounded-lg border text-sm font-bold transition-colors cursor-pointer',
-              value === n ? 'border-accent-blue bg-accent-blue text-white' : 'border-border bg-bg-surface/60 text-text-secondary hover:text-text-primary')}
-          >
+              value === n ? 'border-accent-blue bg-accent-blue text-white' : 'border-border bg-bg-surface/60 text-text-secondary hover:text-text-primary')}>
             {n}
           </button>
         ))}
@@ -38,6 +36,27 @@ function ScoreRow({ value, onChange, labels = SCORE_LABEL }: { value: number; on
         <span>{value ? labels[value] : ''}</span>
         <span>{labels[5]}</span>
       </div>
+    </div>
+  )
+}
+
+function Chips({ options, selected, onToggle, tone }: { options: string[]; selected: string[]; onToggle: (t: string) => void; tone: 'pos' | 'neg' }) {
+  if (!options.length) return null
+  const on = tone === 'pos'
+    ? 'border-accent-emerald bg-accent-emerald/15 text-accent-emerald'
+    : 'border-accent-amber bg-accent-amber/15 text-accent-amber'
+  return (
+    <div className="mt-1.5 flex flex-wrap gap-1.5">
+      {options.map((o) => {
+        const sel = selected.includes(o)
+        return (
+          <button key={o} type="button" onClick={() => onToggle(o)}
+            className={cn('rounded-full border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer',
+              sel ? on : 'border-border bg-bg-surface/60 text-text-secondary hover:text-text-primary')}>
+            {o}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -52,6 +71,7 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
   const [wouldPayAmount, setWouldPayAmount] = useState('')
   const [nps, setNps] = useState<number | null>(null)
   const [overallNote, setOverallNote] = useState('')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
 
@@ -64,14 +84,24 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
     if (!sec) return
     setAnswers((a) => ({ ...a, [sec.key]: { ...(a[sec.key] ?? EMPTY), ...patch } }))
   }
+  const toggleTag = (field: 'likedTags' | 'dislikedTags', tag: string) => {
+    if (!sec) return
+    setAnswers((a) => {
+      const cur = a[sec.key] ?? EMPTY
+      const list = cur[field]
+      return { ...a, [sec.key]: { ...cur, [field]: list.includes(tag) ? list.filter((t) => t !== tag) : [...list, tag] } }
+    })
+  }
   const tryHref = sec?.tryPath ? `${import.meta.env.BASE_URL}#${sec.tryPath}` : null
   const pct = Math.round(((step + 1) / total) * 100)
+  const canSubmit = name.trim().length > 0 && isEmail(email)
 
   function reset() {
     setStep(0); setAnswers({}); setWouldUse(0); setWouldPay(''); setWouldPayAmount('')
-    setNps(null); setOverallNote(''); setEmail(''); setSent(false)
+    setNps(null); setOverallNote(''); setName(''); setEmail(''); setSent(false)
   }
   function submit() {
+    if (!canSubmit) return
     captureReview({
       sections: answers,
       would_use: wouldUse,
@@ -79,7 +109,8 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
       would_pay_amount: wouldPayAmount || undefined,
       nps: nps ?? -1,
       overall_note: overallNote || undefined,
-      email: email || undefined,
+      name: name.trim(),
+      email: email.trim(),
     })
     setSent(true)
     setTimeout(() => { onClose(); reset() }, 2200)
@@ -152,8 +183,16 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
               <textarea value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={2} placeholder="The one thing you'd change first…"
                 className="mt-1.5 w-full resize-none rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
 
-              <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email (optional — if we can follow up)"
-                className="mt-3 w-full rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
+              <div className="mt-4 rounded-xl border border-border bg-bg-surface/40 p-3">
+                <label className="block text-xs font-semibold text-text-secondary">Your name <span className="text-accent-red">*</span></label>
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="First & last name"
+                  className="mt-1.5 w-full rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
+                <label className="mt-3 block text-xs font-semibold text-text-secondary">Your email <span className="text-accent-red">*</span></label>
+                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com"
+                  className={cn('mt-1.5 w-full rounded-lg border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue',
+                    email && !isEmail(email) ? 'border-accent-red' : 'border-border')} />
+                <p className="mt-1.5 text-[10px] text-text-muted">Required — so we can follow up on your feedback.</p>
+              </div>
             </div>
           ) : sec && (
             <div>
@@ -169,12 +208,14 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
               <label className="mt-4 block text-xs font-semibold text-text-secondary">How was this experience?</label>
               <div className="mt-1.5"><ScoreRow value={ans.score} onChange={(n) => setAns({ score: n })} /></div>
 
-              <label className="mt-3 block text-xs font-semibold text-text-secondary">What worked well? <span className="font-normal text-text-muted">(optional)</span></label>
-              <textarea value={ans.liked} onChange={(e) => setAns({ liked: e.target.value })} rows={2} placeholder="What you'd keep…"
+              <label className="mt-3 block text-xs font-semibold text-text-secondary">What worked well? <span className="font-normal text-text-muted">(tap any, or type)</span></label>
+              <Chips options={sec.likedChips ?? []} selected={ans.likedTags} onToggle={(t) => toggleTag('likedTags', t)} tone="pos" />
+              <textarea value={ans.liked} onChange={(e) => setAns({ liked: e.target.value })} rows={2} placeholder="Anything else you'd keep…"
                 className="mt-1.5 w-full resize-none rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
 
-              <label className="mt-3 block text-xs font-semibold text-text-secondary">What didn't, or was confusing? <span className="font-normal text-text-muted">(optional)</span></label>
-              <textarea value={ans.disliked} onChange={(e) => setAns({ disliked: e.target.value })} rows={2} placeholder="What you'd change…"
+              <label className="mt-3 block text-xs font-semibold text-text-secondary">What didn't, or was confusing? <span className="font-normal text-text-muted">(tap any, or type)</span></label>
+              <Chips options={sec.dislikedChips ?? []} selected={ans.dislikedTags} onToggle={(t) => toggleTag('dislikedTags', t)} tone="neg" />
+              <textarea value={ans.disliked} onChange={(e) => setAns({ disliked: e.target.value })} rows={2} placeholder="Anything else you'd change…"
                 className="mt-1.5 w-full resize-none rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
             </div>
           )}
@@ -182,21 +223,26 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
 
         {/* footer controls */}
         {!sent && (
-          <div className="flex items-center gap-2 border-t border-border p-3">
-            <button type="button" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}
-              className="flex items-center gap-1 rounded-lg border border-border bg-bg-surface/60 px-3 py-2 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
-              <ChevronLeft className="h-4 w-4" /> Back
-            </button>
-            {isOverall ? (
-              <button type="button" onClick={submit}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent-blue px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-accent-blue/90 cursor-pointer">
-                <Send className="h-4 w-4" /> Submit review
+          <div className="border-t border-border p-3">
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}
+                className="flex items-center gap-1 rounded-lg border border-border bg-bg-surface/60 px-3 py-2 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
+                <ChevronLeft className="h-4 w-4" /> Back
               </button>
-            ) : (
-              <button type="button" onClick={() => setStep((s) => Math.min(total - 1, s + 1))}
-                className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-accent-blue px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-accent-blue/90 cursor-pointer">
-                Next <ChevronRight className="h-4 w-4" />
-              </button>
+              {isOverall ? (
+                <button type="button" onClick={submit} disabled={!canSubmit}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent-blue px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-accent-blue/90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
+                  <Send className="h-4 w-4" /> Submit review
+                </button>
+              ) : (
+                <button type="button" onClick={() => setStep((s) => Math.min(total - 1, s + 1))}
+                  className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-accent-blue px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-accent-blue/90 cursor-pointer">
+                  Next <ChevronRight className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            {isOverall && !canSubmit && (
+              <p className="mt-2 text-center text-[10px] text-text-muted">Add your name &amp; a valid email to submit.</p>
             )}
           </div>
         )}

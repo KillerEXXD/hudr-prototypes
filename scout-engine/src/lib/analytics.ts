@@ -54,20 +54,30 @@ export function captureFeedback(data: FeedbackPayload): void {
 
 // ---- Guided per-prototype review (the ReviewWizard) ----
 
+export interface ReviewSectionAnswer {
+  score: number
+  liked?: string
+  disliked?: string
+  likedTags?: string[]      // tapped quick-pick suggestions
+  dislikedTags?: string[]
+}
+
 export interface ReviewPayload {
-  sections: Record<string, { score: number; liked?: string; disliked?: string }>
+  sections: Record<string, ReviewSectionAnswer>
   would_use: number              // 1–5
   would_pay: 'no' | 'maybe' | 'yes'
   would_pay_amount?: string
   nps: number                    // 0–10
   overall_note?: string
-  email?: string
+  name: string                   // required
+  email: string                  // required
 }
 
 /**
  * Flattens the guided review into a single `prototype_review_submitted` event:
- * `score_<key>` / `liked_<key>` / `disliked_<key>` per feature section, plus the
- * overall fields — so PostHog can average per-feature scores broken down by prototype.
+ * `score_<key>` / `liked_<key>` / `disliked_<key>` / `likedtags_<key>` /
+ * `dislikedtags_<key>` per feature section, plus the overall fields + name/email —
+ * so PostHog can average per-feature scores and count tags, broken down by prototype.
  */
 export function captureReview(p: ReviewPayload): void {
   const flat: Record<string, unknown> = {
@@ -80,12 +90,17 @@ export function captureReview(p: ReviewPayload): void {
     would_pay_amount: p.would_pay_amount,
     nps: p.nps,
     overall_note: p.overall_note,
+    name: p.name,
     email: p.email,
   }
+  // PostHog can tie the review to a person via $set on identity.
+  posthog.setPersonProperties?.({ name: p.name, email: p.email })
   for (const [k, v] of Object.entries(p.sections)) {
     if (v.score) flat[`score_${k}`] = v.score
     if (v.liked && v.liked.trim()) flat[`liked_${k}`] = v.liked.trim()
     if (v.disliked && v.disliked.trim()) flat[`disliked_${k}`] = v.disliked.trim()
+    if (v.likedTags && v.likedTags.length) flat[`likedtags_${k}`] = v.likedTags
+    if (v.dislikedTags && v.dislikedTags.length) flat[`dislikedtags_${k}`] = v.dislikedTags
   }
   posthog.capture('prototype_review_submitted', flat)
 }

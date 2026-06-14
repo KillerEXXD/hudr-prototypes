@@ -41,6 +41,12 @@ const SECTION_LABELS = {
 const SECTION_ORDER = Object.keys(SECTION_LABELS)
 const avg = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null)
 const fmt = (n) => (n == null ? '—' : n.toFixed(2))
+// Count tapped chip tags across rows -> [[tag, count], ...] sorted desc.
+const tally = (arrs) => {
+  const m = {}
+  for (const a of arrs) for (const t of a || []) m[t] = (m[t] || 0) + 1
+  return Object.entries(m).sort((x, y) => y[1] - x[1])
+}
 
 async function main() {
   const hogql =
@@ -99,15 +105,26 @@ async function main() {
     const amounts = rows.map((r) => r.would_pay_amount).filter(Boolean)
     if (amounts.length) md += `- **Pay amounts**: ${amounts.join(' · ')}\n`
 
-    // verbatim text per feature
+    // reviewers (name + email — for follow-up)
+    const reviewers = rows.map((r) => [r.name, r.email]).filter(([n]) => n)
+    if (reviewers.length) {
+      md += `\n### Reviewers\n`
+      reviewers.forEach(([n, e]) => { md += `- ${n}${e ? ` <${e}>` : ''}\n` })
+    }
+
+    // tapped chip tags + verbatim text per feature
     md += `\n### What testers said\n`
     for (const key of SECTION_ORDER) {
+      const likedTags = tally(rows.map((r) => r[`likedtags_${key}`]))
+      const dislikedTags = tally(rows.map((r) => r[`dislikedtags_${key}`]))
       const liked = rows.map((r) => r[`liked_${key}`]).filter(Boolean)
       const disliked = rows.map((r) => r[`disliked_${key}`]).filter(Boolean)
-      if (!liked.length && !disliked.length) continue
+      if (!likedTags.length && !dislikedTags.length && !liked.length && !disliked.length) continue
       md += `\n**${SECTION_LABELS[key]}**\n`
-      liked.forEach((t) => { md += `- 👍 ${t}\n` })
-      disliked.forEach((t) => { md += `- 👎 ${t}\n` })
+      likedTags.forEach(([t, c]) => { md += `- 👍 ${t} ×${c}\n` })
+      dislikedTags.forEach(([t, c]) => { md += `- 👎 ${t} ×${c}\n` })
+      liked.forEach((t) => { md += `- 👍 “${t}”\n` })
+      disliked.forEach((t) => { md += `- 👎 “${t}”\n` })
     }
     const notes = rows.map((r) => r.overall_note).filter(Boolean)
     if (notes.length) {
