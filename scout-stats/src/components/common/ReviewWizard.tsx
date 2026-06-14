@@ -1,14 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, ChevronLeft, ChevronRight, ExternalLink, Send, CheckCircle2, ClipboardList } from 'lucide-react'
-import { captureReview, PROTOTYPE } from '@/lib/analytics'
+import { captureReview, getIdentity, setIdentity, isEmail, PROTOTYPE } from '@/lib/analytics'
 import { getReviewSections } from '@/lib/reviewSections'
 import { cn } from '@/lib/utils'
 
-// Guided, feature-by-feature review of one prototype. One step per feature area
-// (score 1–5 + liked/disliked quick-pick chips + free text, with a "try it" deep
-// link), ending in an overall step (would-use / would-pay / NPS + required
-// name & email). Submits one structured PostHog event.
+// Guided, feature-by-feature review of one prototype. Identity (name + email)
+// is captured FIRST and reused across the short + long feedback. Then one step
+// per feature area (score 1–5 + liked/disliked chips + free text, with a "try
+// it" deep link), ending in an overall step. Submits one structured PostHog event.
 
 interface Answer { score: number; liked: string; disliked: string; likedTags: string[]; dislikedTags: string[] }
 const EMPTY: Answer = { score: 0, liked: '', disliked: '', likedTags: [], dislikedTags: [] }
@@ -17,7 +17,6 @@ const SCORE = [1, 2, 3, 4, 5]
 const SCORE_LABEL: Record<number, string> = { 1: 'Poor', 2: 'Weak', 3: 'OK', 4: 'Good', 5: 'Great' }
 const USE_LABEL: Record<number, string> = { 1: 'Never', 2: 'Unlikely', 3: 'Maybe', 4: 'Likely', 5: 'Definitely' }
 const NPS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-const isEmail = (s: string) => /.+@.+\..+/.test(s.trim())
 
 function ScoreRow({ value, onChange, labels = SCORE_LABEL }: { value: number; onChange: (n: number) => void; labels?: Record<number, string> }) {
   return (
@@ -63,7 +62,7 @@ function Chips({ options, selected, onToggle, tone }: { options: string[]; selec
 
 export default function ReviewWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
   const sections = getReviewSections()
-  const total = sections.length + 1 // + overall step
+  const total = sections.length + 2 // identity (first) + feature sections + overall
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<Record<string, Answer>>({})
   const [wouldUse, setWouldUse] = useState(0)
@@ -71,14 +70,22 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
   const [wouldPayAmount, setWouldPayAmount] = useState('')
   const [nps, setNps] = useState<number | null>(null)
   const [overallNote, setOverallNote] = useState('')
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [name, setName] = useState(() => getIdentity()?.name ?? '')
+  const [email, setEmail] = useState(() => getIdentity()?.email ?? '')
   const [sent, setSent] = useState(false)
+
+  // Reuse a previously-captured identity (from the quick note or a prior review).
+  useEffect(() => {
+    if (!open) return
+    const id = getIdentity()
+    if (id) { setName(id.name); setEmail(id.email) }
+  }, [open])
 
   if (!open) return null
 
-  const isOverall = step === sections.length
-  const sec = isOverall ? null : sections[step]
+  const isIdentity = step === 0
+  const isOverall = step === sections.length + 1
+  const sec = (isIdentity || isOverall) ? null : sections[step - 1]
   const ans = sec ? (answers[sec.key] ?? EMPTY) : EMPTY
   const setAns = (patch: Partial<Answer>) => {
     if (!sec) return
@@ -94,14 +101,15 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
   }
   const tryHref = sec?.tryPath ? `${import.meta.env.BASE_URL}#${sec.tryPath}` : null
   const pct = Math.round(((step + 1) / total) * 100)
-  const canSubmit = name.trim().length > 0 && isEmail(email)
+  const identityOk = name.trim().length > 0 && isEmail(email)
 
   function reset() {
     setStep(0); setAnswers({}); setWouldUse(0); setWouldPay(''); setWouldPayAmount('')
-    setNps(null); setOverallNote(''); setName(''); setEmail(''); setSent(false)
+    setNps(null); setOverallNote(''); setSent(false)
+    // keep name/email — identity is reused across feedback
   }
   function submit() {
-    if (!canSubmit) return
+    if (!identityOk) return
     captureReview({
       sections: answers,
       would_use: wouldUse,
@@ -126,7 +134,7 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
               <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-accent-blue">
                 <ClipboardList className="h-3.5 w-3.5" /> Review · <span className="capitalize">{PROTOTYPE}</span>
               </div>
-              <div className="mt-0.5 text-[11px] text-text-muted">{sent ? 'Done' : isOverall ? 'Last step — overall' : `Step ${step + 1} of ${total}`}</div>
+              <div className="mt-0.5 text-[11px] text-text-muted">{sent ? 'Done' : isIdentity ? 'About you' : isOverall ? 'Last step — overall' : `Step ${step + 1} of ${total}`}</div>
             </div>
             <button type="button" onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer" aria-label="Close"><X className="h-4 w-4" /></button>
           </div>
@@ -144,6 +152,19 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
               <CheckCircle2 className="h-10 w-10 text-accent-emerald" />
               <p className="text-base font-bold text-text-primary">Thanks — review submitted!</p>
               <p className="text-xs text-text-muted">This directly shapes the <span className="capitalize font-semibold">{PROTOTYPE}</span> build.</p>
+            </div>
+          ) : isIdentity ? (
+            <div>
+              <h3 className="text-base font-bold text-text-primary">Quick <span className="capitalize">{PROTOTYPE}</span> review</h3>
+              <p className="mt-0.5 text-xs leading-snug text-text-muted">~3 minutes — you’ll rate each feature (Browse, Stats, AI, replays, the player report…) then a couple of overall questions. First, who are you?</p>
+              <label className="mt-4 block text-xs font-semibold text-text-secondary">Your name <span className="text-accent-red">*</span></label>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="First & last name"
+                className="mt-1.5 w-full rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
+              <label className="mt-3 block text-xs font-semibold text-text-secondary">Your email <span className="text-accent-red">*</span></label>
+              <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com"
+                className={cn('mt-1.5 w-full rounded-lg border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue',
+                  email && !isEmail(email) ? 'border-accent-red' : 'border-border')} />
+              <p className="mt-1.5 text-[10px] text-text-muted">Required — so we can follow up. Reused for your quick notes too.</p>
             </div>
           ) : isOverall ? (
             <div>
@@ -183,16 +204,7 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
               <textarea value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={2} placeholder="The one thing you'd change first…"
                 className="mt-1.5 w-full resize-none rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
 
-              <div className="mt-4 rounded-xl border border-border bg-bg-surface/40 p-3">
-                <label className="block text-xs font-semibold text-text-secondary">Your name <span className="text-accent-red">*</span></label>
-                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="First & last name"
-                  className="mt-1.5 w-full rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
-                <label className="mt-3 block text-xs font-semibold text-text-secondary">Your email <span className="text-accent-red">*</span></label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com"
-                  className={cn('mt-1.5 w-full rounded-lg border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue',
-                    email && !isEmail(email) ? 'border-accent-red' : 'border-border')} />
-                <p className="mt-1.5 text-[10px] text-text-muted">Required — so we can follow up on your feedback.</p>
-              </div>
+              <p className="mt-3 text-[10px] text-text-muted">Submitting as <span className="font-semibold text-text-secondary">{name || '—'}</span> · {email || '—'}</p>
             </div>
           ) : sec && (
             <div>
@@ -230,19 +242,19 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
                 <ChevronLeft className="h-4 w-4" /> Back
               </button>
               {isOverall ? (
-                <button type="button" onClick={submit} disabled={!canSubmit}
+                <button type="button" onClick={submit} disabled={!identityOk}
                   className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent-blue px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-accent-blue/90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
                   <Send className="h-4 w-4" /> Submit review
                 </button>
               ) : (
-                <button type="button" onClick={() => setStep((s) => Math.min(total - 1, s + 1))}
-                  className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-accent-blue px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-accent-blue/90 cursor-pointer">
-                  Next <ChevronRight className="h-4 w-4" />
+                <button type="button" onClick={() => { if (isIdentity) setIdentity(name.trim(), email.trim()); setStep((s) => Math.min(total - 1, s + 1)) }} disabled={isIdentity && !identityOk}
+                  className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-accent-blue px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-accent-blue/90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
+                  {isIdentity ? 'Start review' : 'Next'} <ChevronRight className="h-4 w-4" />
                 </button>
               )}
             </div>
-            {isOverall && !canSubmit && (
-              <p className="mt-2 text-center text-[10px] text-text-muted">Add your name &amp; a valid email to submit.</p>
+            {isIdentity && !identityOk && (
+              <p className="mt-2 text-center text-[10px] text-text-muted">Enter your name &amp; a valid email to start.</p>
             )}
           </div>
         )}

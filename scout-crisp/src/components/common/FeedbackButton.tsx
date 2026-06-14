@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { MessageSquarePlus, X, Send, CheckCircle2, ClipboardList, ArrowRight } from 'lucide-react'
-import { captureFeedback, PROTOTYPE } from '@/lib/analytics'
+import { captureFeedback, getIdentity, isEmail, PROTOTYPE } from '@/lib/analytics'
 import ReviewWizard from '@/components/common/ReviewWizard'
 
 // Floating "Give feedback" launcher + a short in-context form. Captures the
@@ -19,15 +19,20 @@ export default function FeedbackButton() {
   const [ease, setEase] = useState(0)
   const [improve, setImprove] = useState('')
   const [liked, setLiked] = useState('')
-  const [email, setEmail] = useState('')
+  const [name, setName] = useState(() => getIdentity()?.name ?? '')
+  const [email, setEmail] = useState(() => getIdentity()?.email ?? '')
+
+  const canSend = (ease > 0 || improve.trim().length > 0) && name.trim().length > 0 && isEmail(email)
 
   function reset() {
-    setEase(0); setImprove(''); setLiked(''); setEmail('')
+    setEase(0); setImprove(''); setLiked('')
+    // keep name/email — identity is reused across feedback
   }
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
-    captureFeedback({ screen: window.location.hash || '#/', ease, improve, liked, email })
+    if (!canSend) return
+    captureFeedback({ screen: window.location.hash || '#/', ease, improve, liked, name: name.trim(), email: email.trim() })
     setSent(true)
     setTimeout(() => { setOpen(false); setSent(false); reset() }, 1700)
   }
@@ -38,7 +43,7 @@ export default function FeedbackButton() {
       <div className="pointer-events-none fixed inset-x-0 bottom-20 z-40 mx-auto flex max-w-md justify-end px-3">
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => { const id = getIdentity(); if (id) { setName(id.name); setEmail(id.email) } setOpen(true) }}
           className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-accent-blue/30 bg-accent-blue px-3 py-2 text-xs font-bold text-white shadow-lg transition-transform hover:scale-[1.03] cursor-pointer"
           aria-label="Give feedback on this prototype"
         >
@@ -120,22 +125,32 @@ export default function FeedbackButton() {
                   className="mt-1.5 w-full rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue"
                 />
 
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
-                  placeholder="Email (optional — if we can follow up)"
-                  className="mt-3 w-full rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue"
-                />
+                <div className="mt-3 rounded-xl border border-border bg-bg-surface/40 p-3">
+                  <label className="block text-xs font-semibold text-text-secondary">Your name <span className="text-accent-red">*</span></label>
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="First & last name"
+                    className="mt-1.5 w-full rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue"
+                  />
+                  <label className="mt-2.5 block text-xs font-semibold text-text-secondary">Your email <span className="text-accent-red">*</span></label>
+                  <input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    type="email"
+                    placeholder="you@example.com"
+                    className={`mt-1.5 w-full rounded-lg border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue ${email && !isEmail(email) ? 'border-accent-red' : 'border-border'}`}
+                  />
+                </div>
 
                 <button
                   type="submit"
-                  disabled={!ease && !improve.trim()}
+                  disabled={!canSend}
                   className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-blue px-3 py-2.5 text-sm font-bold text-white transition-colors hover:bg-accent-blue/90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
                 >
                   <Send className="h-4 w-4" /> Send feedback
                 </button>
-                <p className="mt-2 text-center text-[10px] text-text-muted">Anonymous unless you add an email. Your session may be recorded to help us improve.</p>
+                <p className="mt-2 text-center text-[10px] text-text-muted">Name &amp; email required. Your session may be recorded to help us improve.</p>
               </form>
             )}
           </div>

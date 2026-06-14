@@ -39,16 +39,42 @@ function capturePage(): void {
   posthog.capture('$pageview', { prototype: PROTOTYPE, screen: window.location.hash || '#/' })
 }
 
+// ---- Shared reviewer identity (captured once, reused by short + long feedback) ----
+
+const IDENTITY_KEY = 'scout-reviewer'
+export const isEmail = (s: string) => /.+@.+\..+/.test((s || '').trim())
+
+/** Reviewer identity, persisted in localStorage and reused across both forms. */
+export function getIdentity(): { name: string; email: string } | null {
+  try {
+    const raw = localStorage.getItem(IDENTITY_KEY)
+    if (raw) {
+      const o = JSON.parse(raw)
+      if (o && typeof o.name === 'string' && typeof o.email === 'string' && o.name && o.email) return o
+    }
+  } catch { /* ignore */ }
+  return null
+}
+
+/** Persist identity + attach it to the PostHog person so events/replays are named. */
+export function setIdentity(name: string, email: string): void {
+  const n = name.trim(); const e = email.trim()
+  try { localStorage.setItem(IDENTITY_KEY, JSON.stringify({ name: n, email: e })) } catch { /* ignore */ }
+  posthog.setPersonProperties?.({ name: n, email: e })
+}
+
 export interface FeedbackPayload {
   screen: string
   ease: number          // 1–5 (SEQ-style)
   improve?: string
   liked?: string
-  email?: string
+  name: string          // required (reused from the shared identity)
+  email: string         // required
 }
 
-/** Structured feedback event — links to the user's session replay in PostHog. */
+/** Structured quick-note event — links to the user's session replay in PostHog. */
 export function captureFeedback(data: FeedbackPayload): void {
+  setIdentity(data.name, data.email)
   posthog.capture('feedback_submitted', { prototype: PROTOTYPE, surface: 'scout-prototype', ...data })
 }
 
@@ -93,8 +119,7 @@ export function captureReview(p: ReviewPayload): void {
     name: p.name,
     email: p.email,
   }
-  // PostHog can tie the review to a person via $set on identity.
-  posthog.setPersonProperties?.({ name: p.name, email: p.email })
+  setIdentity(p.name, p.email)
   for (const [k, v] of Object.entries(p.sections)) {
     if (v.score) flat[`score_${k}`] = v.score
     if (v.liked && v.liked.trim()) flat[`liked_${k}`] = v.liked.trim()
