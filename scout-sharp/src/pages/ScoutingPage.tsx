@@ -38,11 +38,11 @@ export default function ScoutingPage() {
   const fromEvent = !!tournamentId
 
   const [filters, setFilters] = useState<StatFilters>({
-    // Default to the full (career) sample — even from a tournament — so the READ
-    // is trustworthy instead of a thin/empty single-event slice. The hands drill
-    // still scopes to this event via tournamentId, and "This event" stays
-    // selectable for event-only stats.
-    scope: 'career',
+    // Opened from a tournament (?t=) → land on THIS EVENT's stats (the user
+    // clicked in from that event's Stats page). Standalone (from the Players
+    // list) → career. "Career" stays one tap away for a wider, more reliable
+    // read; thin single-event samples surface the sample-size banner honestly.
+    scope: tournamentId ? 'event' : 'career',
     tournamentId: tournamentId ?? null,
     tableSize: (['short', 'full'].includes(tsParam ?? '') ? tsParam : 'all') as TableSizeBucket,
     depth: (['short', 'mid', 'deep'].includes(dpParam ?? '') ? dpParam : 'all') as DepthBucket,
