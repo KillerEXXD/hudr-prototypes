@@ -171,8 +171,8 @@
       color: #4b5563;
       font-size: 13px;
     }
-    /* Show the Scout prototypes (Engine + Crisp + Stats + Sharp); hide the rest of the gallery. */
-    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]):not([href^="scout-stats-demo"]):not([href^="scout-sharp-demo"]) {
+    /* Show the Scout prototypes (Engine + Crisp + Stats + Sharp) + the ClubR flow; hide the rest of the gallery. */
+    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]):not([href^="scout-stats-demo"]):not([href^="scout-sharp-demo"]):not([href^="clubr-flow"]) {
       display: none !important;
     }
   </style>
@@ -697,6 +697,21 @@
           <span class="tag">Sizing / ranges / showdown</span>
         </div>
         <span class="cta" style="background: linear-gradient(135deg, #0ea5e9, #6366f1)">Open Scout Sharp →</span>
+      </a>
+
+      <a href="clubr-flow/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #f59e0b, #d946ef)"></div>
+        <div class="card-letter" style="background: rgba(217,70,239,0.15); color: #e879f9;">CR</div>
+        <h2>ClubR — Flow Diagram</h2>
+        <div class="subtitle">Interactive explainer • Poker clubs</div>
+        <p>A visual walkthrough of <strong>how the ClubR feature works</strong>, for a product review. The full lifecycle across 5 phases (Club Setup → Tournament &amp; Buckets → Registration → Live Scoring → Results), the two game types — <strong>FT Fantasy "Buckets"</strong> and <strong>Last Longer</strong> — plus roles, member journey, stats &amp; leaderboards, seasons, HUDR integration and the data model.</p>
+        <div class="tags">
+          <span class="tag">FT Fantasy</span>
+          <span class="tag">Last Longer</span>
+          <span class="tag">Multi-tournament</span>
+          <span class="tag">HUDR-scored</span>
+        </div>
+        <span class="cta" style="background: linear-gradient(135deg, #f59e0b, #d946ef)">Open the flow →</span>
       </a>
 
       <a href="#" onclick="alert('V7 Beacon — Coming Soon. Prototype not yet built.');return false;" class="card" style="opacity:0.7">
