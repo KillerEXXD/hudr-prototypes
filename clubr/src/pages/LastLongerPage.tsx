@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Timer, CheckCircle2, Eye, Shield, Plus } from 'lucide-react'
+import { Timer, CheckCircle2, Eye, Shield, Plus, ChevronDown } from 'lucide-react'
 import { useGames } from '@/hooks/ll'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
@@ -41,9 +41,12 @@ export function LastLongerPage() {
   const myClubs = useMyClubs()
   const canHost = (myClubs.data ?? []).some((c) => c.canManage)
   const [createOpen, setCreateOpen] = useState(false)
+  const [pastOpen, setPastOpen] = useState(false)
 
-  const hosting = data?.filter((g) => g.canManage) ?? []
-  const playing = data?.filter((g) => !g.canManage) ?? []
+  const active = (data ?? []).filter((g) => g.status !== 'completed')
+  const past = (data ?? []).filter((g) => g.status === 'completed')
+  const hosting = active.filter((g) => g.canManage)
+  const playing = active.filter((g) => !g.canManage)
 
   return (
     <div className="animate-fade-up">
@@ -52,25 +55,26 @@ export function LastLongerPage() {
 
       {canHost && <Btn className="mt-3 w-full" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" />Create a Last Longer</Btn>}
 
-      {isLoading ? <Spinner /> : data && data.length > 0 ? (
+      {isLoading ? <Spinner /> : (
         <>
           {hosting.length > 0 && (
-            <Section title="You're hosting">
-              <div className="flex flex-col gap-2">{hosting.map((g) => <GameRow key={g.id} g={g} />)}</div>
-            </Section>
+            <Section title="You're hosting"><div className="flex flex-col gap-2">{hosting.map((g) => <GameRow key={g.id} g={g} />)}</div></Section>
           )}
-          <Section title={hosting.length > 0 ? 'Playing in' : 'Games in your clubs'}>
-            {playing.length > 0 ? (
-              <div className="flex flex-col gap-2">{playing.map((g) => <GameRow key={g.id} g={g} />)}</div>
-            ) : (
-              <EmptyState title="Nothing to play in yet" sub="Games you're a player in show here." />
-            )}
-          </Section>
+          {playing.length > 0 && (
+            <Section title={hosting.length > 0 ? 'Playing in' : 'Live & upcoming'}><div className="flex flex-col gap-2">{playing.map((g) => <GameRow key={g.id} g={g} />)}</div></Section>
+          )}
+          {active.length === 0 && (
+            <Section title="Games"><EmptyState icon={<Timer className="h-7 w-7" />} title="Nothing live right now" sub={canHost ? 'Create one above to get your club playing.' : 'Join a club and check back when your host starts one.'} /></Section>
+          )}
+          {past.length > 0 && (
+            <div className="mt-5">
+              <button onClick={() => setPastOpen((o) => !o)} className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-bg-card px-3 py-2 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
+                {pastOpen ? 'Hide' : 'Show'} past games ({past.length}) <ChevronDown className={`h-3.5 w-3.5 transition-transform ${pastOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {pastOpen && <div className="mt-2 flex flex-col gap-2">{past.map((g) => <GameRow key={g.id} g={g} />)}</div>}
+            </div>
+          )}
         </>
-      ) : (
-        <Section title="Games in your clubs">
-          <EmptyState icon={<Timer className="h-7 w-7" />} title="No games yet" sub="Join a club to see its Last Longer games, or create one above." />
-        </Section>
       )}
 
       <CreateGameSheet open={createOpen} onClose={() => setCreateOpen(false)} />
