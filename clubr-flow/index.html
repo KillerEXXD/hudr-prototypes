@@ -141,17 +141,21 @@
     <span class="kicker">Product Walkthrough · Flow Diagram</span>
     <h1>ClubR — How It Works</h1>
     <p class="sub">A web PWA that is the <strong>transparent scorekeeper</strong> for a poker club's games:
-       <strong style="color:var(--ftf)">FT Fantasy</strong> — predict a HUDR live‑streamed Final Table — and
+       <strong style="color:var(--ftf)">FT Fantasy</strong> — a fantasy contest on a streamed Final Table (launch format: <strong>Stack Draft</strong>) — and
        <strong style="color:var(--ll)">Last Longer</strong> — the club's own live tournament.
        ClubR <strong>tracks and proves</strong> the count and the result. It
        <strong style="color:var(--ok)">awards nothing, holds nothing, and never touches the cash.</strong>
        Clubs settle all stakes <strong>offline</strong>.</p>
-    <p class="tagline">Be the tool, not the bank. Pay a flat fee to use it (credits, or free with a subscription) — the money stays between the players.</p>
+    <p class="tagline">Be the tool, not the bank. Pay a flat fee to use it (credits, or a subscription) — the money stays between the players.</p>
+    <div style="max-width:800px;margin:18px auto 0;padding:11px 14px;border:1px solid rgba(52,211,153,.35);background:rgba(52,211,153,.06);border-radius:12px;font-size:13px;color:var(--mut);text-align:left">
+      <strong style="color:var(--ok)">⚡ Launches standalone — Phase 1 (no HUDR).</strong> The ClubR <strong>operator hand‑enters each FT's chip stacks → the app computes ICM prices</strong>, then enters the <strong>public finishing order</strong> to score. <strong>Phase 2</strong> automates this off a HUDR live feed. Ships in ~2–3 days.
+    </div>
     <div class="legend">
       <span class="it"><span class="dot" style="background:var(--owner)"></span>Owner</span>
       <span class="it"><span class="dot" style="background:var(--admin)"></span>Host / Admin</span>
       <span class="it"><span class="dot" style="background:var(--member)"></span>Player</span>
-      <span class="it"><span class="dot" style="background:var(--hudr)"></span>HUDR (FT Fantasy oracle)</span>
+      <span class="it"><span class="dot" style="background:var(--guest)"></span>Operator (Phase 1)</span>
+      <span class="it"><span class="dot" style="background:var(--hudr)"></span>HUDR (Phase 2)</span>
     </div>
   </div>
 </header>
@@ -176,7 +180,7 @@
     <div class="lane a" style="border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.05)">
       <span class="pill" style="--c:var(--ok)">What ClubR does</span>
       <h3 style="margin:8px 0 2px;font-size:17px;color:var(--ok)">🔎 The notary, not the bank</h3>
-      <p class="mut">Every player <strong>self‑joins</strong> in the app and is <strong>publicly visible</strong> — so the count can't be faked. Results are tamper‑proof (HUDR‑resolved for FT Fantasy; logged + player‑confirmable for Last Longer). <strong>The cash stays between the host and players; the app never knows, holds, or promises it.</strong></p>
+      <p class="mut">Every player <strong>self‑joins</strong> in the app and is <strong>publicly visible</strong> — so the count can't be faked. Results are tamper‑proof — the <strong>public FT finishing order</strong> for FT Fantasy (operator‑entered in Phase 1, HUDR‑automated in Phase 2); logged + player‑confirmable for Last Longer. <strong>The cash stays between the host and players; the app never knows, holds, or promises it.</strong></p>
       <div class="chips">
         <span class="chip">👀 Public, un‑hideable count</span>
         <span class="chip">🧾 Visible audit log</span>
@@ -192,12 +196,12 @@
   <p class="lead">Both features are the <strong>same kind of thing</strong>: a transparent scorekeeper. The app <strong>awards nothing and settles nothing</strong> — it proves the count and the result, you pay a flat fee to use it, and the club handles the stakes offline. They differ only in <em>where the truth comes from</em>.</p>
   <div class="grid g2">
     <div class="lane a">
-      <span class="pill" style="--c:var(--ftf)">Feature A · Predict</span>
-      <h3 style="margin:8px 0 2px;font-size:18px;color:var(--ftf)">🎯 FT Fantasy</h3>
-      <p class="mut">Members <strong>pick 3 players</strong> from a <strong>HUDR live‑streamed Final Table</strong> and enter a bucket (a <strong>Stakes tier</strong>). <strong>HUDR auto‑resolves</strong> the result from the real finishing order — <strong>no human judges it, no disputes possible.</strong> The app shows the ranking; the club settles offline.</p>
+      <span class="pill" style="--c:var(--ftf)">Feature A · Fantasy</span>
+      <h3 style="margin:8px 0 2px;font-size:18px;color:var(--ftf)">🎯 FT Fantasy <span style="font-size:12px;color:var(--mut2)">· Stack Draft</span></h3>
+      <p class="mut">Members get a <strong>budget and draft 4 of the 9</strong> finalists, each <strong>priced by ICM</strong>, and enter a bucket (a <strong>Stakes tier</strong>). The result comes from the <strong>public finishing order</strong> — operator‑entered in Phase 1, HUDR‑automated in Phase 2 — <strong>verifiable, not a private judgment.</strong> The app shows the ranking; the club settles offline.</p>
       <div class="chips">
-        <span class="chip">Truth = HUDR live feed</span>
-        <span class="chip yes">Auto‑resolved · undisputable</span>
+        <span class="chip">Truth = public FT result</span>
+        <span class="chip yes">ICM‑priced · verifiable</span>
         <span class="chip">App awards nothing</span>
       </div>
     </div>
@@ -221,27 +225,27 @@
 
   <div class="phase-head" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);max-width:460px;margin:0 auto 14px">Shared · Club Setup</div>
   <div class="flow" style="margin-bottom:10px">
-    <div class="card" style="--c:var(--owner)"><span class="ic">🏛️</span><h4>Create Club</h4><p>Owner holds the ClubR subscription (incl. HUDR).</p></div>
+    <div class="card" style="--c:var(--owner)"><span class="ic">🏛️</span><h4>Create Club</h4><p>Owner holds the ClubR subscription.</p></div>
     <div class="ha">→</div>
     <div class="card" style="--c:var(--member)"><span class="ic">📱</span><h4>Players Join</h4><p>Phone + OTP. 1000 free credits to start.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--admin)"><span class="ic">📣</span><h4>Telegram Bot</h4><p>Posts upcoming games into the club's group.</p></div>
+    <div class="card" style="--c:var(--admin)"><span class="ic">📣</span><h4>Notify Members</h4><p>Telegram bot posts games (Phase 2).</p></div>
   </div>
   <div class="rel" style="font-size:18px;color:var(--mut2)">▼ &nbsp; branches into two independent features &nbsp; ▼</div>
 
   <div class="grid g2" style="margin-top:12px;align-items:start">
     <!-- FT Fantasy lane -->
     <div>
-      <div class="phase-head" style="background:linear-gradient(135deg,#86198f,#d946ef)">Feature A · FT Fantasy (predict a HUDR FT)</div>
-      <div class="card" style="--c:var(--hudr)"><span class="ic">📺</span><h4>HUDR Publishes the FT Slate</h4><p>~6–10 live‑streamed Final Tables a week.</p></div>
+      <div class="phase-head" style="background:linear-gradient(135deg,#86198f,#d946ef)">Feature A · FT Fantasy — Stack Draft (Phase 1)</div>
+      <div class="card" style="--c:var(--guest)"><span class="ic">⌨️</span><h4>Operator Enters Chip Stacks</h4><p>Day before → app computes &amp; publishes <strong>ICM prices</strong>.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--admin)"><span class="ic">🎟️</span><h4>Host Curates 1–2 + Sets Stakes</h4><p>Picks the FTs the club cares about; opens buckets.</p></div>
+      <div class="card" style="--c:var(--admin)"><span class="ic">🎟️</span><h4>Host Opens the Contest</h4><p>Sets Stakes buckets for the club's members.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--member)"><span class="ic">🃏</span><h4>Players Pay Fee + Pick 3</h4><p>Flat fee = entry. Picks <strong>lock 10 min before</strong>.</p></div>
+      <div class="card" style="--c:var(--member)"><span class="ic">🃏</span><h4>Players Pay Fee + Draft 4</h4><p>Budget &amp; ICM prices. Picks <strong>lock 10 min before</strong>.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--hudr)"><span class="ic">🎬</span><h4>HUDR Auto‑Resolves</h4><p>Real finishing order → ranked, undisputable.</p></div>
+      <div class="card" style="--c:var(--guest)"><span class="ic">🎬</span><h4>Operator Enters Public Result</h4><p>Finishing order (with source link) → app scores it.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--ok)" data-x><span class="ic">🧾</span><h4>App Shows Result · Club Settles Offline</h4><p>Suggested split in Stakes. App moves nothing.</p></div>
+      <div class="card" style="--c:var(--ok)"><span class="ic">🧾</span><h4>App Shows Result · Club Settles Offline</h4><p>Suggested split in Stakes. App moves nothing.</p></div>
     </div>
     <!-- Last Longer lane -->
     <div>
@@ -262,12 +266,13 @@
 <!-- ROLES -->
 <section id="roles">
   <div class="h2"><span class="num">4.</span><h2>Roles &amp; Permissions</h2></div>
-  <p class="lead">Owners hold the paid subscription and run the club; hosts curate &amp; run games (and earn nothing — reputation only); players self‑join and pay per game or via a HUDR subscription.</p>
+  <p class="lead">In Phase 1 the <strong>operator</strong> enters the FT data; owners hold the paid subscription and run the club; hosts run games (earn nothing — reputation only); players self‑join and pay per game with credits. <em>HUDR automates the data &amp; waives player fees in Phase 2.</em></p>
   <div class="grid g4">
-    <div class="panel"><span class="pill" style="--c:var(--owner)">Owner</span><h3 style="margin-top:8px">Holds the subscription</h3><p class="mut">Buys the <strong>ClubR subscription</strong> (premium — <strong>includes HUDR</strong>). Creates the club, assigns admins/hosts. Required to host.</p></div>
-    <div class="panel"><span class="pill" style="--c:var(--admin)">Host / Admin</span><h3 style="margin-top:8px">Curates &amp; runs games</h3><p class="mut"><strong>FT Fantasy:</strong> curates FTs off HUDR's slate. <strong>Last Longer:</strong> runs the live game, judges eliminations. <strong>Earns nothing</strong>; every action is logged.</p></div>
-    <div class="panel"><span class="pill" style="--c:var(--member)">Player</span><h3 style="margin-top:8px">Self‑joins &amp; plays</h3><p class="mut">Joins via phone + OTP. Pays a <strong>flat fee per entry</strong> (credits), or <strong>free with a HUDR subscription</strong>. Picks in FT Fantasy; plays in Last Longer.</p></div>
-    <div class="panel" style="border-color:rgba(217,70,239,.35);background:rgba(217,70,239,.05)"><span class="pill" style="--c:var(--hudr)">HUDR</span><h3 style="margin-top:8px">The FT oracle</h3><p class="mut">Publishes the weekly FT slate + feeds the live finishing order that <strong>auto‑resolves FT Fantasy</strong>. A HUDR subscription <strong>waives the player fee</strong>. Last Longer doesn't use HUDR.</p></div>
+    <div class="panel" style="border-color:rgba(6,182,212,.35);background:rgba(6,182,212,.05)"><span class="pill" style="--c:var(--guest)">Operator · Phase 1</span><h3 style="margin-top:8px">Enters the FT data</h3><p class="mut">ClubR enters each FT's <strong>chip stacks → ICM prices</strong>, and the <strong>public finishing order</strong> to score. <strong>HUDR replaces this in Phase 2.</strong></p></div>
+    <div class="panel"><span class="pill" style="--c:var(--owner)">Owner</span><h3 style="margin-top:8px">Holds the subscription</h3><p class="mut">Buys the <strong>ClubR subscription</strong> (premium). Creates the club, assigns admins/hosts. Required to host. <em>(Phase 2: includes HUDR.)</em></p></div>
+    <div class="panel"><span class="pill" style="--c:var(--admin)">Host / Admin</span><h3 style="margin-top:8px">Runs games</h3><p class="mut"><strong>FT Fantasy:</strong> opens contests on the priced FTs. <strong>Last Longer:</strong> runs the live game, judges eliminations. <strong>Earns nothing</strong>; every action is logged.</p></div>
+    <div class="panel"><span class="pill" style="--c:var(--member)">Player</span><h3 style="margin-top:8px">Self‑joins &amp; plays</h3><p class="mut">Joins via phone + OTP. Pays a <strong>flat fee per entry</strong> (credits). Drafts in FT Fantasy; plays in Last Longer. <em>(Phase 2: a HUDR sub plays free.)</em></p></div>
+    <div class="panel" style="border-color:rgba(217,70,239,.35);background:rgba(217,70,239,.05)"><span class="pill" style="--c:var(--hudr)">HUDR · Phase 2</span><h3 style="margin-top:8px">Automates the data</h3><p class="mut">Later, HUDR <strong>auto‑feeds the chip stacks + finishing order</strong> (removes the manual step), and a HUDR sub <strong>waives the player fee</strong>. Last Longer never uses HUDR.</p></div>
   </div>
 </section>
 
@@ -290,43 +295,43 @@
 
 <!-- FT FANTASY -->
 <section id="ftf">
-  <div class="h2"><span class="num">6.</span><h2>FT Fantasy</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--ftf)">Feature A · Predict a HUDR FT</span></div>
-  <p class="lead">Players <strong>pick 3</strong> of the 9 final‑table players and enter a <strong>Stakes bucket</strong>. <strong>HUDR auto‑resolves</strong> from the real finishing order — undisputable. The app shows the ranking and a suggested split; <strong>the club settles the cash offline.</strong></p>
+  <div class="h2"><span class="num">6.</span><h2>FT Fantasy — Stack Draft</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--ftf)">Feature A · salary‑cap, ICM‑priced</span></div>
+  <p class="lead">Each player gets a <strong>budget</strong> and <strong>drafts 4 of the 9</strong> finalists, each <strong>priced by ICM</strong> (from operator‑entered chip stacks). After the FT, the <strong>public finishing order</strong> scores every entry; the app shows the ranking + a suggested split, and <strong>the club settles the cash offline.</strong> <span style="color:var(--mut2)">(Pick'em — pick 3, one top/mid/bottom — is the fast‑follow format.)</span></p>
   <div class="flow" style="margin-bottom:18px">
-    <div class="card" style="--c:var(--hudr)"><span class="ic">📺</span><h4>HUDR FT Slate</h4><p>Host curates 1–2.</p></div>
+    <div class="card" style="--c:var(--guest)"><span class="ic">⌨️</span><h4>Operator → ICM Prices</h4><p>Enters chip stacks day before.</p></div>
     <div class="ha">→</div>
     <div class="card" style="--c:var(--admin)"><span class="ic">🎟️</span><h4>Open Buckets</h4><p>Stakes tiers.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--member)"><span class="ic">🃏</span><h4>Fee + Pick 3</h4><p>Locks 10 min before.</p></div>
+    <div class="card" style="--c:var(--member)"><span class="ic">🃏</span><h4>Fee + Draft 4</h4><p>Budget. Locks 10 min before.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--hudr)"><span class="ic">🎬</span><h4>HUDR Resolves</h4><p>Real finishing order.</p></div>
+    <div class="card" style="--c:var(--guest)"><span class="ic">🎬</span><h4>Operator → Public Result</h4><p>Finishing order + source link.</p></div>
     <div class="ha">→</div>
     <div class="card" style="--c:var(--ok)"><span class="ic">🧾</span><h4>Show &amp; Settle Offline</h4><p>App moves nothing.</p></div>
   </div>
   <div class="grid g2">
-    <div class="panel"><h3>The final table — pick 3 of 9</h3><p class="mut" style="margin-bottom:10px">The broadcast event's 9 players (A–I), with live chip counts from HUDR. A pick of <strong style="color:var(--ftf)">[A, B, C]</strong> is shown highlighted.</p>
+    <div class="panel"><h3>The final table — draft 4 of 9 (ICM‑priced)</h3><p class="mut" style="margin-bottom:10px">The 9 finalists with their <strong>ICM price</strong> (from the operator's chip entry). A draft of <strong style="color:var(--ftf)">[A, C, H, I]</strong> for exactly 100k is highlighted.</p>
       <div class="ft">
-        <div class="seat pk"><span class="b">A</span><div class="nm">Negreanu</div><div class="ch">9.3M</div></div>
-        <div class="seat pk"><span class="b">B</span><div class="nm">Ivey</div><div class="ch">7.1M</div></div>
-        <div class="seat pk"><span class="b">C</span><div class="nm">Hellmuth</div><div class="ch">5.5M</div></div>
-        <div class="seat"><span class="b">D</span><div class="nm">Bonomo</div><div class="ch">4.2M</div></div>
-        <div class="seat"><span class="b">E</span><div class="nm">Selbst</div><div class="ch">3.8M</div></div>
-        <div class="seat"><span class="b">F</span><div class="nm">Holz</div><div class="ch">2.6M</div></div>
-        <div class="seat"><span class="b">G</span><div class="nm">Kenney</div><div class="ch">1.9M</div></div>
-        <div class="seat"><span class="b">H</span><div class="nm">Konnikova</div><div class="ch">1.1M</div></div>
-        <div class="seat"><span class="b">I</span><div class="nm">Seidel</div><div class="ch">0.7M</div></div>
+        <div class="seat pk"><span class="b">A</span><div class="nm">Negreanu</div><div class="ch">38k</div></div>
+        <div class="seat"><span class="b">B</span><div class="nm">Ivey</div><div class="ch">33k</div></div>
+        <div class="seat pk"><span class="b">C</span><div class="nm">Hellmuth</div><div class="ch">29k</div></div>
+        <div class="seat"><span class="b">D</span><div class="nm">Bonomo</div><div class="ch">26k</div></div>
+        <div class="seat"><span class="b">E</span><div class="nm">Selbst</div><div class="ch">24k</div></div>
+        <div class="seat"><span class="b">F</span><div class="nm">Holz</div><div class="ch">22k</div></div>
+        <div class="seat"><span class="b">G</span><div class="nm">Kenney</div><div class="ch">20k</div></div>
+        <div class="seat pk"><span class="b">H</span><div class="nm">Konnikova</div><div class="ch">18k</div></div>
+        <div class="seat pk"><span class="b">I</span><div class="nm">Seidel</div><div class="ch">15k</div></div>
       </div>
     </div>
-    <div class="panel"><h3>Buckets = Stakes tiers</h3><p class="mut">A player pays the flat fee to enter a bucket and picks 3. When the FT ends, HUDR's finishing order ranks every entry; the app shows the top‑3 split <strong>in Stakes, never dollars.</strong></p>
+    <div class="panel"><h3>Budget, ICM &amp; scoring</h3><p class="mut">Spend a <strong>100k budget on 4 players</strong> (use‑it‑or‑lose‑it). Score = <strong>sum of each player's points‑per‑finish</strong>; highest total takes the bucket.</p>
       <div style="margin-top:12px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px">
-        <div style="font-weight:700">Enter <span style="color:var(--ftf)">250‑Stake</span> bucket · pick <span style="color:var(--ftf)">[A, B, C]</span></div>
-        <div class="mut" style="margin-top:6px;font-size:13px">HUDR result → ranked → <strong style="color:var(--coin)">Pool 5,000 · 1st 2,500 · 2nd 1,500 · 3rd 1,000</strong></div>
+        <div style="font-weight:700">Draft <span style="color:var(--ftf)">[A, C, H, I]</span> · 100k · 250‑Stake bucket</div>
+        <div class="mut" style="margin-top:6px;font-size:13px">Public result → score 197 → <strong style="color:var(--coin)">Pool 5,000 · top‑3 50/30/20</strong> (winner‑take‑all under 5 entries)</div>
         <div class="mut" style="margin-top:4px;font-size:12px">Shown for the offline settle. <span class="no">ClubR moves nothing.</span></div>
       </div>
       <div class="chips">
-        <span class="chip">Flat fee to enter (or free w/ HUDR sub)</span>
+        <span class="chip">Flat fee to enter (credits)</span>
         <span class="chip yes">🔒 Picks lock 10 min before</span>
-        <span class="chip">🔗 HUDR auto‑resolves</span>
+        <span class="chip">📊 Prices = ICM (published)</span>
         <span class="chip no">No coins/cash awarded by the app</span>
       </div>
     </div>
@@ -386,25 +391,25 @@
 <!-- PRICING -->
 <section id="pricing">
   <div class="h2"><span class="num">8.</span><h2>Pricing — by role</h2></div>
-  <p class="lead">Hosting and playing are paid <strong>separately</strong>. The owner subscribes to host; players pay per game or hold a HUDR subscription. <strong>A subscription never makes the app hold or move money</strong> — it just unlocks the tool.</p>
+  <p class="lead">Hosting and playing are paid <strong>separately</strong>. The owner subscribes to host; players pay per game with credits. <strong>A subscription never makes the app hold or move money</strong> — it just unlocks the tool. <em style="color:var(--ok)">Phase 1 = credits + host subscription (free / invite‑only pilot); the HUDR perks below switch on in Phase 2.</em></p>
   <div class="grid g2">
     <div class="panel" style="border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.05)">
       <span class="pill" style="--c:var(--owner)">To host · Owner</span>
       <h3 style="margin-top:8px;font-size:17px">💳 ClubR subscription <span style="font-size:12px;color:var(--coin)">· premium</span></h3>
-      <p class="mut">Required to create a club and host FT Fantasy / Last Longer. <strong>Includes HUDR access</strong> for the owner/admin.</p>
+      <p class="mut">Required to create a club and host FT Fantasy / Last Longer. <em>(Phase 2: also <strong>includes HUDR access</strong>.)</em></p>
       <div class="chips">
         <span class="chip">Higher‑cost premium tier</span>
-        <span class="chip">🔗 Bundles HUDR</span>
+        <span class="chip">🔗 Bundles HUDR (Phase 2)</span>
         <span class="chip no">Does NOT make players free</span>
       </div>
     </div>
     <div class="panel" style="border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.05)">
       <span class="pill" style="--c:var(--member)">To play · Player</span>
-      <h3 style="margin-top:8px;font-size:17px">🪙 Credits, or a HUDR subscription</h3>
-      <p class="mut"><strong>Buy credits</strong> — the payment is your tamper‑proof receipt for being counted — <strong>or</strong> hold a <strong>HUDR subscription</strong> and play free. <strong>There is no ClubR subscription for players.</strong></p>
+      <h3 style="margin-top:8px;font-size:17px">🪙 Credits <span style="font-size:12px;color:var(--mut2)">(HUDR sub waives them in Phase 2)</span></h3>
+      <p class="mut"><strong>Buy credits</strong> — the payment is your tamper‑proof receipt for being counted. <strong>There is no ClubR subscription for players.</strong> <em>(Phase 2: a HUDR subscription plays free.)</em></p>
       <div class="chips">
         <span class="chip coin">Credits = per‑entry fee &amp; receipt</span>
-        <span class="chip yes">HUDR sub → plays free</span>
+        <span class="chip yes">HUDR sub → free (Phase 2)</span>
         <span class="chip">🎁 1000 free credits · 10 free games</span>
       </div>
     </div>
@@ -429,16 +434,16 @@
   <div class="h2"><span class="num">10.</span><h2>Data Model</h2></div>
   <p class="lead">Shared at the top (Club · Member); each feature has its own entities. <strong>Note what's absent: no coin pools, no payouts, no points</strong> — the app stores only what it needs to prove the count and result.</p>
   <div class="flow" style="margin-bottom:14px">
-    <div class="ent" style="border-color:var(--owner);flex:1"><div class="t" style="color:var(--owner)">Club</div><div class="f">name · owner (holds ClubR subscription, incl. HUDR) · hosts</div></div>
+    <div class="ent" style="border-color:var(--owner);flex:1"><div class="t" style="color:var(--owner)">Club</div><div class="f">name · owner (holds ClubR subscription) · hosts</div></div>
     <div class="ent" style="border-color:var(--member);flex:1"><div class="t" style="color:var(--member)">Member</div><div class="f">phone identity · credits balance / HUDR sub · stats (both games)</div></div>
   </div>
   <div class="grid g2" style="margin-top:6px">
     <div class="lane a">
-      <div class="ent" style="border-color:var(--ftf)"><div class="t" style="color:var(--ftf)">FT Fantasy Contest</div><div class="f">HUDR FT · host‑curated · Stakes tiers · lock time</div></div>
+      <div class="ent" style="border-color:var(--ftf)"><div class="t" style="color:var(--ftf)">FT Fantasy Contest</div><div class="f">operator‑priced FT (ICM) · host‑run · Stakes tiers · lock time</div></div>
       <div class="rel">┃ has ▼</div>
       <div class="ent" style="border-color:var(--ftf)"><div class="t" style="color:var(--ftf)">Bucket (Stakes tier)</div><div class="f">stake level · suggested split (shown) · status</div></div>
       <div class="rel">┃ holds ▼</div>
-      <div class="ent" style="border-color:var(--guest)"><div class="t" style="color:var(--guest)">Entry</div><div class="f">player · 3 picks · fee paid · HUDR‑scored rank</div></div>
+      <div class="ent" style="border-color:var(--guest)"><div class="t" style="color:var(--guest)">Entry</div><div class="f">player · 4‑player draft · fee paid · scored from public result</div></div>
     </div>
     <div class="lane b">
       <div class="ent" style="border-color:var(--ll)"><div class="t" style="color:var(--ll)">Live Game</div><div class="f">club‑hosted · host · Stakes tiers · audit log</div></div>
@@ -456,21 +461,21 @@
   <p class="lead">One glance. Notice the bottom three rows are <strong>identical</strong> — that's the whole point: ClubR is one honest tool, used two ways.</p>
   <table>
     <tr><th>Aspect</th><th style="color:var(--ftf)">🎯 FT Fantasy</th><th style="color:var(--ll)">🏟️ Last Longer</th></tr>
-    <tr><td class="role">What it is</td><td>Predict a <strong>HUDR live‑streamed</strong> Final Table</td><td>The club's <strong>own</strong> live tournament</td></tr>
-    <tr><td class="role">Players…</td><td>Pick 3 of the 9 finalists</td><td>Play in the live game (self‑join)</td></tr>
-    <tr><td class="role">Result source</td><td><strong style="color:var(--hudr)">HUDR auto‑resolves</strong> — undisputable</td><td><strong>Host‑judged</strong> — fully logged</td></tr>
-    <tr><td class="role">Provisioning</td><td>Host curates off HUDR's weekly slate</td><td>Host creates the club's own game</td></tr>
-    <tr><td class="role">Uses HUDR?</td><td><strong style="color:var(--hudr)">Yes</strong> — the oracle</td><td><strong>No</strong> — self‑contained</td></tr>
+    <tr><td class="role">What it is</td><td><strong>Stack Draft</strong> on a streamed Final Table (ICM‑priced)</td><td>The club's <strong>own</strong> live tournament</td></tr>
+    <tr><td class="role">Players…</td><td>Draft 4 of the 9 (salary cap)</td><td>Play in the live game (self‑join)</td></tr>
+    <tr><td class="role">Result source</td><td><strong>Operator‑entered public result</strong> (P1) → <strong style="color:var(--hudr)">HUDR auto‑feed</strong> (P2)</td><td><strong>Host‑judged</strong> — fully logged</td></tr>
+    <tr><td class="role">Provisioning</td><td>Operator prices the FT; host runs it for the club</td><td>Host creates the club's own game</td></tr>
+    <tr><td class="role">Uses HUDR?</td><td><strong style="color:var(--hudr)">Phase 2</strong> (Phase 1 is manual)</td><td><strong>No</strong> — self‑contained</td></tr>
     <tr><td class="role">App awards</td><td><span class="no">Nothing</span></td><td><span class="no">Nothing</span></td></tr>
     <tr><td class="role">Stakes settled</td><td><strong>Offline</strong>, by the club</td><td><strong>Offline</strong>, by the club</td></tr>
-    <tr><td class="role">You pay to use it</td><td>Flat fee (credits) or free w/ HUDR sub</td><td>Flat fee (credits) or free w/ HUDR sub</td></tr>
+    <tr><td class="role">You pay to use it</td><td>Flat fee (credits) · HUDR sub free in P2</td><td>Flat fee (credits) · HUDR sub free in P2</td></tr>
   </table>
 </section>
 
 </main>
 
 <footer>
-  ClubR — interactive flow diagram · a transparent scorekeeper for poker clubs: FT Fantasy (predict a HUDR live‑streamed Final Table) &amp; Last Longer (the club's own live tournament).<br>
+  ClubR — interactive flow diagram · a transparent scorekeeper for poker clubs: FT Fantasy (Stack Draft on a streamed Final Table, ICM‑priced) &amp; Last Longer (the club's own live tournament). Phase 1 launches standalone (no HUDR).<br>
   The app proves the count &amp; the result — it never holds, moves, or promises the money. Visual walkthrough for product review.
 </footer>
 
