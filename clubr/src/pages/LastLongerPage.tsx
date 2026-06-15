@@ -1,26 +1,46 @@
-import { Timer, Lock, Sparkles } from 'lucide-react'
-import { Badge, Card, Section } from '@/components/common/ui'
+import { useNavigate } from 'react-router-dom'
+import { Timer, CheckCircle2, Eye } from 'lucide-react'
+import { useGames } from '@/hooks/ll'
+import { Badge, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import type { LLGameView } from '@/types/ll'
+
+function MyBadge({ g }: { g: LLGameView }) {
+  if (g.me?.status === 'active') return <Badge tone="green"><CheckCircle2 className="h-3 w-3" />In</Badge>
+  if (g.me?.status === 'pending') return <Badge tone="amber"><Eye className="h-3 w-3" />Pending</Badge>
+  if (g.me?.status === 'out') return <Badge tone="neutral">Out</Badge>
+  return null
+}
+
+function GameRow({ g }: { g: LLGameView }) {
+  const navigate = useNavigate()
+  const s = g.status === 'live' ? { tone: 'green' as const, label: '● Live' } : g.status === 'registration' ? { tone: 'blue' as const, label: 'Registering' } : { tone: 'neutral' as const, label: 'Completed' }
+  return (
+    <Card onClick={() => navigate(`/lastlonger/${g.id}`)} className="p-3.5">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
+        <div className="flex items-center gap-1.5"><MyBadge g={g} /><Badge tone={s.tone}>{s.label}</Badge></div>
+      </div>
+      <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Timer className="h-4 w-4 text-accent-amber" />{g.title}</p>
+      <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
+        <span className="font-mono">{g.stake} Stakes</span>
+        <span className="text-text-muted">· {g.activeCount} in · {g.participants.filter((p) => p.status === 'out').length} out</span>
+      </div>
+    </Card>
+  )
+}
 
 export function LastLongerPage() {
+  const { data, isLoading } = useGames()
   return (
     <div className="animate-fade-up">
-      <div className="flex items-center gap-2">
-        <h1 className="text-xl font-extrabold tracking-tight text-text-primary"><Timer className="mr-1 inline h-5 w-5 text-accent-amber" />Last Longer</h1>
-        <Badge tone="amber">Live</Badge>
-      </div>
-      <p className="mt-1 text-sm text-text-secondary">Your club's own live tournament — a public, un-hideable headcount, host-judged eliminations, chat &amp; chop. The app proves it; the cash is offline.</p>
-
-      <Card className="mt-4 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
-        <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />
-        <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Coming in Phase 3.</span> The live leaderboard (in/waiting/out), chip updates with a stale-pulse, eliminations, in-app chat, chop voting, and a visible audit log.</p>
-      </Card>
-
-      <Section title="What it'll do">
-        {['Host creates a game; players self-join (public in/waiting list)', 'Live leaderboard — active by chips, eliminated drop to the bottom', 'Self-report chips every ~20 min (stale-pulse reminder)', 'Eliminations by host / self / flagged by others — host decides', 'Chat + chop voting; every host action in a visible audit log'].map((t) => (
-          <div key={t} className="mt-1.5 flex items-center gap-2 rounded-xl border border-border bg-bg-card px-3 py-2.5 text-sm text-text-secondary">
-            <Lock className="h-3.5 w-3.5 shrink-0 text-text-muted" />{t}
-          </div>
-        ))}
+      <h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />Last Longer</h1>
+      <p className="mt-1 text-sm text-text-secondary">Your club's live tournament — public count, host-judged eliminations, chip updates, chat &amp; chop. Get admitted, then you're on the board.</p>
+      <Section title="Games in your clubs">
+        {isLoading ? <Spinner /> : data && data.length > 0 ? (
+          <div className="flex flex-col gap-2">{data.map((g) => <GameRow key={g.id} g={g} />)}</div>
+        ) : (
+          <EmptyState icon={<Timer className="h-7 w-7" />} title="No games yet" sub="Join a club to see its Last Longer games, or ask your host to start one." />
+        )}
       </Section>
     </div>
   )

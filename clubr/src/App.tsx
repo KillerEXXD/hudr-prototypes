@@ -8,6 +8,7 @@ import { ClubDetailPage } from '@/pages/ClubDetailPage'
 import { FantasyPage } from '@/pages/FantasyPage'
 import { ContestDetailPage } from '@/pages/ContestDetailPage'
 import { LastLongerPage } from '@/pages/LastLongerPage'
+import { LastLongerGamePage } from '@/pages/LastLongerGamePage'
 import { MePage } from '@/pages/MePage'
 import { AdminPage } from '@/pages/AdminPage'
 
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/fantasy" element={<FantasyPage />} />
         <Route path="/fantasy/:id" element={<ContestDetailPage />} />
         <Route path="/lastlonger" element={<LastLongerPage />} />
+        <Route path="/lastlonger/:id" element={<LastLongerGamePage />} />
         <Route path="/me" element={<MePage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
