@@ -2,8 +2,12 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Copy, Check, Target, Timer, Plus, UserCheck, X } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin } from '@/hooks'
+import { useContests } from '@/hooks/ft'
+import { useGames } from '@/hooks/ll'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
+import { ContestRow } from '@/pages/FantasyPage'
+import { GameRow } from '@/pages/LastLongerPage'
 
 export function ClubDetailPage() {
   const { id = '' } = useParams()
@@ -12,6 +16,8 @@ export function ClubDetailPage() {
   const approve = useApproveMember()
   const reject = useRejectMember()
   const request = useRequestToJoin()
+  const contests = useContests()
+  const games = useGames()
   const [copied, setCopied] = useState(false)
 
   if (isLoading) return <Spinner label="Loading club…" />
@@ -20,6 +26,8 @@ export function ClubDetailPage() {
   const members = club.members.filter((m) => m.status === 'member')
   const pending = club.members.filter((m) => m.status === 'pending')
   const isMember = club.myStatus === 'member'
+  const clubContests = (contests.data ?? []).filter((c) => c.clubId === club.id && c.status !== 'settled')
+  const clubGames = (games.data ?? []).filter((g) => g.clubId === club.id && g.status !== 'completed')
 
   function copyCode() {
     navigator.clipboard?.writeText(club!.inviteCode).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500) })
@@ -79,13 +87,20 @@ export function ClubDetailPage() {
         </>
       )}
 
-      {/* Games */}
-      <Section title="Games">
-        <div className="grid grid-cols-2 gap-2">
-          <GameTile icon={<Target className="h-5 w-5" />} label="FT Fantasy" sub="Stack Draft" disabled={!isMember && !club.canManage} onClick={() => navigate('/fantasy')} />
-          <GameTile icon={<Timer className="h-5 w-5" />} label="Last Longer" sub="Live tournament" disabled={!isMember && !club.canManage} onClick={() => navigate('/lastlonger')} />
-        </div>
-        {!isMember && !club.canManage && <p className="mt-2 flex items-center gap-1 text-[11px] text-text-muted"><Lock className="h-3 w-3" />Join &amp; get approved to enter games.</p>}
+      {/* Games in this club */}
+      <Section title="FT Fantasy" action={<span className="flex items-center gap-1 text-xs text-text-muted"><Target className="h-3.5 w-3.5 text-accent-purple" />Stack Draft</span>}>
+        {clubContests.length > 0 ? (
+          <div className="flex flex-col gap-2">{clubContests.map((c) => <ContestRow key={c.id} c={c} />)}</div>
+        ) : (
+          <p className="rounded-xl border border-border bg-bg-card px-3 py-2.5 text-xs text-text-muted">{isMember || club.canManage ? 'No open contests right now.' : 'Join the club to see its contests.'}{club.canManage && ' Host one from the FT Fantasy tab.'}</p>
+        )}
+      </Section>
+      <Section title="Last Longer" action={<span className="flex items-center gap-1 text-xs text-text-muted"><Timer className="h-3.5 w-3.5 text-accent-amber" />Live tournament</span>}>
+        {clubGames.length > 0 ? (
+          <div className="flex flex-col gap-2">{clubGames.map((g) => <GameRow key={g.id} g={g} />)}</div>
+        ) : (
+          <p className="rounded-xl border border-border bg-bg-card px-3 py-2.5 text-xs text-text-muted">{isMember || club.canManage ? 'No live games right now.' : 'Join the club to see its games.'}{club.canManage && ' Create one from the Last Longer tab.'}</p>
+        )}
       </Section>
 
       {/* Members */}

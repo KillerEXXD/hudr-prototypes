@@ -43,7 +43,7 @@ const F = {
 
 export const THEMES: Record<ThemeName, ThemeDef> = {
   engine: {
-    name: 'engine', label: 'Scout Engine', tagline: 'The original dark',
+    name: 'engine', label: 'Midnight', tagline: 'Dark & focused',
     flags: {},
     swatch: { bg: '#0e0e15', accent: '#3b82f6', text: '#f2f2f7' },
     vars: {

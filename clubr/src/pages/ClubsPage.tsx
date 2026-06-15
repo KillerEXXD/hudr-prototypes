@@ -1,10 +1,14 @@
 import { useState } from 'react'
-import { Plus, Ticket, Users } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Plus, Ticket, Users, ShieldCheck, ChevronRight } from 'lucide-react'
 import { useMyClubs, useCreateClub, useJoinViaInvite } from '@/hooks'
-import { Section, Spinner, Btn, Sheet, Field, EmptyState } from '@/components/common/ui'
+import { useAuth } from '@/contexts/AuthContext'
+import { Section, Spinner, Btn, Card, Sheet, Field, EmptyState } from '@/components/common/ui'
 import { ClubRow } from '@/components/common/cards'
 
 export function ClubsPage() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const clubs = useMyClubs()
   const create = useCreateClub()
   const join = useJoinViaInvite()
@@ -29,6 +33,12 @@ export function ClubsPage() {
       <Section title="Clubs you're in">
         {clubs.isLoading ? <Spinner /> : clubs.data && clubs.data.length > 0 ? (
           <div className="flex flex-col gap-2">{clubs.data.map((c) => <ClubRow key={c.id} club={c} />)}</div>
+        ) : user?.role === 'admin' ? (
+          <Card onClick={() => navigate('/admin')} className="flex items-center gap-3">
+            <ShieldCheck className="h-5 w-5 text-accent-purple" />
+            <div className="flex-1"><p className="text-sm font-bold text-text-primary">You're an App Admin</p><p className="text-xs text-text-muted">You don't join clubs — manage every club from the Admin console.</p></div>
+            <ChevronRight className="h-4 w-4 text-text-muted" />
+          </Card>
         ) : (
           <EmptyState icon={<Users className="h-7 w-7" />} title="No clubs yet" sub="Discover a club and request to join, create your own, or join with an invite code." />
         )}
