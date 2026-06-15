@@ -50,3 +50,10 @@ export function usePostChat() {
   const { userId } = useIdentity(); const inv = useInvalidate()
   return useMutation({ mutationFn: (v: { contestId: string; text: string }) => ft.postChat(v.contestId, userId, v.text), onSuccess: inv })
 }
+export function useAvailableFTs() {
+  return useQuery({ queryKey: ['ft', 'available'], queryFn: () => ft.listAvailableFTs() })
+}
+export function useCreateContest() {
+  const { userId } = useIdentity(); const inv = useInvalidate()
+  return useMutation({ mutationFn: (v: { clubId: string; ftId: string; stake: number; budget: number }) => ft.createContest(v.clubId, userId, { ftId: v.ftId, stake: v.stake, budget: v.budget }), onSuccess: inv })
+}

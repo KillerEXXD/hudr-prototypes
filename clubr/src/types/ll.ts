@@ -29,6 +29,8 @@ export interface LLGame {
   clubName: string
   clubEmoji: string
   title: string
+  location?: string
+  mode?: 'in-person' | 'online'
   status: LLStatus
   stake: number
   hostId: string

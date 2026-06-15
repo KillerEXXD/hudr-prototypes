@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi } from 'lucide-react'
 import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useUpdateChips, useBust, usePostChatLL, useProposeChop, useAgreeChop } from '@/hooks/ll'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
@@ -44,6 +44,12 @@ export function LastLongerGamePage() {
         <span className="font-mono">{g.stake} Stakes</span>
         <span className="text-text-muted">· {g.activeCount} in · {out.length} out</span>
       </div>
+      {(g.location || g.mode) && (
+        <p className="mt-1 flex items-center gap-1.5 text-[11px] text-text-muted">
+          {g.mode === 'online' ? <Wifi className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
+          {g.mode === 'online' ? 'Online' : 'In person'}{g.location && ` · ${g.location}`}
+        </p>
+      )}
 
       {g.status === 'completed' && (
         <Card className="mt-3 flex items-center gap-2 border-accent-emerald/30 bg-accent-emerald/10">

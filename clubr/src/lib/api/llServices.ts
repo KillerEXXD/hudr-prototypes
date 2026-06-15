@@ -111,3 +111,18 @@ export async function agreeChop(gameId: string, userId: string): Promise<void> {
 }
 
 function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th' }
+
+export async function createGame(clubId: string, hostId: string, input: { title: string; location: string; mode: 'in-person' | 'online'; stake: number }): Promise<string> {
+  await delay()
+  const club = CLUBS.find((c) => c.id === clubId)
+  const u = USERS[hostId]
+  const id = `ll_${Date.now()}`
+  LL_GAMES.unshift({
+    id, clubId, clubName: club?.name ?? 'Club', clubEmoji: club?.emoji ?? '🃏',
+    title: input.title.trim() || 'New Last Longer', location: input.location.trim() || undefined, mode: input.mode,
+    status: 'registration', stake: input.stake, hostId, coHostIds: [],
+    participants: [{ userId: hostId, name: u?.name ?? 'Host', avatarColor: u?.avatarColor ?? '#6b7280', status: 'active', paid: true, chips: 0, chipsUpdatedAgo: 'now', stale: false }],
+    chat: [],
+  })
+  return id
+}

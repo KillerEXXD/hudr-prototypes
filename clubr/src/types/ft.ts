@@ -64,3 +64,13 @@ export interface FTContestView extends FTContest {
 
 /** Points awarded per finishing position (1st..9th). */
 export const FINISH_POINTS = [100, 70, 50, 35, 25, 18, 12, 6, 3]
+
+/** An upcoming, operator-priced final table a host can choose to run in their club. */
+export interface AvailableFT {
+  id: string
+  name: string
+  room: string
+  startsIn: string // display, e.g. 'in 2h 10m'
+  hoursLeft: number
+  players: FTPlayer[] // ICM-priced by the operator, ready to use
+}

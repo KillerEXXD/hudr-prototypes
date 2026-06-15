@@ -1,9 +1,9 @@
 // FT Fantasy services — swap seam (mock store today, API later).
 
-import { FT_CONTESTS, spendOf } from '@/data/ftStore'
+import { AVAILABLE_FTS, FT_CONTESTS, spendOf } from '@/data/ftStore'
 import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
-import { FINISH_POINTS, type ContestEntry, type FTContest, type FTContestView } from '@/types/ft'
+import { FINISH_POINTS, type AvailableFT, type ContestEntry, type FTContest, type FTContestView } from '@/types/ft'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 
@@ -93,4 +93,26 @@ export async function postChat(contestId: string, userId: string, text: string):
   const c = FT_CONTESTS.find((x) => x.id === contestId)
   const u = USERS[userId]
   if (c && text.trim()) c.chat.push({ id: `m_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: text.trim(), ts: 'now' })
+}
+
+export async function listAvailableFTs(): Promise<AvailableFT[]> {
+  await delay()
+  return [...AVAILABLE_FTS].sort((a, b) => a.hoursLeft - b.hoursLeft)
+}
+
+export async function createContest(clubId: string, hostId: string, input: { ftId: string; stake: number; budget: number }): Promise<string | null> {
+  await delay()
+  const ft = AVAILABLE_FTS.find((f) => f.id === input.ftId)
+  const club = CLUBS.find((c) => c.id === clubId)
+  if (!ft) return null
+  const u = USERS[hostId]
+  const id = `ct_${Date.now()}`
+  FT_CONTESTS.unshift({
+    id, clubId, clubName: club?.name ?? 'Club', clubEmoji: club?.emoji ?? '🃏',
+    ftName: ft.name, status: 'open', stake: input.stake, budget: input.budget,
+    locksAt: `${ft.startsIn} · locks 10m before`, hostId, coHostIds: [], players: ft.players,
+    entries: [{ userId: hostId, name: u?.name ?? 'Host', avatarColor: u?.avatarColor ?? '#6b7280', status: 'approved', paid: false, picks: [], spend: 0 }],
+    chat: [],
+  })
+  return id
 }

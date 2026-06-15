@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Copy, Check, Target, Timer, Plus, UserCheck, X } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Copy, Check, Target, Timer, Plus, UserCheck, X, Clock, MapPin } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin } from '@/hooks'
-import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { useCreateContest, useAvailableFTs } from '@/hooks/ft'
+import { useCreateGame } from '@/hooks/ll'
+import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState, Sheet, Field } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
+import { cn } from '@/lib/utils/cn'
 
 export function ClubDetailPage() {
   const { id = '' } = useParams()
@@ -12,7 +15,18 @@ export function ClubDetailPage() {
   const approve = useApproveMember()
   const reject = useRejectMember()
   const request = useRequestToJoin()
+  const createContest = useCreateContest()
+  const createGame = useCreateGame()
+  const availableFts = useAvailableFTs()
   const [copied, setCopied] = useState(false)
+  const [ftOpen, setFtOpen] = useState(false)
+  const [llOpen, setLlOpen] = useState(false)
+  const [ftId, setFtId] = useState('')
+  const [ftStake, setFtStake] = useState(250)
+  const [llTitle, setLlTitle] = useState('')
+  const [llLoc, setLlLoc] = useState('')
+  const [llMode, setLlMode] = useState<'in-person' | 'online'>('in-person')
+  const [llStake, setLlStake] = useState(100)
 
   if (isLoading) return <Spinner label="Loading club…" />
   if (!club) return <EmptyState title="Club not found" />
@@ -80,12 +94,17 @@ export function ClubDetailPage() {
       )}
 
       {/* Games */}
-      <Section title="Games">
-        <div className="grid grid-cols-2 gap-2">
-          <GameTile icon={<Target className="h-5 w-5" />} label="FT Fantasy" sub="Stack Draft" disabled={!isMember} onClick={() => navigate('/fantasy')} />
-          <GameTile icon={<Timer className="h-5 w-5" />} label="Last Longer" sub="Live tournament" disabled={!isMember} onClick={() => navigate('/lastlonger')} />
+      <Section title="Games" action={club.canManage ? (
+        <div className="flex gap-2">
+          <button onClick={() => setFtOpen(true)} className="flex items-center gap-1 text-xs font-bold text-accent-purple cursor-pointer"><Plus className="h-3.5 w-3.5" />Contest</button>
+          <button onClick={() => setLlOpen(true)} className="flex items-center gap-1 text-xs font-bold text-accent-amber cursor-pointer"><Plus className="h-3.5 w-3.5" />Game</button>
         </div>
-        {!isMember && <p className="mt-2 flex items-center gap-1 text-[11px] text-text-muted"><Lock className="h-3 w-3" />Join &amp; get approved to enter games.</p>}
+      ) : undefined}>
+        <div className="grid grid-cols-2 gap-2">
+          <GameTile icon={<Target className="h-5 w-5" />} label="FT Fantasy" sub="Stack Draft" disabled={!isMember && !club.canManage} onClick={() => navigate('/fantasy')} />
+          <GameTile icon={<Timer className="h-5 w-5" />} label="Last Longer" sub="Live tournament" disabled={!isMember && !club.canManage} onClick={() => navigate('/lastlonger')} />
+        </div>
+        {!isMember && !club.canManage && <p className="mt-2 flex items-center gap-1 text-[11px] text-text-muted"><Lock className="h-3 w-3" />Join &amp; get approved to enter games.</p>}
       </Section>
 
       {/* Members */}
@@ -104,6 +123,53 @@ export function ClubDetailPage() {
           ))}
         </div>
       </Section>
+
+      {/* Host: create an FT Fantasy contest from the operator's slate */}
+      <Sheet open={ftOpen} onClose={() => setFtOpen(false)} title="Host an FT Fantasy contest">
+        <p className="mb-2 text-xs text-text-muted">Pick an upcoming final table (priced by the ClubR operator) and set the bucket.</p>
+        <div className="flex max-h-60 flex-col gap-2 overflow-y-auto scrollbar-thin">
+          {availableFts.data?.map((f) => (
+            <button key={f.id} onClick={() => setFtId(f.id)} className={cn('flex items-center gap-2 rounded-xl border p-2.5 text-left cursor-pointer', ftId === f.id ? 'border-accent-purple ring-1 ring-accent-purple/40' : 'border-border hover:bg-bg-surface')}>
+              <Target className="h-4 w-4 shrink-0 text-accent-purple" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-bold text-text-primary">{f.name}</span>
+                <span className="flex items-center gap-1 text-[11px] text-text-muted"><Clock className="h-3 w-3" />{f.startsIn} · ICM priced ✓</span>
+              </span>
+              {ftId === f.id && <Check className="h-4 w-4 shrink-0 text-accent-purple" />}
+            </button>
+          ))}
+        </div>
+        <p className="mt-3 mb-1 text-xs font-semibold text-text-secondary">Bucket (Stakes)</p>
+        <div className="flex gap-2">{[100, 250, 500].map((s) => (
+          <button key={s} onClick={() => setFtStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', ftStake === s ? 'border-accent-purple bg-accent-purple/15 text-accent-purple' : 'border-border text-text-secondary')}>{s}</button>
+        ))}</div>
+        <Btn className="mt-3 w-full" disabled={!ftId || createContest.isPending} onClick={async () => { const newId = await createContest.mutateAsync({ clubId: club.id, ftId, stake: ftStake, budget: 100000 }); setFtOpen(false); setFtId(''); if (newId) navigate(`/fantasy/${newId}`) }}>Host this FT</Btn>
+      </Sheet>
+
+      {/* Host: create a Last Longer */}
+      <Sheet open={llOpen} onClose={() => setLlOpen(false)} title="Create a Last Longer">
+        <div className="flex flex-col gap-3">
+          <Field label="Tournament name" value={llTitle} onChange={setLlTitle} placeholder="e.g. Friday Night Last Longer" />
+          <Field label="Location" value={llLoc} onChange={setLlLoc} placeholder="e.g. Mike's basement, or a site name" />
+          <div>
+            <span className="mb-1 block text-xs font-semibold text-text-secondary">Format</span>
+            <div className="flex gap-2">
+              {(['in-person', 'online'] as const).map((m) => (
+                <button key={m} onClick={() => setLlMode(m)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', llMode === m ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>
+                  {m === 'in-person' ? <><MapPin className="mr-1 inline h-3.5 w-3.5" />In person</> : 'Online'}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <span className="mb-1 block text-xs font-semibold text-text-secondary">Stake</span>
+            <div className="flex gap-2">{[50, 100, 250].map((s) => (
+              <button key={s} onClick={() => setLlStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', llStake === s ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>{s}</button>
+            ))}</div>
+          </div>
+          <Btn className="w-full" disabled={!llTitle.trim() || createGame.isPending} onClick={async () => { const newId = await createGame.mutateAsync({ clubId: club.id, title: llTitle, location: llLoc, mode: llMode, stake: llStake }); setLlOpen(false); setLlTitle(''); setLlLoc(''); if (newId) navigate(`/lastlonger/${newId}`) }}>Create Last Longer</Btn>
+        </div>
+      </Sheet>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 // In-memory FT Fantasy (Stack Draft) seed data. Mutated by services.
 
 import { USERS } from './store'
-import type { ContestEntry, FTContest, FTPlayer } from '@/types/ft'
+import type { AvailableFT, ContestEntry, FTContest, FTPlayer } from '@/types/ft'
 
 export const FT_PLAYERS: FTPlayer[] = [
   { seat: 'A', name: 'Negreanu', bbStack: 95, icmPrice: 38000 },
@@ -77,4 +77,12 @@ export const FT_CONTESTS: FTContest[] = [
     ],
     chat: [cmsg('u_gary', 'GG everyone — Mike runs it', '11:20p', 'system')],
   },
+]
+
+// The operator's slate of upcoming, ICM-priced final tables a host can choose to host.
+export const AVAILABLE_FTS: AvailableFT[] = [
+  { id: 'aft1', name: 'PokerGO Cup — Event 8 FT', room: 'PokerGO', startsIn: 'in 2h 10m', hoursLeft: 2, players: FT_PLAYERS },
+  { id: 'aft2', name: 'WSOP Online — High Roller FT', room: 'WSOP', startsIn: 'in 5h 40m', hoursLeft: 6, players: FT_PLAYERS },
+  { id: 'aft3', name: 'Triton Series — NLH FT', room: 'Triton', startsIn: 'in 21h', hoursLeft: 21, players: FT_PLAYERS },
+  { id: 'aft4', name: 'EPT Barcelona — Main Event FT', room: 'EPT', startsIn: 'tomorrow', hoursLeft: 30, players: FT_PLAYERS },
 ]
