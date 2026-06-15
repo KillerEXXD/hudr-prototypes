@@ -90,12 +90,16 @@ export function ClubDetailPage() {
 
       {/* Members */}
       <Section title={`Members · ${members.length}`}>
+        {club.canManage && <p className="mb-2 text-[11px] text-text-muted">You manage this roster — remove a member with ✕.</p>}
         <div className="flex flex-col gap-1.5">
           {members.map((m) => (
             <div key={m.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
               <Avatar name={m.name} color={m.avatarColor} size={30} />
               <span className="flex-1 truncate text-sm text-text-primary">{m.name}</span>
               {m.role !== 'member' && <Badge tone={m.role === 'owner' ? 'green' : 'blue'}>{m.role}</Badge>}
+              {club.canManage && m.role !== 'owner' && (
+                <button onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-accent-red/10 hover:text-accent-red cursor-pointer" aria-label={`Remove ${m.name}`}><X className="h-3.5 w-3.5" /></button>
+              )}
             </div>
           ))}
         </div>

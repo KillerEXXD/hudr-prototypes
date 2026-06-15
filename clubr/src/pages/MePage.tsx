@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Btn, Card, Section } from '@/components/common/ui'
+import { useMyClubs } from '@/hooks'
+import { Avatar, Badge, Btn, Card, Section, Spinner } from '@/components/common/ui'
 import { SkinPicker } from '@/components/common/SkinPicker'
 import type { AccountRole } from '@/types'
 
@@ -40,11 +41,7 @@ export function MePage() {
         </Section>
       )}
 
-      {user.role === 'host' && (
-        <Section title="Hosting">
-          <Card className="text-sm text-text-secondary">You host clubs you own. Open a club to manage its <span className="font-semibold text-text-primary">invite code</span>, <span className="font-semibold text-text-primary">join requests</span>, and games.</Card>
-        </Section>
-      )}
+      {user.role === 'host' && <HostConsole />}
 
       <Section title="Appearance" action={<Palette className="h-4 w-4 text-text-muted" />}>
         <SkinPicker />
@@ -53,5 +50,28 @@ export function MePage() {
       <Btn variant="danger" className="mt-5 w-full" onClick={logout}><LogOut className="h-4 w-4" />Sign out</Btn>
       <p className="mt-4 text-center text-[11px] text-text-muted">ClubR prototype · mock data behind a swappable services layer</p>
     </div>
+  )
+}
+
+function HostConsole() {
+  const navigate = useNavigate()
+  const clubs = useMyClubs()
+  const owned = clubs.data?.filter((c) => c.canManage) ?? []
+  return (
+    <Section title="Host console">
+      {clubs.isLoading ? <Spinner /> : owned.length === 0 ? (
+        <Card className="text-sm text-text-secondary">You don't host any clubs yet. Create one from the <span className="font-semibold text-text-primary">Clubs</span> tab.</Card>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {owned.map((c) => (
+            <Card key={c.id} onClick={() => navigate(`/club/${c.id}`)} className="flex items-center gap-3 p-3">
+              <Avatar emoji={c.emoji} color={c.color} size={38} />
+              <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold text-text-primary">{c.name}</p><p className="text-xs text-text-muted">{c.members.filter((m) => m.status === 'member').length} members · code {c.inviteCode}</p></div>
+              {c.pendingCount > 0 && <Badge tone="amber">{c.pendingCount} pending</Badge>}
+            </Card>
+          ))}
+        </div>
+      )}
+    </Section>
   )
 }
