@@ -1,26 +1,47 @@
-import { Target, Lock, Sparkles } from 'lucide-react'
-import { Badge, Card, Section } from '@/components/common/ui'
+import { useNavigate } from 'react-router-dom'
+import { Target, Clock, Lock, CheckCircle2, Eye } from 'lucide-react'
+import { useContests } from '@/hooks/ft'
+import { Badge, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import type { FTContestView } from '@/types/ft'
+
+function MyEntryBadge({ c }: { c: FTContestView }) {
+  if (c.myEntry?.status === 'approved') return <Badge tone="green"><CheckCircle2 className="h-3 w-3" />Entered</Badge>
+  if (c.myEntry?.status === 'pending') return <Badge tone="amber"><Eye className="h-3 w-3" />Pending</Badge>
+  return null
+}
+
+function ContestRow({ c }: { c: FTContestView }) {
+  const navigate = useNavigate()
+  const s = c.status === 'open' ? { tone: 'blue' as const, icon: Clock, label: 'Open' } : c.status === 'locked' ? { tone: 'amber' as const, icon: Lock, label: 'Locked' } : { tone: 'neutral' as const, icon: CheckCircle2, label: 'Settled' }
+  return (
+    <Card onClick={() => navigate(`/fantasy/${c.id}`)} className="p-3.5">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span>{c.clubName}</div>
+        <div className="flex items-center gap-1.5"><MyEntryBadge c={c} /><Badge tone={s.tone}><s.icon className="h-3 w-3" />{s.label}</Badge></div>
+      </div>
+      <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Target className="h-4 w-4 text-accent-purple" />{c.ftName}</p>
+      <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
+        <span className="font-mono">{c.stake} Stakes</span>
+        <span className="text-text-muted">· {c.entries.filter((e) => e.status === 'approved').length} entered</span>
+        <span className="ml-auto text-text-muted">{c.locksAt}</span>
+      </div>
+    </Card>
+  )
+}
 
 export function FantasyPage() {
+  const { data, isLoading } = useContests()
   return (
     <div className="animate-fade-up">
-      <div className="flex items-center gap-2">
-        <h1 className="text-xl font-extrabold tracking-tight text-text-primary"><Target className="mr-1 inline h-5 w-5 text-accent-purple" />FT Fantasy</h1>
-        <Badge tone="purple">Stack Draft</Badge>
-      </div>
-      <p className="mt-1 text-sm text-text-secondary">Draft 4 of the 9 finalists within a budget — players priced by ICM. Highest points takes the bucket; the club settles offline.</p>
+      <h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />FT Fantasy</h1>
+      <p className="mt-1 text-sm text-text-secondary">Stack Draft — draft 4 of the 9 finalists within budget, priced by ICM. Get admitted by the host, then draft before the lock.</p>
 
-      <Card className="mt-4 flex items-start gap-2.5 border-accent-blue/30 bg-accent-blue/10">
-        <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-accent-blue" />
-        <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Coming in Phase 2.</span> The full Stack Draft flow — operator-priced FTs, the 100k budget draft board, the 10-minute lock, and points-per-finish scoring.</p>
-      </Card>
-
-      <Section title="What it'll do">
-        {['Operator enters chip stacks → app computes & publishes ICM prices', 'Browse open contests in your club; pick a Stakes bucket', 'Draft 4 players within your 100k budget (use-it-or-lose-it)', 'Picks lock 10 minutes before the FT starts', 'Scored from the public finishing order → 50/30/20'].map((t) => (
-          <div key={t} className="mt-1.5 flex items-center gap-2 rounded-xl border border-border bg-bg-card px-3 py-2.5 text-sm text-text-secondary">
-            <Lock className="h-3.5 w-3.5 shrink-0 text-text-muted" />{t}
-          </div>
-        ))}
+      <Section title="Contests in your clubs">
+        {isLoading ? <Spinner /> : data && data.length > 0 ? (
+          <div className="flex flex-col gap-2">{data.map((c) => <ContestRow key={c.id} c={c} />)}</div>
+        ) : (
+          <EmptyState icon={<Target className="h-7 w-7" />} title="No contests yet" sub="Join a club to see its FT Fantasy contests, or ask your host to open one." />
+        )}
       </Section>
     </div>
   )
