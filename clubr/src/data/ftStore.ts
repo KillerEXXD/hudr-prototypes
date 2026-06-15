@@ -82,8 +82,8 @@ export const FT_CONTESTS: FTContest[] = [
 
 // The operator's slate of upcoming, ICM-priced final tables a host can choose to host.
 export const AVAILABLE_FTS: AvailableFT[] = [
-  { id: 'aft1', name: 'PokerGO Cup — Event 8 FT', room: 'PokerGO', startsIn: 'in 2h 10m', hoursLeft: 2, players: FT_PLAYERS },
-  { id: 'aft2', name: 'WSOP Online — High Roller FT', room: 'WSOP', startsIn: 'in 5h 40m', hoursLeft: 6, players: FT_PLAYERS },
-  { id: 'aft3', name: 'Triton Series — NLH FT', room: 'Triton', startsIn: 'in 21h', hoursLeft: 21, players: FT_PLAYERS },
-  { id: 'aft4', name: 'EPT Barcelona — Main Event FT', room: 'EPT', startsIn: 'tomorrow', hoursLeft: 30, players: FT_PLAYERS },
+  { id: 'aft1', name: 'PokerGO Cup — Event 8 FT', room: 'PokerGO', startsIn: 'in 2h 10m', hoursLeft: 2, date: 'Today · 8:00pm ET', prizePool: '$1,200,000', buyIn: '$25,000', players: FT_PLAYERS },
+  { id: 'aft2', name: 'WSOP Online — High Roller FT', room: 'WSOP', startsIn: 'in 5h 40m', hoursLeft: 6, date: 'Today · 11:30pm ET', prizePool: '$3,450,000', buyIn: '$10,000', players: FT_PLAYERS },
+  { id: 'aft3', name: 'Triton Series — NLH FT', room: 'Triton', startsIn: 'in 21h', hoursLeft: 21, date: 'Tomorrow · 6:00pm ET', prizePool: '$8,900,000', buyIn: '$100,000', players: FT_PLAYERS },
+  { id: 'aft4', name: 'EPT Barcelona — Main Event FT', room: 'EPT', startsIn: 'tomorrow', hoursLeft: 30, date: 'Sat · 3:00pm ET', prizePool: '$5,100,000', buyIn: '$5,300', players: FT_PLAYERS },
 ]

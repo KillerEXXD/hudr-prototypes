@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils/cn'
 
 // Shared "host an FT Fantasy contest" sheet. Pass `fixedClubId` from a club
 // page (no picker); omit it on the Fantasy tab to show a club picker.
-export function CreateContestSheet({ open, onClose, fixedClubId }: { open: boolean; onClose: () => void; fixedClubId?: string }) {
+export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: { open: boolean; onClose: () => void; fixedClubId?: string; presetFtId?: string }) {
   const navigate = useNavigate()
   const myClubs = useMyClubs()
   const availableFts = useAvailableFTs()
@@ -24,6 +24,7 @@ export function CreateContestSheet({ open, onClose, fixedClubId }: { open: boole
     if (fixedClubId) setClubId(fixedClubId)
     else if (managed.length === 1) setClubId(managed[0].id)
   }, [fixedClubId, managed.length])
+  useEffect(() => { if (presetFtId) setFtId(presetFtId) }, [presetFtId])
 
   const club = managed.find((c) => c.id === clubId)
   const members = (club?.members ?? []).filter((m) => m.status === 'member')
@@ -49,16 +50,22 @@ export function CreateContestSheet({ open, onClose, fixedClubId }: { open: boole
           </div>
         </>
       )}
-      <p className="mb-2 text-xs text-text-muted">Pick an upcoming final table (priced by the ClubR operator) and set the bucket.</p>
-      <div className="flex max-h-44 flex-col gap-2 overflow-y-auto scrollbar-thin">
-        {availableFts.data?.map((f) => (
-          <button key={f.id} onClick={() => setFtId(f.id)} className={cn('flex items-center gap-2 rounded-xl border p-2.5 text-left cursor-pointer', ftId === f.id ? 'border-accent-purple ring-1 ring-accent-purple/40' : 'border-border hover:bg-bg-surface')}>
-            <Target className="h-4 w-4 shrink-0 text-accent-purple" />
-            <span className="min-w-0 flex-1"><span className="block truncate text-sm font-bold text-text-primary">{f.name}</span><span className="flex items-center gap-1 text-[11px] text-text-muted"><Clock className="h-3 w-3" />{f.startsIn} · ICM priced ✓</span></span>
-            {ftId === f.id && <Check className="h-4 w-4 shrink-0 text-accent-purple" />}
-          </button>
-        ))}
-      </div>
+      {presetFtId ? (
+        <div className="mb-1 flex items-center gap-2 rounded-xl border border-accent-purple/30 bg-accent-purple/10 p-2.5 text-sm font-bold text-text-primary"><Target className="h-4 w-4 shrink-0 text-accent-purple" />{availableFts.data?.find((f) => f.id === presetFtId)?.name ?? 'Final table'}</div>
+      ) : (
+        <>
+          <p className="mb-2 text-xs text-text-muted">Pick an upcoming final table (priced by the ClubR operator) and set the bucket.</p>
+          <div className="flex max-h-44 flex-col gap-2 overflow-y-auto scrollbar-thin">
+            {availableFts.data?.map((f) => (
+              <button key={f.id} onClick={() => setFtId(f.id)} className={cn('flex items-center gap-2 rounded-xl border p-2.5 text-left cursor-pointer', ftId === f.id ? 'border-accent-purple ring-1 ring-accent-purple/40' : 'border-border hover:bg-bg-surface')}>
+                <Target className="h-4 w-4 shrink-0 text-accent-purple" />
+                <span className="min-w-0 flex-1"><span className="block truncate text-sm font-bold text-text-primary">{f.name}</span><span className="flex items-center gap-1 text-[11px] text-text-muted"><Clock className="h-3 w-3" />{f.startsIn} · ICM priced ✓</span></span>
+                {ftId === f.id && <Check className="h-4 w-4 shrink-0 text-accent-purple" />}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
       <p className="mt-3 mb-1 text-xs font-semibold text-text-secondary">Bucket (Stakes)</p>
       <div className="flex gap-2">{[100, 250, 500].map((s) => (
         <button key={s} onClick={() => setStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', stake === s ? 'border-accent-purple bg-accent-purple/15 text-accent-purple' : 'border-border text-text-secondary')}>{s}</button>

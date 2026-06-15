@@ -74,5 +74,8 @@ export interface AvailableFT {
   room: string
   startsIn: string // display, e.g. 'in 2h 10m'
   hoursLeft: number
+  date: string // display, e.g. 'Today · 8:00pm ET'
+  prizePool: string // the REAL event's prize pool — informational only (the contest pays its own Stakes)
+  buyIn: string // the real event's buy-in, informational
   players: FTPlayer[] // ICM-priced by the operator, ready to use
 }

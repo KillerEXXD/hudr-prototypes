@@ -4,7 +4,6 @@ import { Target, Clock, Lock, CheckCircle2, Eye, Shield, Plus, ChevronDown, Trop
 import { useContests } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
-import { CreateContestSheet } from '@/components/ft/CreateContestSheet'
 import type { FTContestView } from '@/types/ft'
 
 function RoleBadges({ c }: { c: FTContestView }) {
@@ -42,10 +41,10 @@ export function ContestRow({ c }: { c: FTContestView }) {
 function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th' }
 
 export function FantasyPage() {
+  const navigate = useNavigate()
   const { data, isLoading } = useContests()
   const myClubs = useMyClubs()
   const canHost = (myClubs.data ?? []).some((c) => c.canManage)
-  const [createOpen, setCreateOpen] = useState(false)
   const [pastOpen, setPastOpen] = useState(false)
 
   const active = (data ?? []).filter((c) => c.status !== 'settled')
@@ -59,7 +58,7 @@ export function FantasyPage() {
       <h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />FT Fantasy</h1>
       <p className="mt-1 text-sm text-text-secondary">Stack Draft — draft 4 of the 9 finalists within budget, priced by ICM. Get admitted by the host, then draft before the lock.</p>
 
-      {canHost && <Btn className="mt-3 w-full" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" />Host a contest</Btn>}
+      {canHost && <Btn className="mt-3 w-full" onClick={() => navigate('/host-ft')}><Plus className="h-4 w-4" />Host a contest</Btn>}
 
       {isLoading ? <Spinner /> : (
         <>
@@ -83,7 +82,6 @@ export function FantasyPage() {
         </>
       )}
 
-      <CreateContestSheet open={createOpen} onClose={() => setCreateOpen(false)} />
     </div>
   )
 }

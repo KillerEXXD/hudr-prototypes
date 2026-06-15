@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils/cn'
 const ITEMS = [
   { to: '/', label: 'Discover', icon: Compass, match: (p: string) => p === '/' },
   { to: '/clubs', label: 'Clubs', icon: Users, match: (p: string) => p === '/clubs' || p.startsWith('/club/') },
-  { to: '/fantasy', label: 'Fantasy', icon: Target, match: (p: string) => p.startsWith('/fantasy') },
+  { to: '/fantasy', label: 'Fantasy', icon: Target, match: (p: string) => p.startsWith('/fantasy') || p.startsWith('/host-ft') },
   { to: '/lastlonger', label: 'Last Longer', icon: Timer, match: (p: string) => p.startsWith('/lastlonger') },
   { to: '/me', label: 'Me', icon: CircleUser, match: (p: string) => p.startsWith('/me') || p.startsWith('/admin') },
 ]
