@@ -171,8 +171,8 @@
       color: #4b5563;
       font-size: 13px;
     }
-    /* Show the Scout prototypes (Engine + Crisp + Stats + Sharp) + the ClubR flow; hide the rest of the gallery. */
-    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]):not([href^="scout-stats-demo"]):not([href^="scout-sharp-demo"]):not([href^="clubr-flow"]) {
+    /* Show the Scout prototypes (Engine + Crisp + Stats + Sharp) + the ClubR flow + the ClubR app; hide the rest of the gallery. */
+    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]):not([href^="scout-stats-demo"]):not([href^="scout-sharp-demo"]):not([href^="clubr-flow"]):not([href^="clubr-demo"]) {
       display: none !important;
     }
   </style>
@@ -712,6 +712,21 @@
           <span class="tag">Tool, not the bank</span>
         </div>
         <span class="cta" style="background: linear-gradient(135deg, #f59e0b, #d946ef)">Open the flow →</span>
+      </a>
+
+      <a href="clubr-demo/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #10b981, #3b82f6)"></div>
+        <div class="card-letter" style="background: rgba(16,185,129,0.15); color: #34d399;">CA</div>
+        <h2>ClubR — App Prototype</h2>
+        <div class="subtitle">Mobile PWA • Poker club games</div>
+        <p>The working <strong>ClubR app</strong> (same architecture as the Scout prototypes — React + Vite, <strong>6 skins</strong>, mock data behind a swappable services layer). <strong>3 logins</strong> (Player / Club Host / App Admin), a slick <strong>Discover</strong> feed (recent clubs, contests &amp; Last Longers), and the full <strong>join-request → host-approval → read-only-until-approved</strong> flow. Built in phases — FT Fantasy (Stack Draft) &amp; Last Longer land next.</p>
+        <div class="tags">
+          <span class="tag">3 logins + roles</span>
+          <span class="tag">Join &amp; approval flow</span>
+          <span class="tag">6 skins</span>
+          <span class="tag">Mock → API ready</span>
+        </div>
+        <span class="cta" style="background: linear-gradient(135deg, #10b981, #3b82f6)">Open the app →</span>
       </a>
 
       <a href="#" onclick="alert('V7 Beacon — Coming Soon. Prototype not yet built.');return false;" class="card" style="opacity:0.7">
