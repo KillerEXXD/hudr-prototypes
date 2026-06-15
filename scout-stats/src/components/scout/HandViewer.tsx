@@ -24,13 +24,13 @@ function Modal({ hand, onClose }: { hand: ViewableHand; onClose: () => void }) {
   const [view, setView] = useState<View>(hasClip ? 'youtube' : 'replayer')
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 sm:p-4" onClick={onClose}>
       <div
-        className="w-full max-w-md rounded-t-2xl border border-border bg-bg-card sm:rounded-2xl"
+        className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-border bg-bg-card sm:max-h-[calc(100dvh-2rem)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* header */}
-        <div className="flex items-center justify-between border-b border-border p-3">
+        <div className="flex shrink-0 items-center justify-between border-b border-border p-3">
           <div className="min-w-0">
             <div className="text-sm font-bold text-text-primary">Hand #{hand.handNumber}</div>
             {hand.title && <div className="truncate text-xs text-text-muted">{hand.title}</div>}
@@ -40,6 +40,8 @@ function Modal({ hand, onClose }: { hand: ViewableHand; onClose: () => void }) {
           </button>
         </div>
 
+        {/* scrollable body — keeps the header pinned and lets tall content (replayer) scroll inside the modal */}
+        <div className="min-h-0 flex-1 overflow-y-auto">
         {/* view toggle */}
         <div className="flex gap-1 p-3 pb-0">
           {([['youtube', 'YouTube clip', Film], ['replayer', 'Replayer', Clapperboard]] as const).map(([v, label, Icon]) => (
@@ -103,6 +105,7 @@ function Modal({ hand, onClose }: { hand: ViewableHand; onClose: () => void }) {
             )}
             <span className="ml-auto rounded-full bg-bg-surface px-2 py-1 text-[10px] text-text-muted">Integration pending</span>
           </div>
+        </div>
         </div>
       </div>
     </div>
