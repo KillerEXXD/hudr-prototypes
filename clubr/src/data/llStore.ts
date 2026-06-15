@@ -57,4 +57,15 @@ export const LL_GAMES: LLGame[] = [
     ],
     chat: [cmsg('u_gary', 'Mike takes it down 🏆', '11:55p', 'system')],
   },
+  {
+    id: 'll_e', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', title: "Last Week's Grind",
+    status: 'completed', stake: 250, hostId: 'u_gary', coHostIds: [], winnerName: 'Gary Grind',
+    location: 'The Card Room', mode: 'in-person',
+    participants: [
+      p('u_gary', 'out', true, 0, '—', false, 1),
+      p('u_player', 'out', true, 0, '—', false, 2, '1h ago'),
+      p('u_lena', 'out', true, 0, '—', false, 3, '2h 10m ago'),
+    ],
+    chat: [cmsg('u_gary', 'Sam so close — 2nd! GG', '10:40p', 'system')],
+  },
 ]
