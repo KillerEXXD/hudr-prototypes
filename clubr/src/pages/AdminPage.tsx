@@ -1,6 +1,7 @@
-import { ChevronLeft, ShieldCheck, Users, Building2 } from 'lucide-react'
+import { ChevronLeft, ShieldCheck, Users, Building2, Target, Trophy, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAllClubs, useAllUsers } from '@/hooks'
+import { useAvailableFTs } from '@/hooks/ft'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 
@@ -9,6 +10,7 @@ export function AdminPage() {
   const navigate = useNavigate()
   const clubs = useAllClubs()
   const users = useAllUsers()
+  const fts = useAvailableFTs()
 
   if (user?.role !== 'admin') return <EmptyState icon={<ShieldCheck className="h-7 w-7" />} title="Admins only" sub="Sign in as App Admin to manage all clubs and users." />
 
@@ -24,6 +26,21 @@ export function AdminPage() {
         <Card className="flex items-center gap-2"><Building2 className="h-5 w-5 text-accent-blue" /><div><p className="text-lg font-extrabold text-text-primary">{clubs.data?.length ?? '—'}</p><p className="text-[11px] text-text-muted">Clubs</p></div></Card>
         <Card className="flex items-center gap-2"><Users className="h-5 w-5 text-accent-emerald" /><div><p className="text-lg font-extrabold text-text-primary">{users.data?.length ?? '—'}</p><p className="text-[11px] text-text-muted">Users</p></div></Card>
       </div>
+
+      <Section title="FT slate (operator)">
+        <p className="mb-2 text-[11px] text-text-muted">The priced final tables hosts can run. The operator supplies players, stacks &amp; prize pool; the app computes ICM. Hosts only review &amp; host. <span className="text-text-secondary">(Add/edit ships with operator tooling; Phase 2 = HUDR auto‑fill.)</span></p>
+        {fts.isLoading ? <Spinner /> : (
+          <div className="flex flex-col gap-2">
+            {fts.data?.map((f) => (
+              <Card key={f.id} className="p-3">
+                <div className="flex items-center gap-2 text-[11px] text-text-muted"><Badge tone="purple">{f.room}</Badge>{f.date}<span className="ml-auto flex items-center gap-1"><Clock className="h-3 w-3" />{f.startsIn}</span></div>
+                <p className="mt-1 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Target className="h-4 w-4 text-accent-purple" />{f.name}</p>
+                <div className="mt-1 flex items-center gap-2 text-[11px] text-text-muted"><span className="flex items-center gap-1"><Trophy className="h-3 w-3 text-accent-amber" />{f.prizePool}</span><span>· {f.players.length} finalists · ICM ✓</span></div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </Section>
 
       <Section title="All clubs">
         {clubs.isLoading ? <Spinner /> : (
