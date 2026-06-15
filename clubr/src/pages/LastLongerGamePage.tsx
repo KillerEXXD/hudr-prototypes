@@ -126,7 +126,7 @@ export function LastLongerGamePage() {
               <span className="w-6 text-center text-sm font-bold text-text-muted">{medal(p.finishPos)}</span>
               <Avatar name={p.name} color={p.avatarColor} size={28} />
               <span className="flex-1 truncate text-sm text-text-secondary line-through">{p.name}</span>
-              <span className="text-[11px] text-text-muted">out</span>
+              <span className="text-[11px] text-text-muted">{p.finishPos === 1 ? 'winner 🏆' : p.bustedAgo ? `busted ${p.bustedAgo}` : 'out'}</span>
             </div>
           ))}
         </div>

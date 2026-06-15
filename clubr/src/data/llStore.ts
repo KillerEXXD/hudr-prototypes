@@ -3,9 +3,9 @@
 import { USERS } from './store'
 import type { LLGame, LLParticipant } from '@/types/ll'
 
-function p(userId: string, status: LLParticipant['status'], paid: boolean, chips: number, ago: string, stale = false, finishPos?: number): LLParticipant {
+function p(userId: string, status: LLParticipant['status'], paid: boolean, chips: number, ago: string, stale = false, finishPos?: number, bustedAgo?: string): LLParticipant {
   const u = USERS[userId]
-  return { userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status, paid, chips, chipsUpdatedAgo: ago, stale, finishPos }
+  return { userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status, paid, chips, chipsUpdatedAgo: ago, stale, finishPos, bustedAgo }
 }
 
 let _cid = 0
@@ -25,8 +25,8 @@ export const LL_GAMES: LLGame[] = [
       p('u_tom', 'active', false, 190000, '24m', true),
       p('u_lena', 'active', true, 120000, '8m'),
       p('u_jordan', 'pending', false, 0, '—'),
-      p('u_cody', 'out', true, 0, '—', false, 7),
-      p('u_dustin', 'out', true, 0, '—', false, 8),
+      p('u_cody', 'out', true, 0, '—', false, 7, '52m ago'),
+      p('u_dustin', 'out', true, 0, '—', false, 8, '1h 15m ago'),
     ],
     chat: [cmsg('u_host', 'Blinds up to 2k/4k 🔼', '8:10p'), cmsg('u_mike', 'chip leader flexing 😏', '8:12p'), cmsg('u_cody', 'gg me, out in 7th', '8:05p', 'system')],
   },
@@ -51,9 +51,9 @@ export const LL_GAMES: LLGame[] = [
     status: 'completed', stake: 100, hostId: 'u_gary', coHostIds: [], winnerName: 'Mike Jones',
     participants: [
       p('u_mike', 'out', true, 0, '—', false, 1),
-      p('u_tom', 'out', true, 0, '—', false, 2),
-      p('u_lena', 'out', true, 0, '—', false, 3),
-      p('u_cody', 'out', true, 0, '—', false, 4),
+      p('u_tom', 'out', true, 0, '—', false, 2, '15m ago'),
+      p('u_lena', 'out', true, 0, '—', false, 3, '48m ago'),
+      p('u_cody', 'out', true, 0, '—', false, 4, '1h 20m ago'),
     ],
     chat: [cmsg('u_gary', 'Mike takes it down 🏆', '11:55p', 'system')],
   },

@@ -1,0 +1,71 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { MapPin } from 'lucide-react'
+import { useMyClubs } from '@/hooks'
+import { useCreateGame } from '@/hooks/ll'
+import { Sheet, Btn, Field } from '@/components/common/ui'
+import { cn } from '@/lib/utils/cn'
+
+// Shared "create a Last Longer" sheet. Pass `fixedClubId` from a club page
+// (no picker); omit it on the Last Longer tab to show a club picker.
+export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean; onClose: () => void; fixedClubId?: string }) {
+  const navigate = useNavigate()
+  const myClubs = useMyClubs()
+  const create = useCreateGame()
+  const managed = (myClubs.data ?? []).filter((c) => c.canManage)
+  const [clubId, setClubId] = useState(fixedClubId ?? '')
+  const [title, setTitle] = useState('')
+  const [loc, setLoc] = useState('')
+  const [mode, setMode] = useState<'in-person' | 'online'>('in-person')
+  const [stake, setStake] = useState(100)
+
+  useEffect(() => {
+    if (fixedClubId) setClubId(fixedClubId)
+    else if (managed.length === 1) setClubId(managed[0].id)
+  }, [fixedClubId, managed.length])
+
+  async function submit() {
+    const newId = await create.mutateAsync({ clubId, title, location: loc, mode, stake })
+    onClose(); setTitle(''); setLoc('')
+    if (newId) navigate(`/lastlonger/${newId}`)
+  }
+
+  return (
+    <Sheet open={open} onClose={onClose} title="Create a Last Longer">
+      <div className="flex flex-col gap-3">
+        {!fixedClubId && (
+          <div>
+            <span className="mb-1 block text-xs font-semibold text-text-secondary">Which club?</span>
+            <div className="flex flex-wrap gap-2">
+              {managed.length === 0 && <p className="text-xs text-text-muted">You don't host any clubs yet.</p>}
+              {managed.map((c) => (
+                <button key={c.id} onClick={() => setClubId(c.id)} className={cn('flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-sm font-semibold cursor-pointer', clubId === c.id ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>
+                  <span>{c.emoji}</span>{c.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <Field label="Tournament name" value={title} onChange={setTitle} placeholder="e.g. Friday Night Last Longer" />
+        <Field label="Location" value={loc} onChange={setLoc} placeholder="e.g. Mike's basement, or a site name" />
+        <div>
+          <span className="mb-1 block text-xs font-semibold text-text-secondary">Format</span>
+          <div className="flex gap-2">
+            {(['in-person', 'online'] as const).map((m) => (
+              <button key={m} onClick={() => setMode(m)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', mode === m ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>
+                {m === 'in-person' ? <><MapPin className="mr-1 inline h-3.5 w-3.5" />In person</> : 'Online'}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <span className="mb-1 block text-xs font-semibold text-text-secondary">Stake</span>
+          <div className="flex gap-2">{[50, 100, 250].map((s) => (
+            <button key={s} onClick={() => setStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', stake === s ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>{s}</button>
+          ))}</div>
+        </div>
+        <Btn className="w-full" disabled={!clubId || !title.trim() || create.isPending} onClick={submit}>Create Last Longer</Btn>
+      </div>
+    </Sheet>
+  )
+}

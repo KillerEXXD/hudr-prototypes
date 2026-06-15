@@ -16,6 +16,7 @@ export interface LLParticipant {
   chipsUpdatedAgo: string // e.g. 'now', '4m', '24m'
   stale: boolean // chips not updated recently → pulse
   finishPos?: number // set when out (1 = winner)
+  bustedAgo?: string // when they busted, e.g. '10m ago', '2h ago'
 }
 
 export interface ChopProposal {

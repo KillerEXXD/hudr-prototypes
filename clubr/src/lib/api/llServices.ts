@@ -78,7 +78,7 @@ export async function bust(gameId: string, target: string, byUserId: string): Pr
   const p = g?.participants.find((x) => x.userId === target)
   if (!g || !p || p.status !== 'active') return
   const activeCount = g.participants.filter((x) => x.status === 'active').length
-  p.status = 'out'; p.finishPos = activeCount; p.chips = 0
+  p.status = 'out'; p.finishPos = activeCount; p.chips = 0; p.bustedAgo = 'now'
   const self = byUserId === target
   g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: p.name, avatarColor: p.avatarColor, text: self ? `${p.name} self-busted — out in ${activeCount}${ord(activeCount)}` : `${p.name} eliminated — ${activeCount}${ord(activeCount)}`, ts: 'now', kind: 'system' })
   // last one standing → completed
