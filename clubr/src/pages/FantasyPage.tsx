@@ -44,7 +44,8 @@ export function FantasyPage() {
   const [pastOpen, setPastOpen] = useState(false)
 
   const active = (data ?? []).filter((c) => c.status !== 'settled')
-  const past = (data ?? []).filter((c) => c.status === 'settled')
+  // Past = settled contests YOU were in (entered or hosted) — not every finished one.
+  const past = (data ?? []).filter((c) => c.status === 'settled' && (c.myEntry != null || c.canManage))
   const hosting = active.filter((c) => c.canManage)
   const playing = active.filter((c) => !c.canManage)
 
@@ -69,7 +70,7 @@ export function FantasyPage() {
           {past.length > 0 && (
             <div className="mt-5">
               <button onClick={() => setPastOpen((o) => !o)} className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-bg-card px-3 py-2 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
-                {pastOpen ? 'Hide' : 'Show'} past contests ({past.length}) <ChevronDown className={`h-3.5 w-3.5 transition-transform ${pastOpen ? 'rotate-180' : ''}`} />
+                {pastOpen ? 'Hide' : 'Show'} your past contests ({past.length}) <ChevronDown className={`h-3.5 w-3.5 transition-transform ${pastOpen ? 'rotate-180' : ''}`} />
               </button>
               {pastOpen && <div className="mt-2 flex flex-col gap-2">{past.map((c) => <ContestRow key={c.id} c={c} />)}</div>}
             </div>
