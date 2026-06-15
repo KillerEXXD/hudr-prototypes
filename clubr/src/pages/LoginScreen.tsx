@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { ShieldCheck, Crown, User as UserIcon, Ticket, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Btn, Field } from '@/components/common/ui'
@@ -17,6 +18,9 @@ export function LoginScreen() {
   const [name, setName] = useState('')
   const [code, setCode] = useState('')
   const [msg, setMsg] = useState('')
+  const [params] = useSearchParams()
+  const joinCode = params.get('join')
+  useEffect(() => { if (joinCode) { setJoinOpen(true); setCode(joinCode.toUpperCase()) } }, [joinCode])
 
   async function joinWithLink() {
     if (!name.trim() || !code.trim()) return

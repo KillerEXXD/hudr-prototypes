@@ -30,7 +30,10 @@ export function ClubDetailPage() {
   const clubGames = (games.data ?? []).filter((g) => g.clubId === club.id && g.status !== 'completed')
 
   function copyCode() {
-    navigator.clipboard?.writeText(club!.inviteCode).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500) })
+    // Shareable URL — a new user clicks it, signs up, and is dropped into the
+    // join form with this club's code prefilled (then the host vets & admits).
+    const url = `${window.location.origin}${window.location.pathname}#/?join=${club!.inviteCode}`
+    navigator.clipboard?.writeText(url).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500) })
   }
 
   return (
@@ -61,11 +64,12 @@ export function ClubDetailPage() {
       {/* Host/admin: invite code + join requests */}
       {club.canManage && (
         <>
-          <Section title="Invite code">
+          <Section title="Invite link">
             <Card className="flex items-center justify-between">
               <span className="font-mono text-lg font-bold tracking-widest text-text-primary">{club.inviteCode}</span>
-              <Btn size="sm" variant="secondary" onClick={copyCode}>{copied ? <><Check className="h-3.5 w-3.5 text-accent-emerald" />Copied</> : <><Copy className="h-3.5 w-3.5" />Copy link</>}</Btn>
+              <Btn size="sm" variant="secondary" onClick={copyCode}>{copied ? <><Check className="h-3.5 w-3.5 text-accent-emerald" />Copied!</> : <><Copy className="h-3.5 w-3.5" />Copy link</>}</Btn>
             </Card>
+            <p className="mt-1.5 text-[11px] text-text-muted">Share the link — new players sign up &amp; request to join; you admit them after vetting.</p>
           </Section>
 
           <Section title={`Join requests${pending.length ? ` · ${pending.length}` : ''}`}>
