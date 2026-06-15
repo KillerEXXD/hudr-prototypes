@@ -9,7 +9,7 @@
     --bg:#0b0f17; --panel:#141a26; --card:#1a2233; --card2:#202a3e;
     --bd:#283450; --bd2:#36456a; --tx:#e9edf6; --mut:#9aa6be; --mut2:#7b88a3;
     --owner:#3b82f6; --admin:#10b981; --member:#f59e0b; --guest:#06b6d4; --hudr:#d946ef;
-    --ftf:#d946ef; --ll:#f59e0b; --coin:#fbbf24;
+    --ftf:#d946ef; --ll:#f59e0b; --coin:#fbbf24; --ok:#34d399; --warn:#f87171;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -31,7 +31,7 @@
   header{padding:56px 0 30px;text-align:center;border-bottom:1px solid var(--bd)}
   header .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coin);background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);padding:5px 12px;border-radius:999px}
   header h1{font-size:46px;font-weight:800;letter-spacing:-1px;margin-top:16px;background:linear-gradient(120deg,#f0abfc,#a78bfa,#fbbf24);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  header p.sub{color:var(--mut);font-size:16px;max-width:760px;margin:12px auto 0}
+  header p.sub{color:var(--mut);font-size:16px;max-width:820px;margin:12px auto 0}
   header p.tagline{color:var(--mut2);font-size:13px;margin-top:10px}
   .legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 18px;margin:24px auto 0;max-width:780px}
   .legend .it{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--mut)}
@@ -42,7 +42,7 @@
   .h2 .num{font-size:14px;font-weight:800;color:var(--mut2)}
   .h2 h2{font-size:27px;font-weight:800;letter-spacing:-.3px}
   .h2 .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
-  .lead{color:var(--mut);font-size:15px;margin:8px 0 26px;max-width:880px}
+  .lead{color:var(--mut);font-size:15px;margin:8px 0 26px;max-width:920px}
 
   .phase-head{border-radius:10px;padding:11px 12px;font-weight:800;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:#fff;text-align:center;margin-bottom:14px;border:1px solid rgba(255,255,255,.12)}
   .card{position:relative;background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--c,var(--bd2));border-radius:12px;padding:14px 14px 13px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
@@ -67,6 +67,7 @@
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .chip{font-size:11.5px;color:var(--mut);background:var(--card2);border:1px solid var(--bd);border-radius:7px;padding:3px 8px}
   .coin{color:var(--coin);font-weight:700}
+  .no{color:var(--warn);font-weight:700}.yes{color:var(--ok);font-weight:700}
 
   table{width:100%;border-collapse:collapse;font-size:13px;overflow:hidden;border-radius:12px;border:1px solid var(--bd)}
   th{background:var(--card2);text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut2);padding:9px 11px;font-weight:700}
@@ -76,6 +77,7 @@
   .ft{display:grid;grid-template-columns:repeat(9,1fr);gap:6px}
   .seat{background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:8px 4px;text-align:center}
   .seat .b{display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;border-radius:6px;font-weight:800;font-size:12px;background:rgba(217,70,239,.16);color:var(--ftf);margin-bottom:4px}
+  .seat.pk .b{background:var(--ftf);color:#fff}
   .seat .nm{font-size:11px;font-weight:600}.seat .ch{font-size:10px;color:var(--mut2)}
 
   .ll{display:flex;flex-direction:column;gap:7px}
@@ -83,7 +85,10 @@
   .row .rk{width:22px;text-align:center;font-weight:800;color:var(--mut2)}
   .row.elim{opacity:.55}.row .grow{flex:1}
   .b-paid{font-size:10px;font-weight:700;color:var(--admin);background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);padding:2px 7px;border-radius:999px}
+  .b-wait{font-size:10px;font-weight:700;color:var(--coin);background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);padding:2px 7px;border-radius:999px}
   .b-out{font-size:10px;font-weight:700;color:var(--mut2)}
+  .pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 0 rgba(248,113,113,.6);animation:pl 1.6s infinite}
+  @keyframes pl{0%{box-shadow:0 0 0 0 rgba(248,113,113,.5)}70%{box-shadow:0 0 0 6px rgba(248,113,113,0)}100%{box-shadow:0 0 0 0 rgba(248,113,113,0)}}
 
   .chat{display:flex;flex-direction:column;gap:6px}
   .msg{font-size:12.5px;padding:7px 10px;border-radius:9px;max-width:90%}
@@ -102,6 +107,11 @@
   .ent .t{font-weight:800;font-size:14px}.ent .f{font-size:11.5px;color:var(--mut);margin-top:3px}
   .rel{text-align:center;color:var(--mut2);font-size:12px;padding:3px 0;font-weight:600}
 
+  .wall{border:1px solid rgba(52,211,153,.35);background:rgba(52,211,153,.05);border-radius:16px;padding:18px}
+  .wall .it{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--mut);padding:6px 0}
+  .wall .it b{color:var(--tx)}
+  .wall .mk{color:var(--ok);font-weight:800;flex-shrink:0}
+
   footer{margin-top:54px;padding:26px 0 40px;border-top:1px solid var(--bd);text-align:center;color:var(--mut2);font-size:12.5px}
 
   @media (max-width:1000px){.g4,.g3{grid-template-columns:repeat(2,1fr)}.ft{grid-template-columns:repeat(3,1fr)}}
@@ -113,15 +123,15 @@
 
 <nav><div class="nav-inner">
   <a href="#home" class="brand">🃏 ClubR</a>
+  <a href="#why">Why It Exists</a>
   <a href="#two">Two Features</a>
   <a href="#flow">System Flow</a>
   <a href="#roles">Roles</a>
-  <a href="#club-setup">Club Setup</a>
+  <a href="#setup">Club Setup</a>
   <a href="#ftf">FT Fantasy</a>
   <a href="#ll">Last Longer</a>
-  <a href="#member">Member</a>
-  <a href="#stats">Stats</a>
-  <a href="#hudr">HUDR</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#wall">The Wall</a>
   <a href="#data">Data Model</a>
   <a href="#summary">Summary</a>
 </div></nav>
@@ -130,47 +140,75 @@
   <div class="wrap">
     <span class="kicker">Product Walkthrough · Flow Diagram</span>
     <h1>ClubR — How It Works</h1>
-    <p class="sub">A PWA where a <strong>poker club</strong> offers its members <strong>two independent, coin‑based games</strong>:
-       <strong style="color:var(--ftf)">FT Fantasy</strong> — bet coins on an external Final Table — and
-       <strong style="color:var(--ll)">Last Longer</strong> — join a coin pool in the club's own live tournament.
-       Both pay out in <span class="coin">🪙 coins</span>.</p>
-    <p class="tagline">Set the club up once, then run either feature (or both). They share the club &amp; members — nothing else.</p>
+    <p class="sub">A web PWA that is the <strong>transparent scorekeeper</strong> for a poker club's games:
+       <strong style="color:var(--ftf)">FT Fantasy</strong> — predict a HUDR live‑streamed Final Table — and
+       <strong style="color:var(--ll)">Last Longer</strong> — the club's own live tournament.
+       ClubR <strong>tracks and proves</strong> the count and the result. It
+       <strong style="color:var(--ok)">awards nothing, holds nothing, and never touches the cash.</strong>
+       Clubs settle all stakes <strong>offline</strong>.</p>
+    <p class="tagline">Be the tool, not the bank. Pay a flat fee to use it (credits, or free with a subscription) — the money stays between the players.</p>
     <div class="legend">
       <span class="it"><span class="dot" style="background:var(--owner)"></span>Owner</span>
-      <span class="it"><span class="dot" style="background:var(--admin)"></span>Admin</span>
-      <span class="it"><span class="dot" style="background:var(--member)"></span>Member</span>
-      <span class="it"><span class="dot" style="background:var(--guest)"></span>Guest</span>
-      <span class="it"><span class="dot" style="background:var(--hudr)"></span>HUDR (FT Fantasy only)</span>
+      <span class="it"><span class="dot" style="background:var(--admin)"></span>Host / Admin</span>
+      <span class="it"><span class="dot" style="background:var(--member)"></span>Player</span>
+      <span class="it"><span class="dot" style="background:var(--hudr)"></span>HUDR (FT Fantasy oracle)</span>
     </div>
   </div>
 </header>
 
 <main class="wrap">
 
-<!-- TWO FEATURES AT A GLANCE -->
+<!-- WHY IT EXISTS -->
+<section id="why">
+  <div class="h2"><span class="num">1.</span><h2>Why ClubR exists</h2></div>
+  <p class="lead">Today a club's Last Longer runs on <strong>paper / WhatsApp</strong>. Players pay the host cash; the host tracks who's in and out. <strong>The players never see the true headcount</strong> — so a dishonest host can hide players and pocket the money. ClubR makes the count <strong>un‑hideable</strong>.</p>
+  <div class="grid g2">
+    <div class="lane b" style="border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.05)">
+      <span class="pill" style="--c:var(--warn)">The problem today</span>
+      <h3 style="margin:8px 0 2px;font-size:17px;color:var(--warn)">🩹 Blind trust in the host</h3>
+      <p class="mut">Was it 30, 35, or 40 entries? Nobody knows but the host. Eliminated players stop paying attention, so the host can <strong>under‑report the count and pocket the early‑busted players' buy‑ins.</strong> Chips, eliminations and the chop are all on the host's word.</p>
+      <div class="chips">
+        <span class="chip">🤷 Hidden headcount</span>
+        <span class="chip">📝 Paper / WhatsApp</span>
+        <span class="chip">🙈 No proof, no audit</span>
+      </div>
+    </div>
+    <div class="lane a" style="border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.05)">
+      <span class="pill" style="--c:var(--ok)">What ClubR does</span>
+      <h3 style="margin:8px 0 2px;font-size:17px;color:var(--ok)">🔎 The notary, not the bank</h3>
+      <p class="mut">Every player <strong>self‑joins</strong> in the app and is <strong>publicly visible</strong> — so the count can't be faked. Results are tamper‑proof (HUDR‑resolved for FT Fantasy; logged + player‑confirmable for Last Longer). <strong>The cash stays between the host and players; the app never knows, holds, or promises it.</strong></p>
+      <div class="chips">
+        <span class="chip">👀 Public, un‑hideable count</span>
+        <span class="chip">🧾 Visible audit log</span>
+        <span class="chip">🚫 App never touches money</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TWO FEATURES -->
 <section id="two">
-  <div class="h2"><span class="num">1.</span><h2>Two distinct features</h2></div>
-  <p class="lead">The single most important thing: <strong>FT Fantasy and Last Longer are separate.</strong> One is betting on an outside game; the other is the club running its own game. They never depend on each other.</p>
+  <div class="h2"><span class="num">2.</span><h2>Two features — one job</h2></div>
+  <p class="lead">Both features are the <strong>same kind of thing</strong>: a transparent scorekeeper. The app <strong>awards nothing and settles nothing</strong> — it proves the count and the result, you pay a flat fee to use it, and the club handles the stakes offline. They differ only in <em>where the truth comes from</em>.</p>
   <div class="grid g2">
     <div class="lane a">
-      <span class="pill" style="--c:var(--ftf)">Feature A · Betting</span>
+      <span class="pill" style="--c:var(--ftf)">Feature A · Predict</span>
       <h3 style="margin:8px 0 2px;font-size:18px;color:var(--ftf)">🎯 FT Fantasy</h3>
-      <p class="mut">Members are <strong>fans/bettors</strong> on an <strong>external Final Table</strong>. They pick FT players, choose a bucket (pool), and stake <span class="coin">coins</span>. The real FT result decides which pool wins; coins are distributed.</p>
+      <p class="mut">Members <strong>pick 3 players</strong> from a <strong>HUDR live‑streamed Final Table</strong> and enter a bucket (a <strong>Stakes tier</strong>). <strong>HUDR auto‑resolves</strong> the result from the real finishing order — <strong>no human judges it, no disputes possible.</strong> The app shows the ranking; the club settles offline.</p>
       <div class="chips">
-        <span class="chip">External Final Table (via HUDR)</span>
-        <span class="chip">Users = bettors, not players</span>
-        <span class="chip coin">🪙 coin pools</span>
+        <span class="chip">Truth = HUDR live feed</span>
+        <span class="chip yes">Auto‑resolved · undisputable</span>
+        <span class="chip">App awards nothing</span>
       </div>
     </div>
     <div class="lane b">
-      <span class="pill" style="--c:var(--ll)">Feature B · Play</span>
+      <span class="pill" style="--c:var(--ll)">Feature B · Track</span>
       <h3 style="margin:8px 0 2px;font-size:18px;color:var(--ll)">🏟️ Last Longer</h3>
-      <p class="mut">The club hosts its <strong>own live poker tournament</strong>. Members are the <strong>players</strong>; they <strong>join a coin pool</strong>; the <strong>admin manages</strong> the live game and tracks who lasts longest. Last one standing wins the pool.</p>
+      <p class="mut">The club runs its <strong>own live tournament</strong>. Players <strong>self‑join</strong> (so the count is public &amp; un‑hideable); they self‑report chips; the <strong>host judges</strong> eliminations — and <strong>every host action is logged for all to see.</strong> Last one standing (or a chop) wins — offline.</p>
       <div class="chips">
-        <span class="chip">Club's own live tournament</span>
-        <span class="chip">Members = players</span>
-        <span class="chip">Admin‑managed · no HUDR</span>
-        <span class="chip coin">🪙 coin pool</span>
+        <span class="chip">Truth = host, fully logged</span>
+        <span class="chip yes">Public self‑join count</span>
+        <span class="chip">App awards nothing</span>
       </div>
     </div>
   </div>
@@ -178,103 +216,99 @@
 
 <!-- OVERALL SYSTEM FLOW -->
 <section id="flow">
-  <div class="h2"><span class="num">2.</span><h2>Overall System Flow</h2></div>
-  <p class="lead">Set the club up once (shared), then it branches into the two independent features.</p>
+  <div class="h2"><span class="num">3.</span><h2>Overall System Flow</h2></div>
+  <p class="lead">Set the club up once, then it branches into two independent features. <strong>Both lanes end the same way: the app shows a proven result, and the club settles the cash offline.</strong></p>
 
-  <div class="phase-head" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);max-width:440px;margin:0 auto 14px">Shared · Club Setup</div>
+  <div class="phase-head" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);max-width:460px;margin:0 auto 14px">Shared · Club Setup</div>
   <div class="flow" style="margin-bottom:10px">
-    <div class="card" style="--c:var(--owner)"><span class="ic">🏛️</span><h4>Create Club</h4><p>Owner sets up the club.</p></div>
+    <div class="card" style="--c:var(--owner)"><span class="ic">🏛️</span><h4>Create Club</h4><p>Owner holds the ClubR subscription (incl. HUDR).</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--owner)"><span class="ic">✉️</span><h4>Invite Members</h4><p>Invite code; members join.</p></div>
+    <div class="card" style="--c:var(--member)"><span class="ic">📱</span><h4>Players Join</h4><p>Phone + OTP. 1000 free credits to start.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--owner)"><span class="ic">🪙</span><h4>Members Hold Coins</h4><p>The wallet used in both games.</p></div>
+    <div class="card" style="--c:var(--admin)"><span class="ic">📣</span><h4>Telegram Bot</h4><p>Posts upcoming games into the club's group.</p></div>
   </div>
   <div class="rel" style="font-size:18px;color:var(--mut2)">▼ &nbsp; branches into two independent features &nbsp; ▼</div>
 
   <div class="grid g2" style="margin-top:12px;align-items:start">
     <!-- FT Fantasy lane -->
     <div>
-      <div class="phase-head" style="background:linear-gradient(135deg,#86198f,#d946ef)">Feature A · FT Fantasy (bet on an external FT)</div>
-      <div class="card" style="--c:var(--hudr)"><span class="ic">📺</span><h4>External Final Table</h4><p>A broadcast FT (via HUDR) is the thing being bet on — members are fans, not players.</p></div>
+      <div class="phase-head" style="background:linear-gradient(135deg,#86198f,#d946ef)">Feature A · FT Fantasy (predict a HUDR FT)</div>
+      <div class="card" style="--c:var(--hudr)"><span class="ic">📺</span><h4>HUDR Publishes the FT Slate</h4><p>~6–10 live‑streamed Final Tables a week.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--admin)"><span class="ic">🎟️</span><h4>Create Buckets (coin pools)</h4><p>Admin opens coin betting pools for the event.</p></div>
+      <div class="card" style="--c:var(--admin)"><span class="ic">🎟️</span><h4>Host Curates 1–2 + Sets Stakes</h4><p>Picks the FTs the club cares about; opens buckets.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--member)"><span class="ic">🃏</span><h4>Pick FT Players + Stake Coins</h4><p>Member picks from the FT, chooses a bucket, stakes <span class="coin">coins</span>.</p></div>
+      <div class="card" style="--c:var(--member)"><span class="ic">🃏</span><h4>Players Pay Fee + Pick 3</h4><p>Flat fee = entry. Picks <strong>lock 10 min before</strong>.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--hudr)"><span class="ic">🎬</span><h4>FT Plays Out</h4><p>Real results determine which pool won.</p></div>
+      <div class="card" style="--c:var(--hudr)"><span class="ic">🎬</span><h4>HUDR Auto‑Resolves</h4><p>Real finishing order → ranked, undisputable.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--guest)"><span class="ic">🪙</span><h4>Distribute Coins</h4><p>Winning pool's members get the coins.</p></div>
+      <div class="card" style="--c:var(--ok)" data-x><span class="ic">🧾</span><h4>App Shows Result · Club Settles Offline</h4><p>Suggested split in Stakes. App moves nothing.</p></div>
     </div>
     <!-- Last Longer lane -->
     <div>
       <div class="phase-head" style="background:linear-gradient(135deg,#b45309,#f59e0b)">Feature B · Last Longer (the club's own live game)</div>
-      <div class="card" style="--c:var(--admin)"><span class="ic">🏟️</span><h4>Admin Hosts Live Tournament</h4><p>The club's own live poker tournament for its members.</p></div>
+      <div class="card" style="--c:var(--admin)"><span class="ic">🏟️</span><h4>Host Creates the Live Game</h4><p>Sets Stakes tiers; shares the join link.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--member)"><span class="ic">🪙</span><h4>Members Join the Coin Pool</h4><p>Player‑members buy in with <span class="coin">coins</span>.</p></div>
+      <div class="card" style="--c:var(--member)"><span class="ic">🙋</span><h4>Players Self‑Join (public)</h4><p>Pay fee → on the visible in / waiting list. <strong>Count can't be hidden.</strong></p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--admin)"><span class="ic">🎛️</span><h4>Admin Runs It Live</h4><p>Tracks chips, eliminations, chat &amp; chop.</p></div>
+      <div class="card" style="--c:var(--admin)"><span class="ic">🎛️</span><h4>Run Live — All Logged</h4><p>Chips every 20 min · eliminations · chat · chop.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--member)"><span class="ic">⏱️</span><h4>Last One Standing</h4><p>Whoever survives longest wins.</p></div>
+      <div class="card" style="--c:var(--member)"><span class="ic">⏱️</span><h4>Last One Standing / Chop</h4><p>Host‑judged; last 3 can agree to chop.</p></div>
       <div class="arrow">▼</div>
-      <div class="card" style="--c:var(--guest)"><span class="ic">🪙</span><h4>Pool Paid in Coins</h4><p>Winner takes the pool — or a chop split.</p></div>
+      <div class="card" style="--c:var(--ok)"><span class="ic">🧾</span><h4>App Records Result · Club Settles Offline</h4><p>App moves nothing.</p></div>
     </div>
   </div>
 </section>
 
 <!-- ROLES -->
 <section id="roles">
-  <div class="h2"><span class="num">3.</span><h2>Roles &amp; Permissions</h2></div>
-  <p class="lead">Owners &amp; admins run the club &amp; games; members play/bet with coins; guests can be invited into a game.</p>
+  <div class="h2"><span class="num">4.</span><h2>Roles &amp; Permissions</h2></div>
+  <p class="lead">Owners hold the paid subscription and run the club; hosts curate &amp; run games (and earn nothing — reputation only); players self‑join and pay per game or via a HUDR subscription.</p>
   <div class="grid g4">
-    <div class="panel"><span class="pill" style="--c:var(--owner)">Owner</span><h3 style="margin-top:8px">Runs the club</h3><p class="mut">Creates the club, manages members &amp; roles, invite code; can do anything an admin can.</p></div>
-    <div class="panel"><span class="pill" style="--c:var(--admin)">Admin</span><h3 style="margin-top:8px">Runs the games</h3><p class="mut"><strong>FT Fantasy:</strong> opens buckets, resolves pools. <strong>Last Longer:</strong> hosts the live tournament, tracks chips/eliminations, settles the pool.</p></div>
-    <div class="panel"><span class="pill" style="--c:var(--member)">Member</span><h3 style="margin-top:8px">Plays &amp; bets</h3><p class="mut">FT Fantasy: picks + stakes coins. Last Longer: joins the coin pool as a player. Sees own profile &amp; leaderboards.</p></div>
-    <div class="panel"><span class="pill" style="--c:var(--guest)">Guest</span><h3 style="margin-top:8px">Invited in</h3><p class="mut">Can be invited into a game via a link, buy in with coins, and appear on its leaderboard.</p></div>
-  </div>
-  <div class="panel" style="margin-top:12px;border-color:rgba(217,70,239,.35);background:rgba(217,70,239,.05)">
-    <h3><span style="color:var(--hudr)">⚙️ HUDR</span> — feeds <strong>FT Fantasy only</strong></h3>
-    <p class="mut">Provides the external Final Table + live results that resolve FT Fantasy pools. Last Longer does <strong>not</strong> use HUDR — the admin manages that live event directly.</p>
+    <div class="panel"><span class="pill" style="--c:var(--owner)">Owner</span><h3 style="margin-top:8px">Holds the subscription</h3><p class="mut">Buys the <strong>ClubR subscription</strong> (premium — <strong>includes HUDR</strong>). Creates the club, assigns admins/hosts. Required to host.</p></div>
+    <div class="panel"><span class="pill" style="--c:var(--admin)">Host / Admin</span><h3 style="margin-top:8px">Curates &amp; runs games</h3><p class="mut"><strong>FT Fantasy:</strong> curates FTs off HUDR's slate. <strong>Last Longer:</strong> runs the live game, judges eliminations. <strong>Earns nothing</strong>; every action is logged.</p></div>
+    <div class="panel"><span class="pill" style="--c:var(--member)">Player</span><h3 style="margin-top:8px">Self‑joins &amp; plays</h3><p class="mut">Joins via phone + OTP. Pays a <strong>flat fee per entry</strong> (credits), or <strong>free with a HUDR subscription</strong>. Picks in FT Fantasy; plays in Last Longer.</p></div>
+    <div class="panel" style="border-color:rgba(217,70,239,.35);background:rgba(217,70,239,.05)"><span class="pill" style="--c:var(--hudr)">HUDR</span><h3 style="margin-top:8px">The FT oracle</h3><p class="mut">Publishes the weekly FT slate + feeds the live finishing order that <strong>auto‑resolves FT Fantasy</strong>. A HUDR subscription <strong>waives the player fee</strong>. Last Longer doesn't use HUDR.</p></div>
   </div>
 </section>
 
 <!-- CLUB SETUP -->
-<section id="club-setup">
-  <div class="h2"><span class="num">4.</span><h2>Club Setup</h2><span class="tag" style="background:rgba(59,130,246,.14);color:var(--owner)">Shared · Owner</span></div>
-  <p class="lead">A one‑time setup; the same club &amp; members feed both features.</p>
+<section id="setup">
+  <div class="h2"><span class="num">5.</span><h2>Club Setup</h2><span class="tag" style="background:rgba(59,130,246,.14);color:var(--owner)">Shared · Owner</span></div>
+  <p class="lead">A one‑time setup; the same club &amp; players feed both features.</p>
   <div class="flow">
+    <div class="card" style="--c:var(--owner)"><span class="ic">💳</span><h4>Owner Subscribes</h4><p>ClubR sub (incl. HUDR).</p></div>
+    <div class="ha">→</div>
     <div class="card" style="--c:var(--owner)"><span class="ic">🏛️</span><h4>Create Club</h4><p>Name &amp; brand.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--owner)"><span class="ic">🔑</span><h4>Invite Code</h4><p>Shareable join code.</p></div>
+    <div class="card" style="--c:var(--member)"><span class="ic">📱</span><h4>Players Join</h4><p>Phone + OTP.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--member)"><span class="ic">🙋</span><h4>Members Join</h4><p>Enter the code.</p></div>
+    <div class="card" style="--c:var(--owner)"><span class="ic">🛡️</span><h4>Assign Hosts</h4><p>Promote admins.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--owner)"><span class="ic">🛡️</span><h4>Assign Roles</h4><p>Promote admins.</p></div>
-    <div class="ha">→</div>
-    <div class="card" style="--c:var(--coin)"><span class="ic">🪙</span><h4>Coin Wallets</h4><p>Members hold coins.</p></div>
+    <div class="card" style="--c:var(--coin)"><span class="ic">🎁</span><h4>Free Trial</h4><p>1000 credits · first 10 games free.</p></div>
   </div>
 </section>
 
 <!-- FT FANTASY -->
 <section id="ftf">
-  <div class="h2"><span class="num">5.</span><h2>FT Fantasy</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--ftf)">Feature A · Bet on an external FT</span></div>
-  <p class="lead">Members <strong>bet coins</strong> on an <strong>external Final Table</strong>. Pick players, choose a bucket (pool); the real FT result decides which pool wins, and coins are distributed. <strong>Members are spectators here — not the players.</strong></p>
+  <div class="h2"><span class="num">6.</span><h2>FT Fantasy</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--ftf)">Feature A · Predict a HUDR FT</span></div>
+  <p class="lead">Players <strong>pick 3</strong> of the 9 final‑table players and enter a <strong>Stakes bucket</strong>. <strong>HUDR auto‑resolves</strong> from the real finishing order — undisputable. The app shows the ranking and a suggested split; <strong>the club settles the cash offline.</strong></p>
   <div class="flow" style="margin-bottom:18px">
-    <div class="card" style="--c:var(--hudr)"><span class="ic">📺</span><h4>External Final Table</h4><p>From HUDR / broadcast.</p></div>
+    <div class="card" style="--c:var(--hudr)"><span class="ic">📺</span><h4>HUDR FT Slate</h4><p>Host curates 1–2.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--admin)"><span class="ic">🎟️</span><h4>Open Buckets</h4><p>Coin pools.</p></div>
+    <div class="card" style="--c:var(--admin)"><span class="ic">🎟️</span><h4>Open Buckets</h4><p>Stakes tiers.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--member)"><span class="ic">🃏</span><h4>Pick + Stake</h4><p>Pick FT players, bet coins.</p></div>
+    <div class="card" style="--c:var(--member)"><span class="ic">🃏</span><h4>Fee + Pick 3</h4><p>Locks 10 min before.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--hudr)"><span class="ic">🎬</span><h4>FT Plays Out</h4><p>Real results.</p></div>
+    <div class="card" style="--c:var(--hudr)"><span class="ic">🎬</span><h4>HUDR Resolves</h4><p>Real finishing order.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--guest)"><span class="ic">🪙</span><h4>Distribute Coins</h4><p>Winning pool paid.</p></div>
+    <div class="card" style="--c:var(--ok)"><span class="ic">🧾</span><h4>Show &amp; Settle Offline</h4><p>App moves nothing.</p></div>
   </div>
   <div class="grid g2">
-    <div class="panel"><h3>The external final table</h3><p class="mut" style="margin-bottom:10px">The 9 players (A–I) of the broadcast event you're betting on, with live chip counts from HUDR.</p>
+    <div class="panel"><h3>The final table — pick 3 of 9</h3><p class="mut" style="margin-bottom:10px">The broadcast event's 9 players (A–I), with live chip counts from HUDR. A pick of <strong style="color:var(--ftf)">[A, B, C]</strong> is shown highlighted.</p>
       <div class="ft">
-        <div class="seat"><span class="b">A</span><div class="nm">Negreanu</div><div class="ch">9.3M</div></div>
-        <div class="seat"><span class="b">B</span><div class="nm">Ivey</div><div class="ch">7.1M</div></div>
-        <div class="seat"><span class="b">C</span><div class="nm">Hellmuth</div><div class="ch">5.5M</div></div>
+        <div class="seat pk"><span class="b">A</span><div class="nm">Negreanu</div><div class="ch">9.3M</div></div>
+        <div class="seat pk"><span class="b">B</span><div class="nm">Ivey</div><div class="ch">7.1M</div></div>
+        <div class="seat pk"><span class="b">C</span><div class="nm">Hellmuth</div><div class="ch">5.5M</div></div>
         <div class="seat"><span class="b">D</span><div class="nm">Bonomo</div><div class="ch">4.2M</div></div>
         <div class="seat"><span class="b">E</span><div class="nm">Selbst</div><div class="ch">3.8M</div></div>
         <div class="seat"><span class="b">F</span><div class="nm">Holz</div><div class="ch">2.6M</div></div>
@@ -283,16 +317,17 @@
         <div class="seat"><span class="b">I</span><div class="nm">Seidel</div><div class="ch">0.7M</div></div>
       </div>
     </div>
-    <div class="panel"><h3>Buckets = coin pools</h3><p class="mut">A member picks players, joins a bucket and stakes coins. When the FT finishes, the system decides which pool won (by how the picked players placed) and pays out.</p>
+    <div class="panel"><h3>Buckets = Stakes tiers</h3><p class="mut">A player pays the flat fee to enter a bucket and picks 3. When the FT ends, HUDR's finishing order ranks every entry; the app shows the top‑3 split <strong>in Stakes, never dollars.</strong></p>
       <div style="margin-top:12px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px">
-        <div style="font-weight:700">Pick <span style="color:var(--ftf)">[A, B, C]</span> · stake <span class="coin">🪙 250</span></div>
-        <div class="mut" style="margin-top:6px;font-size:13px">FT result → your pool wins → <strong style="color:var(--coin)">coins distributed</strong></div>
+        <div style="font-weight:700">Enter <span style="color:var(--ftf)">250‑Stake</span> bucket · pick <span style="color:var(--ftf)">[A, B, C]</span></div>
+        <div class="mut" style="margin-top:6px;font-size:13px">HUDR result → ranked → <strong style="color:var(--coin)">Pool 5,000 · 1st 2,500 · 2nd 1,500 · 3rd 1,000</strong></div>
+        <div class="mut" style="margin-top:4px;font-size:12px">Shown for the offline settle. <span class="no">ClubR moves nothing.</span></div>
       </div>
       <div class="chips">
-        <span class="chip">Members are bettors, not players</span>
-        <span class="chip coin">🪙 coins in &amp; out</span>
-        <span class="chip">🔗 needs HUDR (the external FT)</span>
-        <span class="chip">🧾 audit trail of pool resolution</span>
+        <span class="chip">Flat fee to enter (or free w/ HUDR sub)</span>
+        <span class="chip yes">🔒 Picks lock 10 min before</span>
+        <span class="chip">🔗 HUDR auto‑resolves</span>
+        <span class="chip no">No coins/cash awarded by the app</span>
       </div>
     </div>
   </div>
@@ -300,157 +335,117 @@
 
 <!-- LAST LONGER -->
 <section id="ll">
-  <div class="h2"><span class="num">6.</span><h2>Last Longer</h2><span class="tag" style="background:rgba(245,158,11,.14);color:var(--ll)">Feature B · The club's own live game</span></div>
-  <p class="lead">The club runs its <strong>own live poker tournament</strong> where <strong>members are the players</strong>. They <strong>join a coin pool</strong>; the <strong>admin manages the live event</strong> and tracks who lasts longest. Last one standing wins the pool (or the last few chop it). <strong>Self‑contained — no external Final Table, no HUDR.</strong></p>
+  <div class="h2"><span class="num">7.</span><h2>Last Longer</h2><span class="tag" style="background:rgba(245,158,11,.14);color:var(--ll)">Feature B · The club's own live game</span></div>
+  <p class="lead">The club runs its <strong>own live tournament</strong>. Players <strong>self‑join</strong> (the count is public and un‑hideable), self‑report chips, and the <strong>host judges eliminations</strong> — with <strong>every action in a visible audit log.</strong> Last one standing, or a chop. <strong>No HUDR; cash settled offline.</strong></p>
   <div class="flow" style="margin-bottom:18px">
-    <div class="card" style="--c:var(--admin)"><span class="ic">🏟️</span><h4>Host Live Tournament</h4><p>Admin creates it.</p></div>
+    <div class="card" style="--c:var(--admin)"><span class="ic">🏟️</span><h4>Host Creates</h4><p>Stakes tiers.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--member)"><span class="ic">🪙</span><h4>Join Coin Pool</h4><p>Members buy in.</p></div>
+    <div class="card" style="--c:var(--member)"><span class="ic">🙋</span><h4>Self‑Join (public)</h4><p>Fee → visible list.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--admin)"><span class="ic">🎛️</span><h4>Run Live</h4><p>Chips · eliminations.</p></div>
+    <div class="card" style="--c:var(--admin)"><span class="ic">🎛️</span><h4>Run Live · Logged</h4><p>Chips · eliminations.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--member)"><span class="ic">💬</span><h4>Chat &amp; Chop</h4><p>Banter + split vote.</p></div>
+    <div class="card" style="--c:var(--member)"><span class="ic">💬</span><h4>Chat &amp; Chop</h4><p>Last 3 agree.</p></div>
     <div class="ha">→</div>
-    <div class="card" style="--c:var(--guest)"><span class="ic">🏆</span><h4>Pool Paid</h4><p>Last one standing.</p></div>
+    <div class="card" style="--c:var(--ok)"><span class="ic">🧾</span><h4>Settle Offline</h4><p>App moves nothing.</p></div>
   </div>
   <div class="grid g3">
-    <div class="panel"><h3>Live leaderboard</h3><p class="mut" style="font-size:12px;margin-bottom:9px">Player‑members; active on top by chips, eliminated drop to the bottom by time.</p>
+    <div class="panel"><h3>Live leaderboard</h3><p class="mut" style="font-size:12px;margin-bottom:9px">Public count: in, waiting, and out. Active on top by chips; eliminated drop to the bottom by time.</p>
       <div class="ll">
-        <div class="row"><span class="rk">1</span><span class="grow">Mike Jones</span><span style="color:var(--mut)">285K</span><span class="b-paid">In pool</span></div>
-        <div class="row"><span class="rk">2</span><span class="grow">Sarah Lee</span><span style="color:var(--mut)">245K</span><span class="b-paid">In pool</span></div>
-        <div class="row"><span class="rk">3</span><span class="grow">Tom Wilson</span><span style="color:var(--mut)">190K</span><span class="b-paid">In pool</span></div>
+        <div class="row"><span class="rk">1</span><span class="grow">Mike Jones</span><span style="color:var(--mut)">285K</span><span class="b-paid">In</span></div>
+        <div class="row"><span class="rk">2</span><span class="grow">Sarah Lee <span class="pulse" title="chips stale"></span></span><span style="color:var(--mut)">245K</span><span class="b-paid">In</span></div>
+        <div class="row"><span class="rk">3</span><span class="grow">Tom Wilson</span><span style="color:var(--mut)">190K</span><span class="b-paid">In</span></div>
+        <div class="row"><span class="rk">—</span><span class="grow">Raj Patel</span><span class="b-wait">Waiting</span></div>
         <div class="row elim"><span class="rk">✕</span><span class="grow">Amy Johnson</span><span class="b-out">Out 3:45</span></div>
-        <div class="row elim"><span class="rk">✕</span><span class="grow">Tim Brown</span><span class="b-out">Out 3:20</span></div>
       </div>
     </div>
-    <div class="panel"><h3>Admin‑managed, live</h3><p class="mut" style="font-size:12px;margin-bottom:9px">The admin drives the live event in real time.</p>
+    <div class="panel"><h3>Host‑run, fully logged</h3><p class="mut" style="font-size:12px;margin-bottom:9px">The host drives it live — and every action is on the record for all to see.</p>
       <div class="chat">
-        <div class="msg sys">🟢 Live tournament started · pool 🪙 800</div>
+        <div class="msg sys">🟢 Live · 38 joined · 12 remaining</div>
         <div class="msg usr"><strong>Mike:</strong> GL all 🔥</div>
-        <div class="msg out">💀 Amy eliminated — 6th</div>
-        <div class="msg sys">🪙 Chip leader: Mike (285K)</div>
+        <div class="msg out">💀 Amy eliminated — 6th (host)</div>
+        <div class="msg sys">🧾 Audit: host marked Amy OUT · 3:45</div>
       </div>
       <div class="chips">
         <span class="chip">Update chips (K / M / exact)</span>
-        <span class="chip">Self / admin / delegate eliminate</span>
-        <span class="chip">Reinstate · late registration</span>
+        <span class="chip">Self / host / others flag eliminate</span>
+        <span class="chip">⏱️ Stale‑chip pulse + reminders</span>
+        <span class="chip">📸 Photo‑verifiable counts</span>
       </div>
     </div>
-    <div class="panel"><h3>Chop the pool</h3><p class="mut" style="font-size:12px;margin-bottom:9px">The last players can vote to split the coin pool; all must agree.</p>
+    <div class="panel"><h3>Chop — host decides</h3><p class="mut" style="font-size:12px;margin-bottom:9px">The last 3 can agree to chop. The app records the agreement; <strong>it never moves the money.</strong></p>
       <div class="ll">
-        <div class="row"><span class="grow">Mike Jones</span><span class="b-paid">✅ 🪙 100</span></div>
-        <div class="row"><span class="grow">Sarah Lee</span><span class="b-paid">✅ 🪙 100</span></div>
+        <div class="row"><span class="grow">Mike Jones</span><span class="b-paid">✅ Agreed</span></div>
+        <div class="row"><span class="grow">Sarah Lee</span><span class="b-paid">✅ Agreed</span></div>
         <div class="row"><span class="grow">Tom Wilson</span><span class="b-out">⏳ Pending</span></div>
       </div>
-      <div class="chips"><span class="chip coin">🪙 Winner / Top‑3 / custom payouts</span></div>
+      <div class="chips"><span class="chip">Result recorded in Stakes</span><span class="chip no">Cash settled offline</span></div>
     </div>
   </div>
 </section>
 
-<!-- MEMBER JOURNEY -->
-<section id="member">
-  <div class="h2"><span class="num">7.</span><h2>Member Journey — two paths</h2></div>
-  <p class="lead">After joining a club, a member can be a <strong style="color:var(--ftf)">bettor</strong> (FT Fantasy) or a <strong style="color:var(--ll)">player</strong> (Last Longer) — or both.</p>
+<!-- PRICING -->
+<section id="pricing">
+  <div class="h2"><span class="num">8.</span><h2>Pricing — by role</h2></div>
+  <p class="lead">Hosting and playing are paid <strong>separately</strong>. The owner subscribes to host; players pay per game or hold a HUDR subscription. <strong>A subscription never makes the app hold or move money</strong> — it just unlocks the tool.</p>
   <div class="grid g2">
-    <div class="lane a">
-      <div class="phase-head" style="background:linear-gradient(135deg,#86198f,#d946ef)">As a bettor · FT Fantasy</div>
-      <div class="flow">
-        <div class="card" style="--c:var(--member)"><span class="ic">📺</span><h4>See the FT</h4><p>External event.</p></div>
-        <div class="ha">→</div>
-        <div class="card" style="--c:var(--member)"><span class="ic">🃏</span><h4>Pick + Stake</h4><p>Coins.</p></div>
-        <div class="ha">→</div>
-        <div class="card" style="--c:var(--coin)"><span class="ic">🪙</span><h4>Win Coins</h4><p>If pool wins.</p></div>
+    <div class="panel" style="border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.05)">
+      <span class="pill" style="--c:var(--owner)">To host · Owner</span>
+      <h3 style="margin-top:8px;font-size:17px">💳 ClubR subscription <span style="font-size:12px;color:var(--coin)">· premium</span></h3>
+      <p class="mut">Required to create a club and host FT Fantasy / Last Longer. <strong>Includes HUDR access</strong> for the owner/admin.</p>
+      <div class="chips">
+        <span class="chip">Higher‑cost premium tier</span>
+        <span class="chip">🔗 Bundles HUDR</span>
+        <span class="chip no">Does NOT make players free</span>
       </div>
     </div>
-    <div class="lane b">
-      <div class="phase-head" style="background:linear-gradient(135deg,#b45309,#f59e0b)">As a player · Last Longer</div>
-      <div class="flow">
-        <div class="card" style="--c:var(--member)"><span class="ic">🪙</span><h4>Join Pool</h4><p>Buy in.</p></div>
-        <div class="ha">→</div>
-        <div class="card" style="--c:var(--member)"><span class="ic">🏟️</span><h4>Play Live</h4><p>Survive.</p></div>
-        <div class="ha">→</div>
-        <div class="card" style="--c:var(--coin)"><span class="ic">🏆</span><h4>Win Pool</h4><p>Last standing.</p></div>
+    <div class="panel" style="border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.05)">
+      <span class="pill" style="--c:var(--member)">To play · Player</span>
+      <h3 style="margin-top:8px;font-size:17px">🪙 Credits, or a HUDR subscription</h3>
+      <p class="mut"><strong>Buy credits</strong> — the payment is your tamper‑proof receipt for being counted — <strong>or</strong> hold a <strong>HUDR subscription</strong> and play free. <strong>There is no ClubR subscription for players.</strong></p>
+      <div class="chips">
+        <span class="chip coin">Credits = per‑entry fee &amp; receipt</span>
+        <span class="chip yes">HUDR sub → plays free</span>
+        <span class="chip">🎁 1000 free credits · 10 free games</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<section id="stats">
-  <div class="h2"><span class="num">8.</span><h2>Stats &amp; Leaderboards</h2></div>
-  <p class="lead">Results from <em>both</em> games roll up into each member's coin profile and the club leaderboard.</p>
-  <div class="grid g2">
-    <div class="panel"><h3>👤 Member profile</h3>
-      <div class="grid g3" style="margin-top:10px">
-        <div class="ent"><div class="t">28</div><div class="f">Games played</div></div>
-        <div class="ent"><div class="t">6</div><div class="f">Wins</div></div>
-        <div class="ent"><div class="t" style="color:var(--coin)">+1,820 🪙</div><div class="f">Net coins</div></div>
-        <div class="ent"><div class="t">62%</div><div class="f">ROI</div></div>
-        <div class="ent"><div class="t">18</div><div class="f">FT Fantasy</div></div>
-        <div class="ent"><div class="t">10</div><div class="f">Last Longer</div></div>
-      </div>
-    </div>
-    <div class="panel"><h3>🏆 Club leaderboard (coins)</h3>
-      <table style="margin-top:10px">
-        <tr><th>#</th><th>Member</th><th>Games</th><th>Wins</th><th>Net 🪙</th></tr>
-        <tr><td>🥇</td><td class="role">Mike Jones</td><td>30</td><td>7</td><td>+2,140</td></tr>
-        <tr><td>🥈</td><td class="role">Sarah Lee</td><td>34</td><td>5</td><td>+1,560</td></tr>
-        <tr><td>🥉</td><td class="role">John Doe</td><td>22</td><td>4</td><td>+980</td></tr>
-      </table>
-      <p class="mut" style="font-size:11.5px;margin-top:8px">Sortable; combines both features. (Optional seasons can group events for a championship.)</p>
-    </div>
-  </div>
-</section>
-
-<!-- HUDR -->
-<section id="hudr">
-  <div class="h2"><span class="num">9.</span><h2>HUDR Integration</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--hudr)">FT Fantasy only</span></div>
-  <p class="lead">HUDR powers <strong>only FT Fantasy</strong> — it supplies the external Final Table being bet on. <strong>Last Longer does not use HUDR</strong> (the admin runs that live event directly).</p>
-  <div class="dflow">
-    <div class="dbox h"><h3 style="color:var(--hudr)">📡 HUDR provides</h3>
-      <ul>
-        <li>The external Final Table (9 players)</li>
-        <li>Live chip counts &amp; eliminations</li>
-        <li>Final finishing order / results</li>
-      </ul>
-    </div>
-    <div class="dx">⟶</div>
-    <div class="dbox c"><h3 style="color:var(--ftf)">🎯 FT Fantasy uses it to</h3>
-      <ul>
-        <li>Show the FT players to pick from</li>
-        <li>Resolve which bucket / pool won</li>
-        <li>Distribute the coin pool</li>
-      </ul>
-    </div>
-  </div>
-  <div class="panel" style="margin-top:12px;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05)">
-    <h3 style="color:var(--ll)">🏟️ Last Longer — no HUDR</h3>
-    <p class="mut">It's the club's own live tournament; the admin enters chips &amp; eliminations manually. Self‑contained.</p>
+<!-- THE WALL -->
+<section id="wall">
+  <div class="h2"><span class="num">9.</span><h2>The Wall — “the tool, not the bank”</h2></div>
+  <p class="lead">The whole posture in five rules. Everything of value — the cash — is <strong>offline and invisible to the app.</strong></p>
+  <div class="wall">
+    <div class="it"><span class="mk">✓</span><span><b>The app awards, holds, pools, and promises nothing.</b> No prize, no payout, no coin pool, no points — for either feature. It records and proves a count and a result.</span></div>
+    <div class="it"><span class="mk">✓</span><span><b>All cash is offline and app‑blind.</b> No IOUs, no cash ledger. The app shows counts, statuses and results in <b>“Stakes,” never dollars.</b></span></div>
+    <div class="it"><span class="mk">✓</span><span><b>Players self‑join and are publicly visible</b> — so the host can't fake the headcount. That transparency is the product.</span></div>
+    <div class="it"><span class="mk">✓</span><span><b>No peer‑to‑peer credit transfer.</b> Credits are a fee paid to use the tool — never sent between users.</span></div>
+    <div class="it"><span class="mk">✓</span><span><b>Credits are a facilitation fee, never a prize.</b> You pay to be provably counted; you don't “win” anything inside the app.</span></div>
   </div>
 </section>
 
 <!-- DATA MODEL -->
 <section id="data">
   <div class="h2"><span class="num">10.</span><h2>Data Model</h2></div>
-  <p class="lead">Shared at the top (Club · Member · coin wallet); then each feature has its own separate entities.</p>
+  <p class="lead">Shared at the top (Club · Member); each feature has its own entities. <strong>Note what's absent: no coin pools, no payouts, no points</strong> — the app stores only what it needs to prove the count and result.</p>
   <div class="flow" style="margin-bottom:14px">
-    <div class="ent" style="border-color:var(--owner);flex:1"><div class="t" style="color:var(--owner)">Club</div><div class="f">name · invite code · owner/admin</div></div>
-    <div class="ent" style="border-color:var(--member);flex:1"><div class="t" style="color:var(--member)">Member</div><div class="f">role · 🪙 coin wallet · aggregate stats (both games)</div></div>
+    <div class="ent" style="border-color:var(--owner);flex:1"><div class="t" style="color:var(--owner)">Club</div><div class="f">name · owner (holds ClubR subscription, incl. HUDR) · hosts</div></div>
+    <div class="ent" style="border-color:var(--member);flex:1"><div class="t" style="color:var(--member)">Member</div><div class="f">phone identity · credits balance / HUDR sub · stats (both games)</div></div>
   </div>
   <div class="grid g2" style="margin-top:6px">
     <div class="lane a">
-      <div class="ent" style="border-color:var(--ftf)"><div class="t" style="color:var(--ftf)">FT Fantasy Event</div><div class="f">external Final Table · hudrId · players A–I</div></div>
+      <div class="ent" style="border-color:var(--ftf)"><div class="t" style="color:var(--ftf)">FT Fantasy Contest</div><div class="f">HUDR FT · host‑curated · Stakes tiers · lock time</div></div>
       <div class="rel">┃ has ▼</div>
-      <div class="ent" style="border-color:var(--ftf)"><div class="t" style="color:var(--ftf)">Bucket (coin pool)</div><div class="f">coin stake tier · prize split · status</div></div>
+      <div class="ent" style="border-color:var(--ftf)"><div class="t" style="color:var(--ftf)">Bucket (Stakes tier)</div><div class="f">stake level · suggested split (shown) · status</div></div>
       <div class="rel">┃ holds ▼</div>
-      <div class="ent" style="border-color:var(--guest)"><div class="t" style="color:var(--guest)">Bet / Pick</div><div class="f">member · picked FT players · coins staked · result</div></div>
+      <div class="ent" style="border-color:var(--guest)"><div class="t" style="color:var(--guest)">Entry</div><div class="f">player · 3 picks · fee paid · HUDR‑scored rank</div></div>
     </div>
     <div class="lane b">
-      <div class="ent" style="border-color:var(--ll)"><div class="t" style="color:var(--ll)">Live Tournament</div><div class="f">club‑hosted · admin · status · settings</div></div>
+      <div class="ent" style="border-color:var(--ll)"><div class="t" style="color:var(--ll)">Live Game</div><div class="f">club‑hosted · host · Stakes tiers · audit log</div></div>
       <div class="rel">┃ has ▼</div>
-      <div class="ent" style="border-color:var(--ll)"><div class="t" style="color:var(--ll)">Coin Pool</div><div class="f">buy‑in · total coins · payout / chop</div></div>
-      <div class="rel">┃ of ▼</div>
-      <div class="ent" style="border-color:var(--guest)"><div class="t" style="color:var(--guest)">Player Entry</div><div class="f">member · chips · eliminated‑at · paid</div></div>
+      <div class="ent" style="border-color:var(--ll)"><div class="t" style="color:var(--ll)">Participant</div><div class="f">player · self‑join · fee paid · status (in / waiting / out)</div></div>
+      <div class="rel">┃ logs ▼</div>
+      <div class="ent" style="border-color:var(--guest)"><div class="t" style="color:var(--guest)">Audit Event</div><div class="f">chip update · elimination · chop — who, what, when</div></div>
     </div>
   </div>
 </section>
@@ -458,24 +453,25 @@
 <!-- SUMMARY -->
 <section id="summary">
   <div class="h2"><span class="num">11.</span><h2>Summary — the two features compared</h2></div>
-  <p class="lead">One glance: what each feature is and how they differ.</p>
+  <p class="lead">One glance. Notice the bottom three rows are <strong>identical</strong> — that's the whole point: ClubR is one honest tool, used two ways.</p>
   <table>
     <tr><th>Aspect</th><th style="color:var(--ftf)">🎯 FT Fantasy</th><th style="color:var(--ll)">🏟️ Last Longer</th></tr>
-    <tr><td class="role">What it is</td><td>Bet on an <strong>external</strong> Final Table</td><td>The club's <strong>own</strong> live poker tournament</td></tr>
-    <tr><td class="role">Members are…</td><td>Bettors / fans</td><td>The players</td></tr>
-    <tr><td class="role">Their action</td><td>Pick FT players + stake coins into a bucket</td><td>Join a coin pool &amp; play to survive</td></tr>
-    <tr><td class="role">Decided by</td><td>The real FT result → which pool won</td><td>Who lasts longest in the live game</td></tr>
-    <tr><td class="role">Run by</td><td>System resolves pools (admin opens them)</td><td>Admin manages the live event</td></tr>
-    <tr><td class="role">Currency</td><td><span class="coin">🪙 coins</span> in &amp; out</td><td><span class="coin">🪙 coins</span> in &amp; out</td></tr>
-    <tr><td class="role">Uses HUDR?</td><td><strong style="color:var(--hudr)">Yes</strong> — the external FT</td><td><strong>No</strong> — self‑contained</td></tr>
+    <tr><td class="role">What it is</td><td>Predict a <strong>HUDR live‑streamed</strong> Final Table</td><td>The club's <strong>own</strong> live tournament</td></tr>
+    <tr><td class="role">Players…</td><td>Pick 3 of the 9 finalists</td><td>Play in the live game (self‑join)</td></tr>
+    <tr><td class="role">Result source</td><td><strong style="color:var(--hudr)">HUDR auto‑resolves</strong> — undisputable</td><td><strong>Host‑judged</strong> — fully logged</td></tr>
+    <tr><td class="role">Provisioning</td><td>Host curates off HUDR's weekly slate</td><td>Host creates the club's own game</td></tr>
+    <tr><td class="role">Uses HUDR?</td><td><strong style="color:var(--hudr)">Yes</strong> — the oracle</td><td><strong>No</strong> — self‑contained</td></tr>
+    <tr><td class="role">App awards</td><td><span class="no">Nothing</span></td><td><span class="no">Nothing</span></td></tr>
+    <tr><td class="role">Stakes settled</td><td><strong>Offline</strong>, by the club</td><td><strong>Offline</strong>, by the club</td></tr>
+    <tr><td class="role">You pay to use it</td><td>Flat fee (credits) or free w/ HUDR sub</td><td>Flat fee (credits) or free w/ HUDR sub</td></tr>
   </table>
 </section>
 
 </main>
 
 <footer>
-  ClubR — interactive flow diagram · two independent coin‑based features: FT Fantasy (bet on an external Final Table) &amp; Last Longer (the club's own live tournament).<br>
-  Visual walkthrough for product review.
+  ClubR — interactive flow diagram · a transparent scorekeeper for poker clubs: FT Fantasy (predict a HUDR live‑streamed Final Table) &amp; Last Longer (the club's own live tournament).<br>
+  The app proves the count &amp; the result — it never holds, moves, or promises the money. Visual walkthrough for product review.
 </footer>
 
 <script>
