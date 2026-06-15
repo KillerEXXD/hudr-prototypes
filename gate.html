@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>HUDR Prototypes — Access</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(217,70,239,.12), transparent 70%),
+      radial-gradient(900px 500px at 0% 110%, rgba(245,158,11,.12), transparent 70%),
+      #0b0f17;color:#e9edf6;padding:20px}
+  .box{width:100%;max-width:360px;background:#141a26;border:1px solid #283450;
+    border-radius:18px;padding:30px 26px;box-shadow:0 20px 60px rgba(0,0,0,.45);text-align:center}
+  .logo{font-size:20px;font-weight:800;letter-spacing:-.3px;
+    background:linear-gradient(120deg,#f0abfc,#a78bfa,#fbbf24);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:#9aa6be;font-size:13.5px;margin-top:8px;line-height:1.5}
+  form{margin-top:22px;display:flex;flex-direction:column;gap:12px}
+  input{width:100%;text-align:center;font-size:22px;font-weight:700;letter-spacing:.4em;
+    color:#e9edf6;background:#0b0f17;border:1px solid #36456a;border-radius:12px;
+    padding:14px 12px;outline:none;transition:.15s}
+  input:focus{border-color:#a78bfa;box-shadow:0 0 0 3px rgba(167,139,250,.22)}
+  input::placeholder{letter-spacing:.4em;color:#4b5670}
+  button{width:100%;font-size:15px;font-weight:800;color:#fff;cursor:pointer;
+    background:linear-gradient(135deg,#d946ef,#f59e0b);border:none;border-radius:12px;
+    padding:13px;transition:.15s}
+  button:hover{filter:brightness(1.07)}
+  button:active{transform:translateY(1px)}
+  .err{color:#fca5a5;font-size:13px;margin-top:14px;font-weight:600}
+  .foot{color:#56627d;font-size:11.5px;margin-top:18px}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="logo">🃏 HUDR Prototypes</div>
+    <p class="sub">This area is private. Enter your access code to continue.</p>
+    <form id="f">
+      <input id="c" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••" aria-label="Access code" autofocus />
+      <button type="submit">Unlock</button>
+    </form>
+    <p id="err" class="err" hidden>Incorrect code — please try again.</p>
+    <p class="foot">Access is by invitation only.</p>
+  </div>
+<script>
+  var p = new URLSearchParams(location.search);
+  if (p.get('e')) { document.getElementById('err').hidden = false; }
+  // Same-origin destination only (guard against open-redirect via ?to=).
+  var to = p.get('to') || '/';
+  if (to.charAt(0) !== '/' || to.slice(0, 2) === '//') to = '/';
+  document.getElementById('f').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var code = document.getElementById('c').value.trim();
+    if (!code) return;
+    var sep = to.indexOf('?') === -1 ? '?' : '&';
+    location.href = to + sep + 'code=' + encodeURIComponent(code);
+  });
+</script>
+</body>
+</html>
