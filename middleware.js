@@ -10,7 +10,7 @@
 
 const CODES = new Set(['2716', '4207', '1958']);
 const COOKIE = 'hp_access';
-const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+const MAX_AGE = 60 * 60 * 2; // 2 hours
 
 export const config = {
   // Run on every path (so deep links into any prototype are gated too).
