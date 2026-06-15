@@ -11,7 +11,7 @@ function MyBadge({ g }: { g: LLGameView }) {
   return null
 }
 
-function GameRow({ g }: { g: LLGameView }) {
+export function GameRow({ g }: { g: LLGameView }) {
   const navigate = useNavigate()
   const s = g.status === 'live' ? { tone: 'green' as const, label: '● Live' } : g.status === 'registration' ? { tone: 'blue' as const, label: 'Registering' } : { tone: 'neutral' as const, label: 'Completed' }
   return (

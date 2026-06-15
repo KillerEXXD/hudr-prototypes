@@ -25,14 +25,6 @@ export function useClub(clubId: string) {
   return useQuery({ queryKey: ['club', clubId, userId], queryFn: () => api.getClub(clubId, userId, isAdmin), enabled: !!clubId })
 }
 
-export function useRecentContests() {
-  return useQuery({ queryKey: ['contests', 'recent'], queryFn: () => api.listRecentContests() })
-}
-
-export function useRecentLastLongers() {
-  return useQuery({ queryKey: ['lastlongers', 'recent'], queryFn: () => api.listRecentLastLongers() })
-}
-
 export function useAllClubs() {
   return useQuery({ queryKey: ['admin', 'clubs'], queryFn: () => api.listAllClubs() })
 }

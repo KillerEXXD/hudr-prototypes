@@ -10,7 +10,7 @@ function MyEntryBadge({ c }: { c: FTContestView }) {
   return null
 }
 
-function ContestRow({ c }: { c: FTContestView }) {
+export function ContestRow({ c }: { c: FTContestView }) {
   const navigate = useNavigate()
   const s = c.status === 'open' ? { tone: 'blue' as const, icon: Clock, label: 'Open' } : c.status === 'locked' ? { tone: 'amber' as const, icon: Lock, label: 'Locked' } : { tone: 'neutral' as const, icon: CheckCircle2, label: 'Settled' }
   return (

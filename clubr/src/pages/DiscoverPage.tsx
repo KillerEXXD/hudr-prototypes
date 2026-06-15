@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { Sparkles, Plus } from 'lucide-react'
-import { useRecentClubs, useRecentContests, useRecentLastLongers, useRequestToJoin } from '@/hooks'
+import { useRecentClubs, useRequestToJoin } from '@/hooks'
+import { useContests } from '@/hooks/ft'
+import { useGames } from '@/hooks/ll'
 import { useAuth } from '@/contexts/AuthContext'
-import { Section, Spinner, Btn } from '@/components/common/ui'
-import { ClubRow, ContestCard, LastLongerCard, MembershipBadge } from '@/components/common/cards'
+import { Section, Spinner, Btn, EmptyState } from '@/components/common/ui'
+import { ClubRow, MembershipBadge } from '@/components/common/cards'
+import { ContestRow } from '@/pages/FantasyPage'
+import { GameRow } from '@/pages/LastLongerPage'
 import type { ClubView } from '@/types'
 
 function RequestButton({ club }: { club: ClubView }) {
@@ -19,8 +23,8 @@ function RequestButton({ club }: { club: ClubView }) {
 export function DiscoverPage() {
   const { user } = useAuth()
   const clubs = useRecentClubs()
-  const contests = useRecentContests()
-  const lls = useRecentLastLongers()
+  const contests = useContests()
+  const games = useGames()
   const [showAll, setShowAll] = useState(false)
 
   return (
@@ -32,22 +36,24 @@ export function DiscoverPage() {
       <Section title="Recent clubs" action={<button onClick={() => setShowAll((s) => !s)} className="text-xs font-semibold text-accent-blue cursor-pointer">{showAll ? 'Show less' : 'See all'}</button>}>
         {clubs.isLoading ? <Spinner /> : (
           <div className="flex flex-col gap-2">
-            {(showAll ? clubs.data : clubs.data?.slice(0, 4))?.map((c) => (
-              <ClubRow key={c.id} club={c} right={<RequestButton club={c} />} />
-            ))}
+            {(showAll ? clubs.data : clubs.data?.slice(0, 4))?.map((c) => <ClubRow key={c.id} club={c} right={<RequestButton club={c} />} />)}
           </div>
         )}
       </Section>
 
-      <Section title="Recent FT Fantasy contests">
-        {contests.isLoading ? <Spinner /> : (
-          <div className="flex flex-col gap-2">{contests.data?.map((c) => <ContestCard key={c.id} c={c} />)}</div>
+      <Section title="FT Fantasy contests">
+        {contests.isLoading ? <Spinner /> : contests.data && contests.data.length > 0 ? (
+          <div className="flex flex-col gap-2">{contests.data.slice(0, 3).map((c) => <ContestRow key={c.id} c={c} />)}</div>
+        ) : (
+          <EmptyState title="No contests in your clubs yet" sub="Join a club to see its FT Fantasy contests." />
         )}
       </Section>
 
-      <Section title="Recent Last Longers">
-        {lls.isLoading ? <Spinner /> : (
-          <div className="flex flex-col gap-2">{lls.data?.map((ll) => <LastLongerCard key={ll.id} ll={ll} />)}</div>
+      <Section title="Last Longers">
+        {games.isLoading ? <Spinner /> : games.data && games.data.length > 0 ? (
+          <div className="flex flex-col gap-2">{games.data.slice(0, 3).map((g) => <GameRow key={g.id} g={g} />)}</div>
+        ) : (
+          <EmptyState title="No games in your clubs yet" sub="Join a club to see its Last Longer games." />
         )}
       </Section>
     </div>

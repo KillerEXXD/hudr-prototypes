@@ -7,7 +7,7 @@
 // real API calls and this file is deleted — nothing else changes.
 // =====================================================================
 
-import type { Club, ContestSummary, LastLongerSummary, User } from '@/types'
+import type { Club, User } from '@/types'
 
 // ---- Accounts (one per login role) + extra people who populate clubs ----
 export const USERS: Record<string, User> = {
@@ -74,20 +74,6 @@ export const CLUBS: Club[] = [
     ownerId: 'u_rae', ownerName: 'Rae Rivers', inviteCode: 'HIGH88', createdAt: '2026-06-11',
     members: [member('u_rae', 'owner', 'member', '2026-06-11'), member('u_tom', 'member', 'member', '2026-06-12')],
   },
-]
-
-// ---- Discover previews (full features arrive in Phases 2 & 3) ----
-export const CONTESTS: ContestSummary[] = [
-  { id: 'ct1', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'PokerGO Cup — Event 7 FT', format: 'stack-draft', status: 'open', stake: 250, entries: 11, locksAt: 'in 3h 40m' },
-  { id: 'ct2', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'WSOP Online — Main FT', format: 'stack-draft', status: 'open', stake: 100, entries: 6, locksAt: 'in 1h 05m' },
-  { id: 'ct3', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', ftName: 'EPT Monte Carlo FT', format: 'stack-draft', status: 'locked', stake: 500, entries: 14, locksAt: 'locked' },
-  { id: 'ct4', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Triton Series — HR FT', format: 'pickem', status: 'settled', stake: 250, entries: 9, locksAt: 'settled' },
-]
-
-export const LAST_LONGERS: LastLongerSummary[] = [
-  { id: 'll1', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', title: 'Friday Night Last Longer', status: 'live', stake: 100, players: 38, remaining: 12 },
-  { id: 'll2', clubId: 'c_river', clubName: 'River Rats', clubEmoji: '🌊', title: 'Sunday Sweat', status: 'registration', stake: 50, players: 9, remaining: 9 },
-  { id: 'll3', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', title: 'Midweek Grind', status: 'completed', stake: 100, players: 24, remaining: 1 },
 ]
 
 // Counter for generated ids (avoids relying on wall-clock for uniqueness).

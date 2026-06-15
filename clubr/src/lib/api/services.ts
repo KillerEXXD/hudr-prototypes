@@ -8,9 +8,9 @@
 // hook changes are needed.
 // =====================================================================
 
-import { CLUBS, CONTESTS, LAST_LONGERS, USERS, nextId } from '@/data/store'
+import { CLUBS, USERS, nextId } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
-import type { Club, ClubMember, ClubView, ContestSummary, LastLongerSummary, User } from '@/types'
+import type { Club, ClubMember, ClubView, User } from '@/types'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 const today = () => new Date().toISOString().slice(0, 10)
@@ -52,16 +52,6 @@ export async function getClub(clubId: string, userId: string, isAdmin = false): 
   await delay()
   const c = CLUBS.find((x) => x.id === clubId)
   return c ? toView(c, userId, isAdmin) : null
-}
-
-export async function listRecentContests(): Promise<ContestSummary[]> {
-  await delay()
-  return [...CONTESTS]
-}
-
-export async function listRecentLastLongers(): Promise<LastLongerSummary[]> {
-  await delay()
-  return [...LAST_LONGERS]
 }
 
 // ---- Admin reads ----

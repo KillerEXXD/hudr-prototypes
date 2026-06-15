@@ -53,34 +53,5 @@ export interface ClubView extends Club {
   pendingCount: number
 }
 
-// ---- Discover feed entities (read-only previews; full features land in later phases) ----
-
-export type ContestFormat = 'stack-draft' | 'pickem'
-export type ContestStatus = 'open' | 'locked' | 'settled'
-
-export interface ContestSummary {
-  id: string
-  clubId: string
-  clubName: string
-  clubEmoji: string
-  ftName: string
-  format: ContestFormat
-  status: ContestStatus
-  stake: number
-  entries: number
-  locksAt: string
-}
-
-export type LastLongerStatus = 'registration' | 'live' | 'completed'
-
-export interface LastLongerSummary {
-  id: string
-  clubId: string
-  clubName: string
-  clubEmoji: string
-  title: string
-  status: LastLongerStatus
-  stake: number
-  players: number
-  remaining: number
-}
+// (Discover surfaces real clubs/contests/games via the FT + LL services —
+//  no separate preview seed/types.)
