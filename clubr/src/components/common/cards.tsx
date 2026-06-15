@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom'
-import { Clock, CheckCircle2, Users } from 'lucide-react'
+import { Clock, CheckCircle2, Users, Crown, Shield } from 'lucide-react'
 import { Avatar, Badge, Card } from './ui'
 import type { ClubView } from '@/types'
 
-export function MembershipBadge({ status }: { status: ClubView['myStatus'] }) {
-  if (status === 'member') return <Badge tone="green"><CheckCircle2 className="h-3 w-3" />Member</Badge>
+export function MembershipBadge({ status, role }: { status: ClubView['myStatus']; role?: ClubView['myRole'] }) {
   if (status === 'pending') return <Badge tone="amber"><Clock className="h-3 w-3" />Pending</Badge>
+  if (role === 'owner') return <Badge tone="green"><Crown className="h-3 w-3" />Owner</Badge>
+  if (role === 'host') return <Badge tone="blue"><Shield className="h-3 w-3" />Host</Badge>
+  if (status === 'member') return <Badge tone="green"><CheckCircle2 className="h-3 w-3" />Member</Badge>
   return null
 }
 
@@ -19,7 +21,7 @@ export function ClubRow({ club, right }: { club: ClubView; right?: React.ReactNo
         <p className="truncate text-sm font-bold text-text-primary">{club.name}</p>
         <p className="truncate text-xs text-text-muted"><Users className="mr-1 inline h-3 w-3" />{memberCount} members · {club.ownerName}</p>
       </div>
-      {right ?? <MembershipBadge status={club.myStatus} />}
+      {right ?? <MembershipBadge status={club.myStatus} role={club.myRole} />}
     </Card>
   )
 }

@@ -49,7 +49,7 @@ export function ClubDetailPage() {
           <h1 className="truncate text-xl font-extrabold tracking-tight text-text-primary">{club.name}</h1>
           <p className="text-xs text-text-muted">{members.length} members · hosted by {club.ownerName}</p>
         </div>
-        <MembershipBadge status={club.myStatus} />
+        <MembershipBadge status={club.myStatus} role={club.myRole} />
       </div>
       <p className="mt-2 text-sm text-text-secondary">{club.description}</p>
 

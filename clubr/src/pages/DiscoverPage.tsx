@@ -12,7 +12,7 @@ import type { ClubView } from '@/types'
 
 function RequestButton({ club }: { club: ClubView }) {
   const req = useRequestToJoin()
-  if (club.myStatus !== 'none') return <MembershipBadge status={club.myStatus} />
+  if (club.myStatus !== 'none') return <MembershipBadge status={club.myStatus} role={club.myRole} />
   return (
     <Btn size="sm" variant="secondary" onClick={() => req.mutate(club.id)} disabled={req.isPending}>
       <Plus className="h-3.5 w-3.5" /> {req.isPending ? '…' : 'Request'}
