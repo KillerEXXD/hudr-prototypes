@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Target, Clock, Lock, CheckCircle2, Eye, Shield, Plus, ChevronDown } from 'lucide-react'
+import { Target, Clock, Lock, CheckCircle2, Eye, Shield, Plus, ChevronDown, Trophy } from 'lucide-react'
 import { useContests } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
@@ -32,9 +32,14 @@ export function ContestRow({ c }: { c: FTContestView }) {
         <span className="text-text-muted">· {c.entries.filter((e) => e.status === 'approved').length} entered</span>
         <span className="ml-auto text-text-muted">{c.locksAt}</span>
       </div>
+      {c.status === 'settled' && c.myEntry?.rank && (
+        <div className="mt-1.5 flex items-center gap-1 text-[11px] font-bold text-accent-purple"><Trophy className="h-3 w-3" />You finished {c.myEntry.rank}{ord(c.myEntry.rank)} · {c.myEntry.score} pts</div>
+      )}
     </Card>
   )
 }
+
+function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th' }
 
 export function FantasyPage() {
   const { data, isLoading } = useContests()
@@ -70,7 +75,7 @@ export function FantasyPage() {
           {past.length > 0 && (
             <div className="mt-5">
               <button onClick={() => setPastOpen((o) => !o)} className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-bg-card px-3 py-2 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
-                {pastOpen ? 'Hide' : 'Show'} your past contests ({past.length}) <ChevronDown className={`h-3.5 w-3.5 transition-transform ${pastOpen ? 'rotate-180' : ''}`} />
+                {pastOpen ? 'Hide' : 'Show'} your results ({past.length}) <ChevronDown className={`h-3.5 w-3.5 transition-transform ${pastOpen ? 'rotate-180' : ''}`} />
               </button>
               {pastOpen && <div className="mt-2 flex flex-col gap-2">{past.map((c) => <ContestRow key={c.id} c={c} />)}</div>}
             </div>
