@@ -48,6 +48,7 @@ export const FT_CONTESTS: FTContest[] = [
   },
   {
     id: 'ct_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'PokerGO Cup — Event 7 FT',
+    visibility: 'private', accessUserIds: ['u_gary', 'u_lena', 'u_player'],
     status: 'open', stake: 250, budget: 100000, locksAt: 'in 3h 40m', hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [

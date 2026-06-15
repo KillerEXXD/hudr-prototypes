@@ -30,6 +30,8 @@ export interface LLGame {
   clubName: string
   clubEmoji: string
   title: string
+  visibility?: 'public' | 'private' // undefined = public (all club members can view)
+  accessUserIds?: string[] // for private: the members who can see it (host always included)
   location?: string
   mode?: 'in-person' | 'online'
   status: LLStatus

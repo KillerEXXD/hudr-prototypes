@@ -24,7 +24,7 @@ export function ContestRow({ c }: { c: FTContestView }) {
     <Card onClick={() => navigate(`/fantasy/${c.id}`)} className="p-3.5">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span>{c.clubName}</div>
-        <div className="flex flex-wrap items-center justify-end gap-1.5"><RoleBadges c={c} /><Badge tone={s.tone}><s.icon className="h-3 w-3" />{s.label}</Badge></div>
+        <div className="flex flex-wrap items-center justify-end gap-1.5"><RoleBadges c={c} />{c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}<Badge tone={s.tone}><s.icon className="h-3 w-3" />{s.label}</Badge></div>
       </div>
       <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Target className="h-4 w-4 text-accent-purple" />{c.ftName}</p>
       <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">

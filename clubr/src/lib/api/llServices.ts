@@ -8,6 +8,12 @@ import type { LLGame, LLGameView } from '@/types/ll'
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 const isMember = (clubId: string, userId: string) => !!CLUBS.find((c) => c.id === clubId)?.members.some((m) => m.userId === userId && m.status === 'member')
 
+// Private games are only visible to host, co-hosts, the chosen access list, and admins.
+function canView(g: LLGame, userId: string, isAdmin: boolean): boolean {
+  if (g.visibility !== 'private') return true
+  return isAdmin || g.hostId === userId || g.coHostIds.includes(userId) || (g.accessUserIds ?? []).includes(userId)
+}
+
 function toView(g: LLGame, userId: string, isAdmin: boolean): LLGameView {
   return {
     ...g,
@@ -21,7 +27,7 @@ function toView(g: LLGame, userId: string, isAdmin: boolean): LLGameView {
 export async function listGames(userId: string, isAdmin = false): Promise<LLGameView[]> {
   await delay()
   return LL_GAMES
-    .filter((g) => isAdmin || isMember(g.clubId, userId) || g.hostId === userId || g.coHostIds.includes(userId))
+    .filter((g) => (isAdmin || isMember(g.clubId, userId) || g.hostId === userId || g.coHostIds.includes(userId)) && canView(g, userId, isAdmin))
     .map((g) => toView(g, userId, isAdmin))
     .sort((a, b) => Number(a.status === 'completed') - Number(b.status === 'completed'))
 }
@@ -29,7 +35,8 @@ export async function listGames(userId: string, isAdmin = false): Promise<LLGame
 export async function getGame(id: string, userId: string, isAdmin = false): Promise<LLGameView | null> {
   await delay()
   const g = LL_GAMES.find((x) => x.id === id)
-  return g ? toView(g, userId, isAdmin) : null
+  if (!g || !canView(g, userId, isAdmin)) return null
+  return toView(g, userId, isAdmin)
 }
 
 export async function requestJoin(gameId: string, userId: string): Promise<void> {
@@ -112,14 +119,17 @@ export async function agreeChop(gameId: string, userId: string): Promise<void> {
 
 function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th' }
 
-export async function createGame(clubId: string, hostId: string, input: { title: string; location: string; mode: 'in-person' | 'online'; stake: number }): Promise<string> {
+export async function createGame(clubId: string, hostId: string, input: { title: string; location: string; mode: 'in-person' | 'online'; stake: number; visibility: 'public' | 'private'; accessUserIds: string[] }): Promise<string> {
   await delay()
   const club = CLUBS.find((c) => c.id === clubId)
   const u = USERS[hostId]
   const id = `ll_${Date.now()}`
   LL_GAMES.unshift({
     id, clubId, clubName: club?.name ?? 'Club', clubEmoji: club?.emoji ?? '🃏',
-    title: input.title.trim() || 'New Last Longer', location: input.location.trim() || undefined, mode: input.mode,
+    title: input.title.trim() || 'New Last Longer',
+    visibility: input.visibility,
+    accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
+    location: input.location.trim() || undefined, mode: input.mode,
     status: 'registration', stake: input.stake, hostId, coHostIds: [],
     participants: [{ userId: hostId, name: u?.name ?? 'Host', avatarColor: u?.avatarColor ?? '#6b7280', status: 'active', paid: true, chips: 0, chipsUpdatedAgo: 'now', stale: false }],
     chat: [],

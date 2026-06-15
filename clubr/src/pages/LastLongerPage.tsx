@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Timer, CheckCircle2, Eye, Shield, Plus, ChevronDown, Trophy } from 'lucide-react'
+import { Timer, CheckCircle2, Eye, Shield, Plus, ChevronDown, Trophy, Lock } from 'lucide-react'
 import { useGames } from '@/hooks/ll'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
@@ -25,7 +25,7 @@ export function GameRow({ g }: { g: LLGameView }) {
     <Card onClick={() => navigate(`/lastlonger/${g.id}`)} className="p-3.5">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
-        <div className="flex flex-wrap items-center justify-end gap-1.5"><RoleBadges g={g} /><Badge tone={s.tone}>{s.label}</Badge></div>
+        <div className="flex flex-wrap items-center justify-end gap-1.5"><RoleBadges g={g} />{g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}<Badge tone={s.tone}>{s.label}</Badge></div>
       </div>
       <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Timer className="h-4 w-4 text-accent-amber" />{g.title}</p>
       <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">

@@ -32,6 +32,7 @@ export const LL_GAMES: LLGame[] = [
   },
   {
     id: 'll_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', title: 'Midweek Grind',
+    visibility: 'private', accessUserIds: ['u_gary', 'u_lena', 'u_player'],
     status: 'live', stake: 250, hostId: 'u_gary', coHostIds: [],
     participants: [
       p('u_gary', 'active', true, 410000, 'now'),

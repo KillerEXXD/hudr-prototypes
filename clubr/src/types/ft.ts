@@ -43,6 +43,8 @@ export interface FTContest {
   clubName: string
   clubEmoji: string
   ftName: string
+  visibility?: 'public' | 'private' // undefined = public (all club members can view)
+  accessUserIds?: string[] // for private: the members who can see it (host always included)
   status: ContestStatusFull
   stake: number
   budget: number

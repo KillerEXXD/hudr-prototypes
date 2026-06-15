@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MapPin } from 'lucide-react'
+import { MapPin, Globe, Lock } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useCreateGame } from '@/hooks/ll'
 import { Sheet, Btn, Field } from '@/components/common/ui'
@@ -18,14 +18,19 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
   const [loc, setLoc] = useState('')
   const [mode, setMode] = useState<'in-person' | 'online'>('in-person')
   const [stake, setStake] = useState(100)
+  const [visibility, setVisibility] = useState<'public' | 'private'>('public')
+  const [access, setAccess] = useState<string[]>([])
 
   useEffect(() => {
     if (fixedClubId) setClubId(fixedClubId)
     else if (managed.length === 1) setClubId(managed[0].id)
   }, [fixedClubId, managed.length])
 
+  const club = managed.find((c) => c.id === clubId)
+  const members = (club?.members ?? []).filter((m) => m.status === 'member')
+
   async function submit() {
-    const newId = await create.mutateAsync({ clubId, title, location: loc, mode, stake })
+    const newId = await create.mutateAsync({ clubId, title, location: loc, mode, stake, visibility, accessUserIds: access })
     onClose(); setTitle(''); setLoc('')
     if (newId) navigate(`/lastlonger/${newId}`)
   }
@@ -63,6 +68,27 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
           <div className="flex gap-2">{[50, 100, 250].map((s) => (
             <button key={s} onClick={() => setStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', stake === s ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>{s}</button>
           ))}</div>
+        </div>
+        <div>
+          <span className="mb-1 block text-xs font-semibold text-text-secondary">Visibility</span>
+          <div className="flex gap-2">
+            {(['public', 'private'] as const).map((v) => (
+              <button key={v} onClick={() => setVisibility(v)} className={cn('flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-2 text-sm font-bold capitalize cursor-pointer', visibility === v ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>
+                {v === 'public' ? <Globe className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}{v}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-[11px] text-text-muted">{visibility === 'public' ? 'All club members can see it & request to join.' : 'Only the members you pick can see it. Approval still required.'}</p>
+          {visibility === 'private' && (
+            <div className="mt-2 max-h-32 overflow-y-auto scrollbar-thin rounded-xl border border-border p-2">
+              {members.length === 0 ? <p className="text-xs text-text-muted">No members to add yet.</p> : members.map((m) => (
+                <label key={m.userId} className="flex items-center gap-2 py-1 text-sm cursor-pointer">
+                  <input type="checkbox" checked={access.includes(m.userId)} onChange={(e) => setAccess((a) => e.target.checked ? [...a, m.userId] : a.filter((x) => x !== m.userId))} />
+                  <span className="text-text-primary">{m.name}</span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
         <Btn className="w-full" disabled={!clubId || !title.trim() || create.isPending} onClick={submit}>Create Last Longer</Btn>
       </div>

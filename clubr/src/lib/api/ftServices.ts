@@ -11,6 +11,13 @@ function isMember(clubId: string, userId: string): boolean {
   return !!CLUBS.find((c) => c.id === clubId)?.members.some((m) => m.userId === userId && m.status === 'member')
 }
 
+// Private contests are only visible to the host, co-hosts, the chosen access
+// list, and app admins. Public (default) is visible to all club members.
+function canView(c: FTContest, userId: string, isAdmin: boolean): boolean {
+  if (c.visibility !== 'private') return true
+  return isAdmin || c.hostId === userId || c.coHostIds.includes(userId) || (c.accessUserIds ?? []).includes(userId)
+}
+
 /** Compute scores + ranks for a settled contest (pure; doesn't mutate). */
 function scored(contest: FTContest): ContestEntry[] {
   if (contest.status !== 'settled' || !contest.finishingOrder) return contest.entries
@@ -38,7 +45,7 @@ function toView(contest: FTContest, userId: string, isAdmin: boolean): FTContest
 export async function listContests(userId: string, isAdmin = false): Promise<FTContestView[]> {
   await delay()
   return FT_CONTESTS
-    .filter((c) => isAdmin || isMember(c.clubId, userId) || c.hostId === userId || c.coHostIds.includes(userId))
+    .filter((c) => (isAdmin || isMember(c.clubId, userId) || c.hostId === userId || c.coHostIds.includes(userId)) && canView(c, userId, isAdmin))
     .map((c) => toView(c, userId, isAdmin))
     .sort((a, b) => Number(a.status === 'settled') - Number(b.status === 'settled'))
 }
@@ -46,7 +53,8 @@ export async function listContests(userId: string, isAdmin = false): Promise<FTC
 export async function getContest(id: string, userId: string, isAdmin = false): Promise<FTContestView | null> {
   await delay()
   const c = FT_CONTESTS.find((x) => x.id === id)
-  return c ? toView(c, userId, isAdmin) : null
+  if (!c || !canView(c, userId, isAdmin)) return null
+  return toView(c, userId, isAdmin)
 }
 
 export async function requestEnter(contestId: string, userId: string): Promise<void> {
@@ -100,7 +108,7 @@ export async function listAvailableFTs(): Promise<AvailableFT[]> {
   return [...AVAILABLE_FTS].sort((a, b) => a.hoursLeft - b.hoursLeft)
 }
 
-export async function createContest(clubId: string, hostId: string, input: { ftId: string; stake: number; budget: number }): Promise<string | null> {
+export async function createContest(clubId: string, hostId: string, input: { ftId: string; stake: number; budget: number; visibility: 'public' | 'private'; accessUserIds: string[] }): Promise<string | null> {
   await delay()
   const ft = AVAILABLE_FTS.find((f) => f.id === input.ftId)
   const club = CLUBS.find((c) => c.id === clubId)
@@ -109,7 +117,10 @@ export async function createContest(clubId: string, hostId: string, input: { ftI
   const id = `ct_${Date.now()}`
   FT_CONTESTS.unshift({
     id, clubId, clubName: club?.name ?? 'Club', clubEmoji: club?.emoji ?? '🃏',
-    ftName: ft.name, status: 'open', stake: input.stake, budget: input.budget,
+    ftName: ft.name,
+    visibility: input.visibility,
+    accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
+    status: 'open', stake: input.stake, budget: input.budget,
     locksAt: `${ft.startsIn} · locks 10m before`, hostId, coHostIds: [], players: ft.players,
     entries: [{ userId: hostId, name: u?.name ?? 'Host', avatarColor: u?.avatarColor ?? '#6b7280', status: 'approved', paid: false, picks: [], spend: 0 }],
     chat: [],
