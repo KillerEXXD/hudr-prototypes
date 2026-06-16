@@ -28,7 +28,7 @@ export function Header() {
       </div>
       <div className="flex items-center gap-1.5">
         <button onClick={() => setSkinOpen(true)} className="flex items-center gap-1.5 rounded-full border border-border bg-bg-card px-2.5 py-1.5 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer" aria-label="Change appearance">
-          <Palette className="h-3.5 w-3.5 text-accent-blue" /> <span className="hidden sm:inline">{label}</span>
+          <Palette className="h-3.5 w-3.5 text-accent-blue" /> <span>{label}</span>
         </button>
         <button onClick={() => setAcctOpen(true)} aria-label="Account"><Avatar name={user.name} color={user.avatarColor} size={32} /></button>
       </div>
