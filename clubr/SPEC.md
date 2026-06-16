@@ -22,7 +22,8 @@ truth for *how the app behaves*; update it as decisions change.
   slate (players, stacks, prize pool); the app computes ICM. **Has ALL visibilities:**
   every club, the full roster of any club, all games (including private), and all
   contact details. **The one exception: FT picks are sealed until lock for everyone,
-  admin included.**
+  admin included.** App Admins **oversee only — they never join a club or play a game**;
+  their Clubs tab shows **all clubs** (see §16).
 - **Club Host / Owner** — creates a club, holds the (premium) subscription, runs
   games, vets & admits members. Earns nothing — reputation only.
 - **Player (Member)** — joins clubs, plays games.
@@ -212,3 +213,25 @@ pure helpers in `lib/gameSetup.ts`):
 - **On the game card:** a `PayoutBadge` summarizes the split ("Winner takes all" / "2 winners ·
   60/40" / "Top 3 · 50/30/20"), and a **live ticking countdown** (`Countdown`) shows how long
   registration stays open — **green normally, red under 10 minutes, pulsing under 2**.
+
+## 16. Roles, entry flow & navigation
+- **App Admin is overseer‑only.** Admins **cannot join a club or participate in a game** —
+  Join/Create (Clubs tab), Request‑to‑join (club page), and the FT **"Your entry"** / LL
+  **"You"** participate sections are hidden for admins. Admins keep full management.
+- **Admin sees ALL clubs.** The **Clubs tab lists every club** for an admin (titled "All
+  Clubs"), not just ones they're in; the **Admin home** also lists all clubs + all users.
+- **Member profiles reachable from every member list.** Tapping a member opens their profile
+  from the **club roster**, **FT contest Entrants**, the **Last Longer leaderboard** (active /
+  waiting / out), and **Admin → All users**. Host/co‑host can do this for their games; the
+  **App Admin sees every member's full details** (contact, location, all games) from anywhere.
+  Contact gating is unchanged (admin = all; host = members of a shared club).
+- **Join from the list.** FT Fantasy & Last Longer **cards carry a "Request to enter / join"
+  button**, so an eligible member can request **without opening the game**. Shows only for a
+  club member who isn't the host and hasn't already joined; non‑members are pointed to join the
+  club first. (Tapping it never navigates into the game.)
+- **Entry CTA placement.** On the FT contest page the **"Your entry"** block (request‑to‑enter,
+  then the draft) sits **above** the Final Table details — the join action is the first thing a
+  player sees.
+- **Stakes · players joined · pool** (`StakePool`) appear on **both the cards and the detail
+  pages** for FT + LL: **buy‑in per entry**, **players joined**, and the **live pool** (buy‑in ×
+  players joined).
