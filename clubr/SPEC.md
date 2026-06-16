@@ -339,3 +339,42 @@ later). Navigation is by **entity/activity, never by game type**:
   its page), **Last Longer** and **Football Squares** (a "How it works" chip on the game detail).
 - *(Transitional: the old `/fantasy` & `/lastlonger` list pages still resolve but are out of nav;
   they're folded away in a later phase.)*
+
+## 19. Credit economy (coins)
+**Credits are the real‑money facilitation fee for *acting* — not a prize, and not "Stakes."** Stakes
+stay the **offline, club‑settled** pool the app never touches; credits gate **joining / creating /
+hosting**. Credits are **non‑cash, non‑refundable to money, and non‑transferable between users**
+(keeps the §11 legal posture).
+
+- **Starting balance:** every new user begins with **1000 credits** (this replaces the old
+  "first 10 games free" trial in §10).
+- **Action costs (App‑Admin‑configurable; defaults):** **Join a game = 100** · **Create a club =
+  200** · **Host a game = 100**. Joining a *club* (membership), browsing, viewing and chat are
+  **free**. A host who also *plays* their own game pays **both** (host + join); co‑hosts pay nothing.
+- **Charge & refund:**
+  - **Join (player):** charged **at request**. **Auto‑refunded** if the host **declines** the
+    request or the player **withdraws before lock**. Once **approved and the game locks**, the join
+    fee is **final**.
+  - **Create club (200) / Host a game (100):** charged on creation. Non‑refundable — **except** the
+    host **cancels the game before lock**, which refunds the **host fee + every player's join fee**.
+  - All refunds return **credits** (never cash), each with a ledger entry.
+- **Awareness:** every spend shows a **confirm sheet first** ("Join costs **100 cr** · **1000 →
+  900** · Confirm") and the **CTA shows its cost** ("Request to join · 100 cr", "Create a club · 200
+  cr", "Host this game · 100 cr").
+- **Out of credits:** the action is **blocked**; the sheet shows the shortfall + a **"Buy credits"**
+  button → the package store.
+- **Purchase packages (App‑Admin‑configured):** each `{ label, credits, priceUSD, active, sortOrder,
+  bonus? }`. Seed store: **500/$5 · 1,200/$10 · 2,000/$15 · 5,000/$30**. Buying goes through a
+  **checkout step**: in the prototype it's a **mock confirm that instantly tops up** the balance +
+  ledger; the same step becomes a **real checkout** when payments are wired (Phase 2 — processor +
+  attorney, §12).
+- **Wallet & ledger:** the balance shows as a **coin chip in the header**; **Me → Wallet** holds the
+  balance, the package store, and a **transaction history** (date · action · +/− · balance after).
+- **Roles:** Player & Club Host have balances and spend per the table above. **App Admin has no
+  balance** — they own an **"Economy" section in the Admin console** to set the three action costs
+  and **CRUD the packages**.
+- **Phase 2 (noted, not built):** the **ClubR subscription** + **HUDR‑subscription fee waiver**
+  return as alternatives to credits once HUDR integrates (supersedes the §10 subscription wording —
+  for now everything runs on credits).
+- **Prototype seed:** new accounts = 1000 cr; demo **Player (Sam) = 1000** (+ a few ledger entries),
+  **Club Host (Harper) = ~600** (shows spend), App Admin = N/A.
