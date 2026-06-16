@@ -62,8 +62,10 @@ export async function requestEnter(contestId: string, userId: string): Promise<v
   const c = FT_CONTESTS.find((x) => x.id === contestId)
   if (!c || c.entries.some((e) => e.userId === userId)) return
   const u = USERS[userId]
-  c.entries.push({ userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status: 'pending', paid: false, picks: [], spend: 0 })
-  c.chat.push({ id: `m_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `${u?.name ?? 'A player'} requested to enter`, ts: 'now', kind: 'system' })
+  // A host/co-host joining their own contest is auto-approved (no self-approval dance).
+  const isHost = c.hostId === userId || c.coHostIds.includes(userId)
+  c.entries.push({ userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status: isHost ? 'approved' : 'pending', paid: false, picks: [], spend: 0 })
+  c.chat.push({ id: `m_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: isHost ? `${u?.name ?? 'The host'} joined as a player` : `${u?.name ?? 'A player'} requested to enter`, ts: 'now', kind: 'system' })
 }
 
 export async function approveEntry(contestId: string, targetUserId: string): Promise<void> {
@@ -122,7 +124,7 @@ export async function createContest(clubId: string, hostId: string, input: { ftI
     accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
     status: 'open', stake: input.stake, budget: input.budget,
     locksAt: `${ft.startsIn} · locks 10m before`, hostId, coHostIds: [], players: ft.players,
-    entries: [{ userId: hostId, name: u?.name ?? 'Host', avatarColor: u?.avatarColor ?? '#6b7280', status: 'approved', paid: false, picks: [], spend: 0 }],
+    entries: [], // host is NOT auto-entered — they join as a player only if they want
     chat: [],
   })
   return id

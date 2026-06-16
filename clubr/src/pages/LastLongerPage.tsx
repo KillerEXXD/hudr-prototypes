@@ -24,14 +24,17 @@ export function GameRow({ g }: { g: LLGameView }) {
   return (
     <Card onClick={() => navigate(`/lastlonger/${g.id}`)} className="p-3.5">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
-        <div className="flex flex-wrap items-center justify-end gap-1.5"><RoleBadges g={g} />{g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}<Badge tone={s.tone}>{s.label}</Badge></div>
+        <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span><span className="truncate">{g.clubName}</span></div>
+        <Badge tone={s.tone}>{s.label}</Badge>
       </div>
-      <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Timer className="h-4 w-4 text-accent-amber" />{g.title}</p>
+      <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Timer className="h-4 w-4 shrink-0 text-accent-amber" /><span className="truncate">{g.title}</span></p>
       <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
         <span className="font-mono">{g.stake} Stakes</span>
         <span className="text-text-muted">· {g.activeCount} in · {g.participants.filter((p) => p.status === 'out').length} out</span>
       </div>
+      {(g.canManage || g.me || g.visibility === 'private') && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges g={g} />{g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
+      )}
       {g.status === 'completed' && g.me?.finishPos && (
         <div className="mt-1.5 flex items-center gap-1 text-[11px] font-bold text-accent-amber"><Trophy className="h-3 w-3" />{g.me.finishPos === 1 ? 'You won 🏆' : `You finished ${g.me.finishPos}${ord(g.me.finishPos)}`}</div>
       )}

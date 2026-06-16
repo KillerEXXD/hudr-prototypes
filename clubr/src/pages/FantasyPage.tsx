@@ -22,15 +22,18 @@ export function ContestRow({ c }: { c: FTContestView }) {
   return (
     <Card onClick={() => navigate(`/fantasy/${c.id}`)} className="p-3.5">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span>{c.clubName}</div>
-        <div className="flex flex-wrap items-center justify-end gap-1.5"><RoleBadges c={c} />{c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}<Badge tone={s.tone}><s.icon className="h-3 w-3" />{s.label}</Badge></div>
+        <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span><span className="truncate">{c.clubName}</span></div>
+        <Badge tone={s.tone}><s.icon className="h-3 w-3" />{s.label}</Badge>
       </div>
-      <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Target className="h-4 w-4 text-accent-purple" />{c.ftName}</p>
+      <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Target className="h-4 w-4 shrink-0 text-accent-purple" /><span className="truncate">{c.ftName}</span></p>
       <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
         <span className="font-mono">{c.stake} Stakes</span>
         <span className="text-text-muted">· {c.entries.filter((e) => e.status === 'approved').length} entered</span>
         <span className="ml-auto text-text-muted">{c.locksAt}</span>
       </div>
+      {(c.canManage || c.myEntry || c.visibility === 'private') && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges c={c} />{c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
+      )}
       {c.status === 'settled' && c.myEntry?.rank && (
         <div className="mt-1.5 flex items-center gap-1 text-[11px] font-bold text-accent-purple"><Trophy className="h-3 w-3" />You finished {c.myEntry.rank}{ord(c.myEntry.rank)} · {c.myEntry.score} pts</div>
       )}

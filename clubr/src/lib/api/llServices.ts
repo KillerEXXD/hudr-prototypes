@@ -44,8 +44,9 @@ export async function requestJoin(gameId: string, userId: string): Promise<void>
   const g = LL_GAMES.find((x) => x.id === gameId)
   if (!g || g.participants.some((p) => p.userId === userId)) return
   const u = USERS[userId]
-  g.participants.push({ userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status: 'pending', paid: false, chips: 0, chipsUpdatedAgo: '—', stale: false })
-  g.chat.push({ id: `lm_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `${u?.name ?? 'A player'} requested to join`, ts: 'now', kind: 'system' })
+  const isHost = g.hostId === userId || g.coHostIds.includes(userId)
+  g.participants.push({ userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status: isHost ? 'active' : 'pending', paid: false, chips: 0, chipsUpdatedAgo: isHost ? 'now' : '—', stale: false })
+  g.chat.push({ id: `lm_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: isHost ? `${u?.name ?? 'The host'} joined as a player` : `${u?.name ?? 'A player'} requested to join`, ts: 'now', kind: 'system' })
 }
 
 export async function approve(gameId: string, target: string): Promise<void> {
@@ -131,7 +132,7 @@ export async function createGame(clubId: string, hostId: string, input: { title:
     accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
     location: input.location.trim() || undefined, mode: input.mode,
     status: 'registration', stake: input.stake, hostId, coHostIds: [],
-    participants: [{ userId: hostId, name: u?.name ?? 'Host', avatarColor: u?.avatarColor ?? '#6b7280', status: 'active', paid: true, chips: 0, chipsUpdatedAgo: 'now', stale: false }],
+    participants: [], // host is NOT auto-added — they join as a player only if they want
     chat: [],
   })
   return id

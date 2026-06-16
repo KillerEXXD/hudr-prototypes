@@ -86,8 +86,8 @@ export function ContestDetailPage() {
             </Card>
           ) : !me ? (
             <>
-              <Card className="text-sm text-text-secondary">Request to enter — the host will admit you, then you can draft.</Card>
-              <Btn className="mt-2 w-full" disabled={requestEnter.isPending} onClick={() => requestEnter.mutate(c.id)}><UserPlus className="h-4 w-4" />Request to enter</Btn>
+              <Card className="text-sm text-text-secondary">{c.canManage ? "You're hosting this contest — you can also join and draft like a player." : 'Request to enter — the host will admit you, then you can draft.'}</Card>
+              <Btn className="mt-2 w-full" disabled={requestEnter.isPending} onClick={() => requestEnter.mutate(c.id)}><UserPlus className="h-4 w-4" />{c.canManage ? 'Join as a player' : 'Request to enter'}</Btn>
             </>
           ) : me.status === 'pending' ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
