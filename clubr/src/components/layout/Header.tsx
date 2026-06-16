@@ -53,7 +53,7 @@ export function Header() {
             const m = ROLE_META[r]
             return (
               <button key={r} onClick={() => { loginAs(r); setAcctOpen(false) }} className="flex flex-col items-center gap-1 rounded-xl border border-border bg-bg-card p-2.5 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
-                <m.icon className="h-4 w-4 text-accent-blue" />{m.label.split(' ')[0]}
+                <m.icon className="h-4 w-4 text-accent-blue" />{m.label}
               </button>
             )
           })}
