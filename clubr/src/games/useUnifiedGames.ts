@@ -15,9 +15,9 @@ import type { SquaresGameView } from '@/types/squares'
 // and a render case wherever items are drawn. Nothing else changes.
 
 export type UnifiedGame =
-  | { type: 'ft_fantasy'; id: string; canManage: boolean; finished: boolean; mine: boolean; sort: number; ft: FTContestView }
-  | { type: 'last_longer'; id: string; canManage: boolean; finished: boolean; mine: boolean; sort: number; ll: LLGameView }
-  | { type: 'football_squares'; id: string; canManage: boolean; finished: boolean; mine: boolean; sort: number; sq: SquaresGameView }
+  | { type: 'ft_fantasy'; id: string; clubId: string; canManage: boolean; finished: boolean; mine: boolean; sort: number; ft: FTContestView }
+  | { type: 'last_longer'; id: string; clubId: string; canManage: boolean; finished: boolean; mine: boolean; sort: number; ll: LLGameView }
+  | { type: 'football_squares'; id: string; clubId: string; canManage: boolean; finished: boolean; mine: boolean; sort: number; sq: SquaresGameView }
 
 export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } {
   const contests = useContests()
@@ -26,19 +26,19 @@ export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } 
 
   const items: UnifiedGame[] = [
     ...(contests.data ?? []).map((c): UnifiedGame => ({
-      type: 'ft_fantasy', id: c.id, canManage: c.canManage,
+      type: 'ft_fantasy', id: c.id, clubId: c.clubId, canManage: c.canManage,
       finished: c.status === 'settled', mine: c.myEntry != null,
       sort: c.status === 'settled' ? Number.MAX_SAFE_INTEGER : regDeadline(c.id, c.locksAtTs),
       ft: c,
     })),
     ...(games.data ?? []).map((g): UnifiedGame => ({
-      type: 'last_longer', id: g.id, canManage: g.canManage,
+      type: 'last_longer', id: g.id, clubId: g.clubId, canManage: g.canManage,
       finished: g.status === 'completed', mine: g.me != null,
       sort: g.status === 'completed' ? Number.MAX_SAFE_INTEGER : (g.status === 'live' ? 0 : regDeadline(g.id, g.registrationClosesAt)),
       ll: g,
     })),
     ...(squares.data ?? []).map((s): UnifiedGame => ({
-      type: 'football_squares', id: s.id, canManage: s.canManage,
+      type: 'football_squares', id: s.id, clubId: s.clubId, canManage: s.canManage,
       finished: s.status === 'completed', mine: s.me != null,
       sort: s.status === 'completed' ? Number.MAX_SAFE_INTEGER : (s.status === 'live' ? 0 : regDeadline(s.id, s.registrationClosesAt)),
       sq: s,

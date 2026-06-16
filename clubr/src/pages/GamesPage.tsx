@@ -3,29 +3,19 @@ import { Gamepad2, Plus } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Section, Spinner, EmptyState } from '@/components/common/ui'
-import { ContestRow } from '@/pages/FantasyPage'
-import { GameRow } from '@/pages/LastLongerPage'
-import { SquaresRow } from '@/components/squares/SquaresRow'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { GAME_TYPES, type GameType } from '@/games/types'
-import { useUnifiedGames, matchesType, type UnifiedGame } from '@/games/useUnifiedGames'
+import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
+import { renderUnifiedGame as renderGame } from '@/games/renderGame'
 import { cn } from '@/lib/utils/cn'
 
 // Unified games feed across all game types — the single surface that replaces
 // the per-game bottom tabs. Driven by the game-type registry + useUnifiedGames,
-// so a new type plugs in via the registry + a render case below.
+// so a new type plugs in via the registry + a render case in renderUnifiedGame.
 
-function renderGame(g: UnifiedGame) {
-  switch (g.type) {
-    case 'ft_fantasy': return <ContestRow key={`ft_${g.id}`} c={g.ft} />
-    case 'last_longer': return <GameRow key={`ll_${g.id}`} g={g.ll} />
-    case 'football_squares': return <SquaresRow key={`sq_${g.id}`} g={g.sq} />
-  }
-}
-
-function FilterChip({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+function FilterChip({ active, onClick, label, activeClass = 'border-accent-blue bg-accent-blue/10 text-accent-blue' }: { active: boolean; onClick: () => void; label: string; activeClass?: string }) {
   return (
-    <button type="button" onClick={onClick} className={cn('rounded-full border px-3 py-1 text-xs font-semibold cursor-pointer', active ? 'border-accent-blue bg-accent-blue/10 text-accent-blue' : 'border-border text-text-secondary')}>{label}</button>
+    <button type="button" onClick={onClick} className={cn('rounded-full border px-3 py-1 text-xs font-semibold cursor-pointer', active ? activeClass : 'border-border text-text-secondary')}>{label}</button>
   )
 }
 
@@ -59,7 +49,7 @@ export function GamesPage() {
       {/* type filter — driven by the registry */}
       <div className="mt-3 flex flex-wrap gap-1.5">
         <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" />
-        {GAME_TYPES.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.label} />)}
+        {GAME_TYPES.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.label} activeClass={t.chipActive} />)}
       </div>
 
       {isLoading ? <Spinner /> : (

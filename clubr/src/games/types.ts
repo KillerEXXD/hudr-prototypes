@@ -20,6 +20,7 @@ export interface GameTypeDef {
   icon: LucideIcon
   iconBg: string         // chooser icon chip background (literal class)
   ring: string           // chooser card border + bg (literal classes)
+  chipActive: string     // active filter-chip classes, per-type accent (literal)
   create: { kind: 'route'; to: string } | { kind: 'sheet' }
 }
 
@@ -27,16 +28,19 @@ export const GAME_TYPES: GameTypeDef[] = [
   {
     id: 'ft_fantasy', label: 'FT Fantasy', sub: 'Draft a streamed final table (Stack Draft)',
     icon: Target, iconBg: 'bg-accent-purple', ring: 'border-accent-purple/30 bg-accent-purple/10',
+    chipActive: 'border-accent-purple bg-accent-purple/10 text-accent-purple',
     create: { kind: 'route', to: '/host-ft' },
   },
   {
     id: 'last_longer', label: 'Last Longer', sub: "Your club's own live tournament",
     icon: Timer, iconBg: 'bg-accent-amber', ring: 'border-accent-amber/30 bg-accent-amber/10',
+    chipActive: 'border-accent-amber bg-accent-amber/10 text-accent-amber',
     create: { kind: 'sheet' },
   },
   {
     id: 'football_squares', label: 'Football Squares', sub: 'A 10×10 squares board on a live game',
     icon: Grid3x3, iconBg: 'bg-accent-emerald', ring: 'border-accent-emerald/30 bg-accent-emerald/10',
+    chipActive: 'border-accent-emerald bg-accent-emerald/10 text-accent-emerald',
     create: { kind: 'sheet' },
   },
 ]

@@ -1,14 +1,23 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, HelpCircle, Coins } from 'lucide-react'
 import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useUpdateChips, useBust, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { GameChat } from '@/components/common/GameChat'
+import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import type { LLParticipant } from '@/types/ll'
+
+const LL_STEPS: HowStep[] = [
+  { icon: UserPlus, title: 'Join the game', body: 'Request to join your club’s live tournament — the host admits you and marks you paid.' },
+  { icon: Timer, title: 'Play it out', body: 'Everyone starts together. As the night goes, the host updates chip counts and busts players as they’re eliminated.' },
+  { icon: Trophy, title: 'Last one standing', body: 'The leaderboard auto-sorts by chips — active players up top, eliminated below with their finish place.' },
+  { icon: Scissors, title: 'Deal or chop', body: 'Near the end, players can propose a chop. It only goes through on a unanimous vote.' },
+  { icon: Coins, title: 'Split the pool', body: 'Pool = entry × players joined, paid by finish place per the host’s split. Settled offline — the app holds no cash.' },
+]
 
 const fmtChips = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(n % 1e6 ? 1 : 0)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}K` : String(n))
 const medal = (n?: number) => (n === 1 ? '🥇' : n === 2 ? '🥈' : n === 3 ? '🥉' : `${n}`)
@@ -26,6 +35,7 @@ export function LastLongerGamePage() {
   const invite = useInviteToGame()
   const [chipInput, setChipInput] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
+  const [howOpen, setHowOpen] = useState(false)
 
   if (isLoading) return <Spinner label="Loading game…" />
   if (!g) return <EmptyState title="Game not found" />
@@ -44,10 +54,11 @@ export function LastLongerGamePage() {
 
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
       <h1 className="mt-1 flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}</h1>
-      <div className="mt-1.5 flex items-center gap-2 text-xs text-text-secondary">
+      <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-secondary">
         <Badge tone={statusTone}>{g.status === 'live' ? '● Live' : g.status === 'registration' ? 'Registering' : 'Completed'}</Badge>
         <span className="font-mono">{g.stake} Stakes</span>
         <span className="text-text-muted">· {g.activeCount} in · {out.length} out</span>
+        <button type="button" onClick={() => setHowOpen(true)} className="flex items-center gap-1 rounded-full border border-border px-2 py-0.5 font-semibold text-text-secondary hover:text-text-primary cursor-pointer"><HelpCircle className="h-3.5 w-3.5" />How it works</button>
       </div>
       {(() => { const joined = g.participants.filter((p) => p.status !== 'pending').length; return <StakePool stake={g.stake} pool={g.stake * joined}>· {joined} joined</StakePool> })()}
       {(g.location || g.mode) && (
@@ -151,6 +162,9 @@ export function LastLongerGamePage() {
       </Section>
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={g.clubId} accessUserIds={g.accessUserIds ?? []} accent="amber" onInvite={(ids) => invite.mutate({ gameId: g.id, userIds: ids })} isPending={invite.isPending} />
+      <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="Last Longer — how it works">
+        <HowItWorks steps={LL_STEPS} dotBg="bg-accent-amber" iconColor="text-accent-amber" />
+      </Sheet>
     </div>
   )
 }

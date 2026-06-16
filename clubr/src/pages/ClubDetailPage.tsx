@@ -1,24 +1,28 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Eye, Copy, Check, Target, Timer, Plus, UserCheck, X, MapPin } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lock, Eye, Copy, Check, Gamepad2, Plus, UserCheck, X, MapPin } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin } from '@/hooks'
-import { useContests } from '@/hooks/ft'
-import { useGames } from '@/hooks/ll'
+import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
-import { ContestRow } from '@/pages/FantasyPage'
-import { GameRow } from '@/pages/LastLongerPage'
+import { NewGameSheet } from '@/components/games/NewGameSheet'
+import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
+import { renderUnifiedGame } from '@/games/renderGame'
+import { GAME_TYPES, type GameType } from '@/games/types'
+import { cn } from '@/lib/utils/cn'
 
 export function ClubDetailPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const { data: club, isLoading } = useClub(id)
   const approve = useApproveMember()
   const reject = useRejectMember()
   const request = useRequestToJoin()
-  const contests = useContests()
-  const games = useGames()
+  const allGames = useUnifiedGames()
   const [copied, setCopied] = useState(false)
+  const [newOpen, setNewOpen] = useState(false)
+  const [gameFilter, setGameFilter] = useState<'all' | GameType>('all')
 
   if (isLoading) return <Spinner label="Loading club…" />
   if (!club) return <EmptyState title="Club not found" />
@@ -27,8 +31,11 @@ export function ClubDetailPage() {
   const pending = club.members.filter((m) => m.status === 'pending')
   const owner = members.find((m) => m.role === 'owner')
   const isMember = club.myStatus === 'member'
-  const clubContests = (contests.data ?? []).filter((c) => c.clubId === club.id && c.status !== 'settled')
-  const clubGames = (games.data ?? []).filter((g) => g.clubId === club.id && g.status !== 'completed')
+  // Every game in this club, across all types (club = container) — urgency-sorted.
+  const clubItems = allGames.items.filter((g) => g.clubId === club.id && !g.finished)
+  const shownItems = clubItems.filter((g) => matchesType(g, gameFilter))
+  const typesPresent = GAME_TYPES.filter((t) => clubItems.some((g) => g.type === t.id))
+  const canHostHere = club.canManage && user?.role !== 'admin'   // app admins never host/join
 
   function copyCode() {
     // Shareable URL — a new user clicks it, signs up, and is dropped into the
@@ -95,19 +102,31 @@ export function ClubDetailPage() {
         </>
       )}
 
-      {/* Games in this club */}
-      <Section title="FT Fantasy" action={<span className="flex items-center gap-1 text-xs text-text-muted"><Target className="h-3.5 w-3.5 text-accent-purple" />Stack Draft</span>}>
-        {clubContests.length > 0 ? (
-          <div className="flex flex-col gap-2">{clubContests.map((c) => <ContestRow key={c.id} c={c} />)}</div>
-        ) : (
-          <p className="rounded-xl border border-border bg-bg-card px-3 py-2.5 text-xs text-text-muted">{isMember || club.canManage ? 'No open contests right now.' : 'Join the club to see its contests.'}{club.canManage && ' Host one from the FT Fantasy tab.'}</p>
+      {/* Games in this club — all types in one place (club = container) */}
+      <Section
+        title="Games"
+        action={canHostHere ? (
+          <button type="button" onClick={() => setNewOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue px-2.5 py-1 text-xs font-bold text-white transition-transform active:scale-95 cursor-pointer"><Plus className="h-3.5 w-3.5" />New</button>
+        ) : undefined}
+      >
+        {typesPresent.length > 1 && (
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            <button type="button" onClick={() => setGameFilter('all')} className={cn('rounded-full border px-2.5 py-0.5 text-xs font-semibold cursor-pointer', gameFilter === 'all' ? 'border-accent-blue bg-accent-blue/10 text-accent-blue' : 'border-border text-text-secondary')}>All</button>
+            {typesPresent.map((t) => (
+              <button key={t.id} type="button" onClick={() => setGameFilter(t.id)} className={cn('flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold cursor-pointer', gameFilter === t.id ? t.chipActive : 'border-border text-text-secondary')}><t.icon className="h-3 w-3" />{t.label}</button>
+            ))}
+          </div>
         )}
-      </Section>
-      <Section title="Last Longer" action={<span className="flex items-center gap-1 text-xs text-text-muted"><Timer className="h-3.5 w-3.5 text-accent-amber" />Live tournament</span>}>
-        {clubGames.length > 0 ? (
-          <div className="flex flex-col gap-2">{clubGames.map((g) => <GameRow key={g.id} g={g} />)}</div>
+        {allGames.isLoading ? (
+          <Spinner />
+        ) : shownItems.length > 0 ? (
+          <div className="flex flex-col gap-2">{shownItems.map(renderUnifiedGame)}</div>
         ) : (
-          <p className="rounded-xl border border-border bg-bg-card px-3 py-2.5 text-xs text-text-muted">{isMember || club.canManage ? 'No live games right now.' : 'Join the club to see its games.'}{club.canManage && ' Create one from the Last Longer tab.'}</p>
+          <EmptyState
+            icon={<Gamepad2 className="h-7 w-7" />}
+            title={clubItems.length > 0 ? 'Nothing of that type' : 'No live games right now'}
+            sub={canHostHere ? 'Tap “New” to host one — FT Fantasy, Last Longer or Football Squares.' : (isMember ? 'Check back when your host starts a game.' : 'Join the club to see its games.')}
+          />
         )}
       </Section>
 
@@ -145,6 +164,8 @@ export function ClubDetailPage() {
           </div>
         )}
       </Section>
+
+      <NewGameSheet open={newOpen} onClose={() => setNewOpen(false)} fixedClubId={club.id} />
     </div>
   )
 }

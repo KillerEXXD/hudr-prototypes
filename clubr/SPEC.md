@@ -312,11 +312,22 @@ later). Navigation is by **entity/activity, never by game type**:
 - **Games tab** (`/games`, `GamesPage.tsx`) = the unified, cross‑club feed of every game type,
   **urgency‑sorted** (live first, then by registration countdown) and split **You're hosting /
   Open & live / Completed**, with a **type‑filter chip row** (All · FT Fantasy · Last Longer · …).
-- **Club = container:** Clubs → a club → its members + its games (all types). The Games feed is a
-  cross‑club aggregation of the same games.
+- **Club = container:** a club detail page renders a **single "Games" section** driven by the same
+  `useUnifiedGames` (filtered to that club) + the shared `renderUnifiedGame` — **all types in one
+  place** with a per‑type filter chip row (only the types actually present) and a host‑only
+  **"+ New"** that opens the same chooser pinned to that club (`fixedClubId`). No more hard‑coded
+  per‑type sub‑sections — a new game type appears here automatically. The Games tab is the
+  cross‑club aggregation of the same items (each carries `clubId`).
 - **One create entry:** a single **"+ New game"** → *"What do you want to host?"* type chooser →
   the chosen type's create flow (`NewGameSheet.tsx`). Hidden for App Admin (overseer‑only).
 - Every card uses one envelope — **type badge · club · status · StakePool (buy‑in·joined·pool) ·
   PayoutBadge · Countdown · Join/Enter** — so a new game type reuses all of it.
+- **Per‑type accent everywhere:** each registry entry carries literal accent classes
+  (`iconBg`/`ring`/`chipActive`) — purple FT · amber LL · emerald Squares — used by the chooser,
+  the active filter chips (Games tab + club section) and the card badges, so a type reads the same
+  color across every surface.
+- **"How it works" per type:** a reusable `HowItWorks` walkthrough (numbered, plain‑English, always
+  ending on the scorekeeper/holds‑no‑cash note) is surfaced from each game's page — FT Fantasy (on
+  its page), **Last Longer** and **Football Squares** (a "How it works" chip on the game detail).
 - *(Transitional: the old `/fantasy` & `/lastlonger` list pages still resolve but are out of nav;
   they're folded away in a later phase.)*
