@@ -70,8 +70,10 @@ export function AdminPage() {
           <div className="flex flex-col gap-1.5">
             {users.data?.map((u) => (
               <div key={u.id} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
-                <Avatar name={u.name} color={u.avatarColor} size={30} />
-                <div className="min-w-0 flex-1"><p className="truncate text-sm text-text-primary">{u.name}</p><p className="truncate text-[11px] text-text-muted">{u.email}</p></div>
+                <button onClick={() => navigate(`/member/${u.id}`)} className="flex min-w-0 flex-1 items-center gap-2.5 text-left cursor-pointer">
+                  <Avatar name={u.name} color={u.avatarColor} size={30} />
+                  <div className="min-w-0 flex-1"><p className="truncate text-sm text-text-primary">{u.name}</p><p className="truncate text-[11px] text-text-muted">{u.email}{u.location ? ` · ${u.location}` : ''}</p></div>
+                </button>
                 <Badge tone={roleTone[u.role]}>{u.role}</Badge>
               </div>
             ))}

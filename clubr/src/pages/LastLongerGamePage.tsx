@@ -120,20 +120,25 @@ export function LastLongerGamePage() {
             <Row key={p.userId} p={p} rank={i + 1} g={g} me={user?.id ?? ''} canManage={g.canManage}
               onPaid={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })}
               onBust={() => bust.mutate({ gameId: g.id, target: p.userId })}
-              onCoHost={() => assignCoHost.mutate({ gameId: g.id, userId: p.userId })} />
+              onCoHost={() => assignCoHost.mutate({ gameId: g.id, userId: p.userId })}
+              onProfile={g.canManage ? () => navigate(`/member/${p.userId}`) : undefined} />
           ))}
           {waiting.map((p) => (
             <div key={p.userId} className="flex items-center gap-2.5 rounded-xl border border-dashed border-accent-amber/40 bg-accent-amber/5 px-3 py-2">
-              <Avatar name={p.name} color={p.avatarColor} size={30} />
-              <span className="flex-1 truncate text-sm text-text-primary">{p.name} <Badge tone="amber">Waiting</Badge></span>
+              <button onClick={() => navigate(`/member/${p.userId}`)} disabled={!g.canManage} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
+                <Avatar name={p.name} color={p.avatarColor} size={30} />
+                <span className="min-w-0 flex-1 truncate text-sm text-text-primary">{p.name} <Badge tone="amber">Waiting</Badge></span>
+              </button>
               {g.canManage && <><Btn size="sm" onClick={() => approve.mutate({ gameId: g.id, userId: p.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn><button onClick={() => decline.mutate({ gameId: g.id, userId: p.userId })} className="text-[11px] text-text-muted hover:text-accent-red cursor-pointer">✕</button></>}
             </div>
           ))}
           {out.map((p) => (
             <div key={p.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2 opacity-60">
               <span className="w-6 text-center text-sm font-bold text-text-muted">{medal(p.finishPos)}</span>
-              <Avatar name={p.name} color={p.avatarColor} size={28} />
-              <span className="flex-1 truncate text-sm text-text-secondary line-through">{p.name}</span>
+              <button onClick={() => navigate(`/member/${p.userId}`)} disabled={!g.canManage} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
+                <Avatar name={p.name} color={p.avatarColor} size={28} />
+                <span className="min-w-0 flex-1 truncate text-sm text-text-secondary line-through">{p.name}</span>
+              </button>
               <span className="text-[11px] text-text-muted">{p.finishPos === 1 ? 'winner 🏆' : p.bustedAgo ? `busted ${p.bustedAgo}` : 'out'}</span>
             </div>
           ))}
@@ -149,17 +154,19 @@ export function LastLongerGamePage() {
   )
 }
 
-function Row({ p, rank, g, me, canManage, onPaid, onBust, onCoHost }: { p: LLParticipant; rank: number; g: { hostId: string; coHostIds: string[] }; me: string; canManage: boolean; onPaid: () => void; onBust: () => void; onCoHost: () => void }) {
+function Row({ p, rank, g, me, canManage, onPaid, onBust, onCoHost, onProfile }: { p: LLParticipant; rank: number; g: { hostId: string; coHostIds: string[] }; me: string; canManage: boolean; onPaid: () => void; onBust: () => void; onCoHost: () => void; onProfile?: () => void }) {
   const isHost = p.userId === g.hostId
   const isCo = g.coHostIds.includes(p.userId)
   return (
     <div className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
       <span className="w-5 text-center text-sm font-extrabold text-text-muted">{rank}</span>
-      <Avatar name={p.name} color={p.avatarColor} size={32} />
-      <div className="min-w-0 flex-1">
-        <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{p.userId === me && <span className="text-[10px] text-accent-blue">(you)</span>}{isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co</Badge>}</p>
-        <p className="flex items-center gap-1 font-mono text-[11px] text-text-muted">{fmtChips(p.chips)}{p.stale && <span className="inline-block h-1.5 w-1.5 animate-pulse-soft rounded-full bg-accent-red" title={`stale · ${p.chipsUpdatedAgo}`} />}<span className="text-text-muted/70"> · {p.chipsUpdatedAgo}</span></p>
-      </div>
+      <button onClick={onProfile} disabled={!onProfile} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
+        <Avatar name={p.name} color={p.avatarColor} size={32} />
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{p.userId === me && <span className="text-[10px] text-accent-blue">(you)</span>}{isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co</Badge>}</p>
+          <p className="flex items-center gap-1 font-mono text-[11px] text-text-muted">{fmtChips(p.chips)}{p.stale && <span className="inline-block h-1.5 w-1.5 animate-pulse-soft rounded-full bg-accent-red" title={`stale · ${p.chipsUpdatedAgo}`} />}<span className="text-text-muted/70"> · {p.chipsUpdatedAgo}</span></p>
+        </div>
+      </button>
       {(canManage || p.userId === me) && <PaidToggle paid={p.paid} editable={canManage} onToggle={onPaid} />}
       {canManage && !isHost && !isCo && <button onClick={onCoHost} title="Make co-host" className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer"><Shield className="h-3.5 w-3.5" /></button>}
       {canManage && <button onClick={onBust} className="rounded-lg border border-accent-red/30 bg-accent-red/10 px-2 py-1 text-[11px] font-bold text-accent-red hover:bg-accent-red/20 cursor-pointer">Out</button>}

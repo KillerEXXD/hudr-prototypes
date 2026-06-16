@@ -134,13 +134,15 @@ export function ContestDetailPage() {
               const isCo = c.coHostIds.includes(e.userId)
               return (
                 <Card key={e.userId} className="flex items-center gap-2.5 p-2.5">
-                  <Avatar name={e.name} color={e.avatarColor} size={34} />
-                  <div className="min-w-0 flex-1">
-                    <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{e.name}
-                      {isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co-host</Badge>}
-                    </p>
-                    <p className="truncate text-[11px] text-text-muted">{c.status === 'open' ? (e.picks.length === 4 ? 'drafted ✓ · sealed until lock' : e.picks.length ? `drafting ${e.picks.length}/4` : 'not drafted') : (e.picks.length ? `${picksToNames(e.picks, c.players)} · ${fmtK(e.spend)} spent` : 'no picks')}</p>
-                  </div>
+                  <button onClick={() => navigate(`/member/${e.userId}`)} className="flex min-w-0 flex-1 items-center gap-2.5 text-left cursor-pointer">
+                    <Avatar name={e.name} color={e.avatarColor} size={34} />
+                    <div className="min-w-0 flex-1">
+                      <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{e.name}
+                        {isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co-host</Badge>}
+                      </p>
+                      <p className="truncate text-[11px] text-text-muted">{c.status === 'open' ? (e.picks.length === 4 ? 'drafted ✓ · sealed until lock' : e.picks.length ? `drafting ${e.picks.length}/4` : 'not drafted') : (e.picks.length ? `${picksToNames(e.picks, c.players)} · ${fmtK(e.spend)} spent` : 'no picks')}</p>
+                    </div>
+                  </button>
                   {e.status === 'pending' ? (
                     <Btn size="sm" onClick={() => approve.mutate({ contestId: c.id, userId: e.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn>
                   ) : (
