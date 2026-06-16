@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils/cn'
-import type { FTPlayer } from '@/types/ft'
+import { FINISH_POINTS, type FTPlayer } from '@/types/ft'
 
 const fmtK = (n: number) => `${Math.round(n / 1000)}k`
+const ord = (n: number) => `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}`
 
 // The 9-player ICM-priced draft board. Pick up to `max` within budget.
 export function DraftBoard({ players, budget, value, onChange, max = 4, disabled }: {
@@ -23,6 +24,7 @@ export function DraftBoard({ players, budget, value, onChange, max = 4, disabled
         <span className="font-mono font-bold text-text-primary">{fmtK(remaining)} <span className="text-text-muted">/ {fmtK(budget)} left</span></span>
         <span className={cn('font-bold', value.length === max ? 'text-accent-emerald' : 'text-text-secondary')}>{value.length}/{max} drafted</span>
       </div>
+      <p className="mb-2 text-[10px] leading-snug text-text-muted"><span className="font-semibold text-text-secondary">Finish points</span> · {FINISH_POINTS.map((p, i) => `${ord(i + 1)} ${p}`).join('  ·  ')}</p>
       <div className="grid grid-cols-3 gap-2">
         {players.map((p) => {
           const picked = value.includes(p.seat)

@@ -11,6 +11,7 @@ import { DraftBoard } from '@/components/ft/DraftBoard'
 import { FinalTableDetails } from '@/components/ft/FinalTableDetails'
 import { SettledResult } from '@/components/ft/SettledResult'
 import { StakePool } from '@/components/common/StakePool'
+import { ScoringSchedule } from '@/components/ft/ScoringSchedule'
 import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
 
 export function ContestDetailPage() {
@@ -89,6 +90,9 @@ export function ContestDetailPage() {
           )}
         </Section>
       )}
+
+      {/* ===== Scoring — points per finish (every state; open by default while drafting) ===== */}
+      <div className="mt-3"><ScoringSchedule defaultOpen={c.status === 'open'} /></div>
 
       {/* ===== Full FT details — roster, stacks, prices, live stream (everyone) ===== */}
       <FinalTableDetails contest={c} />

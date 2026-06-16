@@ -70,6 +70,12 @@ Approval is required to do anything beyond viewing:
   reveal to everyone** in the contest. Settled contests show the leaderboard with picks.
 - **Scoring:** sum of **points‑per‑finish** across your 4 players; highest total
   takes the bucket. Top‑3 **50/30/20** (winner‑take‑all under 5 entries).
+- **Scoring schedule is visible WHILE drafting** (not only at settlement): a collapsible
+  **"How scoring works — points per finish"** panel on the contest page (open by default while
+  the contest is open) lists **1st 100 · 2nd 70 · 3rd 50 · 4th 35 · 5th 25 · 6th 18 · 7th 12 ·
+  8th 6 · 9th 3**, and the **draft board shows the same one‑line reminder**. Single source of
+  truth = `FINISH_POINTS` (`ScoringSchedule.tsx`). *(Points rank the drafted players; the §15
+  payout split divides the pool among entrants — two different things.)*
 - **Prize pool shown is the REAL event's — informational only.** The contest pays
   its own **Stakes bucket**, settled **offline**. The app moves nothing.
 - **Operator slate is host/admin-only.** Players **never** see it; the Host page
