@@ -31,6 +31,7 @@ export function ContestDetailPage() {
   if (!c) return <EmptyState title="Contest not found" />
 
   const me = c.myEntry
+  const isAdmin = user?.role === 'admin'
   const approved = me?.status === 'approved'
   const canChat = approved || c.canManage
   const statusTone = c.status === 'open' ? 'blue' : c.status === 'locked' ? 'amber' : 'neutral'
@@ -76,6 +77,22 @@ export function ContestDetailPage() {
         </>
       )}
 
+      {/* ===== LOCKED: picks revealed to everyone, scores pending ===== */}
+      {c.status === 'locked' && (
+        <Section title="Picks — locked in">
+          <p className="mb-2 text-[11px] text-text-muted">The lock has passed, so picks are revealed to everyone. Scores post when the FT finishes.</p>
+          <div className="flex flex-col gap-1.5">
+            {c.entries.filter((e) => e.status === 'approved').map((e) => (
+              <div key={e.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
+                <Avatar name={e.name} color={e.avatarColor} size={28} />
+                <span className="flex-1 truncate text-sm text-text-primary">{e.name}{e.userId === user?.id && <span className="ml-1 text-[10px] text-accent-blue">(you)</span>}</span>
+                <span className="font-mono text-xs text-text-secondary">{e.picks.join(' · ')}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
       {/* ===== OPEN: access + draft ===== */}
       {c.status === 'open' && (
         <Section title="Your entry">
@@ -113,6 +130,8 @@ export function ContestDetailPage() {
       {c.canManage && (
         <Section title={`Entrants · ${c.entries.length}`} action={<Badge tone="green"><Shield className="h-3 w-3" />You manage</Badge>}>
           <p className="mb-2 text-[11px] text-text-muted">Admit players · toggle the green dot when they've paid · tap a name to make a co-host.</p>
+          {c.status === 'open' && !isAdmin && <p className="mb-2 flex items-center gap-1 text-[11px] text-accent-amber"><Lock className="h-3 w-3" />Picks are sealed until the 10‑min lock — even from you. They reveal to everyone after lock.</p>}
+          {isAdmin && c.status === 'open' && <p className="mb-2 flex items-center gap-1 text-[11px] text-accent-purple"><Shield className="h-3 w-3" />Admin view — picks visible pre‑lock for oversight.</p>}
           <div className="flex flex-col gap-2">
             {c.entries.map((e) => {
               const isHost = e.userId === c.hostId
@@ -124,7 +143,7 @@ export function ContestDetailPage() {
                     <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{e.name}
                       {isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co-host</Badge>}
                     </p>
-                    <p className="text-[11px] text-text-muted">{e.picks.length ? `${e.picks.length} picked · ${fmtK(e.spend)}` : 'not drafted'}</p>
+                    <p className="text-[11px] text-text-muted">{c.status === 'open' && !isAdmin ? (e.picks.length === 4 ? 'drafted ✓ · sealed until lock' : e.picks.length ? `drafting ${e.picks.length}/4` : 'not drafted') : (e.picks.length ? `${e.picks.join(' ')} · ${fmtK(e.spend)}` : 'no picks')}</p>
                   </div>
                   {e.status === 'pending' ? (
                     <Btn size="sm" onClick={() => approve.mutate({ contestId: c.id, userId: e.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn>

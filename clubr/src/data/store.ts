@@ -13,14 +13,14 @@ import type { Club, User } from '@/types'
 export const USERS: Record<string, User> = {
   u_admin: { id: 'u_admin', name: 'Avery Admin', handle: 'avery', email: 'avery@clubr.app', role: 'admin', avatarColor: '#8b5cf6' },
   u_host: { id: 'u_host', name: 'Harper Host', handle: 'harper', email: 'harper@aceshigh.club', role: 'host', avatarColor: '#10b981' },
-  u_player: { id: 'u_player', name: 'Sam Rivers', handle: 'sam', email: 'sam@example.com', role: 'player', avatarColor: '#3b82f6' },
-  u_gary: { id: 'u_gary', name: 'Gary Grind', handle: 'gary', email: 'gary@grinders.club', role: 'host', avatarColor: '#f59e0b' },
+  u_player: { id: 'u_player', name: 'Sam Rivers', handle: 'sam', email: 'sam@example.com', phone: '+1 (415) 555‑0182', role: 'player', avatarColor: '#3b82f6' },
+  u_gary: { id: 'u_gary', name: 'Gary Grind', handle: 'gary', email: 'gary@grinders.club', phone: '+1 (312) 555‑0143', role: 'host', avatarColor: '#f59e0b' },
   u_rae: { id: 'u_rae', name: 'Rae Rivers', handle: 'rae', email: 'rae@riverrats.club', role: 'host', avatarColor: '#06b6d4' },
-  u_mike: { id: 'u_mike', name: 'Mike Jones', handle: 'mikej', email: 'mike@example.com', role: 'player', avatarColor: '#ef4444' },
-  u_tom: { id: 'u_tom', name: 'Tom Wilson', handle: 'tomw', email: 'tom@example.com', role: 'player', avatarColor: '#ec4899' },
-  u_lena: { id: 'u_lena', name: 'Lena Park', handle: 'lena', email: 'lena@example.com', role: 'player', avatarColor: '#14b8a6' },
-  u_jordan: { id: 'u_jordan', name: 'Jordan Lee', handle: 'jordan', email: 'jordan@example.com', role: 'player', avatarColor: '#f97316' },
-  u_dustin: { id: 'u_dustin', name: 'Dustin Cole', handle: 'dustin', email: 'dustin@example.com', role: 'player', avatarColor: '#a855f7' },
+  u_mike: { id: 'u_mike', name: 'Mike Jones', handle: 'mikej', email: 'mike@example.com', phone: '+1 (646) 555‑0110', role: 'player', avatarColor: '#ef4444' },
+  u_tom: { id: 'u_tom', name: 'Tom Wilson', handle: 'tomw', email: 'tom@example.com', phone: '+1 (702) 555‑0177', role: 'player', avatarColor: '#ec4899' },
+  u_lena: { id: 'u_lena', name: 'Lena Park', handle: 'lena', email: 'lena@example.com', phone: '+1 (213) 555‑0199', role: 'player', avatarColor: '#14b8a6' },
+  u_jordan: { id: 'u_jordan', name: 'Jordan Lee', handle: 'jordan', email: 'jordan@example.com', phone: '+1 (305) 555‑0164', role: 'player', avatarColor: '#f97316' },
+  u_dustin: { id: 'u_dustin', name: 'Dustin Cole', handle: 'dustin', email: 'dustin@example.com', phone: '+1 (408) 555‑0125', role: 'player', avatarColor: '#a855f7' },
   u_cody: { id: 'u_cody', name: 'Cody Banks', handle: 'cody', email: 'cody@example.com', role: 'player', avatarColor: '#eab308' },
 }
 

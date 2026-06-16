@@ -78,6 +78,27 @@ export const FT_CONTESTS: FTContest[] = [
     ],
     chat: [cmsg('u_gary', 'GG everyone — Mike runs it', '11:20p', 'system')],
   },
+  {
+    id: 'ct_h', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'GG Super MILLION$ FT',
+    status: 'locked', stake: 100, budget: 100000, locksAt: 'locked · plays in 25m', hostId: 'u_gary', coHostIds: [],
+    players: FT_PLAYERS,
+    entries: [
+      entry('u_gary', 'approved', true, ['A', 'B', 'I', 'H']),
+      entry('u_lena', 'approved', true, ['C', 'D', 'E', 'G']),
+      entry('u_player', 'approved', false, ['A', 'C', 'H', 'I']),
+    ],
+    chat: [cmsg('u_gary', 'Locked! Cards in the air soon 🔒', '9:05p', 'system')],
+  },
+  {
+    id: 'ct_i', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'partypoker MILLIONS FT',
+    status: 'locked', stake: 250, budget: 100000, locksAt: 'locked · plays in 12m', hostId: 'u_host', coHostIds: [],
+    players: FT_PLAYERS,
+    entries: [
+      entry('u_mike', 'approved', true, ['B', 'D', 'F', 'G']),
+      entry('u_tom', 'approved', false, ['A', 'C', 'E', 'I']),
+    ],
+    chat: [],
+  },
 ]
 
 // The operator's slate of upcoming, ICM-priced final tables a host can choose to host.

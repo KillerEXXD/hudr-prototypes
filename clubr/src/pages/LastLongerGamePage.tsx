@@ -150,7 +150,7 @@ function Row({ p, rank, g, me, canManage, onPaid, onBust, onCoHost }: { p: LLPar
         <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{p.userId === me && <span className="text-[10px] text-accent-blue">(you)</span>}{isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co</Badge>}</p>
         <p className="flex items-center gap-1 font-mono text-[11px] text-text-muted">{fmtChips(p.chips)}{p.stale && <span className="inline-block h-1.5 w-1.5 animate-pulse-soft rounded-full bg-accent-red" title={`stale · ${p.chipsUpdatedAgo}`} />}<span className="text-text-muted/70"> · {p.chipsUpdatedAgo}</span></p>
       </div>
-      <PaidToggle paid={p.paid} editable={canManage} onToggle={onPaid} />
+      {(canManage || p.userId === me) && <PaidToggle paid={p.paid} editable={canManage} onToggle={onPaid} />}
       {canManage && !isHost && !isCo && <button onClick={onCoHost} title="Make co-host" className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer"><Shield className="h-3.5 w-3.5" /></button>}
       {canManage && <button onClick={onBust} className="rounded-lg border border-accent-red/30 bg-accent-red/10 px-2 py-1 text-[11px] font-bold text-accent-red hover:bg-accent-red/20 cursor-pointer">Out</button>}
     </div>

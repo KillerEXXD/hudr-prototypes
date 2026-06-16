@@ -12,6 +12,7 @@ import { LastLongerPage } from '@/pages/LastLongerPage'
 import { LastLongerGamePage } from '@/pages/LastLongerGamePage'
 import { MePage } from '@/pages/MePage'
 import { AdminPage } from '@/pages/AdminPage'
+import { MemberPage } from '@/pages/MemberPage'
 
 export default function App() {
   const { user } = useAuth()
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/lastlonger/:id" element={<LastLongerGamePage />} />
         <Route path="/me" element={<MePage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/member/:id" element={<MemberPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

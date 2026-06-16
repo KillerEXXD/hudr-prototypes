@@ -4,6 +4,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import * as api from '@/lib/api/services'
+import * as memberApi from '@/lib/api/memberServices'
 
 function useIdentity() {
   const { user } = useAuth()
@@ -23,6 +24,11 @@ export function useMyClubs() {
 export function useClub(clubId: string) {
   const { userId, isAdmin } = useIdentity()
   return useQuery({ queryKey: ['club', clubId, userId], queryFn: () => api.getClub(clubId, userId, isAdmin), enabled: !!clubId })
+}
+
+export function useMemberProfile(memberId: string) {
+  const { userId, isAdmin } = useIdentity()
+  return useQuery({ queryKey: ['member', memberId, userId], queryFn: () => memberApi.getMemberProfile(memberId, userId, isAdmin), enabled: !!memberId })
 }
 
 export function useAllClubs() {

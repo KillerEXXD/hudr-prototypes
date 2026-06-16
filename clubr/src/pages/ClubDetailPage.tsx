@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Copy, Check, Target, Timer, Plus, UserCheck, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lock, Eye, Copy, Check, Target, Timer, Plus, UserCheck, X } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin } from '@/hooks'
 import { useContests } from '@/hooks/ft'
 import { useGames } from '@/hooks/ll'
@@ -25,6 +25,7 @@ export function ClubDetailPage() {
 
   const members = club.members.filter((m) => m.status === 'member')
   const pending = club.members.filter((m) => m.status === 'pending')
+  const owner = members.find((m) => m.role === 'owner')
   const isMember = club.myStatus === 'member'
   const clubContests = (contests.data ?? []).filter((c) => c.clubId === club.id && c.status !== 'settled')
   const clubGames = (games.data ?? []).filter((g) => g.clubId === club.id && g.status !== 'completed')
@@ -79,8 +80,10 @@ export function ClubDetailPage() {
               <div className="flex flex-col gap-2">
                 {pending.map((m) => (
                   <Card key={m.userId} className="flex items-center gap-3 p-3">
-                    <Avatar name={m.name} color={m.avatarColor} size={36} />
-                    <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-text-primary">{m.name}</p><p className="text-xs text-text-muted">@{m.handle} · requested {m.joinedAt}</p></div>
+                    <button onClick={() => navigate(`/member/${m.userId}`)} className="flex min-w-0 flex-1 items-center gap-3 text-left cursor-pointer">
+                      <Avatar name={m.name} color={m.avatarColor} size={36} />
+                      <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-text-primary">{m.name}</p><p className="text-xs text-text-muted">@{m.handle} · tap to vet →</p></div>
+                    </button>
                     <Btn size="sm" onClick={() => approve.mutate({ clubId: club.id, userId: m.userId })}><UserCheck className="h-3.5 w-3.5" />Admit</Btn>
                     <button onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer" aria-label="Reject"><X className="h-4 w-4" /></button>
                   </Card>
@@ -107,21 +110,39 @@ export function ClubDetailPage() {
         )}
       </Section>
 
-      {/* Members */}
+      {/* Members — full roster is host/admin only; members see just the owner + count */}
       <Section title={`Members · ${members.length}`}>
-        {club.canManage && <p className="mb-2 text-[11px] text-text-muted">You manage this roster — remove a member with ✕.</p>}
-        <div className="flex flex-col gap-1.5">
-          {members.map((m) => (
-            <div key={m.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
-              <Avatar name={m.name} color={m.avatarColor} size={30} />
-              <span className="flex-1 truncate text-sm text-text-primary">{m.name}</span>
-              {m.role !== 'member' && <Badge tone={m.role === 'owner' ? 'green' : 'blue'}>{m.role}</Badge>}
-              {club.canManage && m.role !== 'owner' && (
-                <button onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-accent-red/10 hover:text-accent-red cursor-pointer" aria-label={`Remove ${m.name}`}><X className="h-3.5 w-3.5" /></button>
-              )}
+        {club.canManage ? (
+          <>
+            <p className="mb-2 text-[11px] text-text-muted">You manage this roster — tap a member to view, ✕ to remove.</p>
+            <div className="flex flex-col gap-1.5">
+              {members.map((m) => (
+                <div key={m.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
+                  <button onClick={() => navigate(`/member/${m.userId}`)} className="flex min-w-0 flex-1 items-center gap-2.5 text-left cursor-pointer">
+                    <Avatar name={m.name} color={m.avatarColor} size={30} />
+                    <span className="truncate text-sm text-text-primary">{m.name}</span>
+                    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-text-muted" />
+                  </button>
+                  {m.role !== 'member' && <Badge tone={m.role === 'owner' ? 'green' : 'blue'}>{m.role}</Badge>}
+                  {m.role !== 'owner' && (
+                    <button onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-accent-red/10 hover:text-accent-red cursor-pointer" aria-label={`Remove ${m.name}`}><X className="h-3.5 w-3.5" /></button>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        ) : (
+          <div className="flex flex-col gap-1.5">
+            {owner && (
+              <div className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
+                <Avatar name={owner.name} color={owner.avatarColor} size={30} />
+                <span className="flex-1 truncate text-sm text-text-primary">{owner.name}</span>
+                <Badge tone="green">Owner</Badge>
+              </div>
+            )}
+            <p className="text-[11px] text-text-muted">{members.length} members total · only the host sees the full roster.</p>
+          </div>
+        )}
       </Section>
     </div>
   )

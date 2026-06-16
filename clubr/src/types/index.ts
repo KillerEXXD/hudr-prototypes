@@ -13,6 +13,7 @@ export interface User {
   name: string
   handle: string
   email: string
+  phone?: string
   role: AccountRole
   avatarColor: string
 }
