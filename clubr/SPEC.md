@@ -76,6 +76,9 @@ Approval is required to do anything beyond viewing:
   8th 6 · 9th 3**, and the **draft board shows the same one‑line reminder**. Single source of
   truth = `FINISH_POINTS` (`ScoringSchedule.tsx`). *(Points rank the drafted players; the §15
   payout split divides the pool among entrants — two different things.)*
+- **"How it works?" walkthrough.** A **"How it works"** pill by the FT Fantasy heading opens a
+  **simple numbered step‑by‑step** (find a contest → request to enter → draft 4 → picks lock →
+  watch & score → win the pool), in plain English for first‑timers (`HowItWorks.tsx`).
 - **Prize pool shown is the REAL event's — informational only.** The contest pays
   its own **Stakes bucket**, settled **offline**. The app moves nothing.
 - **Operator slate is host/admin-only.** Players **never** see it; the Host page
