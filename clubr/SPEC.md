@@ -294,6 +294,10 @@ later). Navigation is by **entity/activity, never by game type**:
 - **Bottom nav = Home · Clubs · Games · Me** (4 fixed tabs). The old per‑game tabs (Fantasy, Last
   Longer) are **replaced by a single Games tab**; adding a game type adds a **filter chip + a card
   variant**, never a nav slot.
+- **Game‑type registry:** every type is declared once in **`games/types.ts`** (`GAME_TYPES` — label,
+  icon, colors, create route/sheet). **`useUnifiedGames()`** merges all types into one sorted feed.
+  The Games tab, filter chips and "+ New game" chooser all **iterate the registry** — so a new type
+  is a registry entry + a render case + a create flow, with no plumbing changes.
 - **Games tab** (`/games`, `GamesPage.tsx`) = the unified, cross‑club feed of every game type,
   **urgency‑sorted** (live first, then by registration countdown) and split **You're hosting /
   Open & live / Completed**, with a **type‑filter chip row** (All · FT Fantasy · Last Longer · …).
