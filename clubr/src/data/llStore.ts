@@ -69,4 +69,31 @@ export const LL_GAMES: LLGame[] = [
     ],
     chat: [cmsg('u_gary', 'Sam so close — 2nd! GG', '10:40p', 'system')],
   },
+  // ---- Aces High (Club Host) — REGISTERING ----
+  {
+    id: 'll_f', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', title: 'Saturday Deep Stack Last Longer',
+    status: 'registration', stake: 100, hostId: 'u_host', coHostIds: [],
+    location: 'Aces High Card Room', mode: 'in-person',
+    participants: [
+      p('u_host', 'active', true, 0, 'now'),
+      p('u_mike', 'active', true, 0, 'now'),
+      p('u_tom', 'active', false, 0, 'now'),
+      p('u_jordan', 'pending', false, 0, '—'),
+    ],
+    chat: [cmsg('u_host', 'Registration open — cards in the air at 8pm 🃏', '7:15p', 'system')],
+  },
+  // ---- Aces High (Club Host) — COMPLETED ----
+  {
+    id: 'll_g', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', title: 'Last Friday Last Longer',
+    status: 'completed', stake: 100, hostId: 'u_host', coHostIds: [], winnerName: 'Mike Jones',
+    location: 'Aces High Card Room', mode: 'in-person',
+    participants: [
+      p('u_mike', 'out', true, 0, '—', false, 1),
+      p('u_host', 'out', true, 0, '—', false, 2, '20m ago'),
+      p('u_tom', 'out', true, 0, '—', false, 3, '55m ago'),
+      p('u_dustin', 'out', true, 0, '—', false, 4, '1h 30m ago'),
+      p('u_jordan', 'out', true, 0, '—', false, 5, '2h 05m ago'),
+    ],
+    chat: [cmsg('u_host', 'GG all — Mike takes it down 🏆', '11:48p', 'system')],
+  },
 ]

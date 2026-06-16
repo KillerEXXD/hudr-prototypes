@@ -128,9 +128,10 @@ export const FT_CONTESTS: FTContest[] = [
     entries: [
       entry('u_host', 'approved', true, ['A', 'C', 'F', 'I']), // 223 pts → 1st
       entry('u_tom', 'approved', true, ['A', 'B', 'G', 'I']), // 174 pts → 2nd
-      entry('u_dustin', 'approved', true, ['B', 'C', 'H', 'I']), // 141 pts → 3rd
-      entry('u_jordan', 'approved', true, ['C', 'D', 'F', 'G']), // 136 pts → 4th
-      entry('u_mike', 'approved', true, ['B', 'D', 'E', 'H']), // 90 pts → 5th
+      entry('u_player', 'approved', true, ['A', 'D', 'F', 'H']), // 163 pts → 3rd (Sam — Player demo account)
+      entry('u_dustin', 'approved', true, ['B', 'C', 'H', 'I']), // 141 pts → 4th
+      entry('u_jordan', 'approved', true, ['C', 'D', 'F', 'G']), // 136 pts → 5th
+      entry('u_mike', 'approved', true, ['B', 'D', 'E', 'H']), // 90 pts → 6th
     ],
     chat: [cmsg('u_host', 'GG all — Harper takes it down 🏆', '1:05a', 'system')],
   },
@@ -144,6 +145,7 @@ export const FT_CONTESTS: FTContest[] = [
     finishingOrder: ['B', 'A', 'H', 'C', 'I', 'D', 'E', 'F', 'G'],
     entries: [
       entry('u_mike', 'approved', true, ['A', 'B', 'H', 'I']), // 245 pts → WINNER, takes the pot
+      entry('u_player', 'approved', true, ['A', 'H', 'C', 'I']), // 180 pts → 2nd, no payout (WTA) — Sam, Player demo account
       entry('u_jordan', 'approved', true, ['B', 'E', 'G', 'H']), // 165 pts
       entry('u_host', 'approved', true, ['A', 'D', 'F', 'H']), // 144 pts
       entry('u_tom', 'approved', true, ['C', 'D', 'E', 'F']), // 71 pts

@@ -45,7 +45,7 @@ function toView(contest: FTContest, userId: string, isAdmin: boolean): FTContest
 export async function listContests(userId: string, isAdmin = false): Promise<FTContestView[]> {
   await delay()
   return FT_CONTESTS
-    .filter((c) => (isAdmin || isMember(c.clubId, userId) || c.hostId === userId || c.coHostIds.includes(userId)) && canView(c, userId, isAdmin))
+    .filter((c) => (isAdmin || isMember(c.clubId, userId) || c.hostId === userId || c.coHostIds.includes(userId) || c.entries.some((e) => e.userId === userId)) && canView(c, userId, isAdmin))
     .map((c) => toView(c, userId, isAdmin))
     .sort((a, b) => Number(a.status === 'settled') - Number(b.status === 'settled'))
 }
