@@ -9,6 +9,8 @@ import { StakePool } from '@/components/common/StakePool'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { cn } from '@/lib/utils/cn'
+import { useEconomy } from '@/hooks/credits'
+import { useSpend } from '@/components/credits/SpendProvider'
 import type { SquaresGameView } from '@/types/squares'
 
 const initials = (name?: string) => (name ? name.split(' ').map((w) => w[0]).slice(0, 2).join('') : '')
@@ -27,6 +29,8 @@ export function SquaresGamePage() {
   const { user } = useAuth()
   const { data: g, isLoading } = useSquaresGame(id)
   const join = useRequestJoinSquares()
+  const spend = useSpend()
+  const joinCost = useEconomy().data?.costs.joinGameCost ?? 100
   const approve = useApproveSquares(); const decline = useDeclineSquares()
   const togglePaid = useToggleSquaresPaid()
   const claim = useClaimSquare()
@@ -72,7 +76,7 @@ export function SquaresGamePage() {
       {!g.isMemberOfClub && !g.canManage ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to claim squares.</p></Card>
       ) : !me && !isAdmin ? (
-        <Btn className="mt-3 w-full" disabled={join.isPending} onClick={() => join.mutate(g.id)}><UserPlus className="h-4 w-4" />{g.canManage ? 'Join as a player' : 'Request to join'}</Btn>
+        <Btn className="mt-3 w-full" disabled={join.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${g.title}`, title: g.canManage ? 'Join your board' : 'Join this board', verb: 'Join' })) join.mutate(g.id) }}><UserPlus className="h-4 w-4" />{g.canManage ? 'Join as a player' : 'Request to join'} · {joinCost} cr</Btn>
       ) : me?.status === 'pending' ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary"><b className="text-text-primary">Awaiting host approval.</b> You can claim squares once admitted.</p></Card>
       ) : me?.status === 'active' ? (

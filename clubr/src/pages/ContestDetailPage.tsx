@@ -13,12 +13,16 @@ import { SettledResult } from '@/components/ft/SettledResult'
 import { StakePool } from '@/components/common/StakePool'
 import { ScoringSchedule } from '@/components/ft/ScoringSchedule'
 import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
+import { useEconomy } from '@/hooks/credits'
+import { useSpend } from '@/components/credits/SpendProvider'
 
 export function ContestDetailPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
   const { data: c, isLoading } = useContest(id)
+  const spend = useSpend()
+  const joinCost = useEconomy().data?.costs.joinGameCost ?? 100
   const requestEnter = useRequestEnter()
   const approve = useApproveEntry()
   const decline = useDeclineEntry()
@@ -69,7 +73,7 @@ export function ContestDetailPage() {
           ) : !me ? (
             <>
               <Card className="text-sm text-text-secondary">{c.canManage ? "You're hosting this contest — you can also join and draft like a player." : 'Request to enter — the host will admit you, then you can draft.'}</Card>
-              <Btn className="mt-2 w-full" disabled={requestEnter.isPending} onClick={() => requestEnter.mutate(c.id)}><UserPlus className="h-4 w-4" />{c.canManage ? 'Join as a player' : 'Request to enter'}</Btn>
+              <Btn className="mt-2 w-full" disabled={requestEnter.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${c.ftName}`, title: c.canManage ? 'Join your contest' : 'Join this contest', verb: 'Join' })) requestEnter.mutate(c.id) }}><UserPlus className="h-4 w-4" />{c.canManage ? 'Join as a player' : 'Request to enter'} · {joinCost} cr</Btn>
             </>
           ) : me.status === 'pending' ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">

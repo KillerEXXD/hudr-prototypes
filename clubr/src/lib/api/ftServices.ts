@@ -3,6 +3,7 @@
 import { AVAILABLE_FTS, FT_CONTESTS, spendOf } from '@/data/ftStore'
 import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
+import { ECONOMY, refund } from '@/data/creditsStore'
 import { FINISH_POINTS, type AvailableFT, type ContestEntry, type FTContest, type FTContestView, type FTPlayer } from '@/types/ft'
 import { formatClose } from '@/lib/gameSetup'
 
@@ -78,7 +79,10 @@ export async function approveEntry(contestId: string, targetUserId: string): Pro
 export async function declineEntry(contestId: string, targetUserId: string): Promise<void> {
   await delay(150)
   const c = FT_CONTESTS.find((x) => x.id === contestId)
-  if (c) c.entries = c.entries.filter((e) => e.userId !== targetUserId)
+  if (c) {
+    if (c.entries.some((e) => e.userId === targetUserId)) refund(targetUserId, `Refund — declined from ${c.ftName}`, ECONOMY.joinGameCost)
+    c.entries = c.entries.filter((e) => e.userId !== targetUserId)
+  }
 }
 
 export async function togglePaid(contestId: string, targetUserId: string): Promise<void> {

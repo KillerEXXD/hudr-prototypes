@@ -9,6 +9,8 @@ import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { GameChat } from '@/components/common/GameChat'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
+import { useEconomy } from '@/hooks/credits'
+import { useSpend } from '@/components/credits/SpendProvider'
 import type { LLParticipant } from '@/types/ll'
 
 const LL_STEPS: HowStep[] = [
@@ -28,6 +30,8 @@ export function LastLongerGamePage() {
   const { user } = useAuth()
   const { data: g, isLoading } = useGame(id)
   const requestJoin = useRequestJoinLL()
+  const spend = useSpend()
+  const joinCost = useEconomy().data?.costs.joinGameCost ?? 100
   const approve = useApproveLL(); const decline = useDeclineLL()
   const togglePaid = useTogglePaidLL(); const assignCoHost = useAssignCoHostLL()
   const updateChips = useUpdateChips(); const bust = useBust()
@@ -98,7 +102,7 @@ export function LastLongerGamePage() {
           {!g.isMemberOfClub && !g.canManage ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to play.</p></Card>
           ) : !me ? (
-            <Btn className="w-full" disabled={requestJoin.isPending} onClick={() => requestJoin.mutate(g.id)}><UserPlus className="h-4 w-4" />{g.canManage ? 'Join as a player' : 'Request to join'}</Btn>
+            <Btn className="w-full" disabled={requestJoin.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${g.title}`, title: g.canManage ? 'Join your game' : 'Join this game', verb: 'Join' })) requestJoin.mutate(g.id) }}><UserPlus className="h-4 w-4" />{g.canManage ? 'Join as a player' : 'Request to join'} · {joinCost} cr</Btn>
           ) : me.status === 'pending' ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Awaiting host approval.</span> Read-only until the host admits you.</p></Card>
           ) : me.status === 'active' ? (

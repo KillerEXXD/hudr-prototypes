@@ -13,6 +13,7 @@ import { LastLongerPage } from '@/pages/LastLongerPage'
 import { LastLongerGamePage } from '@/pages/LastLongerGamePage'
 import { SquaresGamePage } from '@/pages/SquaresGamePage'
 import { MePage } from '@/pages/MePage'
+import { WalletPage } from '@/pages/WalletPage'
 import { AdminPage } from '@/pages/AdminPage'
 import { MemberPage } from '@/pages/MemberPage'
 
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/lastlonger/:id" element={<LastLongerGamePage />} />
         <Route path="/squares/:id" element={<SquaresGamePage />} />
         <Route path="/me" element={<MePage />} />
+        <Route path="/wallet" element={<WalletPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/member/:id" element={<MemberPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

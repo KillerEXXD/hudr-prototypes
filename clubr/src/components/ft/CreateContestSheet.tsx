@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Target, Clock, Check, Globe, Lock } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useAvailableFTs, useCreateContest } from '@/hooks/ft'
+import { useEconomy } from '@/hooks/credits'
+import { useSpend } from '@/components/credits/SpendProvider'
 import { Sheet, Btn } from '@/components/common/ui'
 import { ScheduleFields, PayoutEditor } from '@/components/common/GameSetup'
 import { defaultCloseLocal, DEFAULT_PAYOUTS, arePayoutsValid } from '@/lib/gameSetup'
@@ -15,6 +17,8 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
   const myClubs = useMyClubs()
   const availableFts = useAvailableFTs()
   const create = useCreateContest()
+  const spend = useSpend()
+  const hostCost = useEconomy().data?.costs.hostGameCost ?? 100
   const managed = (myClubs.data ?? []).filter((c) => c.canManage)
   const [clubId, setClubId] = useState(fixedClubId ?? '')
   const [ftId, setFtId] = useState('')
@@ -35,6 +39,8 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
   const members = (club?.members ?? []).filter((m) => m.status === 'member')
 
   async function submit() {
+    const ftName = availableFts.data?.find((f) => f.id === ftId)?.name ?? 'FT contest'
+    if (!(await spend({ cost: hostCost, kind: 'host_game', label: `Hosted ${ftName}`, title: 'Host this final table', verb: 'Host' }))) return
     const newId = await create.mutateAsync({ clubId, ftId, stake, budget: 100000, visibility, accessUserIds: access, closesAt, timezone: tz, payouts })
     onClose(); setFtId('')
     if (newId) navigate(`/fantasy/${newId}`)
@@ -110,7 +116,7 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
         </div>
       )}
 
-      <Btn className="mt-3 w-full" disabled={!clubId || !ftId || !closesAt || !arePayoutsValid(payouts) || create.isPending} onClick={submit}>Host this FT</Btn>
+      <Btn className="mt-3 w-full" disabled={!clubId || !ftId || !closesAt || !arePayoutsValid(payouts) || create.isPending} onClick={submit}>Host this FT · {hostCost} cr</Btn>
     </Sheet>
   )
 }

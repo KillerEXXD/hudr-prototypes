@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette } from 'lucide-react'
+import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useMyClubs } from '@/hooks'
+import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge, Btn, Card, Section, Spinner } from '@/components/common/ui'
 import { SkinPicker } from '@/components/common/SkinPicker'
 import type { AccountRole } from '@/types'
@@ -15,6 +16,7 @@ const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' |
 export function MePage() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const wallet = useWallet()
   if (!user) return null
   const role = ROLE_META[user.role]
 
@@ -30,6 +32,17 @@ export function MePage() {
         </div>
         <Badge tone={role.tone}><role.icon className="h-3 w-3" />{role.label}</Badge>
       </Card>
+
+      {user.role !== 'admin' && (
+        <Section title="Wallet">
+          <Card onClick={() => navigate('/wallet')} className="flex items-center gap-3">
+            <Coins className="h-5 w-5 text-accent-amber" />
+            <div className="flex-1"><p className="text-sm font-bold text-text-primary">Credits</p><p className="text-xs text-text-muted">Buy credits · transaction history</p></div>
+            <span className="font-mono text-sm font-bold text-accent-amber">{(wallet.data?.balance ?? 0).toLocaleString()}</span>
+            <ChevronRight className="h-4 w-4 text-text-muted" />
+          </Card>
+        </Section>
+      )}
 
       {user.role === 'admin' && (
         <Section title="App administration">

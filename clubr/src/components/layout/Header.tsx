@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { Palette, LogOut, ShieldCheck, Crown, User as UserIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Palette, LogOut, ShieldCheck, Crown, User as UserIcon, Coins } from 'lucide-react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge, Btn, Sheet } from '@/components/common/ui'
 import { SkinPicker } from '@/components/common/SkinPicker'
 import type { AccountRole } from '@/types'
@@ -15,6 +17,8 @@ const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' |
 export function Header() {
   const { label } = useTheme()
   const { user, loginAs, logout } = useAuth()
+  const navigate = useNavigate()
+  const { data: wallet } = useWallet()
   const [skinOpen, setSkinOpen] = useState(false)
   const [acctOpen, setAcctOpen] = useState(false)
   if (!user) return null
@@ -27,6 +31,11 @@ export function Header() {
         <Badge tone={role.tone}><role.icon className="h-3 w-3" />{role.label}</Badge>
       </div>
       <div className="flex items-center gap-1.5">
+        {user.role !== 'admin' && (
+          <button onClick={() => navigate('/wallet')} className="flex items-center gap-1 rounded-full border border-accent-amber/40 bg-accent-amber/10 px-2.5 py-1.5 text-xs font-bold text-accent-amber hover:bg-accent-amber/20 cursor-pointer" aria-label="Wallet" title="Your credits">
+            <Coins className="h-3.5 w-3.5" /><span className="font-mono">{(wallet?.balance ?? 0).toLocaleString()}</span>
+          </button>
+        )}
         <button onClick={() => setSkinOpen(true)} className="flex items-center gap-1.5 rounded-full border border-border bg-bg-card px-2.5 py-1.5 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer" aria-label="Change appearance">
           <Palette className="h-3.5 w-3.5 text-accent-blue" /> <span>{label}</span>
         </button>

@@ -19,7 +19,7 @@ export function useContest(id: string) {
 
 function useInvalidate() {
   const qc = useQueryClient()
-  return () => qc.invalidateQueries({ queryKey: ['ft'] })
+  return () => { qc.invalidateQueries({ queryKey: ['ft'] }); qc.invalidateQueries({ queryKey: ['credits'] }) }
 }
 
 export function useRequestEnter() {

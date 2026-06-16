@@ -6,6 +6,7 @@ import { useAvailableFTs } from '@/hooks/ft'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { CreateFTSheet } from '@/components/ft/CreateFTSheet'
+import { AdminEconomy } from '@/components/credits/AdminEconomy'
 
 export function AdminPage() {
   const { user } = useAuth()
@@ -31,6 +32,8 @@ export function AdminPage() {
         <Card className="flex items-center gap-2"><Building2 className="h-5 w-5 text-accent-blue" /><div><p className="text-lg font-extrabold text-text-primary">{clubs.data?.length ?? '—'}</p><p className="text-[11px] text-text-muted">Clubs</p></div></Card>
         <Card className="flex items-center gap-2"><Users className="h-5 w-5 text-accent-emerald" /><div><p className="text-lg font-extrabold text-text-primary">{users.data?.length ?? '—'}</p><p className="text-[11px] text-text-muted">Users</p></div></Card>
       </div>
+
+      <AdminEconomy />
 
       <Section title="FT slate (operator)" action={<Btn size="sm" onClick={() => setAddOpen(true)}><Plus className="h-3.5 w-3.5" />Add a final table</Btn>}>
         <p className="mb-2 text-[11px] text-text-muted">The priced final tables hosts can run. You supply players &amp; stacks; the app computes each ICM draft price. Hosts only review &amp; host — <span className="text-text-secondary">players never see this slate.</span></p>

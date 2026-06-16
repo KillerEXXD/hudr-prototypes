@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Plus, Ticket, Users } from 'lucide-react'
 import { useMyClubs, useRecentClubs, useCreateClub, useJoinViaInvite } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
+import { useEconomy } from '@/hooks/credits'
+import { useSpend } from '@/components/credits/SpendProvider'
 import { Section, Spinner, Btn, Card, Sheet, Field, EmptyState } from '@/components/common/ui'
 import { ClubRow } from '@/components/common/cards'
 
@@ -12,6 +14,8 @@ export function ClubsPage() {
   const allClubs = useRecentClubs()
   const create = useCreateClub()
   const join = useJoinViaInvite()
+  const spend = useSpend()
+  const createClubCost = useEconomy().data?.costs.createClubCost ?? 200
   const [createOpen, setCreateOpen] = useState(false)
   const [joinOpen, setJoinOpen] = useState(false)
   const [name, setName] = useState('')
@@ -59,8 +63,8 @@ export function ClubsPage() {
           </div>
           <Field label="Description" value={desc} onChange={setDesc} placeholder="What's your club about?" />
           <Field label="City" value={loc} onChange={setLoc} placeholder="e.g. Houston, TX" />
-          <Btn className="w-full" disabled={!name.trim() || !loc.trim() || create.isPending} onClick={async () => { await create.mutateAsync({ name, emoji, description: desc, location: loc }); setCreateOpen(false); setName(''); setDesc(''); setLoc('') }}>
-            Create club — you're the host
+          <Btn className="w-full" disabled={!name.trim() || !loc.trim() || create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; await create.mutateAsync({ name, emoji, description: desc, location: loc }); setCreateOpen(false); setName(''); setDesc(''); setLoc('') }}>
+            Create club — you're the host · {createClubCost} cr
           </Btn>
           <p className="text-center text-[11px] text-text-muted">You'll own it, get an invite code, and approve who joins.</p>
         </div>

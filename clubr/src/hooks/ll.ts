@@ -18,7 +18,7 @@ export function useGame(id: string) {
 
 function useInvalidate() {
   const qc = useQueryClient()
-  return () => qc.invalidateQueries({ queryKey: ['ll'] })
+  return () => { qc.invalidateQueries({ queryKey: ['ll'] }); qc.invalidateQueries({ queryKey: ['credits'] }) }
 }
 
 export function useRequestJoinLL() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => ll.requestJoin(gameId, userId), onSuccess: inv }) }

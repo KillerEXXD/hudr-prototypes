@@ -2,6 +2,7 @@
 import { SQUARES_GAMES } from '@/data/squaresStore'
 import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
+import { ECONOMY, refund } from '@/data/creditsStore'
 import { emptyGrid, type SquaresGame, type SquaresGameView } from '@/types/squares'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
@@ -62,7 +63,12 @@ export async function approveSquares(gameId: string, userId: string): Promise<vo
   await delay(150); const p = SQUARES_GAMES.find((x) => x.id === gameId)?.participants.find((x) => x.userId === userId); if (p) p.status = 'active'
 }
 export async function declineSquares(gameId: string, userId: string): Promise<void> {
-  await delay(150); const g = SQUARES_GAMES.find((x) => x.id === gameId); if (g) g.participants = g.participants.filter((p) => p.userId !== userId)
+  await delay(150)
+  const g = SQUARES_GAMES.find((x) => x.id === gameId)
+  if (g) {
+    if (g.participants.some((p) => p.userId === userId)) refund(userId, `Refund — declined from ${g.title}`, ECONOMY.joinGameCost)
+    g.participants = g.participants.filter((p) => p.userId !== userId)
+  }
 }
 export async function toggleSquaresPaid(gameId: string, userId: string): Promise<void> {
   await delay(120); const p = SQUARES_GAMES.find((x) => x.id === gameId)?.participants.find((x) => x.userId === userId); if (p) p.paid = !p.paid

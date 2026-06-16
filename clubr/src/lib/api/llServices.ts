@@ -3,6 +3,7 @@
 import { LL_GAMES } from '@/data/llStore'
 import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
+import { ECONOMY, refund } from '@/data/creditsStore'
 import type { LLGame, LLGameView, LLParticipant } from '@/types/ll'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
@@ -76,7 +77,10 @@ export async function approve(gameId: string, target: string): Promise<void> {
 export async function decline(gameId: string, target: string): Promise<void> {
   await delay(150)
   const g = LL_GAMES.find((x) => x.id === gameId)
-  if (g) g.participants = g.participants.filter((p) => p.userId !== target)
+  if (g) {
+    if (g.participants.some((p) => p.userId === target)) refund(target, `Refund — declined from ${g.title}`, ECONOMY.joinGameCost)
+    g.participants = g.participants.filter((p) => p.userId !== target)
+  }
 }
 
 export async function togglePaid(gameId: string, target: string): Promise<void> {

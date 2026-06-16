@@ -16,7 +16,7 @@ export function useSquaresGame(id: string) {
   return useQuery({ queryKey: ['sq', 'one', id, userId], queryFn: () => sq.getSquares(id, userId, isAdmin), enabled: !!id })
 }
 
-function useInvalidate() { const qc = useQueryClient(); return () => qc.invalidateQueries({ queryKey: ['sq'] }) }
+function useInvalidate() { const qc = useQueryClient(); return () => { qc.invalidateQueries({ queryKey: ['sq'] }); qc.invalidateQueries({ queryKey: ['credits'] }) } }
 
 export function useRequestJoinSquares() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => sq.requestJoinSquares(gameId, userId), onSuccess: inv }) }
 export function useApproveSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; userId: string }) => sq.approveSquares(v.gameId, v.userId), onSuccess: inv }) }

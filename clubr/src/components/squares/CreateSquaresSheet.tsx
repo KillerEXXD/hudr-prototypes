@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Grid3x3, Globe, Lock } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useCreateSquares } from '@/hooks/squares'
+import { useEconomy } from '@/hooks/credits'
+import { useSpend } from '@/components/credits/SpendProvider'
 import { Sheet, Btn, Field } from '@/components/common/ui'
 import { ScheduleFields } from '@/components/common/GameSetup'
 import { defaultCloseLocal, arePayoutsValid, payoutsSum } from '@/lib/gameSetup'
@@ -13,6 +15,8 @@ export function CreateSquaresSheet({ open, onClose, fixedClubId }: { open: boole
   const navigate = useNavigate()
   const myClubs = useMyClubs()
   const create = useCreateSquares()
+  const spend = useSpend()
+  const hostCost = useEconomy().data?.costs.hostGameCost ?? 100
   const managed = (myClubs.data ?? []).filter((c) => c.canManage)
   const [clubId, setClubId] = useState(fixedClubId ?? '')
   const [title, setTitle] = useState('')
@@ -33,6 +37,7 @@ export function CreateSquaresSheet({ open, onClose, fixedClubId }: { open: boole
   const canCreate = !!clubId && !!title.trim() && !!home.trim() && !!away.trim() && !!closesAt && sumOk && !create.isPending
 
   async function submit() {
+    if (!(await spend({ cost: hostCost, kind: 'host_game', label: `Hosted ${title.trim() || 'a Squares board'}`, title: 'Host this Squares board', verb: 'Host' }))) return
     const id = await create.mutateAsync({ clubId, title, homeTeam: home, awayTeam: away, stake, visibility, accessUserIds: access, closesAt, timezone: tz, periodPayouts: payouts })
     onClose(); setTitle(''); setHome(''); setAway('')
     if (id) navigate(`/squares/${id}`)
@@ -100,7 +105,7 @@ export function CreateSquaresSheet({ open, onClose, fixedClubId }: { open: boole
             </div>
           )}
         </div>
-        <Btn className="w-full" disabled={!canCreate} onClick={submit}><Grid3x3 className="h-4 w-4" />Create Football Squares</Btn>
+        <Btn className="w-full" disabled={!canCreate} onClick={submit}><Grid3x3 className="h-4 w-4" />Create Football Squares · {hostCost} cr</Btn>
       </div>
     </Sheet>
   )
