@@ -98,6 +98,9 @@ Approval is required to do anything beyond viewing:
   out")**; host decides disputes. Every host action is logged.
 - **Chop:** host proposes → players agree → game settles.
 - **Per‑game chat** among the players.
+- **Auto-updates in chat.** The app posts **system chat lines** automatically: when
+  the **chip lead changes** ("👑 … takes the chip lead — …") and on every
+  **bust / elimination**. The **final bust auto-completes** the game and crowns the winner.
 
 ## 6. Paid status (the green/grey toggle)
 - A subtle **green = paid / grey = unpaid** toggle, no heading.
@@ -132,11 +135,15 @@ Approval is required to do anything beyond viewing:
   "Houston, TX") is captured on the **user at signup** and on the **club at creation**,
   and shown on each club row.
 - **Fantasy / Last Longer** = **active** games front‑and‑center, split **"You're
-  hosting"** vs **"Playing in"**; **completed/your results** fold into a collapsed
-  **"Show your results"** (scoped to games you entered/hosted).
+  hosting"** vs **"Playing in"**; **completed/your results** now show in an **always-visible "Completed (N)"**
+  section (scoped to games you entered/hosted).
 - **Clubs** = your clubs. **Me** = profile + the 6 skins (+ Host/Admin consoles).
 - Cards: a single **status** badge top‑right; **Hosting / Entered / In / Private**
   on their own row.
+- **First tab is role-aware:** **Player → Discover**, **Club Host → a Home dashboard**,
+  **App Admin → the Admin console** (see §17).
+- **Responsive:** nothing is hidden between mobile and desktop — the same features and
+  labels render at every width (role chip, theme label, account switcher, etc.).
 
 ## 10. Pricing (from the product definition)
 - **To host:** a **ClubR subscription** (premium; bundles HUDR in Phase 2).
@@ -190,9 +197,10 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
 ## 14. Prototype feedback & analytics (testing instrumentation)
 A floating **Feedback** launcher sits on every screen (mounted in `AppShell`,
 pinned above the bottom nav), mirroring the Scout prototypes but scoped to ClubR:
-- **Quick note:** auto‑captures the current screen + a 1–5 ease rating, "what to
-  improve", "what worked", and required **name + email** → PostHog
-  `feedback_submitted`.
+- **Quick note (frictionless):** type a single note and **send instantly** — **no
+  rating and no required name/email** (identity is attached only if already captured).
+  Auto‑captures the current screen → PostHog `quick_note_submitted` (also mirrored to
+  TournamentPro). The longer **guided review** stays one tap away.
 - **Guided review (`ReviewWizard`):** identity first, then **one step per ClubR
   feature** — first impression, Discover, joining a club, FT Fantasy (Stack Draft),
   Last Longer, hosting, paid tracking & vetting, transparent scorekeeper,
@@ -249,3 +257,21 @@ pure helpers in `lib/gameSetup.ts`):
 - **Stakes · players joined · pool** (`StakePool`) appear on **both the cards and the detail
   pages** for FT + LL: **buy‑in per entry**, **players joined**, and the **live pool** (buy‑in ×
   players joined).
+
+## 17. Home dashboard & role‑aware navigation
+- **The first bottom‑nav tab adapts to role:**
+  - **Player → Discover** (unchanged) — browse clubs to join + open/live games. Players
+    only ever see **host‑created contests**, never the operator FT slate.
+  - **Club Host → a Home dashboard:** (1) **FTs you can host** — compact cards of the
+    App‑Admin slate that open the Host page; (2) **Your club** — open/in‑progress FT
+    Fantasy + Last Longer you run; (3) **Other clubs you're in** — open/in‑progress games
+    in clubs where you're a member but not the host. Completed games stay on their tabs.
+  - **App Admin → the Admin console** as home (all clubs + all users + the FT slate;
+    the Back button is hidden when it's the home tab).
+- **App Admin adds final tables** via an **"Add a final table"** form: event meta + the 9
+  finalists by **name & chip stack**; the app **seats them A–I by stack** and
+  **auto‑computes each ICM draft price from the stack** (concave ladder, ~13k–35k). A
+  one‑tap **sample** fills a realistic table. The new FT appears immediately under hosts'
+  **"FTs to host"**. **Players never see the slate**; the Host page (`/host-ft`) is guarded.
+- **Entrants keep visibility:** a player can always see a contest/game they're **entered
+  in**, even across clubs they're not a member of.
