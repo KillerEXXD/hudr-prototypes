@@ -8,9 +8,9 @@ import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/compon
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { GameChat } from '@/components/common/GameChat'
 import { DraftBoard } from '@/components/ft/DraftBoard'
+import { FinalTableDetails } from '@/components/ft/FinalTableDetails'
 import { FINISH_POINTS } from '@/types/ft'
-
-const fmtK = (n: number) => `${Math.round(n / 1000)}k`
+import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
 
 export function ContestDetailPage() {
   const { id = '' } = useParams()
@@ -53,6 +53,9 @@ export function ContestDetailPage() {
         <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>
       )}
 
+      {/* ===== Full FT details — roster, stacks, prices, live stream (everyone) ===== */}
+      <FinalTableDetails contest={c} />
+
       {/* ===== SETTLED: leaderboard ===== */}
       {c.status === 'settled' && (
         <>
@@ -61,7 +64,7 @@ export function ContestDetailPage() {
               {c.finishingOrder?.map((seat, i) => (
                 <span key={seat} className="flex items-center gap-1 rounded-lg bg-bg-surface px-2 py-1 text-xs">
                   <span className="font-bold text-text-muted">{i + 1}.</span>
-                  <span className="font-bold text-text-primary">{c.players.find((p) => p.seat === seat)?.name}</span>
+                  <span className="font-bold text-text-primary">{playerFull(c.players.find((p) => p.seat === seat))}</span>
                   <span className="font-mono text-[10px] text-accent-emerald">+{FINISH_POINTS[i]}</span>
                 </span>
               ))}
@@ -73,7 +76,7 @@ export function ContestDetailPage() {
                 <div key={e.userId} className={cnRow(e.userId === user?.id)}>
                   <span className="w-6 text-center text-sm font-extrabold text-text-muted">{e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : e.rank === 3 ? '🥉' : e.rank}</span>
                   <Avatar name={e.name} color={e.avatarColor} size={30} />
-                  <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-text-primary">{e.name}</p><p className="text-[11px] text-text-muted">{e.picks.join(' · ')}</p></div>
+                  <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-text-primary">{e.name}</p><p className="truncate text-[11px] text-text-muted">{picksToNames(e.picks, c.players)} · <span className="text-text-secondary">{fmtK(e.spend)} spent</span></p></div>
                   <span className="font-mono text-sm font-bold text-accent-purple">{e.score}</span>
                 </div>
               ))}
@@ -88,10 +91,22 @@ export function ContestDetailPage() {
           <p className="mb-2 text-[11px] text-text-muted">The lock has passed, so picks are revealed to everyone. Scores post when the FT finishes.</p>
           <div className="flex flex-col gap-1.5">
             {c.entries.filter((e) => e.status === 'approved').map((e) => (
-              <div key={e.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
-                <Avatar name={e.name} color={e.avatarColor} size={28} />
-                <span className="flex-1 truncate text-sm text-text-primary">{e.name}{e.userId === user?.id && <span className="ml-1 text-[10px] text-accent-blue">(you)</span>}</span>
-                <span className="font-mono text-xs text-text-secondary">{e.picks.join(' · ')}</span>
+              <div key={e.userId} className="flex flex-col gap-1.5 rounded-xl border border-border bg-bg-card px-3 py-2.5">
+                <div className="flex items-center gap-2.5">
+                  <Avatar name={e.name} color={e.avatarColor} size={28} />
+                  <span className="flex-1 truncate text-sm font-semibold text-text-primary">{e.name}{e.userId === user?.id && <span className="ml-1 text-[10px] text-accent-blue">(you)</span>}</span>
+                  <span className="font-mono text-xs font-bold text-accent-purple">{fmtK(e.spend)}<span className="font-sans font-normal text-text-muted"> spent</span></span>
+                </div>
+                <div className="flex flex-wrap gap-1 pl-[38px]">
+                  {e.picks.map((seat) => {
+                    const p = c.players.find((x) => x.seat === seat)
+                    return (
+                      <span key={seat} className="inline-flex items-center gap-1 rounded-lg bg-bg-surface px-1.5 py-0.5 text-[11px] text-text-secondary">
+                        <span className="leading-none">{p?.country ?? '🃏'}</span>{playerFull(p)}
+                      </span>
+                    )
+                  })}
+                </div>
               </div>
             ))}
           </div>
@@ -147,7 +162,7 @@ export function ContestDetailPage() {
                     <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{e.name}
                       {isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co-host</Badge>}
                     </p>
-                    <p className="text-[11px] text-text-muted">{c.status === 'open' ? (e.picks.length === 4 ? 'drafted ✓ · sealed until lock' : e.picks.length ? `drafting ${e.picks.length}/4` : 'not drafted') : (e.picks.length ? `${e.picks.join(' ')} · ${fmtK(e.spend)}` : 'no picks')}</p>
+                    <p className="truncate text-[11px] text-text-muted">{c.status === 'open' ? (e.picks.length === 4 ? 'drafted ✓ · sealed until lock' : e.picks.length ? `drafting ${e.picks.length}/4` : 'not drafted') : (e.picks.length ? `${picksToNames(e.picks, c.players)} · ${fmtK(e.spend)} spent` : 'no picks')}</p>
                   </div>
                   {e.status === 'pending' ? (
                     <Btn size="sm" onClick={() => approve.mutate({ contestId: c.id, userId: e.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn>

@@ -3,16 +3,18 @@
 import { USERS } from './store'
 import type { AvailableFT, ContestEntry, FTContest, FTPlayer } from '@/types/ft'
 
+// 9-handed final table, ordered by chip stack (leader first). Chips are at the
+// current 100k big blind, so chips = bbStack × 100,000.
 export const FT_PLAYERS: FTPlayer[] = [
-  { seat: 'A', name: 'Negreanu', bbStack: 95, icmPrice: 38000 },
-  { seat: 'B', name: 'Ivey', bbStack: 72, icmPrice: 33000 },
-  { seat: 'C', name: 'Hellmuth', bbStack: 58, icmPrice: 29000 },
-  { seat: 'D', name: 'Bonomo', bbStack: 44, icmPrice: 26000 },
-  { seat: 'E', name: 'Selbst', bbStack: 35, icmPrice: 24000 },
-  { seat: 'F', name: 'Holz', bbStack: 26, icmPrice: 22000 },
-  { seat: 'G', name: 'Kenney', bbStack: 19, icmPrice: 20000 },
-  { seat: 'H', name: 'Konnikova', bbStack: 12, icmPrice: 18000 },
-  { seat: 'I', name: 'Seidel', bbStack: 7, icmPrice: 15000 },
+  { seat: 'A', name: 'Negreanu', first: 'Daniel', last: 'Negreanu', country: '🇨🇦', bbStack: 95, chips: 9_500_000, icmPrice: 38000, icmCash: 1_150_000 },
+  { seat: 'B', name: 'Ivey', first: 'Phil', last: 'Ivey', country: '🇺🇸', bbStack: 72, chips: 7_200_000, icmPrice: 33000, icmCash: 880_000 },
+  { seat: 'C', name: 'Hellmuth', first: 'Phil', last: 'Hellmuth', country: '🇺🇸', bbStack: 58, chips: 5_800_000, icmPrice: 29000, icmCash: 700_000 },
+  { seat: 'D', name: 'Bonomo', first: 'Justin', last: 'Bonomo', country: '🇺🇸', bbStack: 44, chips: 4_400_000, icmPrice: 26000, icmCash: 560_000 },
+  { seat: 'E', name: 'Selbst', first: 'Vanessa', last: 'Selbst', country: '🇺🇸', bbStack: 35, chips: 3_500_000, icmPrice: 24000, icmCash: 450_000 },
+  { seat: 'F', name: 'Holz', first: 'Fedor', last: 'Holz', country: '🇩🇪', bbStack: 26, chips: 2_600_000, icmPrice: 22000, icmCash: 360_000 },
+  { seat: 'G', name: 'Kenney', first: 'Bryn', last: 'Kenney', country: '🇺🇸', bbStack: 19, chips: 1_900_000, icmPrice: 20000, icmCash: 290_000 },
+  { seat: 'H', name: 'Konnikova', first: 'Maria', last: 'Konnikova', country: '🇺🇸', bbStack: 12, chips: 1_200_000, icmPrice: 18000, icmCash: 235_000 },
+  { seat: 'I', name: 'Seidel', first: 'Erik', last: 'Seidel', country: '🇺🇸', bbStack: 7, chips: 700_000, icmPrice: 15000, icmCash: 190_000 },
 ]
 
 const PRICE = Object.fromEntries(FT_PLAYERS.map((p) => [p.seat, p.icmPrice]))
@@ -35,7 +37,9 @@ const cmsg = (userId: string, text: string, ts: string, kind: 'user' | 'system' 
 export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'WSOP Online — Main FT',
-    status: 'open', stake: 100, budget: 100000, locksAt: 'in 1h 05m', hostId: 'u_host', coHostIds: [],
+    status: 'open', stake: 100, budget: 100000, locksAt: 'in 1h 05m',
+    room: 'WSOP Online', prizePool: '$2,400,000', buyIn: '$1,000', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@WSOP/streams', streamLive: false,
+    hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
       entry('u_host', 'approved', true, ['A', 'C', 'H', 'I']),
@@ -49,7 +53,9 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'PokerGO Cup — Event 7 FT',
     visibility: 'private', accessUserIds: ['u_gary', 'u_lena', 'u_player'],
-    status: 'open', stake: 250, budget: 100000, locksAt: 'in 3h 40m', hostId: 'u_gary', coHostIds: [],
+    status: 'open', stake: 250, budget: 100000, locksAt: 'in 3h 40m',
+    room: 'PokerGO', prizePool: '$1,065,000', buyIn: '$10,000', level: '30k / 60k · 60k ante', streamUrl: 'https://www.youtube.com/@PokerGO/streams', streamLive: false,
+    hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
       entry('u_gary', 'approved', true, ['A', 'B', 'I', 'H']),
@@ -60,14 +66,18 @@ export const FT_CONTESTS: FTContest[] = [
   },
   {
     id: 'ct_c', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Triton — Short Deck FT',
-    status: 'open', stake: 100, budget: 100000, locksAt: 'in 5h 20m', hostId: 'u_gary', coHostIds: [],
+    status: 'open', stake: 100, budget: 100000, locksAt: 'in 5h 20m',
+    room: 'Triton', prizePool: '$6,200,000', buyIn: '$50,000', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@TritonPoker/streams', streamLive: false,
+    hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [entry('u_lena', 'approved', true)],
     chat: [],
   },
   {
     id: 'ct_d', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', ftName: 'EPT Monte Carlo FT',
-    status: 'settled', stake: 250, budget: 100000, locksAt: 'settled', hostId: 'u_gary', coHostIds: [],
+    status: 'settled', stake: 250, budget: 100000, locksAt: 'settled',
+    room: 'EPT', prizePool: '$5,100,000', buyIn: '$5,300', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@PokerStars/streams', streamLive: false,
+    hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     finishingOrder: ['C', 'F', 'A', 'H', 'B', 'E', 'I', 'D', 'G'],
     entries: [
@@ -80,7 +90,9 @@ export const FT_CONTESTS: FTContest[] = [
   },
   {
     id: 'ct_h', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'GG Super MILLION$ FT',
-    status: 'locked', stake: 100, budget: 100000, locksAt: 'locked · plays in 25m', hostId: 'u_gary', coHostIds: [],
+    status: 'locked', stake: 100, budget: 100000, locksAt: 'locked · plays in 25m',
+    room: 'GGPoker', prizePool: '$1,800,000', buyIn: '$10,300', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@GGPoker/streams', streamLive: true,
+    hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
       entry('u_gary', 'approved', true, ['A', 'B', 'I', 'H']),
@@ -91,7 +103,9 @@ export const FT_CONTESTS: FTContest[] = [
   },
   {
     id: 'ct_i', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'partypoker MILLIONS FT',
-    status: 'locked', stake: 250, budget: 100000, locksAt: 'locked · plays in 12m', hostId: 'u_host', coHostIds: [],
+    status: 'locked', stake: 250, budget: 100000, locksAt: 'locked · plays in 12m',
+    room: 'partypoker', prizePool: '$5,000,000', buyIn: '$10,300', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@partypokerTV/streams', streamLive: true,
+    hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
       entry('u_mike', 'approved', true, ['B', 'D', 'F', 'G']),
