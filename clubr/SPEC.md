@@ -149,7 +149,9 @@ Approval is required to do anything beyond viewing:
 - **Fantasy / Last Longer** = **active** games front‑and‑center, split **"You're
   hosting"** vs **"Playing in"**; **completed/your results** now show in an **always-visible "Completed (N)"**
   section (scoped to games you entered/hosted).
-- **Clubs** = your clubs. **Me** = profile + the 6 skins (+ Host/Admin consoles).
+- **Clubs** = your clubs. **Me** = profile + **the 6‑skin appearance picker** (lives in the
+  Profile/Me view only — moved out of the header) + Host/Admin consoles. The **header** carries only
+  the logo, the role chip, the **credits coin chip** (§19, non‑admin) and the account button.
 - Cards: a single **status** badge top‑right; **Hosting / Entered / In / Private**
   on their own row.
 - **First tab is role-aware:** **Player → Discover**, **Club Host → a Home dashboard**,

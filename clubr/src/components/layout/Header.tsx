@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Palette, LogOut, ShieldCheck, Crown, User as UserIcon, Coins } from 'lucide-react'
-import { useTheme } from '@/contexts/ThemeContext'
+import { LogOut, ShieldCheck, Crown, User as UserIcon, Coins } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge, Btn, Sheet } from '@/components/common/ui'
-import { SkinPicker } from '@/components/common/SkinPicker'
 import type { AccountRole } from '@/types'
 
 const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' | 'blue'; icon: typeof UserIcon }> = {
@@ -15,11 +13,9 @@ const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' |
 }
 
 export function Header() {
-  const { label } = useTheme()
   const { user, loginAs, logout } = useAuth()
   const navigate = useNavigate()
   const { data: wallet } = useWallet()
-  const [skinOpen, setSkinOpen] = useState(false)
   const [acctOpen, setAcctOpen] = useState(false)
   if (!user) return null
   const role = ROLE_META[user.role]
@@ -36,16 +32,8 @@ export function Header() {
             <Coins className="h-3.5 w-3.5" /><span className="font-mono">{(wallet?.balance ?? 0).toLocaleString()}</span>
           </button>
         )}
-        <button onClick={() => setSkinOpen(true)} className="flex items-center gap-1.5 rounded-full border border-border bg-bg-card px-2.5 py-1.5 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer" aria-label="Change appearance">
-          <Palette className="h-3.5 w-3.5 text-accent-blue" /> <span>{label}</span>
-        </button>
         <button onClick={() => setAcctOpen(true)} aria-label="Account"><Avatar name={user.name} color={user.avatarColor} size={32} /></button>
       </div>
-
-      <Sheet open={skinOpen} onClose={() => setSkinOpen(false)} title="Appearance — 6 skins">
-        <p className="mb-3 text-xs text-text-muted">Same theme system as the HUDR prototypes. Your pick is saved.</p>
-        <SkinPicker />
-      </Sheet>
 
       <Sheet open={acctOpen} onClose={() => setAcctOpen(false)} title="Account">
         <div className="flex items-center gap-3 rounded-2xl border border-border bg-bg-surface/50 p-3">
