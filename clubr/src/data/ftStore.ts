@@ -5,16 +5,20 @@ import type { AvailableFT, ContestEntry, FTContest, FTPlayer } from '@/types/ft'
 
 // 9-handed final table, ordered by chip stack (leader first). Chips are at the
 // current 100k big blind, so chips = bbStack × 100,000.
+// 9-handed final table, ordered by chip stack (leader first). Chips are at the
+// current 100k big blind, so chips = bbStack × 100,000. Prices are ICM-weighted
+// so any legal 4-seat draft fits the 100k budget, but the top-heavy combos do
+// not (e.g. A+B+C+D = 116k) — forcing real trade-offs.
 export const FT_PLAYERS: FTPlayer[] = [
-  { seat: 'A', name: 'Negreanu', first: 'Daniel', last: 'Negreanu', country: '🇨🇦', bbStack: 95, chips: 9_500_000, icmPrice: 38000, icmCash: 1_150_000 },
-  { seat: 'B', name: 'Ivey', first: 'Phil', last: 'Ivey', country: '🇺🇸', bbStack: 72, chips: 7_200_000, icmPrice: 33000, icmCash: 880_000 },
-  { seat: 'C', name: 'Hellmuth', first: 'Phil', last: 'Hellmuth', country: '🇺🇸', bbStack: 58, chips: 5_800_000, icmPrice: 29000, icmCash: 700_000 },
-  { seat: 'D', name: 'Bonomo', first: 'Justin', last: 'Bonomo', country: '🇺🇸', bbStack: 44, chips: 4_400_000, icmPrice: 26000, icmCash: 560_000 },
-  { seat: 'E', name: 'Selbst', first: 'Vanessa', last: 'Selbst', country: '🇺🇸', bbStack: 35, chips: 3_500_000, icmPrice: 24000, icmCash: 450_000 },
-  { seat: 'F', name: 'Holz', first: 'Fedor', last: 'Holz', country: '🇩🇪', bbStack: 26, chips: 2_600_000, icmPrice: 22000, icmCash: 360_000 },
-  { seat: 'G', name: 'Kenney', first: 'Bryn', last: 'Kenney', country: '🇺🇸', bbStack: 19, chips: 1_900_000, icmPrice: 20000, icmCash: 290_000 },
-  { seat: 'H', name: 'Konnikova', first: 'Maria', last: 'Konnikova', country: '🇺🇸', bbStack: 12, chips: 1_200_000, icmPrice: 18000, icmCash: 235_000 },
-  { seat: 'I', name: 'Seidel', first: 'Erik', last: 'Seidel', country: '🇺🇸', bbStack: 7, chips: 700_000, icmPrice: 15000, icmCash: 190_000 },
+  { seat: 'A', name: 'Negreanu', first: 'Daniel', last: 'Negreanu', country: '🇨🇦', bbStack: 95, chips: 9_500_000, icmPrice: 35000, icmCash: 1_150_000 },
+  { seat: 'B', name: 'Ivey', first: 'Phil', last: 'Ivey', country: '🇺🇸', bbStack: 72, chips: 7_200_000, icmPrice: 30000, icmCash: 880_000 },
+  { seat: 'C', name: 'Hellmuth', first: 'Phil', last: 'Hellmuth', country: '🇺🇸', bbStack: 58, chips: 5_800_000, icmPrice: 27000, icmCash: 700_000 },
+  { seat: 'D', name: 'Bonomo', first: 'Justin', last: 'Bonomo', country: '🇺🇸', bbStack: 44, chips: 4_400_000, icmPrice: 24000, icmCash: 560_000 },
+  { seat: 'E', name: 'Selbst', first: 'Vanessa', last: 'Selbst', country: '🇺🇸', bbStack: 35, chips: 3_500_000, icmPrice: 22000, icmCash: 450_000 },
+  { seat: 'F', name: 'Holz', first: 'Fedor', last: 'Holz', country: '🇩🇪', bbStack: 26, chips: 2_600_000, icmPrice: 20000, icmCash: 360_000 },
+  { seat: 'G', name: 'Kenney', first: 'Bryn', last: 'Kenney', country: '🇺🇸', bbStack: 19, chips: 1_900_000, icmPrice: 18000, icmCash: 290_000 },
+  { seat: 'H', name: 'Konnikova', first: 'Maria', last: 'Konnikova', country: '🇺🇸', bbStack: 12, chips: 1_200_000, icmPrice: 16000, icmCash: 235_000 },
+  { seat: 'I', name: 'Seidel', first: 'Erik', last: 'Seidel', country: '🇺🇸', bbStack: 7, chips: 700_000, icmPrice: 13000, icmCash: 190_000 },
 ]
 
 const PRICE = Object.fromEntries(FT_PLAYERS.map((p) => [p.seat, p.icmPrice]))
