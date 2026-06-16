@@ -198,3 +198,17 @@ pinned above the bottom nav), mirroring the Scout prototypes but scoped to ClubR
 - Files: `src/lib/analytics.ts`, `src/lib/reviewSections.ts`,
   `src/components/common/FeedbackButton.tsx`, `src/components/common/ReviewWizard.tsx`;
   initialized in `main.tsx`.
+
+## 15. Game scheduling & payouts (FT Fantasy + Last Longer)
+Both create flows share `ScheduleFields` + `PayoutEditor` (`components/common/GameSetup.tsx`,
+pure helpers in `lib/gameSetup.ts`):
+- **Registration close time + timezone are MANDATORY** at creation (a `datetime-local`
+  picker + a timezone select: ET/CT/MT/PT/UTC). Create is disabled until both are set.
+  Stored as `registrationClosesAt` (LL) / `locksAtTs` (FT) + `timezone`.
+- **Payout structure** — default **Top 3 · 50/30/20**; one‑tap presets for **Winner‑takes‑all
+  (100)** and **Top 2 · 60/40**; the host can edit each place's % and **add/remove places**.
+  **Must sum to 100%** (live validity indicator); create is blocked otherwise. Stored as
+  `payouts: number[]` (length 1 = winner‑takes‑all).
+- **On the game card:** a `PayoutBadge` summarizes the split ("Winner takes all" / "2 winners ·
+  60/40" / "Top 3 · 50/30/20"), and a **live ticking countdown** (`Countdown`) shows how long
+  registration stays open — **green normally, red under 10 minutes, pulsing under 2**.
