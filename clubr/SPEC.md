@@ -72,6 +72,20 @@ Approval is required to do anything beyond viewing:
   takes the bucket. Top‑3 **50/30/20** (winner‑take‑all under 5 entries).
 - **Prize pool shown is the REAL event's — informational only.** The contest pays
   its own **Stakes bucket**, settled **offline**. The app moves nothing.
+- **Operator slate is host/admin-only.** Players **never** see it; the Host page
+  (`/host-ft`) is guarded — a player who lands there is redirected home. The App
+  Admin curates the slate via an **"Add a final table"** form (see §17).
+- **Final Table details panel (everyone, every state).** Each contest page shows the
+  full table: a **live YouTube stream** card (per-contest, live/replay), event facts
+  (prize pool, buy-in, blind level, chips in play, avg stack), and the **9-player
+  roster** — country flag, name, relative **chip-stack bar**, chips + BB, the **ICM
+  price**, and **pick popularity** (revealed once picks unlock).
+- **Picks render as player names** (first name + last initial, e.g. "Daniel N.")
+  once revealed — never raw seat letters — and each entry shows its **budget spent**.
+- **Settled result.** A **prize pool** line, a **winner spotlight** (or top-3 podium),
+  and a **payout-aware leaderboard** (paid per the §15 split; points still rank the
+  whole table). Completed contests are **listed by default** for everyone who
+  entered/hosted (no collapse).
 
 ## 5. Last Longer
 - The club's own live tournament (in‑person or online). Host creates it with

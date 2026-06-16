@@ -2,7 +2,7 @@ import { Radio, Play, Trophy, Users, Coins, Layers, Flame, ChevronRight } from '
 import type { FTContestView } from '@/types/ft'
 import { Badge, Section } from '@/components/common/ui'
 import { cn } from '@/lib/utils/cn'
-import { fmtK, fmtChips, fmtCash, playerFull } from '@/lib/utils/ftFormat'
+import { fmtK, fmtChips, playerFull } from '@/lib/utils/ftFormat'
 
 // Read-only "everything we know about this final table" panel.
 // Shown to players AND hosts in every contest state: the live broadcast,
@@ -63,14 +63,13 @@ export function FinalTableDetails({ contest: c }: { contest: FTContestView }) {
         <Fact icon={<Flame className="h-3.5 w-3.5 text-accent-red" />} label="Level" value={c.level ?? '—'} />
       </div>
 
-      {/* ---- Roster: stack · price · ICM cash · popularity ---- */}
+      {/* ---- Roster: stack · price · popularity ---- */}
       <div className="overflow-hidden rounded-2xl border border-border bg-bg-card">
         <div className="flex items-center gap-2 border-b border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-text-muted">
           <span className="w-4">#</span>
           <span className="flex-1">Player</span>
-          <span className="w-14 text-right">Stack</span>
+          <span className="w-16 text-right">Stack</span>
           <span className="w-12 text-right">Price</span>
-          <span className="w-14 text-right">ICM $</span>
         </div>
         {players.map((p, i) => {
           const mine = myPicks.includes(p.seat)
@@ -103,18 +102,17 @@ export function FinalTableDetails({ contest: c }: { contest: FTContestView }) {
                   />
                 </div>
               </div>
-              <div className="w-14 text-right leading-tight">
+              <div className="w-16 text-right leading-tight">
                 <div className="font-mono text-xs font-bold text-text-primary">{p.bbStack} BB</div>
                 {p.chips != null && <div className="font-mono text-[9px] text-text-muted">{fmtChips(p.chips)}</div>}
               </div>
               <div className="w-12 text-right font-mono text-xs font-bold text-accent-purple">{fmtK(p.icmPrice)}</div>
-              <div className="w-14 text-right font-mono text-[11px] text-accent-emerald">{p.icmCash != null ? fmtCash(p.icmCash) : '—'}</div>
             </div>
           )
         })}
       </div>
       <p className="mt-1.5 px-0.5 text-[10px] leading-snug text-text-muted">
-        Stacks &amp; chip counts are live from the broadcast. <span className="text-accent-purple">Price</span> is the ICM draft cost · <span className="text-accent-emerald">ICM $</span> is each seat's current cash equity.
+        Stacks &amp; chip counts are live from the broadcast. <span className="text-accent-purple">Price</span> is the ICM draft cost.
       </p>
     </Section>
   )
