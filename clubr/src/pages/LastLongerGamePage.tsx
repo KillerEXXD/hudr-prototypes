@@ -31,6 +31,7 @@ export function LastLongerGamePage() {
   if (!g) return <EmptyState title="Game not found" />
 
   const me = g.me
+  const isAdmin = user?.role === 'admin'
   const active = g.participants.filter((p) => p.status === 'active').sort((a, b) => b.chips - a.chips)
   const waiting = g.participants.filter((p) => p.status === 'pending')
   const out = g.participants.filter((p) => p.status === 'out').sort((a, b) => (a.finishPos ?? 99) - (b.finishPos ?? 99))
@@ -80,8 +81,8 @@ export function LastLongerGamePage() {
         </Card>
       )}
 
-      {/* My status / actions */}
-      {g.status !== 'completed' && (
+      {/* My status / actions (admins oversee — they don't play) */}
+      {g.status !== 'completed' && !isAdmin && (
         <Section title="You">
           {!g.isMemberOfClub && !g.canManage ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to play.</p></Card>

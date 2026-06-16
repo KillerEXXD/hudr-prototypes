@@ -25,10 +25,12 @@ export function ClubsPage() {
     <div className="animate-fade-up">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-extrabold tracking-tight text-text-primary">My Clubs</h1>
-        <div className="flex gap-1.5">
-          <Btn size="sm" variant="secondary" onClick={() => setJoinOpen(true)}><Ticket className="h-3.5 w-3.5" />Join</Btn>
-          <Btn size="sm" onClick={() => setCreateOpen(true)}><Plus className="h-3.5 w-3.5" />Create</Btn>
-        </div>
+        {user?.role !== 'admin' && (
+          <div className="flex gap-1.5">
+            <Btn size="sm" variant="secondary" onClick={() => setJoinOpen(true)}><Ticket className="h-3.5 w-3.5" />Join</Btn>
+            <Btn size="sm" onClick={() => setCreateOpen(true)}><Plus className="h-3.5 w-3.5" />Create</Btn>
+          </div>
+        )}
       </div>
 
       <Section title="Clubs you're in">

@@ -59,7 +59,7 @@ export function ClubDetailPage() {
           <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Read-only — awaiting approval.</span> You can look around, but you can't enter games until the host admits you.</p>
         </Card>
       )}
-      {club.myStatus === 'none' && (
+      {club.myStatus === 'none' && !club.canManage && (
         <Btn className="mt-3 w-full" onClick={() => request.mutate(club.id)} disabled={request.isPending}><Plus className="h-4 w-4" />Request to join</Btn>
       )}
 

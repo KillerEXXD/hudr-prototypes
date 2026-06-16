@@ -35,6 +35,7 @@ export function ContestDetailPage() {
   if (!c) return <EmptyState title="Contest not found" />
 
   const me = c.myEntry
+  const isAdmin = user?.role === 'admin'
   const approved = me?.status === 'approved'
   const canChat = approved || c.canManage
   const statusTone = c.status === 'open' ? 'blue' : c.status === 'locked' ? 'amber' : 'neutral'
@@ -56,8 +57,8 @@ export function ContestDetailPage() {
         <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>
       )}
 
-      {/* ===== OPEN: entry CTA up top — request to enter, then draft ===== */}
-      {c.status === 'open' && (
+      {/* ===== OPEN: entry CTA up top — request to enter, then draft (admins don't play) ===== */}
+      {c.status === 'open' && !isAdmin && (
         <Section title="Your entry">
           {!c.isMemberOfClub && !c.canManage ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
