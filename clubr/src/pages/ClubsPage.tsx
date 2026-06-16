@@ -17,6 +17,7 @@ export function ClubsPage() {
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('🃏')
   const [desc, setDesc] = useState('')
+  const [loc, setLoc] = useState('')
   const [code, setCode] = useState('')
   const [joinMsg, setJoinMsg] = useState('')
 
@@ -51,7 +52,8 @@ export function ClubsPage() {
             <div className="flex-1"><Field label="Club name" value={name} onChange={setName} placeholder="e.g. Friday Night Crew" /></div>
           </div>
           <Field label="Description" value={desc} onChange={setDesc} placeholder="What's your club about?" />
-          <Btn className="w-full" disabled={!name.trim() || create.isPending} onClick={async () => { await create.mutateAsync({ name, emoji, description: desc }); setCreateOpen(false); setName(''); setDesc('') }}>
+          <Field label="City" value={loc} onChange={setLoc} placeholder="e.g. Houston, TX" />
+          <Btn className="w-full" disabled={!name.trim() || !loc.trim() || create.isPending} onClick={async () => { await create.mutateAsync({ name, emoji, description: desc, location: loc }); setCreateOpen(false); setName(''); setDesc(''); setLoc('') }}>
             Create club — you're the host
           </Btn>
           <p className="text-center text-[11px] text-text-muted">You'll own it, get an invite code, and approve who joins.</p>

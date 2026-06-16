@@ -18,6 +18,7 @@ export function LoginScreen() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [location, setLocation] = useState('')
   const [code, setCode] = useState('')
   const [msg, setMsg] = useState('')
   const [params] = useSearchParams()
@@ -25,10 +26,10 @@ export function LoginScreen() {
   useEffect(() => { if (joinCode) { setJoinOpen(true); setCode(joinCode.toUpperCase()) } }, [joinCode])
 
   const emailOk = /.+@.+\..+/.test(email)
-  const canJoin = !!name.trim() && emailOk && !!phone.trim() && !!code.trim()
+  const canJoin = !!name.trim() && emailOk && !!phone.trim() && !!location.trim() && !!code.trim()
   async function joinWithLink() {
     if (!canJoin) return
-    const u = signUp(name, email, phone)
+    const u = signUp(name, email, phone, location)
     const club = await api.joinViaInvite(code, u.id)
     setMsg(club ? `Requested to join ${club.name} — awaiting host approval.` : 'No club found for that code (try ACES24).')
   }
@@ -69,11 +70,12 @@ export function LoginScreen() {
         ) : (
           <div className="rounded-2xl border border-border bg-bg-card p-4">
             <h2 className="mb-1 text-base font-bold text-text-primary">Create your login</h2>
-            <p className="mb-3 text-xs text-text-muted">Your host shared an invite code. Name, email &amp; phone are required — your host needs them to vet &amp; admit you.</p>
+            <p className="mb-3 text-xs text-text-muted">Your host shared an invite code. Name, email, phone &amp; city are required — your host needs them to vet &amp; admit you, and your city helps us show clubs near you.</p>
             <div className="flex flex-col gap-3">
               <Field label="Your name *" value={name} onChange={setName} placeholder="First & last name" />
               <Field label="Email *" value={email} onChange={setEmail} type="email" placeholder="you@example.com" />
               <Field label="Phone number *" value={phone} onChange={setPhone} type="tel" placeholder="+1 (555) 123‑4567" />
+              <Field label="Your city *" value={location} onChange={setLocation} placeholder="e.g. Houston, TX" />
               <Field label="Invite code *" value={code} onChange={setCode} placeholder="e.g. ACES24" mono />
               <Btn className="w-full" onClick={joinWithLink} disabled={!canJoin}>Join club</Btn>
               {msg && <p className="text-center text-xs font-semibold text-accent-emerald">{msg}</p>}

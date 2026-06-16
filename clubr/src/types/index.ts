@@ -14,6 +14,8 @@ export interface User {
   handle: string
   email: string
   phone?: string
+  /** City the user is based in (e.g. "Houston, TX") — used to surface nearby clubs. */
+  location?: string
   role: AccountRole
   avatarColor: string
 }
@@ -38,6 +40,8 @@ export interface Club {
   emoji: string
   color: string
   description: string
+  /** City the club is based in (e.g. "Dallas, TX"). */
+  location: string
   ownerId: string
   ownerName: string
   inviteCode: string

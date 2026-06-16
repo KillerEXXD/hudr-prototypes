@@ -86,7 +86,7 @@ export async function joinViaInvite(code: string, userId: string): Promise<ClubV
   return toView(c, userId, false)
 }
 
-export async function createClub(input: { name: string; emoji: string; description: string }, userId: string): Promise<ClubView> {
+export async function createClub(input: { name: string; emoji: string; description: string; location?: string }, userId: string): Promise<ClubView> {
   await delay()
   const u = USERS[userId]
   const code = (input.name.replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase() || 'CLUB') + Math.floor(10 + Math.random() * 89)
@@ -96,6 +96,7 @@ export async function createClub(input: { name: string; emoji: string; descripti
     emoji: input.emoji || '🃏',
     color: '#3b82f6',
     description: input.description.trim(),
+    location: (input.location ?? '').trim() || (u?.location ?? ''),
     ownerId: userId,
     ownerName: u?.name ?? 'You',
     inviteCode: code,

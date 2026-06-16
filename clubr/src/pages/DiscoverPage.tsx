@@ -28,6 +28,9 @@ export function DiscoverPage() {
 
   // Discover = act-on surface: clubs you can JOIN + live/open games only.
   const joinable = (clubs.data ?? []).filter((c) => c.myStatus === 'none')
+  const city = user?.location?.trim().toLowerCase()
+  const near = city ? joinable.filter((c) => c.location?.trim().toLowerCase() === city) : []
+  const others = city ? joinable.filter((c) => c.location?.trim().toLowerCase() !== city) : joinable
   const liveContests = (contests.data ?? []).filter((c) => c.status !== 'settled')
   const liveGames = (games.data ?? []).filter((g) => g.status !== 'completed')
 
@@ -35,17 +38,30 @@ export function DiscoverPage() {
     <div className="animate-fade-up">
       <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-accent-blue"><Sparkles className="h-3.5 w-3.5" /> Discover</div>
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
-      <p className="text-sm text-text-secondary">New clubs to join, and games happening right now.</p>
+      <p className="text-sm text-text-secondary">Clubs near you to join, and games happening right now.</p>
 
-      <Section title="Clubs to join" action={joinable.length > 4 ? <button onClick={() => setShowAll((s) => !s)} className="text-xs font-semibold text-accent-blue cursor-pointer">{showAll ? 'Show less' : 'See all'}</button> : undefined}>
-        {clubs.isLoading ? <Spinner /> : joinable.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            {(showAll ? joinable : joinable.slice(0, 4)).map((c) => <ClubRow key={c.id} club={c} right={<RequestButton club={c} />} />)}
-          </div>
-        ) : (
-          <EmptyState icon={<Compass className="h-7 w-7" />} title="You're in every club we know" sub="Create your own from the Clubs tab." />
-        )}
-      </Section>
+      {clubs.isLoading ? (
+        <Section title="Clubs to join"><Spinner /></Section>
+      ) : joinable.length === 0 ? (
+        <Section title="Clubs to join"><EmptyState icon={<Compass className="h-7 w-7" />} title="You're in every club we know" sub="Create your own from the Clubs tab." /></Section>
+      ) : (
+        <>
+          {near.length > 0 && (
+            <Section title={`Near you in ${user?.location}`}>
+              <div className="flex flex-col gap-2">
+                {near.map((c) => <ClubRow key={c.id} club={c} right={<RequestButton club={c} />} />)}
+              </div>
+            </Section>
+          )}
+          {others.length > 0 && (
+            <Section title={near.length > 0 ? 'More clubs to join' : 'Clubs to join'} action={others.length > 4 ? <button type="button" onClick={() => setShowAll((s) => !s)} className="text-xs font-semibold text-accent-blue cursor-pointer">{showAll ? 'Show less' : 'See all'}</button> : undefined}>
+              <div className="flex flex-col gap-2">
+                {(showAll ? others : others.slice(0, 4)).map((c) => <ClubRow key={c.id} club={c} right={<RequestButton club={c} />} />)}
+              </div>
+            </Section>
+          )}
+        </>
+      )}
 
       {liveContests.length > 0 && (
         <Section title="FT Fantasy — open now">

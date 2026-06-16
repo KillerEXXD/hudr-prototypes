@@ -112,7 +112,10 @@ Approval is required to do anything beyond viewing:
 
 ## 9. Information architecture (anti‑clutter)
 - **Discover** = act‑on surface: **clubs you can JOIN** (not ones you're in) +
-  **open/live** contests & games (no settled history).
+  **open/live** contests & games (no settled history). **Clubs in the user's city are
+  surfaced first** under a "Near you in &lt;city&gt;" section. A **location** (city, e.g.
+  "Houston, TX") is captured on the **user at signup** and on the **club at creation**,
+  and shown on each club row.
 - **Fantasy / Last Longer** = **active** games front‑and‑center, split **"You're
   hosting"** vs **"Playing in"**; **completed/your results** fold into a collapsed
   **"Show your results"** (scoped to games you entered/hosted).
