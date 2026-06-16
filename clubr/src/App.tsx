@@ -6,6 +6,7 @@ import { HomePage } from '@/pages/HomePage'
 import { ClubsPage } from '@/pages/ClubsPage'
 import { ClubDetailPage } from '@/pages/ClubDetailPage'
 import { FantasyPage } from '@/pages/FantasyPage'
+import { GamesPage } from '@/pages/GamesPage'
 import { HostFTPage } from '@/pages/HostFTPage'
 import { ContestDetailPage } from '@/pages/ContestDetailPage'
 import { LastLongerPage } from '@/pages/LastLongerPage'
@@ -22,6 +23,7 @@ export default function App() {
       <Route element={<AppShell />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/clubs" element={<ClubsPage />} />
+        <Route path="/games" element={<GamesPage />} />
         <Route path="/club/:id" element={<ClubDetailPage />} />
         <Route path="/fantasy" element={<FantasyPage />} />
         {/* The operator FT slate is host/admin only — players never see it. */}

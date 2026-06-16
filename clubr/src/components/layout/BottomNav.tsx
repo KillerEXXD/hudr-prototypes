@@ -1,12 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Compass, Home, Users, Target, Timer, CircleUser } from 'lucide-react'
+import { Compass, Home, Users, Gamepad2, CircleUser } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { cn } from '@/lib/utils/cn'
 
 const REST = [
   { to: '/clubs', label: 'Clubs', icon: Users, match: (p: string) => p === '/clubs' || p.startsWith('/club/') },
-  { to: '/fantasy', label: 'Fantasy', icon: Target, match: (p: string) => p.startsWith('/fantasy') || p.startsWith('/host-ft') },
-  { to: '/lastlonger', label: 'Last Longer', icon: Timer, match: (p: string) => p.startsWith('/lastlonger') },
+  { to: '/games', label: 'Games', icon: Gamepad2, match: (p: string) => p.startsWith('/games') || p.startsWith('/fantasy') || p.startsWith('/lastlonger') || p.startsWith('/host-ft') },
   { to: '/me', label: 'Me', icon: CircleUser, match: (p: string) => p.startsWith('/me') || p.startsWith('/admin') },
 ]
 

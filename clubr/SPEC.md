@@ -287,3 +287,21 @@ pure helpers in `lib/gameSetup.ts`):
   **"FTs to host"**. **Players never see the slate**; the Host page (`/host-ft`) is guarded.
 - **Entrants keep visibility:** a player can always see a contest/game they're **entered
   in**, even across clubs they're not a member of.
+
+## 18. Multi‑game platform IA (scales to N game types)
+ClubR is a **multi‑game platform** (FT Fantasy, Last Longer, **Football Squares** next, more
+later). Navigation is by **entity/activity, never by game type**:
+- **Bottom nav = Home · Clubs · Games · Me** (4 fixed tabs). The old per‑game tabs (Fantasy, Last
+  Longer) are **replaced by a single Games tab**; adding a game type adds a **filter chip + a card
+  variant**, never a nav slot.
+- **Games tab** (`/games`, `GamesPage.tsx`) = the unified, cross‑club feed of every game type,
+  **urgency‑sorted** (live first, then by registration countdown) and split **You're hosting /
+  Open & live / Completed**, with a **type‑filter chip row** (All · FT Fantasy · Last Longer · …).
+- **Club = container:** Clubs → a club → its members + its games (all types). The Games feed is a
+  cross‑club aggregation of the same games.
+- **One create entry:** a single **"+ New game"** → *"What do you want to host?"* type chooser →
+  the chosen type's create flow (`NewGameSheet.tsx`). Hidden for App Admin (overseer‑only).
+- Every card uses one envelope — **type badge · club · status · StakePool (buy‑in·joined·pool) ·
+  PayoutBadge · Countdown · Join/Enter** — so a new game type reuses all of it.
+- *(Transitional: the old `/fantasy` & `/lastlonger` list pages still resolve but are out of nav;
+  they're folded away in a later phase.)*
