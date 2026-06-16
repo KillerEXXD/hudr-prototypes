@@ -175,7 +175,10 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
               <label className="mt-4 block text-xs font-semibold text-text-secondary">Would you use this to run or play in your own poker club?</label>
               <div className="mt-1.5"><ScoreRow value={wouldUse} onChange={setWouldUse} labels={USE_LABEL} /></div>
 
-              <label className="mt-4 block text-xs font-semibold text-text-secondary">Would you pay for it?</label>
+              <label className="mt-4 block text-xs font-semibold text-text-secondary">Would you pay to keep playing?</label>
+              <div className="mt-1 rounded-lg border border-border bg-bg-surface/60 p-2.5 text-[11px] leading-relaxed text-text-secondary">
+                You’d start with <span className="font-bold text-text-primary">1,000 coins free</span> — that’s <span className="font-bold text-text-primary">10 games</span> (100 coins per game). When they run out, <span className="font-bold text-text-primary">$5 buys 500 coins</span> (≈5 more games). At that price, would you pay to keep playing?
+              </div>
               <div className="mt-1.5 flex gap-1.5">
                 {(['no', 'maybe', 'yes'] as const).map((v) => (
                   <button key={v} type="button" onClick={() => setWouldPay(v)}
@@ -186,7 +189,7 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
                 ))}
               </div>
               {wouldPay === 'yes' && (
-                <input value={wouldPayAmount} onChange={(e) => setWouldPayAmount(e.target.value)} placeholder="How much per month? (e.g. $29 to host, $10 to play)"
+                <input value={wouldPayAmount} onChange={(e) => setWouldPayAmount(e.target.value)} placeholder="How much would you spend per month? (e.g. $5, $10)"
                   className="mt-2 w-full rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
               )}
 
@@ -218,17 +221,21 @@ export default function ReviewWizard({ open, onClose }: { open: boolean; onClose
                 </a>
               )}
 
-              <label className="mt-4 block text-xs font-semibold text-text-secondary">How was this experience?</label>
-              <div className="mt-1.5"><ScoreRow value={ans.score} onChange={(n) => setAns({ score: n })} /></div>
+              {!sec.hideScore && (
+                <>
+                  <label className="mt-4 block text-xs font-semibold text-text-secondary">{sec.scoreLabel ?? 'How was this experience?'}</label>
+                  <div className="mt-1.5"><ScoreRow value={ans.score} onChange={(n) => setAns({ score: n })} /></div>
+                </>
+              )}
 
-              <label className="mt-3 block text-xs font-semibold text-text-secondary">What worked well? <span className="font-normal text-text-muted">(tap any, or type)</span></label>
+              <label className="mt-3 block text-xs font-semibold text-text-secondary">{sec.likedLabel ?? 'What worked well?'} <span className="font-normal text-text-muted">(tap any, or type)</span></label>
               <Chips options={sec.likedChips ?? []} selected={ans.likedTags} onToggle={(t) => toggleTag('likedTags', t)} tone="pos" />
-              <textarea value={ans.liked} onChange={(e) => setAns({ liked: e.target.value })} rows={2} placeholder="Anything else you'd keep…"
+              <textarea value={ans.liked} onChange={(e) => setAns({ liked: e.target.value })} rows={2} placeholder="Type here…"
                 className="mt-1.5 w-full resize-none rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
 
-              <label className="mt-3 block text-xs font-semibold text-text-secondary">What didn't, or was confusing? <span className="font-normal text-text-muted">(tap any, or type)</span></label>
+              <label className="mt-3 block text-xs font-semibold text-text-secondary">{sec.dislikedLabel ?? "What didn't, or was confusing?"} <span className="font-normal text-text-muted">(tap any, or type)</span></label>
               <Chips options={sec.dislikedChips ?? []} selected={ans.dislikedTags} onToggle={(t) => toggleTag('dislikedTags', t)} tone="neg" />
-              <textarea value={ans.disliked} onChange={(e) => setAns({ disliked: e.target.value })} rows={2} placeholder="Anything else you'd change…"
+              <textarea value={ans.disliked} onChange={(e) => setAns({ disliked: e.target.value })} rows={2} placeholder="Type here…"
                 className="mt-1.5 w-full resize-none rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
             </div>
           )}

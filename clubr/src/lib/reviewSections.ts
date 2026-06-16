@@ -14,6 +14,12 @@ export interface ReviewSection {
   tryPath?: string
   likedChips?: string[]
   dislikedChips?: string[]
+  /** hide the 1–5 score row (e.g. open-ended idea steps) */
+  hideScore?: boolean
+  /** override the default step labels */
+  scoreLabel?: string
+  likedLabel?: string
+  dislikedLabel?: string
 }
 
 export function getReviewSections(): ReviewSection[] {
@@ -47,10 +53,17 @@ export function getReviewSections(): ReviewSection[] {
     },
     {
       key: 'last_longer', title: 'Last Longer',
-      blurb: 'The club’s own live tournament — the live board, reporting your chips, busting yourself, the chop and chat.',
+      blurb: 'The club’s own live tournament — the live board, reporting your chips, busting yourself, and the chop.',
       tryPath: '/lastlonger',
-      likedChips: ['Live board is clear', 'Self-bust is handy', 'Chat/chop useful', 'Easy to follow'],
+      likedChips: ['Live board is clear', 'Self-bust is handy', 'Chop is useful', 'Easy to follow'],
       dislikedChips: ['Board confusing', 'Hard to update chips', 'Missed how to bust', 'Too fiddly'],
+    },
+    {
+      key: 'chat', title: 'In-game chat',
+      blurb: 'Each game has its own chat for the players. Did you use it? Was it easy to find, and useful for coordinating the game (or a bit of banter)?',
+      tryPath: '/lastlonger',
+      likedChips: ['Handy for coordinating', 'Easy to find', 'Good for banter', 'Keeps it in one place'],
+      dislikedChips: ['Didn’t notice it', 'Hard to find', 'Felt unnecessary', 'Wanted notifications'],
     },
     {
       key: 'hosting', title: 'Hosting a game',
@@ -79,11 +92,26 @@ export function getReviewSections(): ReviewSection[] {
       dislikedChips: ['Got lost', 'Too many taps', 'Confusing back/forward'],
     },
     {
-      key: 'design', title: 'Look & feel (UI)',
-      blurb: 'The visual design — clean, cluttered, polished, dated? (You can switch skins in Me.)',
+      key: 'skins', title: 'Trying different skins',
+      blurb: 'In Me, ClubR ships with several appearance skins — try switching between a few. Did you find them easily? Did changing the look make it more fun, and did one stand out as your favourite?',
       tryPath: '/me',
-      likedChips: ['Clean', 'Polished', 'Love the skins', 'Easy on the eyes'],
+      likedChips: ['Love having skins', 'Easy to switch', 'Found a favourite', 'Makes it more fun', 'Fun to try them all'],
+      dislikedChips: ['Couldn’t find the skins', 'Didn’t see the point', 'They all felt similar', 'Hard to switch', 'None felt right'],
+    },
+    {
+      key: 'design', title: 'Look & feel (UI)',
+      blurb: 'The overall visual design — clean, cluttered, polished, dated?',
+      likedChips: ['Clean', 'Polished', 'Modern', 'Easy on the eyes'],
       dislikedChips: ['Cluttered', 'Dated', 'Low contrast / hard to read'],
+    },
+    {
+      key: 'feature_ideas', title: 'What would make it better?',
+      blurb: 'Help shape ClubR — what other features would enrich the experience and keep you coming back? Tap any that appeal, or add your own.',
+      hideScore: true,
+      likedLabel: 'Features you’d love to see',
+      likedChips: ['Push notifications', 'Player stats & history', 'Leaderboards / seasons', 'Bigger group chat', 'Built-in payments', 'More game types', 'Achievements / badges', 'Calendar & reminders'],
+      dislikedLabel: 'Anything missing, or that you’d change',
+      dislikedChips: ['Better onboarding', 'Better search', 'Profile customization'],
     },
   ]
 }
