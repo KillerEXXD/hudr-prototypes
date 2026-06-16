@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, Shield, Trophy, Crown, HelpCircle, Hand, Dice5, Coins } from 'lucide-react'
-import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore } from '@/hooks/squares'
+import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, HelpCircle, Hand, Dice5, Coins, Stamp } from 'lucide-react'
+import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares } from '@/hooks/squares'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
@@ -30,6 +30,7 @@ export function SquaresGamePage() {
   const approve = useApproveSquares(); const decline = useDeclineSquares()
   const togglePaid = useToggleSquaresPaid()
   const claim = useClaimSquare()
+  const approveCell = useApproveSquareClaim(); const rejectCell = useRejectSquareClaim(); const approveAll = useApproveAllSquares()
   const lock = useLockSquares()
   const setScore = useSetSquaresScore()
   const [howOpen, setHowOpen] = useState(false)
@@ -41,10 +42,16 @@ export function SquaresGamePage() {
   const isAdmin = user?.role === 'admin'
   const locked = g.status !== 'registration'
   const canClaim = g.status === 'registration' && me?.status === 'active' && !isAdmin
-  const myCount = g.cells.filter((c) => c.userId === user?.id).length
+  const mineCells = g.cells.filter((c) => c.userId === user?.id)
+  const myCount = mineCells.length
+  const myApproved = mineCells.filter((c) => c.approved).length
+  const myPending = myCount - myApproved
   const pending = g.participants.filter((p) => p.status === 'pending')
   const active = g.participants.filter((p) => p.status === 'active')
   const statusTone = g.status === 'live' ? 'green' : g.status === 'registration' ? 'blue' : 'neutral'
+  // squares awaiting host approval (registration only) — drives the host queue + grid pulse
+  const hostCanApprove = g.canManage && g.status === 'registration'
+  const pendingClaims = g.status === 'registration' ? g.cells.map((c, i) => ({ c, i })).filter((x) => x.c.userId && !x.c.approved) : []
 
   const winners = new Map<number, string>()
   g.periods.forEach((p) => { if (p.winnerCell != null) winners.set(p.winnerCell, p.label) })
@@ -69,13 +76,19 @@ export function SquaresGamePage() {
       ) : me?.status === 'pending' ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary"><b className="text-text-primary">Awaiting host approval.</b> You can claim squares once admitted.</p></Card>
       ) : me?.status === 'active' ? (
-        <div className="mt-3 flex items-center justify-between rounded-xl border border-border bg-bg-card px-3 py-2 text-xs">
-          <span className="text-text-secondary">Your squares: <b className="text-text-primary">{myCount}</b></span>
-          <span className="flex items-center gap-1.5 text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></span>
+        <div className="mt-3 flex items-center justify-between rounded-xl border border-border bg-bg-card px-3 py-2">
+          <div className="min-w-0 text-xs">
+            <span className="text-text-secondary">Your squares: <b className="text-text-primary">{myCount}</b>
+              {myCount > 0 && <span className="text-text-muted"> · <b className="text-accent-emerald">{myApproved}</b> locked · <b className="text-accent-amber">{myPending}</b> pending</span>}
+            </span>
+            <div className="mt-0.5 font-mono text-[11px] text-text-secondary">{myCount} × {g.stake} = <b className="text-accent-emerald">{(myCount * g.stake).toLocaleString()}</b> Stakes owed</div>
+          </div>
+          <span className="flex shrink-0 items-center gap-1.5 text-xs text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></span>
         </div>
       ) : null}
 
-      {canClaim && <p className="mt-2 text-[11px] text-accent-emerald">Tap an empty square to claim it (tap yours again to release). Digits are sealed until the host locks.</p>}
+      {canClaim && <p className="mt-2 text-[11px] text-text-secondary">Tap an empty square to claim it — your claim is <span className="text-accent-amber font-semibold">pending the host's approval</span>. Tap one of your pending (amber) squares to <b>withdraw</b>; once the host approves it, it's <b>locked in</b>. Digits stay sealed until lock.</p>}
+      {hostCanApprove && <p className="mt-2 text-[11px] text-text-secondary">You're the host — <span className="text-accent-amber font-semibold">tap any amber (pending) square to approve it</span>, or use the approval queue below.</p>}
 
       <Section title={locked ? 'The board' : 'Claim your squares'}>
         <div className="overflow-x-auto">
@@ -92,14 +105,21 @@ export function SquaresGamePage() {
                   const cell = g.cells[idx]
                   const mine = cell.userId === user?.id
                   const win = winners.get(idx)
-                  const claimable = canClaim && (!cell.userId || mine)
+                  const pend = !!cell.userId && !cell.approved
+                  const canApproveHere = hostCanApprove && pend
+                  const canClaimEmpty = canClaim && !cell.userId
+                  const canWithdrawHere = canClaim && mine && !cell.approved
+                  const interactive = canApproveHere || canClaimEmpty || canWithdrawHere
+                  const onTap = () => { if (canApproveHere) approveCell.mutate({ gameId: g.id, cellIdx: idx }); else claim.mutate({ gameId: g.id, cellIdx: idx }) }
                   return (
-                    <button key={idx} type="button" disabled={!claimable} onClick={() => claim.mutate({ gameId: g.id, cellIdx: idx })}
+                    <button key={idx} type="button" disabled={!interactive} onClick={onTap}
                       className={cn('relative flex aspect-square items-center justify-center text-[8px] font-bold',
-                        win ? 'bg-accent-emerald text-white' : mine ? 'bg-accent-purple/30 text-text-primary' : cell.userId ? 'text-text-muted' : 'bg-bg-card/40 text-text-muted',
-                        claimable && 'cursor-pointer hover:bg-accent-purple/15')}
-                      style={cell.userId && !win && !mine ? { backgroundColor: `${cell.avatarColor}22` } : undefined}
-                      title={cell.name}>
+                        win ? 'bg-accent-emerald text-white'
+                          : pend ? cn('border border-dashed border-accent-amber text-text-primary animate-pulse-soft', mine ? 'bg-accent-amber/20' : 'bg-accent-amber/5')
+                            : cell.userId ? (mine ? 'bg-accent-purple/30 text-text-primary' : 'text-text-muted') : 'bg-bg-card/40 text-text-muted',
+                        interactive && 'cursor-pointer hover:brightness-110')}
+                      style={cell.userId && cell.approved && !win && !mine ? { backgroundColor: `${cell.avatarColor}22` } : undefined}
+                      title={cell.userId ? `${cell.name}${pend ? ' · pending approval' : ''}${win ? ` · won ${win}` : ''}` : ''}>
                       {win ? <Trophy className="h-3 w-3" /> : cell.userId ? initials(cell.name) : ''}
                     </button>
                   )
@@ -130,6 +150,26 @@ export function SquaresGamePage() {
 
       {g.canManage && (
         <Section title="Host" action={<Badge tone="green"><Shield className="h-3 w-3" />You manage</Badge>}>
+          {pendingClaims.length > 0 && (
+            <div className="mb-3 rounded-xl border border-accent-amber/40 bg-accent-amber/5 p-2.5">
+              <div className="mb-1.5 flex items-center justify-between gap-2">
+                <p className="flex items-center gap-1.5 text-xs font-bold text-text-primary"><Stamp className="h-3.5 w-3.5 text-accent-amber" />Square approvals · <span className="text-accent-amber">{pendingClaims.length} pending</span></p>
+                <Btn size="sm" disabled={approveAll.isPending} onClick={() => approveAll.mutate(g.id)}><CheckCheck className="h-3.5 w-3.5" />Approve all</Btn>
+              </div>
+              <div className="flex max-h-56 flex-col gap-1.5 overflow-y-auto scrollbar-thin">
+                {pendingClaims.map(({ c, i }) => (
+                  <div key={i} className="flex items-center gap-2 rounded-lg border border-border bg-bg-card px-2.5 py-1.5">
+                    <Avatar name={c.name} color={c.avatarColor} size={24} />
+                    <button onClick={() => navigate(`/member/${c.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{c.name}</button>
+                    <span className="font-mono text-[10px] text-text-muted">R{Math.floor(i / 10) + 1}·C{(i % 10) + 1}</span>
+                    <button onClick={() => approveCell.mutate({ gameId: g.id, cellIdx: i })} title="Approve square" className="flex h-7 w-7 items-center justify-center rounded-lg border border-accent-emerald/30 bg-accent-emerald/10 text-accent-emerald hover:bg-accent-emerald/20 cursor-pointer"><Check className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => rejectCell.mutate({ gameId: g.id, cellIdx: i })} title="Reject (frees the square)" className="flex h-7 w-7 items-center justify-center rounded-lg border border-accent-red/30 bg-accent-red/10 text-accent-red hover:bg-accent-red/20 cursor-pointer"><X className="h-3.5 w-3.5" /></button>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-1.5 text-[10px] text-text-muted">Approving locks the square in (the player can no longer withdraw). Tip: you can also tap amber squares on the grid to approve.</p>
+            </div>
+          )}
           {pending.length > 0 && (
             <div className="mb-2 flex flex-col gap-1.5">
               {pending.map((p) => (
@@ -148,14 +188,23 @@ export function SquaresGamePage() {
           {g.status === 'live' && <ScoreEntry g={g} onSet={(label, home, away) => setScore.mutate({ gameId: g.id, label, home, away })} />}
           {active.length > 0 && (
             <div className="mt-2 flex flex-col gap-1.5">
-              <p className="text-[11px] text-text-muted">Players · toggle the green dot when they've paid.</p>
-              {active.map((p) => (
-                <div key={p.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-1.5">
-                  <Avatar name={p.name} color={p.avatarColor} size={26} />
-                  <button onClick={() => navigate(`/member/${p.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{p.name}{p.userId === g.hostId && <Crown className="ml-1 inline h-3 w-3 text-accent-emerald" />}</button>
-                  <PaidToggle paid={p.paid} editable onToggle={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })} />
-                </div>
-              ))}
+              <p className="text-[11px] text-text-muted">Players · squares chosen &amp; owed · toggle the green dot when they've paid.</p>
+              {active.map((p) => {
+                const owned = g.cells.filter((c) => c.userId === p.userId)
+                const n = owned.length
+                const pend = owned.filter((c) => !c.approved).length
+                return (
+                  <div key={p.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-1.5">
+                    <Avatar name={p.name} color={p.avatarColor} size={26} />
+                    <button onClick={() => navigate(`/member/${p.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{p.name}{p.userId === g.hostId && <Crown className="ml-1 inline h-3 w-3 text-accent-emerald" />}</button>
+                    <div className="shrink-0 text-right leading-tight">
+                      <div className="font-mono text-[10px] text-text-muted">{n} sq{pend ? <span className="text-accent-amber"> · {pend} pend</span> : ''}</div>
+                      <div className="font-mono text-[10px] font-bold text-accent-emerald">{(n * g.stake).toLocaleString()}</div>
+                    </div>
+                    <PaidToggle paid={p.paid} editable onToggle={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })} />
+                  </div>
+                )
+              })}
             </div>
           )}
         </Section>

@@ -13,6 +13,9 @@ export interface SquaresCell {
   userId?: string
   name?: string
   avatarColor?: string
+  /** false/absent = claimed but PENDING host approval (player may withdraw);
+   *  true = host-approved & locked in (player can no longer withdraw). */
+  approved?: boolean
 }
 
 export interface SquaresPeriod {
@@ -60,7 +63,8 @@ export interface SquaresGameView extends SquaresGame {
   me: SquaresParticipant | null
   canManage: boolean
   isMemberOfClub: boolean
-  claimedCount: number           // cells claimed of 100
+  claimedCount: number           // cells claimed of 100 (pending + approved)
+  pendingCount: number           // claimed but awaiting host approval
 }
 
 export const SQUARES_PERIODS = ['Q1', 'Q2', 'Q3', 'Final'] as const

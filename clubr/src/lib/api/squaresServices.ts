@@ -19,6 +19,7 @@ function toView(g: SquaresGame, userId: string, isAdmin: boolean): SquaresGameVi
     canManage: isAdmin || g.hostId === userId || g.coHostIds.includes(userId),
     isMemberOfClub: isMember(g.clubId, userId),
     claimedCount: g.cells.filter((c) => c.userId).length,
+    pendingCount: g.cells.filter((c) => c.userId && !c.approved).length,
   }
 }
 
@@ -67,14 +68,35 @@ export async function toggleSquaresPaid(gameId: string, userId: string): Promise
   await delay(120); const p = SQUARES_GAMES.find((x) => x.id === gameId)?.participants.find((x) => x.userId === userId); if (p) p.paid = !p.paid
 }
 
-/** Toggle a square: claim an empty one, or release one you own. Registration only, active players only. */
+/** Toggle a square: claim an empty one (→ PENDING host approval), or withdraw one you own
+ *  while it's still pending. Registration only, active players only. An APPROVED square is
+ *  locked in — the player can no longer withdraw it. */
 export async function claimSquare(gameId: string, userId: string, cellIdx: number): Promise<void> {
   await delay(100)
   const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
   const me = g.participants.find((p) => p.userId === userId); if (!me || me.status !== 'active') return
   const cell = g.cells[cellIdx]
-  if (cell.userId === userId) g.cells[cellIdx] = {}
-  else if (!cell.userId) { const u = USERS[userId]; g.cells[cellIdx] = { userId, name: u?.name, avatarColor: u?.avatarColor } }
+  if (cell.userId === userId) { if (!cell.approved) g.cells[cellIdx] = {} } // withdraw only while pending
+  else if (!cell.userId) { const u = USERS[userId]; g.cells[cellIdx] = { userId, name: u?.name, avatarColor: u?.avatarColor, approved: false } }
+}
+
+/** Host approves a single pending square → locks it in (player can no longer withdraw). */
+export async function approveSquareClaim(gameId: string, cellIdx: number): Promise<void> {
+  await delay(100)
+  const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
+  const cell = g.cells[cellIdx]; if (cell.userId) cell.approved = true
+}
+/** Host rejects a pending square → frees it back to empty. */
+export async function rejectSquareClaim(gameId: string, cellIdx: number): Promise<void> {
+  await delay(100)
+  const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
+  const cell = g.cells[cellIdx]; if (cell.userId && !cell.approved) g.cells[cellIdx] = {}
+}
+/** Host approves every pending square at once. */
+export async function approveAllSquares(gameId: string): Promise<void> {
+  await delay(150)
+  const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
+  g.cells.forEach((c) => { if (c.userId) c.approved = true })
 }
 
 function shuffleDigits(): number[] {
@@ -86,6 +108,7 @@ function shuffleDigits(): number[] {
 export async function lockSquares(gameId: string): Promise<void> {
   await delay(200)
   const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
+  g.cells.forEach((c) => { if (c.userId) c.approved = true }) // any still-pending claims are accepted at lock
   g.rowDigits = shuffleDigits(); g.colDigits = shuffleDigits(); g.status = 'live'
 }
 /** Host enters a period's score → the winning square + winner are computed. Final score completes the game. */

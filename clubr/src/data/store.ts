@@ -40,6 +40,7 @@ export const CLUBS: Club[] = [
       member('u_host', 'owner', 'member', '2026-05-02'),
       member('u_mike', 'member', 'member', '2026-05-04'),
       member('u_tom', 'member', 'member', '2026-05-06'),
+      member('u_player', 'member', 'member', '2026-06-15'),
       member('u_jordan', 'member', 'pending', '2026-06-13'),
       member('u_dustin', 'member', 'pending', '2026-06-14'),
     ],

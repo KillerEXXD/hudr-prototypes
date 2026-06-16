@@ -5,13 +5,20 @@ import { USERS } from '@/data/store'
 const u = USERS
 const part = (id: string, status: SquaresParticipant['status'], paid: boolean): SquaresParticipant =>
   ({ userId: id, name: u[id].name, avatarColor: u[id].avatarColor, status, paid })
-const claim = (cells: SquaresCell[], idx: number, id: string) => { cells[idx] = { userId: id, name: u[id].name, avatarColor: u[id].avatarColor } }
+const claim = (cells: SquaresCell[], idx: number, id: string, approved = true) => { cells[idx] = { userId: id, name: u[id].name, avatarColor: u[id].avatarColor, approved } }
 
-// ---- registration board: claims open, digits still sealed ----
+// ---- registration board: claims open, digits still sealed (all host-approved already) ----
 const regCells = emptyGrid()
 ;([[0,'u_mike'],[5,'u_tom'],[12,'u_jordan'],[23,'u_mike'],[34,'u_tom'],[41,'u_host'],[47,'u_jordan'],
   [55,'u_mike'],[63,'u_tom'],[71,'u_jordan'],[78,'u_host'],[80,'u_mike'],[88,'u_tom'],[92,'u_jordan'],[99,'u_host']] as [number, string][])
   .forEach(([i, id]) => claim(regCells, i, id))
+
+// ---- approval-demo board (ongoing): Sam (Player) has 2 approved + 3 pending; others pending too ----
+const apprCells = emptyGrid()
+;([[22,'u_player'],[35,'u_player'],[10,'u_mike'],[56,'u_tom'],[44,'u_host']] as [number, string][])
+  .forEach(([i, id]) => claim(apprCells, i, id, true))   // host-approved → locked in
+;([[3,'u_player'],[48,'u_player'],[61,'u_player'],[27,'u_mike'],[73,'u_tom'],[88,'u_jordan']] as [number, string][])
+  .forEach(([i, id]) => claim(apprCells, i, id, false))  // pending host approval → withdrawable
 
 // ---- completed board: full grid + assigned digits + period winners ----
 const doneCells = emptyGrid()
@@ -25,6 +32,16 @@ const winAt = (home: number, away: number) => {
 }
 
 export const SQUARES_GAMES: SquaresGame[] = [
+  {
+    id: 'sq_c', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡',
+    title: 'Sunday Night Squares', homeTeam: 'Ravens', awayTeam: 'Bills',
+    visibility: 'public', status: 'registration', timezone: 'CT',
+    stake: 50, hostId: 'u_host', coHostIds: [],
+    cells: apprCells, rowDigits: [], colDigits: [],
+    periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
+    participants: [part('u_host', 'active', true), part('u_player', 'active', false), part('u_mike', 'active', true), part('u_tom', 'active', false), part('u_jordan', 'active', true)],
+    chat: [],
+  },
   {
     id: 'sq_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡',
     title: 'Sunday Squares', homeTeam: 'Chiefs', awayTeam: 'Eagles',

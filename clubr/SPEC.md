@@ -193,9 +193,16 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
 - **Host flow:** create a board → name the game/matchup → **stakes bucket** (reuse
   100/250/500) → **payout split per period** (default Q1/Q2/Q3 = 10% each, **Final = 70%**)
   → **visibility** (public/private, same as FT/LL).
-- **Player flow:** request to claim square(s) → **host admits** → claim cells on the grid →
-  **paid toggle** (green/grey, host‑only, same as everywhere) → **row/column digits are
-  assigned and sealed at lock** (like FT picks) → reveal at lock.
+- **Player flow:** request to join → **host admits** → **tap an empty square to claim it**. Each
+  claim **locks with your initials but is PENDING the host's approval** — you can **withdraw a
+  pending square** any time; once the host **approves** it, it's **locked in** (no withdraw). Your
+  panel shows **squares chosen + owed** (e.g. `3 × 100 = 300 Stakes`), split into locked / pending.
+  **Row/column digits are sealed until lock** (like FT picks) → revealed at lock.
+- **Per‑square approval (host).** Every claimed square needs the **host's OK**. The host gets a
+  **"Square approvals · N pending"** queue (avatar · name · cell ref `R3·C7` · **Approve ✓ / Reject ✗**,
+  plus **Approve all**) and can also **tap any amber (pending) square on the grid to approve it**.
+  Pending squares **pulse amber**; approved go solid. **At lock, any still‑pending squares are
+  auto‑approved.** The host's players list shows each player's **squares chosen + owed**.
 - **Live:** host enters each period's score (self‑report, like Last Longer) → the app
   highlights the winning cell (home last digit × away last digit) → marks the period
   winner → settled offline.
@@ -204,7 +211,8 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
   HUDR/FT Fantasy remain the **retention + moat**.
 - **Reuses:** clubs, approval model, visibility/invite, paid toggle, sealed‑until‑lock,
   stakes buckets, chat, offline settlement. **Net‑new:** the 10×10 grid UI, random digit
-  assignment at lock, and period scoring.
+  assignment at lock, period scoring, and **per‑square host approval** (claim → pending →
+  approve/lock; withdraw only while pending) with a host approval queue + squares‑chosen/owed.
 - **Implementation (plugs into the §18 multi‑game platform):** registered as the
   `football_squares` game type in `games/types.ts` (green/`Grid3x3`, sheet‑create), merged
   into the unified Games feed via `useUnifiedGames` and rendered by `SquaresRow`. Stack:
