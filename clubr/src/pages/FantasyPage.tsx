@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Target, Clock, Lock, CheckCircle2, Eye, Shield, Plus, ChevronDown, Trophy } from 'lucide-react'
+import { Target, Clock, Lock, CheckCircle2, Eye, Shield, Plus, Trophy } from 'lucide-react'
 import { useContests } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
@@ -56,7 +55,6 @@ export function FantasyPage() {
   const { data, isLoading } = useContests()
   const myClubs = useMyClubs()
   const canHost = (myClubs.data ?? []).some((c) => c.canManage)
-  const [pastOpen, setPastOpen] = useState(false)
 
   const active = (data ?? []).filter((c) => c.status !== 'settled')
   // Past = settled contests YOU were in (entered or hosted) — not every finished one.
@@ -83,12 +81,9 @@ export function FantasyPage() {
             <Section title="Contests"><EmptyState icon={<Target className="h-7 w-7" />} title="Nothing open right now" sub={canHost ? 'Host one above, or check back when a final table is coming up.' : 'Join a club and check back when your host opens one.'} /></Section>
           )}
           {past.length > 0 && (
-            <div className="mt-5">
-              <button onClick={() => setPastOpen((o) => !o)} className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-bg-card px-3 py-2 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
-                {pastOpen ? 'Hide' : 'Show'} your results ({past.length}) <ChevronDown className={`h-3.5 w-3.5 transition-transform ${pastOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {pastOpen && <div className="mt-2 flex flex-col gap-2">{past.map((c) => <ContestRow key={c.id} c={c} />)}</div>}
-            </div>
+            <Section title={`Completed (${past.length})`}>
+              <div className="flex flex-col gap-2">{past.map((c) => <ContestRow key={c.id} c={c} />)}</div>
+            </Section>
           )}
         </>
       )}
