@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Eye, Copy, Check, Target, Timer, Plus, UserCheck, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lock, Eye, Copy, Check, Target, Timer, Plus, UserCheck, X, MapPin } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin } from '@/hooks'
 import { useContests } from '@/hooks/ft'
 import { useGames } from '@/hooks/ll'
@@ -46,6 +46,7 @@ export function ClubDetailPage() {
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-xl font-extrabold tracking-tight text-text-primary">{club.name}</h1>
           <p className="text-xs text-text-muted">{members.length} members · hosted by {club.ownerName}</p>
+          {club.location && <p className="mt-0.5 flex items-center gap-1 text-[11px] text-text-muted"><MapPin className="h-3 w-3" />{club.location}</p>}
         </div>
         <MembershipBadge status={club.myStatus} role={club.myRole} />
       </div>

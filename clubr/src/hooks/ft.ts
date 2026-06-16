@@ -53,6 +53,10 @@ export function usePostChat() {
 export function useAvailableFTs() {
   return useQuery({ queryKey: ['ft', 'available'], queryFn: () => ft.listAvailableFTs() })
 }
+export function useAddAvailableFT() {
+  const inv = useInvalidate()
+  return useMutation({ mutationFn: (v: Parameters<typeof ft.addAvailableFT>[0]) => ft.addAvailableFT(v), onSuccess: inv })
+}
 export function useCreateContest() {
   const { userId } = useIdentity(); const inv = useInvalidate()
   return useMutation({ mutationFn: (v: { clubId: string; ftId: string; stake: number; budget: number; visibility: 'public' | 'private'; accessUserIds: string[] }) => ft.createContest(v.clubId, userId, { ftId: v.ftId, stake: v.stake, budget: v.budget, visibility: v.visibility, accessUserIds: v.accessUserIds }), onSuccess: inv })

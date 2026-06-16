@@ -3,7 +3,7 @@
 import { AVAILABLE_FTS, FT_CONTESTS, spendOf } from '@/data/ftStore'
 import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
-import { FINISH_POINTS, type AvailableFT, type ContestEntry, type FTContest, type FTContestView } from '@/types/ft'
+import { FINISH_POINTS, type AvailableFT, type ContestEntry, type FTContest, type FTContestView, type FTPlayer } from '@/types/ft'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 
@@ -108,6 +108,41 @@ export async function postChat(contestId: string, userId: string, text: string):
 export async function listAvailableFTs(): Promise<AvailableFT[]> {
   await delay()
   return [...AVAILABLE_FTS].sort((a, b) => a.hoursLeft - b.hoursLeft)
+}
+
+/** Concave (ICM-style) price from a chip stack — bigger stacks cost more, but
+ *  the premium compresses at the top. Maps the shortest stack → 13k, the
+ *  chip leader → 35k (the same ladder the seeded FTs use). */
+function autoIcmPrice(bbStack: number, minBB: number, maxBB: number): number {
+  if (maxBB <= minBB) return 24000
+  const t = (Math.sqrt(bbStack) - Math.sqrt(minBB)) / (Math.sqrt(maxBB) - Math.sqrt(minBB))
+  return Math.round((13000 + t * (35000 - 13000)) / 1000) * 1000
+}
+
+/** App Admin adds a final table to the operator slate. Finalists are seated A..I
+ *  by stack (leader first) and ICM-priced automatically from their stacks. */
+export async function addAvailableFT(input: {
+  name: string; room: string; date: string; startsIn: string; hoursLeft: number; prizePool: string; buyIn: string
+  finalists: { name: string; bbStack: number }[]
+}): Promise<string> {
+  await delay()
+  const fs = input.finalists.filter((f) => f.name.trim() && f.bbStack > 0).sort((a, b) => b.bbStack - a.bbStack)
+  const minBB = Math.min(...fs.map((f) => f.bbStack))
+  const maxBB = Math.max(...fs.map((f) => f.bbStack))
+  const players: FTPlayer[] = fs.map((f, i) => ({
+    seat: String.fromCharCode(65 + i),
+    name: f.name.trim(),
+    bbStack: f.bbStack,
+    chips: f.bbStack * 100000,
+    icmPrice: autoIcmPrice(f.bbStack, minBB, maxBB),
+  }))
+  const id = `aft_${Date.now()}`
+  AVAILABLE_FTS.unshift({
+    id, name: input.name.trim() || 'New final table', room: input.room.trim() || 'Operator',
+    startsIn: input.startsIn.trim() || 'soon', hoursLeft: input.hoursLeft, date: input.date.trim() || 'Today',
+    prizePool: input.prizePool.trim() || '—', buyIn: input.buyIn.trim() || '—', players,
+  })
+  return id
 }
 
 export async function createContest(clubId: string, hostId: string, input: { ftId: string; stake: number; budget: number; visibility: 'public' | 'private'; accessUserIds: string[] }): Promise<string | null> {
