@@ -4,6 +4,7 @@ import { AVAILABLE_FTS, FT_CONTESTS, spendOf } from '@/data/ftStore'
 import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
 import { FINISH_POINTS, type AvailableFT, type ContestEntry, type FTContest, type FTContestView, type FTPlayer } from '@/types/ft'
+import { formatClose } from '@/lib/gameSetup'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 
@@ -145,7 +146,7 @@ export async function addAvailableFT(input: {
   return id
 }
 
-export async function createContest(clubId: string, hostId: string, input: { ftId: string; stake: number; budget: number; visibility: 'public' | 'private'; accessUserIds: string[] }): Promise<string | null> {
+export async function createContest(clubId: string, hostId: string, input: { ftId: string; stake: number; budget: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; payouts: number[] }): Promise<string | null> {
   await delay()
   const ft = AVAILABLE_FTS.find((f) => f.id === input.ftId)
   const club = CLUBS.find((c) => c.id === clubId)
@@ -158,7 +159,9 @@ export async function createContest(clubId: string, hostId: string, input: { ftI
     visibility: input.visibility,
     accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
     status: 'open', stake: input.stake, budget: input.budget,
-    locksAt: `${ft.startsIn} · locks 10m before`, hostId, coHostIds: [], players: ft.players,
+    locksAt: input.closesAt ? `Closes ${formatClose(input.closesAt, input.timezone)}` : `${ft.startsIn} · locks 10m before`,
+    locksAtTs: input.closesAt || undefined, timezone: input.timezone, payouts: input.payouts,
+    hostId, coHostIds: [], players: ft.players,
     entries: [], // host is NOT auto-entered — they join as a player only if they want
     chat: [],
   })

@@ -5,6 +5,7 @@ import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { StakePool } from '@/components/common/StakePool'
+import { PayoutBadge } from '@/components/common/GameSetup'
 import type { FTContestView } from '@/types/ft'
 
 function RoleBadges({ c }: { c: FTContestView }) {
@@ -25,7 +26,6 @@ export function ContestRow({ c }: { c: FTContestView }) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span><span className="truncate">{c.clubName}</span></div>
         <div className="flex shrink-0 items-center gap-1.5">
-          {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />WTA</Badge>}
           <Badge tone={s.tone}><s.icon className="h-3 w-3" />{s.label}</Badge>
         </div>
       </div>
@@ -42,6 +42,7 @@ export function ContestRow({ c }: { c: FTContestView }) {
           >· {entered} entered</StakePool>
         )
       })()}
+      <div className="mt-2"><PayoutBadge payouts={c.payouts ?? (c.format === 'winner_takes_all' ? [100] : undefined)} /></div>
       {(c.canManage || c.myEntry || c.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges c={c} />{c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
       )}

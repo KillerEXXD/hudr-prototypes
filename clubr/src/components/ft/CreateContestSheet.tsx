@@ -4,6 +4,8 @@ import { Target, Clock, Check, Globe, Lock } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useAvailableFTs, useCreateContest } from '@/hooks/ft'
 import { Sheet, Btn } from '@/components/common/ui'
+import { ScheduleFields, PayoutEditor } from '@/components/common/GameSetup'
+import { defaultCloseLocal, DEFAULT_PAYOUTS, arePayoutsValid } from '@/lib/gameSetup'
 import { cn } from '@/lib/utils/cn'
 
 // Shared "host an FT Fantasy contest" sheet. Pass `fixedClubId` from a club
@@ -19,6 +21,9 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
   const [stake, setStake] = useState(250)
   const [visibility, setVisibility] = useState<'public' | 'private'>('public')
   const [access, setAccess] = useState<string[]>([])
+  const [closesAt, setClosesAt] = useState(defaultCloseLocal())
+  const [tz, setTz] = useState('ET')
+  const [payouts, setPayouts] = useState<number[]>(DEFAULT_PAYOUTS)
 
   useEffect(() => {
     if (fixedClubId) setClubId(fixedClubId)
@@ -30,7 +35,7 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
   const members = (club?.members ?? []).filter((m) => m.status === 'member')
 
   async function submit() {
-    const newId = await create.mutateAsync({ clubId, ftId, stake, budget: 100000, visibility, accessUserIds: access })
+    const newId = await create.mutateAsync({ clubId, ftId, stake, budget: 100000, visibility, accessUserIds: access, closesAt, timezone: tz, payouts })
     onClose(); setFtId('')
     if (newId) navigate(`/fantasy/${newId}`)
   }
@@ -71,6 +76,11 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
         <button key={s} onClick={() => setStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', stake === s ? 'border-accent-purple bg-accent-purple/15 text-accent-purple' : 'border-border text-text-secondary')}>{s}</button>
       ))}</div>
 
+      <div className="mt-3 flex flex-col gap-3">
+        <ScheduleFields accent="purple" closesAt={closesAt} onCloseChange={setClosesAt} tz={tz} onTzChange={setTz} />
+        <PayoutEditor accent="purple" payouts={payouts} onChange={setPayouts} />
+      </div>
+
       <p className="mt-3 mb-1 text-xs font-semibold text-text-secondary">Visibility</p>
       <div className="flex gap-2">
         {(['public', 'private'] as const).map((v) => (
@@ -91,7 +101,7 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
         </div>
       )}
 
-      <Btn className="mt-3 w-full" disabled={!clubId || !ftId || create.isPending} onClick={submit}>Host this FT</Btn>
+      <Btn className="mt-3 w-full" disabled={!clubId || !ftId || !closesAt || !arePayoutsValid(payouts) || create.isPending} onClick={submit}>Host this FT</Btn>
     </Sheet>
   )
 }

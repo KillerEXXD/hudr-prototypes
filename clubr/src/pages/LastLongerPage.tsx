@@ -6,6 +6,7 @@ import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { StakePool } from '@/components/common/StakePool'
+import { PayoutBadge } from '@/components/common/GameSetup'
 import { CreateGameSheet } from '@/components/ll/CreateGameSheet'
 import type { LLGameView } from '@/types/ll'
 
@@ -41,6 +42,7 @@ export function GameRow({ g }: { g: LLGameView }) {
           >· {g.activeCount} in{out ? ` · ${out} out` : ''}</StakePool>
         )
       })()}
+      <div className="mt-2"><PayoutBadge payouts={g.payouts} /></div>
       {(g.canManage || g.me || g.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges g={g} />{g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
       )}

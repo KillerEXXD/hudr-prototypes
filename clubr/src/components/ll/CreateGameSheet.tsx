@@ -4,6 +4,8 @@ import { MapPin, Globe, Lock } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useCreateGame } from '@/hooks/ll'
 import { Sheet, Btn, Field } from '@/components/common/ui'
+import { ScheduleFields, PayoutEditor } from '@/components/common/GameSetup'
+import { defaultCloseLocal, DEFAULT_PAYOUTS, arePayoutsValid } from '@/lib/gameSetup'
 import { cn } from '@/lib/utils/cn'
 
 // Shared "create a Last Longer" sheet. Pass `fixedClubId` from a club page
@@ -20,6 +22,9 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
   const [stake, setStake] = useState(100)
   const [visibility, setVisibility] = useState<'public' | 'private'>('public')
   const [access, setAccess] = useState<string[]>([])
+  const [closesAt, setClosesAt] = useState(defaultCloseLocal())
+  const [tz, setTz] = useState('ET')
+  const [payouts, setPayouts] = useState<number[]>(DEFAULT_PAYOUTS)
 
   useEffect(() => {
     if (fixedClubId) setClubId(fixedClubId)
@@ -30,7 +35,7 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
   const members = (club?.members ?? []).filter((m) => m.status === 'member')
 
   async function submit() {
-    const newId = await create.mutateAsync({ clubId, title, location: loc, mode, stake, visibility, accessUserIds: access })
+    const newId = await create.mutateAsync({ clubId, title, location: loc, mode, stake, visibility, accessUserIds: access, closesAt, timezone: tz, payouts })
     onClose(); setTitle(''); setLoc('')
     if (newId) navigate(`/lastlonger/${newId}`)
   }
@@ -69,6 +74,8 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
             <button key={s} onClick={() => setStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', stake === s ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>{s}</button>
           ))}</div>
         </div>
+        <ScheduleFields accent="amber" closesAt={closesAt} onCloseChange={setClosesAt} tz={tz} onTzChange={setTz} />
+        <PayoutEditor accent="amber" payouts={payouts} onChange={setPayouts} />
         <div>
           <span className="mb-1 block text-xs font-semibold text-text-secondary">Visibility</span>
           <div className="flex gap-2">
@@ -90,7 +97,7 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
             </div>
           )}
         </div>
-        <Btn className="w-full" disabled={!clubId || !title.trim() || create.isPending} onClick={submit}>Create Last Longer</Btn>
+        <Btn className="w-full" disabled={!clubId || !title.trim() || !closesAt || !arePayoutsValid(payouts) || create.isPending} onClick={submit}>Create Last Longer</Btn>
       </div>
     </Sheet>
   )

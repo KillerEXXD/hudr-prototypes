@@ -144,7 +144,7 @@ export async function agreeChop(gameId: string, userId: string): Promise<void> {
 
 function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th' }
 
-export async function createGame(clubId: string, hostId: string, input: { title: string; location: string; mode: 'in-person' | 'online'; stake: number; visibility: 'public' | 'private'; accessUserIds: string[] }): Promise<string> {
+export async function createGame(clubId: string, hostId: string, input: { title: string; location: string; mode: 'in-person' | 'online'; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; payouts: number[] }): Promise<string> {
   await delay()
   const club = CLUBS.find((c) => c.id === clubId)
   const u = USERS[hostId]
@@ -155,7 +155,9 @@ export async function createGame(clubId: string, hostId: string, input: { title:
     visibility: input.visibility,
     accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
     location: input.location.trim() || undefined, mode: input.mode,
-    status: 'registration', stake: input.stake, hostId, coHostIds: [],
+    status: 'registration', registrationClosesAt: input.closesAt || undefined,
+    timezone: input.timezone, payouts: input.payouts,
+    stake: input.stake, hostId, coHostIds: [],
     participants: [], // host is NOT auto-added — they join as a player only if they want
     chat: [],
   })

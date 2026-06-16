@@ -37,6 +37,10 @@ export interface LLGame {
   status: LLStatus
   /** ISO timestamp — when registration closes (drives the ticking countdown). */
   registrationClosesAt?: string
+  /** Host-selected timezone label for the close time (e.g. 'ET'). */
+  timezone?: string
+  /** Prize split percentages by place, summing to 100. Length 1 = winner-takes-all. */
+  payouts?: number[]
   stake: number
   hostId: string
   coHostIds: string[]

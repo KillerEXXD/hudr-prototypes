@@ -49,9 +49,9 @@ export function Countdown({ deadline, prefix = 'Closes' }: { deadline: number; p
       </span>
     )
   }
-  const urgent = ms < 5 * 60_000
+  const urgent = ms < 10 * 60_000 // under 10 minutes → red
   return (
-    <span className={`inline-flex items-center gap-1 font-mono text-[11px] font-semibold ${urgent ? 'text-accent-red' : 'text-accent-emerald'} ${ms < 60_000 ? 'animate-pulse' : ''}`}>
+    <span className={`inline-flex items-center gap-1 font-mono text-[11px] font-semibold ${urgent ? 'text-accent-red' : 'text-accent-emerald'} ${ms < 2 * 60_000 ? 'animate-pulse' : ''}`}>
       <Clock className="h-3 w-3" />{prefix} {fmt(ms)}
     </span>
   )

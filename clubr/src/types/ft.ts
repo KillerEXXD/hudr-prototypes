@@ -58,6 +58,10 @@ export interface FTContest {
   locksAt: string
   /** ISO timestamp for `locksAt` — drives the ticking countdown while open. */
   locksAtTs?: string
+  /** Host-selected timezone label for the close time (e.g. 'ET'). */
+  timezone?: string
+  /** Prize split percentages by place, summing to 100. Length 1 = winner-takes-all. */
+  payouts?: number[]
   /** Real-event context for the FT details panel (informational only). */
   room?: string // 'partypoker', 'WSOP', 'PokerGO'…
   prizePool?: string // the real event's prize pool, e.g. '$5,000,000'
