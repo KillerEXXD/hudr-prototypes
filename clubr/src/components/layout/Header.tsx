@@ -24,7 +24,7 @@ export function Header() {
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-bg-secondary/95 px-4 py-3 backdrop-blur">
       <div className="flex items-center gap-2">
         <span className="text-lg font-extrabold tracking-tight text-text-primary">🃏 ClubR</span>
-        <Badge tone={role.tone} className="hidden sm:inline-flex"><role.icon className="h-3 w-3" />{role.label}</Badge>
+        <Badge tone={role.tone}><role.icon className="h-3 w-3" />{role.label}</Badge>
       </div>
       <div className="flex items-center gap-1.5">
         <button onClick={() => setSkinOpen(true)} className="flex items-center gap-1.5 rounded-full border border-border bg-bg-card px-2.5 py-1.5 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer" aria-label="Change appearance">
