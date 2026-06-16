@@ -4,6 +4,7 @@ import { useContests } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
+import { StakePool } from '@/components/common/StakePool'
 import type { FTContestView } from '@/types/ft'
 
 function RoleBadges({ c }: { c: FTContestView }) {
@@ -29,13 +30,18 @@ export function ContestRow({ c }: { c: FTContestView }) {
         </div>
       </div>
       <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Target className="h-4 w-4 shrink-0 text-accent-purple" /><span className="truncate">{c.ftName}</span></p>
-      <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
-        <span className="font-mono">{c.stake} Stakes</span>
-        <span className="text-text-muted">· {c.entries.filter((e) => e.status === 'approved').length} entered</span>
-        {c.status === 'open'
-          ? <span className="ml-auto"><Countdown deadline={regDeadline(c.id, c.locksAtTs)} prefix="Locks" /></span>
-          : <span className="ml-auto text-text-muted">{c.locksAt}</span>}
-      </div>
+      {(() => {
+        const entered = c.entries.filter((e) => e.status === 'approved').length
+        return (
+          <StakePool
+            stake={c.stake}
+            pool={c.stake * entered}
+            right={c.status === 'open'
+              ? <Countdown deadline={regDeadline(c.id, c.locksAtTs)} prefix="Locks" />
+              : <span className="text-text-muted">{c.locksAt}</span>}
+          >· {entered} entered</StakePool>
+        )
+      })()}
       {(c.canManage || c.myEntry || c.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges c={c} />{c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
       )}

@@ -5,6 +5,7 @@ import { useGames } from '@/hooks/ll'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
+import { StakePool } from '@/components/common/StakePool'
 import { CreateGameSheet } from '@/components/ll/CreateGameSheet'
 import type { LLGameView } from '@/types/ll'
 
@@ -29,11 +30,17 @@ export function GameRow({ g }: { g: LLGameView }) {
         <Badge tone={s.tone}>{s.label}</Badge>
       </div>
       <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Timer className="h-4 w-4 shrink-0 text-accent-amber" /><span className="truncate">{g.title}</span></p>
-      <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
-        <span className="font-mono">{g.stake} Stakes</span>
-        <span className="text-text-muted">· {g.activeCount} in · {g.participants.filter((p) => p.status === 'out').length} out</span>
-        {g.status === 'registration' && <span className="ml-auto"><Countdown deadline={regDeadline(g.id, g.registrationClosesAt)} prefix="Closes" /></span>}
-      </div>
+      {(() => {
+        const out = g.participants.filter((p) => p.status === 'out').length
+        const entered = g.participants.filter((p) => p.status !== 'pending').length
+        return (
+          <StakePool
+            stake={g.stake}
+            pool={g.stake * entered}
+            right={g.status === 'registration' ? <Countdown deadline={regDeadline(g.id, g.registrationClosesAt)} prefix="Closes" /> : undefined}
+          >· {g.activeCount} in{out ? ` · ${out} out` : ''}</StakePool>
+        )
+      })()}
       {(g.canManage || g.me || g.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges g={g} />{g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
       )}
