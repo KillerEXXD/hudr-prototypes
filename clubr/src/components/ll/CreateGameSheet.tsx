@@ -70,9 +70,18 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
         </div>
         <div>
           <span className="mb-1 block text-xs font-semibold text-text-secondary">Stake</span>
-          <div className="flex gap-2">{[50, 100, 250].map((s) => (
-            <button key={s} onClick={() => setStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', stake === s ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>{s}</button>
-          ))}</div>
+          <div className="flex gap-2">
+            {[50, 100, 250].map((s) => (
+              <button key={s} type="button" onClick={() => setStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', stake === s ? 'border-accent-amber bg-accent-amber/15 text-accent-amber' : 'border-border text-text-secondary')}>{s}</button>
+            ))}
+            <input
+              type="number" min={1} inputMode="numeric"
+              value={[50, 100, 250].includes(stake) ? '' : stake || ''}
+              onChange={(e) => setStake(Math.max(0, Number(e.target.value) || 0))}
+              placeholder="Custom"
+              className={cn('w-20 rounded-xl border bg-bg-surface px-2 py-2 text-center text-sm font-bold text-text-primary placeholder:font-normal placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-amber', ![50, 100, 250].includes(stake) && stake > 0 ? 'border-accent-amber text-accent-amber' : 'border-border')}
+            />
+          </div>
         </div>
         <ScheduleFields accent="amber" closesAt={closesAt} onCloseChange={setClosesAt} tz={tz} onTzChange={setTz} />
         <PayoutEditor accent="amber" payouts={payouts} onChange={setPayouts} />

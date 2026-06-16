@@ -72,9 +72,18 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
         </>
       )}
       <p className="mt-3 mb-1 text-xs font-semibold text-text-secondary">Bucket (Stakes)</p>
-      <div className="flex gap-2">{[100, 250, 500].map((s) => (
-        <button key={s} onClick={() => setStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', stake === s ? 'border-accent-purple bg-accent-purple/15 text-accent-purple' : 'border-border text-text-secondary')}>{s}</button>
-      ))}</div>
+      <div className="flex gap-2">
+        {[100, 250, 500].map((s) => (
+          <button key={s} type="button" onClick={() => setStake(s)} className={cn('flex-1 rounded-xl border py-2 text-sm font-bold cursor-pointer', stake === s ? 'border-accent-purple bg-accent-purple/15 text-accent-purple' : 'border-border text-text-secondary')}>{s}</button>
+        ))}
+        <input
+          type="number" min={1} inputMode="numeric"
+          value={[100, 250, 500].includes(stake) ? '' : stake || ''}
+          onChange={(e) => setStake(Math.max(0, Number(e.target.value) || 0))}
+          placeholder="Custom"
+          className={cn('w-20 rounded-xl border bg-bg-surface px-2 py-2 text-center text-sm font-bold text-text-primary placeholder:font-normal placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-purple', ![100, 250, 500].includes(stake) && stake > 0 ? 'border-accent-purple text-accent-purple' : 'border-border')}
+        />
+      </div>
 
       <div className="mt-3 flex flex-col gap-3">
         <ScheduleFields accent="purple" closesAt={closesAt} onCloseChange={setClosesAt} tz={tz} onTzChange={setTz} />

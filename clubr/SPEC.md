@@ -62,7 +62,10 @@ Approval is required to do anything beyond viewing:
 - **Host flow:** Fantasy tab → **Host a contest** → browse the operator slate
   (Scout‑Sharp style: room, date, **real prize pool & buy‑in**, hours‑left) → open
   one to see **the 9 finalists with chip stacks + ICM prices** → **Host this FT** →
-  choose club, **Stakes bucket** (100/250/500), and **visibility**.
+  choose club, **Stakes bucket** (presets 100/250/500 **or a custom value** — e.g. 150, 300),
+  registration close + timezone, payouts, and **visibility**.
+- **Stakes bucket = preset or custom.** Both create sheets (FT + LL) offer quick presets **and a
+  "Custom" number input**, so a host can set any bucket (150, 300, …), not just the presets.
 - **Player flow:** request to enter → host admits → **draft 4 of 9 within a 100k
   budget** (use‑it‑or‑lose‑it) → **picks lock 10 minutes before** the FT.
 - **Picks visibility:** **sealed until the lock for EVERYONE — host and App Admin
