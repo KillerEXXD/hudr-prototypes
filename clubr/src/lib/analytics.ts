@@ -103,6 +103,19 @@ export function captureFeedback(data: FeedbackPayload): void {
   sendToTournamentPro('quick_note', { screen: data.screen, ease: data.ease, improve: data.improve, liked: data.liked, name: data.name, email: data.email })
 }
 
+/**
+ * Frictionless quick note — just the text, sent immediately. No rating and no
+ * required name/email; identity is attached only if it was captured earlier.
+ */
+export function captureQuickNote(note: string): void {
+  const text = note.trim()
+  if (!text) return
+  const id = getIdentity()
+  const screen = (typeof location !== 'undefined' ? location.hash : '') || '#/'
+  posthog.capture('quick_note_submitted', { prototype: PROTOTYPE, surface: SURFACE, screen, note: text, name: id?.name, email: id?.email })
+  sendToTournamentPro('quick_note', { screen, improve: text, note: text, name: id?.name ?? '', email: id?.email ?? '' })
+}
+
 // ---- Guided per-feature review (the ReviewWizard) ----
 
 export interface ReviewSectionAnswer {
