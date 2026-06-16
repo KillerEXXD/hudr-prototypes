@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { Sheet } from '@/components/common/ui'
 import { CreateGameSheet } from '@/components/ll/CreateGameSheet'
+import { CreateSquaresSheet } from '@/components/squares/CreateSquaresSheet'
 import { GAME_TYPES, type GameType, type GameTypeDef } from '@/games/types'
 
 // One entry point to host any game type — driven by the game-type registry.
@@ -38,6 +39,7 @@ export function NewGameSheet({ open, onClose, fixedClubId }: { open: boolean; on
 
       {/* Sheet-create flows (route-create types navigate instead). */}
       <CreateGameSheet open={sheetType === 'last_longer'} onClose={() => setSheetType(null)} fixedClubId={fixedClubId} />
+      <CreateSquaresSheet open={sheetType === 'football_squares'} onClose={() => setSheetType(null)} fixedClubId={fixedClubId} />
     </>
   )
 }

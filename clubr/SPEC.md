@@ -181,7 +181,7 @@ Approval is required to do anything beyond viewing:
 - **Next game (queued):** **Football Squares** — see §13. Reuses the rails; net‑new is
   the 10×10 grid UI + random digit assignment + period scoring.
 
-## 13. Football Squares (roadmap — queued build)
+## 13. Football Squares (built — live on the rails)
 A **third club side‑game** on the same rails as FT Fantasy & Last Longer. Widely run in
 poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisition hook**
 (a reason for a club to install ClubR *that week*).
@@ -205,6 +205,17 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
 - **Reuses:** clubs, approval model, visibility/invite, paid toggle, sealed‑until‑lock,
   stakes buckets, chat, offline settlement. **Net‑new:** the 10×10 grid UI, random digit
   assignment at lock, and period scoring.
+- **Implementation (plugs into the §18 multi‑game platform):** registered as the
+  `football_squares` game type in `games/types.ts` (green/`Grid3x3`, sheet‑create), merged
+  into the unified Games feed via `useUnifiedGames` and rendered by `SquaresRow`. Stack:
+  `types/squares.ts`, `data/squaresStore.ts`, `lib/api/squaresServices.ts`,
+  `hooks/squares.ts`, `components/squares/{SquaresRow,CreateSquaresSheet}.tsx`, the
+  `SquaresGamePage` grid detail (`/squares/:id`), and a `CreateSquaresSheet` entry in the
+  shared "+ New game" chooser. **Grid detail:** 10×10 board with sealed `?` digit headers
+  until the host locks (random shuffle → status `live`), tap‑to‑claim/release for admitted
+  active players during registration, per‑period host score entry that lights up the winning
+  cell (`rowDigits.indexOf(home%10)` × `colDigits.indexOf(away%10)`), `Final` completes the
+  game, plus host admit/paid‑toggle controls — same envelope as FT/LL.
 
 ## 14. Prototype feedback & analytics (testing instrumentation)
 A floating **Feedback** launcher sits on every screen (mounted in `AppShell`,

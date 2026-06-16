@@ -1,0 +1,100 @@
+// Football Squares services — swap seam (mock store today, API later).
+import { SQUARES_GAMES } from '@/data/squaresStore'
+import { CLUBS, USERS } from '@/data/store'
+import { MOCK_LATENCY_MS } from '@/config/api'
+import { emptyGrid, type SquaresGame, type SquaresGameView } from '@/types/squares'
+
+const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
+const isMember = (clubId: string, userId: string) => !!CLUBS.find((c) => c.id === clubId)?.members.some((m) => m.userId === userId && m.status === 'member')
+
+function canView(g: SquaresGame, viewerId: string, isAdmin: boolean) {
+  const base = isAdmin || isMember(g.clubId, viewerId) || g.hostId === viewerId || g.coHostIds.includes(viewerId)
+  if (g.visibility !== 'private') return base
+  return isAdmin || g.hostId === viewerId || g.coHostIds.includes(viewerId) || (g.accessUserIds ?? []).includes(viewerId)
+}
+function toView(g: SquaresGame, userId: string, isAdmin: boolean): SquaresGameView {
+  return {
+    ...g,
+    me: g.participants.find((p) => p.userId === userId) ?? null,
+    canManage: isAdmin || g.hostId === userId || g.coHostIds.includes(userId),
+    isMemberOfClub: isMember(g.clubId, userId),
+    claimedCount: g.cells.filter((c) => c.userId).length,
+  }
+}
+
+export async function listSquares(userId: string, isAdmin = false): Promise<SquaresGameView[]> {
+  await delay()
+  return SQUARES_GAMES.filter((g) => canView(g, userId, isAdmin)).map((g) => toView(g, userId, isAdmin))
+}
+export async function getSquares(id: string, userId: string, isAdmin = false): Promise<SquaresGameView | null> {
+  await delay()
+  const g = SQUARES_GAMES.find((x) => x.id === id)
+  return g && canView(g, userId, isAdmin) ? toView(g, userId, isAdmin) : null
+}
+
+export async function createSquares(clubId: string, hostId: string, input: { title: string; homeTeam: string; awayTeam: string; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; periodPayouts: number[] }): Promise<string> {
+  await delay()
+  const club = CLUBS.find((c) => c.id === clubId)
+  const id = `sq_${Date.now()}`
+  const labels = ['Q1', 'Q2', 'Q3', 'Final']
+  SQUARES_GAMES.unshift({
+    id, clubId, clubName: club?.name ?? 'Club', clubEmoji: club?.emoji ?? '🃏',
+    title: input.title.trim() || 'Football Squares', homeTeam: input.homeTeam.trim() || 'Home', awayTeam: input.awayTeam.trim() || 'Away',
+    visibility: input.visibility, accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
+    status: 'registration', registrationClosesAt: input.closesAt || undefined, timezone: input.timezone,
+    stake: input.stake, hostId, coHostIds: [],
+    cells: emptyGrid(), rowDigits: [], colDigits: [],
+    periods: labels.map((label, i) => ({ label, pct: input.periodPayouts[i] ?? 0 })),
+    participants: [], chat: [],
+  })
+  return id
+}
+
+export async function requestJoinSquares(gameId: string, userId: string): Promise<void> {
+  await delay(150)
+  const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.participants.some((p) => p.userId === userId)) return
+  const u = USERS[userId]
+  const auto = g.hostId === userId || g.coHostIds.includes(userId)
+  g.participants.push({ userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status: auto ? 'active' : 'pending', paid: false })
+}
+export async function approveSquares(gameId: string, userId: string): Promise<void> {
+  await delay(150); const p = SQUARES_GAMES.find((x) => x.id === gameId)?.participants.find((x) => x.userId === userId); if (p) p.status = 'active'
+}
+export async function declineSquares(gameId: string, userId: string): Promise<void> {
+  await delay(150); const g = SQUARES_GAMES.find((x) => x.id === gameId); if (g) g.participants = g.participants.filter((p) => p.userId !== userId)
+}
+export async function toggleSquaresPaid(gameId: string, userId: string): Promise<void> {
+  await delay(120); const p = SQUARES_GAMES.find((x) => x.id === gameId)?.participants.find((x) => x.userId === userId); if (p) p.paid = !p.paid
+}
+
+/** Toggle a square: claim an empty one, or release one you own. Registration only, active players only. */
+export async function claimSquare(gameId: string, userId: string, cellIdx: number): Promise<void> {
+  await delay(100)
+  const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
+  const me = g.participants.find((p) => p.userId === userId); if (!me || me.status !== 'active') return
+  const cell = g.cells[cellIdx]
+  if (cell.userId === userId) g.cells[cellIdx] = {}
+  else if (!cell.userId) { const u = USERS[userId]; g.cells[cellIdx] = { userId, name: u?.name, avatarColor: u?.avatarColor } }
+}
+
+function shuffleDigits(): number[] {
+  const a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]] }
+  return a
+}
+/** Host locks registration → digits are randomly assigned (sealed before this) and the board goes live. */
+export async function lockSquares(gameId: string): Promise<void> {
+  await delay(200)
+  const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
+  g.rowDigits = shuffleDigits(); g.colDigits = shuffleDigits(); g.status = 'live'
+}
+/** Host enters a period's score → the winning square + winner are computed. Final score completes the game. */
+export async function setSquaresScore(gameId: string, label: string, home: number, away: number): Promise<void> {
+  await delay(150)
+  const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'live') return
+  const period = g.periods.find((p) => p.label === label); if (!period) return
+  period.homeScore = home; period.awayScore = away
+  const r = g.rowDigits.indexOf(home % 10), c = g.colDigits.indexOf(away % 10)
+  if (r >= 0 && c >= 0) { period.winnerCell = r * 10 + c; period.winnerUserId = g.cells[r * 10 + c].userId }
+  if (label === 'Final') g.status = 'completed'
+}

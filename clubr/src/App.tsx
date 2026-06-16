@@ -11,6 +11,7 @@ import { HostFTPage } from '@/pages/HostFTPage'
 import { ContestDetailPage } from '@/pages/ContestDetailPage'
 import { LastLongerPage } from '@/pages/LastLongerPage'
 import { LastLongerGamePage } from '@/pages/LastLongerGamePage'
+import { SquaresGamePage } from '@/pages/SquaresGamePage'
 import { MePage } from '@/pages/MePage'
 import { AdminPage } from '@/pages/AdminPage'
 import { MemberPage } from '@/pages/MemberPage'
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/fantasy/:id" element={<ContestDetailPage />} />
         <Route path="/lastlonger" element={<LastLongerPage />} />
         <Route path="/lastlonger/:id" element={<LastLongerGamePage />} />
+        <Route path="/squares/:id" element={<SquaresGamePage />} />
         <Route path="/me" element={<MePage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/member/:id" element={<MemberPage />} />

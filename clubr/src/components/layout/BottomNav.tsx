@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils/cn'
 
 const REST = [
   { to: '/clubs', label: 'Clubs', icon: Users, match: (p: string) => p === '/clubs' || p.startsWith('/club/') },
-  { to: '/games', label: 'Games', icon: Gamepad2, match: (p: string) => p.startsWith('/games') || p.startsWith('/fantasy') || p.startsWith('/lastlonger') || p.startsWith('/host-ft') },
+  { to: '/games', label: 'Games', icon: Gamepad2, match: (p: string) => p.startsWith('/games') || p.startsWith('/fantasy') || p.startsWith('/lastlonger') || p.startsWith('/squares') || p.startsWith('/host-ft') },
   { to: '/me', label: 'Me', icon: CircleUser, match: (p: string) => p.startsWith('/me') || p.startsWith('/admin') },
 ]
 

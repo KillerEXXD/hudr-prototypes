@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Section, Spinner, EmptyState } from '@/components/common/ui'
 import { ContestRow } from '@/pages/FantasyPage'
 import { GameRow } from '@/pages/LastLongerPage'
+import { SquaresRow } from '@/components/squares/SquaresRow'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { useUnifiedGames, matchesType, type UnifiedGame } from '@/games/useUnifiedGames'
@@ -18,6 +19,7 @@ function renderGame(g: UnifiedGame) {
   switch (g.type) {
     case 'ft_fantasy': return <ContestRow key={`ft_${g.id}`} c={g.ft} />
     case 'last_longer': return <GameRow key={`ll_${g.id}`} g={g.ll} />
+    case 'football_squares': return <SquaresRow key={`sq_${g.id}`} g={g.sq} />
   }
 }
 

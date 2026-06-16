@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { Target, Timer } from 'lucide-react'
+import { Target, Timer, Grid3x3 } from 'lucide-react'
 
 // =====================================================================
 // Game-type registry — the ONE place a game type is declared. The Games
@@ -11,7 +11,7 @@ import { Target, Timer } from 'lucide-react'
 // the accent name) so the JIT scanner keeps them.
 // =====================================================================
 
-export type GameType = 'ft_fantasy' | 'last_longer'
+export type GameType = 'ft_fantasy' | 'last_longer' | 'football_squares'
 
 export interface GameTypeDef {
   id: GameType
@@ -32,6 +32,11 @@ export const GAME_TYPES: GameTypeDef[] = [
   {
     id: 'last_longer', label: 'Last Longer', sub: "Your club's own live tournament",
     icon: Timer, iconBg: 'bg-accent-amber', ring: 'border-accent-amber/30 bg-accent-amber/10',
+    create: { kind: 'sheet' },
+  },
+  {
+    id: 'football_squares', label: 'Football Squares', sub: 'A 10×10 squares board on a live game',
+    icon: Grid3x3, iconBg: 'bg-accent-emerald', ring: 'border-accent-emerald/30 bg-accent-emerald/10',
     create: { kind: 'sheet' },
   },
 ]
