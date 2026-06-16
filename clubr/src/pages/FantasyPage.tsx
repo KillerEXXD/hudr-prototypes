@@ -3,6 +3,7 @@ import { Target, Clock, Lock, CheckCircle2, Eye, Shield, Plus, Trophy } from 'lu
 import { useContests } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { Countdown, regDeadline } from '@/components/common/Countdown'
 import type { FTContestView } from '@/types/ft'
 
 function RoleBadges({ c }: { c: FTContestView }) {
@@ -31,7 +32,9 @@ export function ContestRow({ c }: { c: FTContestView }) {
       <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
         <span className="font-mono">{c.stake} Stakes</span>
         <span className="text-text-muted">· {c.entries.filter((e) => e.status === 'approved').length} entered</span>
-        <span className="ml-auto text-text-muted">{c.locksAt}</span>
+        {c.status === 'open'
+          ? <span className="ml-auto"><Countdown deadline={regDeadline(c.id, c.locksAtTs)} prefix="Locks" /></span>
+          : <span className="ml-auto text-text-muted">{c.locksAt}</span>}
       </div>
       {(c.canManage || c.myEntry || c.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges c={c} />{c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>

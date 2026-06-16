@@ -56,6 +56,8 @@ export interface FTContest {
   stake: number
   budget: number
   locksAt: string
+  /** ISO timestamp for `locksAt` — drives the ticking countdown while open. */
+  locksAtTs?: string
   /** Real-event context for the FT details panel (informational only). */
   room?: string // 'partypoker', 'WSOP', 'PokerGO'…
   prizePool?: string // the real event's prize pool, e.g. '$5,000,000'

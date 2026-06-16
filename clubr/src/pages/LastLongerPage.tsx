@@ -4,6 +4,7 @@ import { Timer, CheckCircle2, Eye, Shield, Plus, Trophy, Lock } from 'lucide-rea
 import { useGames } from '@/hooks/ll'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { CreateGameSheet } from '@/components/ll/CreateGameSheet'
 import type { LLGameView } from '@/types/ll'
 
@@ -31,6 +32,7 @@ export function GameRow({ g }: { g: LLGameView }) {
       <div className="mt-2 flex items-center gap-2 text-xs text-text-secondary">
         <span className="font-mono">{g.stake} Stakes</span>
         <span className="text-text-muted">· {g.activeCount} in · {g.participants.filter((p) => p.status === 'out').length} out</span>
+        {g.status === 'registration' && <span className="ml-auto"><Countdown deadline={regDeadline(g.id, g.registrationClosesAt)} prefix="Closes" /></span>}
       </div>
       {(g.canManage || g.me || g.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges g={g} />{g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>

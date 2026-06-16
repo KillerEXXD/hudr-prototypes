@@ -35,6 +35,8 @@ export interface LLGame {
   location?: string
   mode?: 'in-person' | 'online'
   status: LLStatus
+  /** ISO timestamp — when registration closes (drives the ticking countdown). */
+  registrationClosesAt?: string
   stake: number
   hostId: string
   coHostIds: string[]
