@@ -187,6 +187,11 @@ pinned above the bottom nav), mirroring the Scout prototypes but scoped to ClubR
 - Every event is tagged `prototype: 'clubr'` / `surface: 'clubr-prototype'` so
   ClubR feedback is filterable in the shared PostHog project. **Public `phc_`
   key only** (never the personal `phx_` key).
+- **Mirrored to TournamentPro:** in addition to PostHog, every submission is POSTed
+  (fire-and-forget) to the `submit-feedback` edge function → stored in the
+  `prototype_feedback` table → viewable in **TournamentPro Admin → Prototype Feedback**.
+  So no feedback is ever lost, even if PostHog is unavailable. The same mirror is wired
+  into the four HUDR Scout prototypes (`product: 'hudr'`).
 - Files: `src/lib/analytics.ts`, `src/lib/reviewSections.ts`,
   `src/components/common/FeedbackButton.tsx`, `src/components/common/ReviewWizard.tsx`;
   initialized in `main.tsx`.

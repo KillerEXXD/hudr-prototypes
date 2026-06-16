@@ -14,6 +14,31 @@ const POSTHOG_HOST = 'https://us.i.posthog.com'
 export const PROTOTYPE = 'clubr'
 const SURFACE = 'clubr-prototype'
 
+// Central feedback store in TournamentPro — every submission is mirrored here
+// (in addition to PostHog) so no feedback is ever lost. Fire-and-forget.
+const FEEDBACK_ENDPOINT = 'https://tgblnqsckkrdhjmncmhu.supabase.co/functions/v1/submit-feedback'
+
+function sendToTournamentPro(kind: 'quick_note' | 'guided_review', fields: Record<string, unknown>): void {
+  try {
+    const ph = posthog as unknown as { get_distinct_id?: () => string; get_session_id?: () => string; get_session_replay_url?: () => string }
+    fetch(FEEDBACK_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        app: 'clubr', product: 'clubr', kind, ...fields,
+        context: {
+          user_agent: navigator.userAgent, referrer: document.referrer, page_url: location.href,
+          viewport: `${window.innerWidth}x${window.innerHeight}`, language: navigator.language,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        posthog: { distinct_id: ph.get_distinct_id?.(), session_id: ph.get_session_id?.(), replay_url: ph.get_session_replay_url?.() },
+        raw: { kind, ...fields },
+      }),
+    }).catch(() => { /* ignore — never block feedback on the network */ })
+  } catch { /* ignore */ }
+}
+
 let started = false
 
 export function initAnalytics(): void {
@@ -75,6 +100,7 @@ export interface FeedbackPayload {
 export function captureFeedback(data: FeedbackPayload): void {
   setIdentity(data.name, data.email)
   posthog.capture('feedback_submitted', { prototype: PROTOTYPE, surface: SURFACE, ...data })
+  sendToTournamentPro('quick_note', { screen: data.screen, ease: data.ease, improve: data.improve, liked: data.liked, name: data.name, email: data.email })
 }
 
 // ---- Guided per-feature review (the ReviewWizard) ----
@@ -127,4 +153,12 @@ export function captureReview(p: ReviewPayload): void {
     if (v.dislikedTags && v.dislikedTags.length) flat[`dislikedtags_${k}`] = v.dislikedTags
   }
   posthog.capture('prototype_review_submitted', flat)
+  const scores = Object.values(p.sections).map((s) => s.score).filter((n) => n > 0)
+  const avg_score = scores.length ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 100) / 100 : undefined
+  sendToTournamentPro('guided_review', {
+    screen: (typeof location !== 'undefined' ? location.hash : '') || '#/',
+    name: p.name, email: p.email, sections: p.sections, avg_score,
+    would_use: p.would_use, would_pay: p.would_pay, would_pay_amount: p.would_pay_amount,
+    nps: p.nps, overall_note: p.overall_note,
+  })
 }
