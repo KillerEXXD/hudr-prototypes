@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi } from 'lucide-react'
-import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useUpdateChips, useBust, usePostChatLL, useProposeChop, useAgreeChop } from '@/hooks/ll'
+import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useUpdateChips, useBust, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
+import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
@@ -21,7 +22,9 @@ export function LastLongerGamePage() {
   const togglePaid = useTogglePaidLL(); const assignCoHost = useAssignCoHostLL()
   const updateChips = useUpdateChips(); const bust = useBust()
   const postChat = usePostChatLL(); const proposeChop = useProposeChop(); const agreeChop = useAgreeChop()
+  const invite = useInviteToGame()
   const [chipInput, setChipInput] = useState('')
+  const [inviteOpen, setInviteOpen] = useState(false)
 
   if (isLoading) return <Spinner label="Loading game…" />
   if (!g) return <EmptyState title="Game not found" />
@@ -49,6 +52,9 @@ export function LastLongerGamePage() {
           {g.mode === 'online' ? <Wifi className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
           {g.mode === 'online' ? 'Online' : 'In person'}{g.location && ` · ${g.location}`}
         </p>
+      )}
+      {g.canManage && g.visibility === 'private' && (
+        <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>
       )}
 
       {g.status === 'completed' && (
@@ -135,6 +141,8 @@ export function LastLongerGamePage() {
       <Section title="Table chat">
         <GameChat messages={g.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ gameId: g.id, text })} />
       </Section>
+
+      <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={g.clubId} accessUserIds={g.accessUserIds ?? []} accent="amber" onInvite={(ids) => invite.mutate({ gameId: g.id, userIds: ids })} isPending={invite.isPending} />
     </div>
   )
 }

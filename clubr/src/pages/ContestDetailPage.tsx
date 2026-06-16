@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield } from 'lucide-react'
-import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat } from '@/hooks/ft'
+import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest } from '@/hooks/ft'
+import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
@@ -23,7 +24,9 @@ export function ContestDetailPage() {
   const assignCoHost = useAssignCoHost()
   const savePicks = useSavePicks()
   const postChat = usePostChat()
+  const invite = useInviteToContest()
   const [picks, setPicks] = useState<string[]>([])
+  const [inviteOpen, setInviteOpen] = useState(false)
 
   useEffect(() => { if (c?.myEntry) setPicks(c.myEntry.picks) }, [c?.myEntry?.picks?.join(',')]) // eslint-disable-line
 
@@ -31,7 +34,6 @@ export function ContestDetailPage() {
   if (!c) return <EmptyState title="Contest not found" />
 
   const me = c.myEntry
-  const isAdmin = user?.role === 'admin'
   const approved = me?.status === 'approved'
   const canChat = approved || c.canManage
   const statusTone = c.status === 'open' ? 'blue' : c.status === 'locked' ? 'amber' : 'neutral'
@@ -47,6 +49,9 @@ export function ContestDetailPage() {
         <span className="font-mono">{c.stake} Stakes</span><span className="text-text-muted">· budget {fmtK(c.budget)}</span>
         <span className="ml-auto text-text-muted">{c.locksAt}</span>
       </div>
+      {c.canManage && c.visibility === 'private' && (
+        <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>
+      )}
 
       {/* ===== SETTLED: leaderboard ===== */}
       {c.status === 'settled' && (
@@ -130,8 +135,7 @@ export function ContestDetailPage() {
       {c.canManage && (
         <Section title={`Entrants · ${c.entries.length}`} action={<Badge tone="green"><Shield className="h-3 w-3" />You manage</Badge>}>
           <p className="mb-2 text-[11px] text-text-muted">Admit players · toggle the green dot when they've paid · tap a name to make a co-host.</p>
-          {c.status === 'open' && !isAdmin && <p className="mb-2 flex items-center gap-1 text-[11px] text-accent-amber"><Lock className="h-3 w-3" />Picks are sealed until the 10‑min lock — even from you. They reveal to everyone after lock.</p>}
-          {isAdmin && c.status === 'open' && <p className="mb-2 flex items-center gap-1 text-[11px] text-accent-purple"><Shield className="h-3 w-3" />Admin view — picks visible pre‑lock for oversight.</p>}
+          {c.status === 'open' && <p className="mb-2 flex items-center gap-1 text-[11px] text-accent-amber"><Lock className="h-3 w-3" />Picks are sealed until the 10‑min lock — for everyone, including the host &amp; admin. They reveal after lock.</p>}
           <div className="flex flex-col gap-2">
             {c.entries.map((e) => {
               const isHost = e.userId === c.hostId
@@ -143,7 +147,7 @@ export function ContestDetailPage() {
                     <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{e.name}
                       {isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co-host</Badge>}
                     </p>
-                    <p className="text-[11px] text-text-muted">{c.status === 'open' && !isAdmin ? (e.picks.length === 4 ? 'drafted ✓ · sealed until lock' : e.picks.length ? `drafting ${e.picks.length}/4` : 'not drafted') : (e.picks.length ? `${e.picks.join(' ')} · ${fmtK(e.spend)}` : 'no picks')}</p>
+                    <p className="text-[11px] text-text-muted">{c.status === 'open' ? (e.picks.length === 4 ? 'drafted ✓ · sealed until lock' : e.picks.length ? `drafting ${e.picks.length}/4` : 'not drafted') : (e.picks.length ? `${e.picks.join(' ')} · ${fmtK(e.spend)}` : 'no picks')}</p>
                   </div>
                   {e.status === 'pending' ? (
                     <Btn size="sm" onClick={() => approve.mutate({ contestId: c.id, userId: e.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn>
@@ -167,6 +171,8 @@ export function ContestDetailPage() {
       <Section title="Table chat">
         <GameChat messages={c.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ contestId: c.id, text })} />
       </Section>
+
+      <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={c.clubId} accessUserIds={c.accessUserIds ?? []} accent="purple" onInvite={(ids) => invite.mutate({ contestId: c.id, userIds: ids })} isPending={invite.isPending} />
     </div>
   )
 }

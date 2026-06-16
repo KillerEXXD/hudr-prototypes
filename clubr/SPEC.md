@@ -14,8 +14,9 @@ truth for *how the app behaves*; update it as decisions change.
 ## 1. Roles & accounts
 - **App Admin** — manages all clubs and all users (Admin console). Supplies the FT
   slate (players, stacks, prize pool); the app computes ICM. **Has ALL visibilities:**
-  every club, the full roster of any club, all games (including private), all contact
-  details, and all picks (no pre‑lock seal — admin isn't a competitor).
+  every club, the full roster of any club, all games (including private), and all
+  contact details. **The one exception: FT picks are sealed until lock for everyone,
+  admin included.**
 - **Club Host / Owner** — creates a club, holds the (premium) subscription, runs
   games, vets & admits members. Earns nothing — reputation only.
 - **Player (Member)** — joins clubs, plays games.
@@ -38,12 +39,15 @@ Approval is required to do anything beyond viewing:
   player only if they choose.
 
 ## 3. Game visibility — Public / Private
-- **Public (default):** all club members can **see** it and request to join.
-- **Private:** only the **host‑selected members** can even *see* it (high‑stakes
-  subset). Host picks the access list at creation. Card shows a **Private** badge.
+- **Public (default):** all club members can **see** it and request to join. No
+  invite needed.
+- **Private = invite‑only:** only the **host‑selected members** can even *see* it
+  (high‑stakes subset). Host sets the initial access list at creation **and can
+  invite more members any time via an "Invite members" button** on the game (FT or
+  LL). Card shows a **Private** badge.
 - Visibility controls **who can view**; **approval is still required to join** for
-  both. There is no separate "invite" button — creating a game makes it visible to
-  the eligible members, who then request → host admits.
+  both (viewing ≠ joining). Inviting grants **view access** — the invited member can
+  now see it and request to join; the host still admits.
 
 ## 4. FT Fantasy (Stack Draft)
 - **Operator supplies** the FT: 9 players, chip stacks, prize pool, buy‑in, start
@@ -54,9 +58,9 @@ Approval is required to do anything beyond viewing:
   choose club, **Stakes bucket** (100/250/500), and **visibility**.
 - **Player flow:** request to enter → host admits → **draft 4 of 9 within a 100k
   budget** (use‑it‑or‑lose‑it) → **picks lock 10 minutes before** the FT.
-- **Picks visibility:** **sealed until the lock — even from the host** (the host can
-  play, so a pre‑lock peek would be rigging). **After the lock, picks reveal to
-  everyone** in the contest. Settled contests show the leaderboard with picks.
+- **Picks visibility:** **sealed until the lock for EVERYONE — host and App Admin
+  included** (you only ever see your own draft before lock). **After the lock, picks
+  reveal to everyone** in the contest. Settled contests show the leaderboard with picks.
 - **Scoring:** sum of **points‑per‑finish** across your 4 players; highest total
   takes the bucket. Top‑3 **50/30/20** (winner‑take‑all under 5 entries).
 - **Prize pool shown is the REAL event's — informational only.** The contest pays

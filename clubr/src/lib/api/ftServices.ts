@@ -129,3 +129,16 @@ export async function createContest(clubId: string, hostId: string, input: { ftI
   })
   return id
 }
+
+// Invite members to a PRIVATE contest — grants them view access. They still
+// request to join and the host admits (approval stays mandatory).
+export async function inviteToContest(contestId: string, userIds: string[]): Promise<void> {
+  await delay(150)
+  const c = FT_CONTESTS.find((x) => x.id === contestId)
+  if (!c) return
+  c.accessUserIds = Array.from(new Set([...(c.accessUserIds ?? []), ...userIds]))
+  userIds.forEach((uid, i) => {
+    const u = USERS[uid]
+    c.chat.push({ id: `m_inv_${Date.now()}_${i}`, userId: uid, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `${u?.name ?? 'A member'} was invited`, ts: 'now', kind: 'system' })
+  })
+}

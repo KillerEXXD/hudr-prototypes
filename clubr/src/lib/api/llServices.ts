@@ -137,3 +137,15 @@ export async function createGame(clubId: string, hostId: string, input: { title:
   })
   return id
 }
+
+// Invite members to a PRIVATE game — grants view access; they still request & the host admits.
+export async function inviteToGame(gameId: string, userIds: string[]): Promise<void> {
+  await delay(150)
+  const g = LL_GAMES.find((x) => x.id === gameId)
+  if (!g) return
+  g.accessUserIds = Array.from(new Set([...(g.accessUserIds ?? []), ...userIds]))
+  userIds.forEach((uid, i) => {
+    const u = USERS[uid]
+    g.chat.push({ id: `lm_inv_${Date.now()}_${i}`, userId: uid, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `${u?.name ?? 'A member'} was invited`, ts: 'now', kind: 'system' })
+  })
+}
