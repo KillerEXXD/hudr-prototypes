@@ -59,8 +59,8 @@ Approval is required to do anything beyond viewing:
 ## 4. FT Fantasy (Stack Draft)
 - **Operator supplies** the FT: 9 players, chip stacks, prize pool, buy‑in, start
   time. The app **computes ICM prices**. The host **only reviews & hosts** it.
-- **Host flow:** Fantasy tab → **Host a contest** → browse the operator slate
-  (Scout‑Sharp style: room, date, **real prize pool & buy‑in**, hours‑left) → open
+- **Host flow:** Fantasy tab → **Host a contest** → the **"Choose a Final Table"** screen — the
+  operator slate (room, date, **real prize pool & buy‑in**, hours‑left) → open
   one to see **the 9 finalists with chip stacks + ICM prices** → **Host this FT** →
   choose club, **Stakes bucket** (presets 100/250/500 **or a custom value** — e.g. 150, 300),
   registration close + timezone, payouts, and **visibility**.
