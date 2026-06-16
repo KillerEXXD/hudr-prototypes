@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils/cn'
 
 function FilterChip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/10 text-accent-blue' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
   return (
-    <button type="button" onClick={onClick} className={cn('flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold cursor-pointer', active ? activeClass : 'border-border text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
+    <button type="button" onClick={onClick} className={cn('flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold cursor-pointer', active ? activeClass : 'border-border text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
   )
 }
 
@@ -46,8 +46,8 @@ export function GamesPage() {
       </div>
       <p className="mt-1 text-sm text-text-secondary">Everything happening across your clubs — all game types in one place.</p>
 
-      {/* type filter — driven by the registry */}
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      {/* type filter — driven by the registry; single scrollable row, never wraps */}
+      <div className="mt-3 flex gap-1.5 overflow-x-auto no-scrollbar">
         <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
         {GAME_TYPES.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.label} icon={t.icon} activeClass={t.chipActive} />)}
       </div>
