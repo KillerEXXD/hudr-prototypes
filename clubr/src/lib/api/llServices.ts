@@ -3,10 +3,28 @@
 import { LL_GAMES } from '@/data/llStore'
 import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
-import type { LLGame, LLGameView } from '@/types/ll'
+import type { LLGame, LLGameView, LLParticipant } from '@/types/ll'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 const isMember = (clubId: string, userId: string) => !!CLUBS.find((c) => c.id === clubId)?.members.some((m) => m.userId === userId && m.status === 'member')
+
+const fmtChips = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(n % 1e6 ? 1 : 0)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}K` : String(n))
+
+/** Current chip leader among ACTIVE players (null if nobody has chips yet). */
+function chipLeader(g: LLGame): LLParticipant | null {
+  const top = g.participants
+    .filter((x) => x.status === 'active')
+    .reduce<LLParticipant | null>((m, x) => (!m || x.chips > m.chips ? x : m), null)
+  return top && top.chips > 0 ? top : null
+}
+
+/** Post a system chat line when the chip lead changes hands. */
+function announceLeadChange(g: LLGame, prevLeaderId?: string) {
+  const leader = chipLeader(g)
+  if (leader && leader.userId !== prevLeaderId) {
+    g.chat.push({ id: `lm_${Date.now()}`, userId: leader.userId, name: leader.name, avatarColor: leader.avatarColor, text: `👑 ${leader.name} takes the chip lead — ${fmtChips(leader.chips)}`, ts: 'now', kind: 'system' })
+  }
+}
 
 // Private games are only visible to host, co-hosts, the chosen access list, and admins.
 function canView(g: LLGame, userId: string, isAdmin: boolean): boolean {
@@ -75,8 +93,12 @@ export async function assignCoHost(gameId: string, target: string): Promise<void
 
 export async function updateChips(gameId: string, userId: string, chips: number): Promise<void> {
   await delay(120)
-  const p = LL_GAMES.find((x) => x.id === gameId)?.participants.find((x) => x.userId === userId)
-  if (p) { p.chips = chips; p.stale = false; p.chipsUpdatedAgo = 'now' }
+  const g = LL_GAMES.find((x) => x.id === gameId)
+  const p = g?.participants.find((x) => x.userId === userId)
+  if (!g || !p) return
+  const prevLeaderId = chipLeader(g)?.userId
+  p.chips = chips; p.stale = false; p.chipsUpdatedAgo = 'now'
+  announceLeadChange(g, prevLeaderId) // new chip leader → chat
 }
 
 /** Bust a player. `bySelf` marks a self-out in the chat. */
@@ -85,6 +107,7 @@ export async function bust(gameId: string, target: string, byUserId: string): Pr
   const g = LL_GAMES.find((x) => x.id === gameId)
   const p = g?.participants.find((x) => x.userId === target)
   if (!g || !p || p.status !== 'active') return
+  const prevLeaderId = chipLeader(g)?.userId
   const activeCount = g.participants.filter((x) => x.status === 'active').length
   p.status = 'out'; p.finishPos = activeCount; p.chips = 0; p.bustedAgo = 'now'
   const self = byUserId === target
@@ -92,6 +115,7 @@ export async function bust(gameId: string, target: string, byUserId: string): Pr
   // last one standing → completed
   const remaining = g.participants.filter((x) => x.status === 'active')
   if (remaining.length === 1) { remaining[0].finishPos = 1; remaining[0].status = 'out'; g.status = 'completed'; g.winnerName = remaining[0].name }
+  else announceLeadChange(g, prevLeaderId) // bust shifted the chip lead → chat
 }
 
 export async function postChat(gameId: string, userId: string, text: string): Promise<void> {
