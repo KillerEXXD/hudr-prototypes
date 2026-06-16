@@ -6,6 +6,7 @@ import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
+import { StakePool } from '@/components/common/StakePool'
 import { GameChat } from '@/components/common/GameChat'
 import type { LLParticipant } from '@/types/ll'
 
@@ -47,6 +48,7 @@ export function LastLongerGamePage() {
         <span className="font-mono">{g.stake} Stakes</span>
         <span className="text-text-muted">· {g.activeCount} in · {out.length} out</span>
       </div>
+      {(() => { const joined = g.participants.filter((p) => p.status !== 'pending').length; return <StakePool stake={g.stake} pool={g.stake * joined}>· {joined} joined</StakePool> })()}
       {(g.location || g.mode) && (
         <p className="mt-1 flex items-center gap-1.5 text-[11px] text-text-muted">
           {g.mode === 'online' ? <Wifi className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}

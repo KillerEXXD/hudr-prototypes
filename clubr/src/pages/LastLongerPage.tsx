@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Timer, CheckCircle2, Eye, Shield, Plus, Trophy, Lock } from 'lucide-react'
-import { useGames } from '@/hooks/ll'
+import { Timer, CheckCircle2, Eye, Shield, Plus, Trophy, Lock, UserPlus } from 'lucide-react'
+import { useGames, useRequestJoinLL } from '@/hooks/ll'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
@@ -18,6 +18,18 @@ function RoleBadges({ g }: { g: LLGameView }) {
       {g.me?.status === 'pending' && <Badge tone="amber"><Eye className="h-3 w-3" />Pending</Badge>}
       {g.me?.status === 'out' && <Badge tone="neutral">Out</Badge>}
     </>
+  )
+}
+
+// Request-to-join straight from the list card (no need to open the game).
+function CardJoinLL({ g }: { g: LLGameView }) {
+  const req = useRequestJoinLL()
+  return (
+    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+      <Btn size="sm" variant="secondary" className="w-full" disabled={req.isPending} onClick={() => req.mutate(g.id)}>
+        <UserPlus className="h-3.5 w-3.5" />{req.isPending ? 'Requesting…' : 'Request to join'}
+      </Btn>
+    </div>
   )
 }
 
@@ -43,6 +55,7 @@ export function GameRow({ g }: { g: LLGameView }) {
         )
       })()}
       <div className="mt-2"><PayoutBadge payouts={g.payouts} /></div>
+      {g.status !== 'completed' && g.isMemberOfClub && !g.canManage && !g.me && <CardJoinLL g={g} />}
       {(g.canManage || g.me || g.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges g={g} />{g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
       )}

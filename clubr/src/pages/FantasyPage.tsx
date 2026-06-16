@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { Target, Clock, Lock, CheckCircle2, Eye, Shield, Plus, Trophy } from 'lucide-react'
-import { useContests } from '@/hooks/ft'
+import { Target, Clock, Lock, CheckCircle2, Eye, Shield, Plus, Trophy, UserPlus } from 'lucide-react'
+import { useContests, useRequestEnter } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
@@ -15,6 +15,18 @@ function RoleBadges({ c }: { c: FTContestView }) {
       {c.myEntry?.status === 'approved' && <Badge tone="blue"><CheckCircle2 className="h-3 w-3" />Entered</Badge>}
       {c.myEntry?.status === 'pending' && <Badge tone="amber"><Eye className="h-3 w-3" />Pending</Badge>}
     </>
+  )
+}
+
+// Request-to-enter straight from the list card (no need to open the contest).
+function CardJoinFT({ c }: { c: FTContestView }) {
+  const req = useRequestEnter()
+  return (
+    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+      <Btn size="sm" variant="secondary" className="w-full" disabled={req.isPending} onClick={() => req.mutate(c.id)}>
+        <UserPlus className="h-3.5 w-3.5" />{req.isPending ? 'Requesting…' : 'Request to enter'}
+      </Btn>
+    </div>
   )
 }
 
@@ -43,6 +55,7 @@ export function ContestRow({ c }: { c: FTContestView }) {
         )
       })()}
       <div className="mt-2"><PayoutBadge payouts={c.payouts ?? (c.format === 'winner_takes_all' ? [100] : undefined)} /></div>
+      {c.status === 'open' && c.isMemberOfClub && !c.canManage && !c.myEntry && <CardJoinFT c={c} />}
       {(c.canManage || c.myEntry || c.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges c={c} />{c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
       )}

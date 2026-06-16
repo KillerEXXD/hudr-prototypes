@@ -10,6 +10,7 @@ import { GameChat } from '@/components/common/GameChat'
 import { DraftBoard } from '@/components/ft/DraftBoard'
 import { FinalTableDetails } from '@/components/ft/FinalTableDetails'
 import { SettledResult } from '@/components/ft/SettledResult'
+import { StakePool } from '@/components/common/StakePool'
 import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
 
 export function ContestDetailPage() {
@@ -50,8 +51,42 @@ export function ContestDetailPage() {
         <span className="font-mono">{c.stake} Stakes</span><span className="text-text-muted">· budget {fmtK(c.budget)}</span>
         <span className="ml-auto text-text-muted">{c.locksAt}</span>
       </div>
+      {(() => { const joined = c.entries.filter((e) => e.status === 'approved').length; return <StakePool stake={c.stake} pool={c.stake * joined}>· {joined} joined</StakePool> })()}
       {c.canManage && c.visibility === 'private' && (
         <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>
+      )}
+
+      {/* ===== OPEN: entry CTA up top — request to enter, then draft ===== */}
+      {c.status === 'open' && (
+        <Section title="Your entry">
+          {!c.isMemberOfClub && !c.canManage ? (
+            <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
+              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />
+              <p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${c.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{c.clubName}</button> first — you must be an approved member to enter its contests.</p>
+            </Card>
+          ) : !me ? (
+            <>
+              <Card className="text-sm text-text-secondary">{c.canManage ? "You're hosting this contest — you can also join and draft like a player." : 'Request to enter — the host will admit you, then you can draft.'}</Card>
+              <Btn className="mt-2 w-full" disabled={requestEnter.isPending} onClick={() => requestEnter.mutate(c.id)}><UserPlus className="h-4 w-4" />{c.canManage ? 'Join as a player' : 'Request to enter'}</Btn>
+            </>
+          ) : me.status === 'pending' ? (
+            <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
+              <Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />
+              <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Awaiting host approval.</span> You'll be able to draft once you're admitted.</p>
+            </Card>
+          ) : (
+            <>
+              <div className="mb-2 flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5 text-text-secondary"><Check className="h-3.5 w-3.5 text-accent-emerald" />You're in</span>
+                <span className="flex items-center gap-1.5 text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></span>
+              </div>
+              <DraftBoard players={c.players} budget={c.budget} value={picks} onChange={setPicks} />
+              <Btn className="mt-2 w-full" disabled={picks.length !== 4 || savePicks.isPending} onClick={() => savePicks.mutate({ contestId: c.id, picks })}>
+                {me.picks.length === 4 ? 'Update draft' : 'Submit draft'} {picks.length !== 4 && `· pick ${4 - picks.length} more`}
+              </Btn>
+            </>
+          )}
+        </Section>
       )}
 
       {/* ===== Full FT details — roster, stacks, prices, live stream (everyone) ===== */}
@@ -85,39 +120,6 @@ export function ContestDetailPage() {
               </div>
             ))}
           </div>
-        </Section>
-      )}
-
-      {/* ===== OPEN: access + draft ===== */}
-      {c.status === 'open' && (
-        <Section title="Your entry">
-          {!c.isMemberOfClub && !c.canManage ? (
-            <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
-              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />
-              <p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${c.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{c.clubName}</button> first — you must be an approved member to enter its contests.</p>
-            </Card>
-          ) : !me ? (
-            <>
-              <Card className="text-sm text-text-secondary">{c.canManage ? "You're hosting this contest — you can also join and draft like a player." : 'Request to enter — the host will admit you, then you can draft.'}</Card>
-              <Btn className="mt-2 w-full" disabled={requestEnter.isPending} onClick={() => requestEnter.mutate(c.id)}><UserPlus className="h-4 w-4" />{c.canManage ? 'Join as a player' : 'Request to enter'}</Btn>
-            </>
-          ) : me.status === 'pending' ? (
-            <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
-              <Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />
-              <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Awaiting host approval.</span> You'll be able to draft once you're admitted.</p>
-            </Card>
-          ) : (
-            <>
-              <div className="mb-2 flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 text-text-secondary"><Check className="h-3.5 w-3.5 text-accent-emerald" />You're in</span>
-                <span className="flex items-center gap-1.5 text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></span>
-              </div>
-              <DraftBoard players={c.players} budget={c.budget} value={picks} onChange={setPicks} />
-              <Btn className="mt-2 w-full" disabled={picks.length !== 4 || savePicks.isPending} onClick={() => savePicks.mutate({ contestId: c.id, picks })}>
-                {me.picks.length === 4 ? 'Update draft' : 'Submit draft'} {picks.length !== 4 && `· pick ${4 - picks.length} more`}
-              </Btn>
-            </>
-          )}
         </Section>
       )}
 
