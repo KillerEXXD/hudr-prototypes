@@ -56,7 +56,7 @@ export function CreateFTSheet({ open, onClose }: { open: boolean; onClose: () =>
           <Field label="Room / operator" value={m.room} onChange={(v) => setM({ ...m, room: v })} placeholder="WSOP" />
           <Field label="When" value={m.date} onChange={(v) => setM({ ...m, date: v })} placeholder="Today · 8:00pm ET" />
         </div>
-        <div class Name="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <Field label="Starts in" value={m.startsIn} onChange={(v) => setM({ ...m, startsIn: v })} placeholder="in 2h" />
           <Field label="Hours left" value={m.hoursLeft} onChange={(v) => setM({ ...m, hoursLeft: v.replace(/[^0-9]/g, '') })} type="number" />
           <Field label="Buy-in" value={m.buyIn} onChange={(v) => setM({ ...m, buyIn: v })} placeholder="$10,000" />

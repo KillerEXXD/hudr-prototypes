@@ -1,24 +1,29 @@
-import { ChevronLeft, ShieldCheck, Users, Building2, Target, Trophy, Clock } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { ChevronLeft, ShieldCheck, Users, Building2, Target, Trophy, Clock, Plus } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAllClubs, useAllUsers } from '@/hooks'
 import { useAvailableFTs } from '@/hooks/ft'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { CreateFTSheet } from '@/components/ft/CreateFTSheet'
 
 export function AdminPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const clubs = useAllClubs()
   const users = useAllUsers()
   const fts = useAvailableFTs()
+  const [addOpen, setAddOpen] = useState(false)
 
   if (user?.role !== 'admin') return <EmptyState icon={<ShieldCheck className="h-7 w-7" />} title="Admins only" sub="Sign in as App Admin to manage all clubs and users." />
 
   const roleTone = { admin: 'purple', host: 'green', player: 'blue' } as const
+  const isHome = pathname === '/'
 
   return (
     <div className="animate-fade-up">
-      <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+      {!isHome && <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>}
       <h1 className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-text-primary"><ShieldCheck className="h-5 w-5 text-accent-purple" />Admin console</h1>
       <p className="text-sm text-text-secondary">Everything on the platform — all clubs and all users.</p>
 
@@ -27,8 +32,8 @@ export function AdminPage() {
         <Card className="flex items-center gap-2"><Users className="h-5 w-5 text-accent-emerald" /><div><p className="text-lg font-extrabold text-text-primary">{users.data?.length ?? '—'}</p><p className="text-[11px] text-text-muted">Users</p></div></Card>
       </div>
 
-      <Section title="FT slate (operator)">
-        <p className="mb-2 text-[11px] text-text-muted">The priced final tables hosts can run. The operator supplies players, stacks &amp; prize pool; the app computes ICM. Hosts only review &amp; host. <span className="text-text-secondary">(Add/edit ships with operator tooling; Phase 2 = HUDR auto‑fill.)</span></p>
+      <Section title="FT slate (operator)" action={<Btn size="sm" onClick={() => setAddOpen(true)}><Plus className="h-3.5 w-3.5" />Add a final table</Btn>}>
+        <p className="mb-2 text-[11px] text-text-muted">The priced final tables hosts can run. You supply players &amp; stacks; the app computes each ICM draft price. Hosts only review &amp; host — <span className="text-text-secondary">players never see this slate.</span></p>
         {fts.isLoading ? <Spinner /> : (
           <div className="flex flex-col gap-2">
             {fts.data?.map((f) => (
@@ -73,6 +78,8 @@ export function AdminPage() {
           </div>
         )}
       </Section>
+
+      <CreateFTSheet open={addOpen} onClose={() => setAddOpen(false)} />
     </div>
   )
 }

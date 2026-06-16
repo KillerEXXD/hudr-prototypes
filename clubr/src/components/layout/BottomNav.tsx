@@ -1,9 +1,9 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Compass, Users, Target, Timer, CircleUser } from 'lucide-react'
+import { Compass, Home, Users, Target, Timer, CircleUser } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 import { cn } from '@/lib/utils/cn'
 
-const ITEMS = [
-  { to: '/', label: 'Discover', icon: Compass, match: (p: string) => p === '/' },
+const REST = [
   { to: '/clubs', label: 'Clubs', icon: Users, match: (p: string) => p === '/clubs' || p.startsWith('/club/') },
   { to: '/fantasy', label: 'Fantasy', icon: Target, match: (p: string) => p.startsWith('/fantasy') || p.startsWith('/host-ft') },
   { to: '/lastlonger', label: 'Last Longer', icon: Timer, match: (p: string) => p.startsWith('/lastlonger') },
@@ -13,6 +13,12 @@ const ITEMS = [
 export function BottomNav() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  const { user } = useAuth()
+  // First tab is role-aware: Players browse via "Discover"; Hosts & Admins land on "Home".
+  const first = user?.role === 'player'
+    ? { to: '/', label: 'Discover', icon: Compass, match: (p: string) => p === '/' }
+    : { to: '/', label: 'Home', icon: Home, match: (p: string) => p === '/' }
+  const ITEMS = [first, ...REST]
   return (
     <nav className="sticky bottom-0 z-30 border-t border-border bg-bg-secondary/95 backdrop-blur">
       <div className="mx-auto flex max-w-md items-stretch">
