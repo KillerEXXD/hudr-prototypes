@@ -8,6 +8,12 @@ truth for *how the app behaves*; update it as decisions change.
 > **FT Fantasy (Stack Draft)** and **Last Longer**. The app tracks and proves the
 > count and the result; it **awards nothing, holds nothing, and never touches the
 > cash.** Clubs settle all stakes offline.
+>
+> **Platform direction:** ClubR is the **operating system for club side‑games** —
+> FT Fantasy and Last Longer today, **Football Squares** next (§13) on the same rails.
+> Each new game reuses clubs, approval, visibility, the paid toggle, sealed‑until‑lock,
+> stakes buckets, chat, and offline settlement — so the marginal build cost is small and
+> the legal posture (app‑touches‑no‑cash) is identical.
 
 ---
 
@@ -135,3 +141,52 @@ Approval is required to do anything beyond viewing:
 - **Phase 1 (this build):** standalone, operator enters FT data manually, free pilot.
 - **Phase 2:** HUDR auto‑fills the FT data + finishing order; HUDR subscription perks;
   Telegram bot; payments.
+- **Next game (queued):** **Football Squares** — see §13. Reuses the rails; net‑new is
+  the 10×10 grid UI + random digit assignment + period scoring.
+
+## 13. Football Squares (roadmap — queued build)
+A **third club side‑game** on the same rails as FT Fantasy & Last Longer. Widely run in
+poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisition hook**
+(a reason for a club to install ClubR *that week*).
+
+- **Pure chance** (10×10 grid, random digit assignment). Because there's no skill element,
+  the **transparent‑scorekeeper / app‑touches‑no‑cash wall matters even more here**: the
+  app assigns digits, reads the **public** score, and highlights winners — it **sells no
+  square, holds no pot, awards nothing.** All cash is settled **offline**.
+- **Host flow:** create a board → name the game/matchup → **stakes bucket** (reuse
+  100/250/500) → **payout split per period** (default Q1/Q2/Q3 = 10% each, **Final = 70%**)
+  → **visibility** (public/private, same as FT/LL).
+- **Player flow:** request to claim square(s) → **host admits** → claim cells on the grid →
+  **paid toggle** (green/grey, host‑only, same as everywhere) → **row/column digits are
+  assigned and sealed at lock** (like FT picks) → reveal at lock.
+- **Live:** host enters each period's score (self‑report, like Last Longer) → the app
+  highlights the winning cell (home last digit × away last digit) → marks the period
+  winner → settled offline.
+- **Data:** public NFL/sports scores — **no HUDR dependency.** This is an **engagement +
+  acquisition** play, not a data‑moat play. Position it as the **top‑of‑funnel hook**;
+  HUDR/FT Fantasy remain the **retention + moat**.
+- **Reuses:** clubs, approval model, visibility/invite, paid toggle, sealed‑until‑lock,
+  stakes buckets, chat, offline settlement. **Net‑new:** the 10×10 grid UI, random digit
+  assignment at lock, and period scoring.
+
+## 14. Prototype feedback & analytics (testing instrumentation)
+A floating **Feedback** launcher sits on every screen (mounted in `AppShell`,
+pinned above the bottom nav), mirroring the Scout prototypes but scoped to ClubR:
+- **Quick note:** auto‑captures the current screen + a 1–5 ease rating, "what to
+  improve", "what worked", and required **name + email** → PostHog
+  `feedback_submitted`.
+- **Guided review (`ReviewWizard`):** identity first, then **one step per ClubR
+  feature** — first impression, Discover, joining a club, FT Fantasy (Stack Draft),
+  Last Longer, hosting, paid tracking & vetting, transparent scorekeeper,
+  navigation, look & feel — each a 1–5 score + liked/disliked quick‑pick chips +
+  free text (with a "try it" deep link), ending in overall **would‑use /
+  would‑pay / NPS** → PostHog `prototype_review_submitted` (flattened
+  `score_<key>`, `liked_<key>`, `dislikedtags_<key>`, …).
+- Reviewer **identity is captured once and reused** across both forms, persisted
+  to `localStorage` (`clubr-reviewer`).
+- Every event is tagged `prototype: 'clubr'` / `surface: 'clubr-prototype'` so
+  ClubR feedback is filterable in the shared PostHog project. **Public `phc_`
+  key only** (never the personal `phx_` key).
+- Files: `src/lib/analytics.ts`, `src/lib/reviewSections.ts`,
+  `src/components/common/FeedbackButton.tsx`, `src/components/common/ReviewWizard.tsx`;
+  initialized in `main.tsx`.

@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
+import FeedbackButton from '@/components/common/FeedbackButton'
 
 /** Mobile-first phone-frame shell: header on top, scrolling content, sticky bottom nav. */
 export function AppShell() {
@@ -13,6 +14,7 @@ export function AppShell() {
         </main>
         <BottomNav />
       </div>
+      <FeedbackButton />
     </div>
   )
 }
