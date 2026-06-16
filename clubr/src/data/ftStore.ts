@@ -117,6 +117,39 @@ export const FT_CONTESTS: FTContest[] = [
     ],
     chat: [],
   },
+  // ---- Completed (settled) — POINTS format: top 3 split the pot ----
+  {
+    id: 'ct_j', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'WSOP Main Event — Final Table',
+    status: 'settled', format: 'points', stake: 250, budget: 100000, locksAt: 'settled',
+    room: 'WSOP', prizePool: '$10,000,000', buyIn: '$10,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@WSOP/streams', streamLive: false,
+    hostId: 'u_host', coHostIds: [],
+    players: FT_PLAYERS,
+    finishingOrder: ['A', 'C', 'B', 'F', 'D', 'I', 'E', 'G', 'H'],
+    entries: [
+      entry('u_host', 'approved', true, ['A', 'C', 'F', 'I']), // 223 pts → 1st
+      entry('u_tom', 'approved', true, ['A', 'B', 'G', 'I']), // 174 pts → 2nd
+      entry('u_dustin', 'approved', true, ['B', 'C', 'H', 'I']), // 141 pts → 3rd
+      entry('u_jordan', 'approved', true, ['C', 'D', 'F', 'G']), // 136 pts → 4th
+      entry('u_mike', 'approved', true, ['B', 'D', 'E', 'H']), // 90 pts → 5th
+    ],
+    chat: [cmsg('u_host', 'GG all — Harper takes it down 🏆', '1:05a', 'system')],
+  },
+  // ---- Completed (settled) — WINNER TAKES ALL: only 1st is paid ----
+  {
+    id: 'ct_k', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Triton Invitational — High Roller FT',
+    status: 'settled', format: 'winner_takes_all', stake: 500, budget: 100000, locksAt: 'settled',
+    room: 'Triton', prizePool: '$8,900,000', buyIn: '$100,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TritonPoker/streams', streamLive: false,
+    hostId: 'u_host', coHostIds: [],
+    players: FT_PLAYERS,
+    finishingOrder: ['B', 'A', 'H', 'C', 'I', 'D', 'E', 'F', 'G'],
+    entries: [
+      entry('u_mike', 'approved', true, ['A', 'B', 'H', 'I']), // 245 pts → WINNER, takes the pot
+      entry('u_jordan', 'approved', true, ['B', 'E', 'G', 'H']), // 165 pts
+      entry('u_host', 'approved', true, ['A', 'D', 'F', 'H']), // 144 pts
+      entry('u_tom', 'approved', true, ['C', 'D', 'E', 'F']), // 71 pts
+    ],
+    chat: [cmsg('u_host', 'Winner takes all — Mike scoops the whole pot 💰', '12:40a', 'system')],
+  },
 ]
 
 // The operator's slate of upcoming, ICM-priced final tables a host can choose to host.

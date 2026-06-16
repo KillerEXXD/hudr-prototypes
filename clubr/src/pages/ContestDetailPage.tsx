@@ -9,7 +9,7 @@ import { PaidToggle } from '@/components/common/PaidToggle'
 import { GameChat } from '@/components/common/GameChat'
 import { DraftBoard } from '@/components/ft/DraftBoard'
 import { FinalTableDetails } from '@/components/ft/FinalTableDetails'
-import { FINISH_POINTS } from '@/types/ft'
+import { SettledResult } from '@/components/ft/SettledResult'
 import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
 
 export function ContestDetailPage() {
@@ -46,6 +46,7 @@ export function ContestDetailPage() {
       <h1 className="mt-1 flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />{c.ftName}</h1>
       <div className="mt-1.5 flex items-center gap-2 text-xs text-text-secondary">
         <Badge tone={statusTone}>{c.status === 'open' ? 'Open' : c.status === 'locked' ? 'Locked' : 'Settled'}</Badge>
+        {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}
         <span className="font-mono">{c.stake} Stakes</span><span className="text-text-muted">· budget {fmtK(c.budget)}</span>
         <span className="ml-auto text-text-muted">{c.locksAt}</span>
       </div>
@@ -56,34 +57,8 @@ export function ContestDetailPage() {
       {/* ===== Full FT details — roster, stacks, prices, live stream (everyone) ===== */}
       <FinalTableDetails contest={c} />
 
-      {/* ===== SETTLED: leaderboard ===== */}
-      {c.status === 'settled' && (
-        <>
-          <Section title="Result — final table">
-            <Card className="flex flex-wrap gap-1.5">
-              {c.finishingOrder?.map((seat, i) => (
-                <span key={seat} className="flex items-center gap-1 rounded-lg bg-bg-surface px-2 py-1 text-xs">
-                  <span className="font-bold text-text-muted">{i + 1}.</span>
-                  <span className="font-bold text-text-primary">{playerFull(c.players.find((p) => p.seat === seat))}</span>
-                  <span className="font-mono text-[10px] text-accent-emerald">+{FINISH_POINTS[i]}</span>
-                </span>
-              ))}
-            </Card>
-          </Section>
-          <Section title="Leaderboard">
-            <div className="flex flex-col gap-1.5">
-              {c.entries.map((e) => (
-                <div key={e.userId} className={cnRow(e.userId === user?.id)}>
-                  <span className="w-6 text-center text-sm font-extrabold text-text-muted">{e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : e.rank === 3 ? '🥉' : e.rank}</span>
-                  <Avatar name={e.name} color={e.avatarColor} size={30} />
-                  <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-text-primary">{e.name}</p><p className="truncate text-[11px] text-text-muted">{picksToNames(e.picks, c.players)} · <span className="text-text-secondary">{fmtK(e.spend)} spent</span></p></div>
-                  <span className="font-mono text-sm font-bold text-accent-purple">{e.score}</span>
-                </div>
-              ))}
-            </div>
-          </Section>
-        </>
-      )}
+      {/* ===== SETTLED: winner / podium + prizes + leaderboard ===== */}
+      {c.status === 'settled' && <SettledResult c={c} meId={user?.id} />}
 
       {/* ===== LOCKED: picks revealed to everyone, scores pending ===== */}
       {c.status === 'locked' && (
@@ -190,8 +165,4 @@ export function ContestDetailPage() {
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={c.clubId} accessUserIds={c.accessUserIds ?? []} accent="purple" onInvite={(ids) => invite.mutate({ contestId: c.id, userIds: ids })} isPending={invite.isPending} />
     </div>
   )
-}
-
-function cnRow(mine: boolean) {
-  return `flex items-center gap-2.5 rounded-xl border px-3 py-2 ${mine ? 'border-accent-purple/40 bg-accent-purple/10' : 'border-border bg-bg-card'}`
 }

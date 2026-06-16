@@ -51,6 +51,8 @@ export interface FTContest {
   visibility?: 'public' | 'private' // undefined = public (all club members can view)
   accessUserIds?: string[] // for private: the members who can see it (host always included)
   status: ContestStatusFull
+  /** Payout format: 'points' splits the pot across the top 3; 'winner_takes_all' pays only 1st. Default 'points'. */
+  format?: 'points' | 'winner_takes_all'
   stake: number
   budget: number
   locksAt: string
