@@ -37,7 +37,7 @@ export function ContestRow({ c, showType }: { c: FTContestView; showType?: boole
   const s = c.status === 'open' ? { tone: 'blue' as const, icon: Clock, label: 'Open' } : c.status === 'locked' ? { tone: 'amber' as const, icon: Lock, label: 'Locked' } : { tone: 'neutral' as const, icon: CheckCircle2, label: 'Settled' }
   return (
     <Card onClick={() => navigate(`/fantasy/${c.id}`)} className="p-3.5">
-      {showType && <div className="mb-2"><Badge tone="purple"><Target className="h-3 w-3" />FT Fantasy</Badge></div>}
+      {showType && <div className="mb-2"><span className="inline-flex items-center gap-1.5 rounded-md bg-accent-purple px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Target className="h-3.5 w-3.5" />FT Fantasy</span></div>}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span><span className="truncate">{c.clubName}</span></div>
         <div className="flex shrink-0 items-center gap-1.5">
