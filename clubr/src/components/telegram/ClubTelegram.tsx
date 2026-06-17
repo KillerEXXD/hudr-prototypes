@@ -3,13 +3,17 @@ import { Send, ExternalLink, Link2, Plug } from 'lucide-react'
 import { Card, Btn, Section, Sheet, Field } from '@/components/common/ui'
 import { useClubTelegram, useConnectChannel, useDisconnectChannel, useLinkTelegram, useJoinChannel } from '@/hooks/telegram'
 
+// Telegram is hidden for now (still being thought through). Flip to `true` to
+// re-enable the mock UI — everything below stays wired. SPEC §22.
+const TELEGRAM_ENABLED = false
+
 // Member-facing: only shows for an APPROVED member of a club that has a channel.
 // Gated flow: connect Telegram (if needed) → join (the bot admits approved members).
 export function TelegramJoinCard({ clubId }: { clubId: string }) {
   const { data: st } = useClubTelegram(clubId)
   const link = useLinkTelegram(clubId)
   const join = useJoinChannel(clubId)
-  if (!st?.channel || !st.canJoin) return null
+  if (!TELEGRAM_ENABLED || !st?.channel || !st.canJoin) return null
 
   return (
     <Card className="mt-3 border-accent-blue/30 bg-accent-blue/5">
@@ -46,6 +50,7 @@ export function TelegramHostPanel({ clubId }: { clubId: string }) {
   const [open, setOpen] = useState(false)
   const [link, setLink] = useState('')
   const [title, setTitle] = useState('')
+  if (!TELEGRAM_ENABLED) return null
 
   return (
     <Section title="Telegram channel">
