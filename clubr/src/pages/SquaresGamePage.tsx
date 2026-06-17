@@ -75,7 +75,7 @@ export function SquaresGamePage() {
   return (
     <div className="animate-fade-up">
       <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
-      <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}<Badge tone="green"><Grid3x3 className="h-3 w-3" />Football Squares</Badge></div>
+      <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}<Badge tone="green"><Grid3x3 className="h-3 w-3" />Squares</Badge></div>
       <h1 className="mt-1 flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Grid3x3 className="h-5 w-5 text-accent-emerald" />{g.title}</h1>
       <p className="mt-0.5 text-sm text-text-secondary"><b className="text-text-primary">{g.homeTeam}</b> <span className="text-text-muted">(side)</span> vs <b className="text-text-primary">{g.awayTeam}</b> <span className="text-text-muted">(top)</span></p>
       <div className="mt-1.5 flex items-center gap-2 text-xs">
@@ -241,7 +241,7 @@ export function SquaresGamePage() {
         </Section>
       )}
 
-      <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="Football Squares — how it works">
+      <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="Squares — how it works">
         <HowItWorks steps={SQUARES_STEPS} dotBg="bg-accent-emerald" iconColor="text-accent-emerald" />
       </Sheet>
     </div>

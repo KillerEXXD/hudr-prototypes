@@ -19,7 +19,7 @@ const LB_STEPS: HowStep[] = [
   { icon: Trophy, title: 'One board per club', body: 'This leaderboard belongs to this club only. Points you earn here count toward this club — every club keeps its own separate board.' },
   { icon: TrendingUp, title: 'Points scale with the field', body: 'Each finish earns round(B × √N ÷ √rank) points, where N is how many played. Winning a bigger game is worth more, and 1st is worth far more than mid-pack.' },
   { icon: Medal, title: 'Only the top third score', body: 'Roughly the top third of the field earns points; everyone below gets zero. A game needs at least 4 players to count.' },
-  { icon: Gamepad2, title: 'Every game type counts', body: 'FT Fantasy, Last Longer and Football Squares all feed the same board. Squares counts half — it’s mostly luck.' },
+  { icon: Gamepad2, title: 'Every game type counts', body: 'FT Fantasy, Last Longer and Squares all feed the same board. Squares counts half — it’s mostly luck.' },
   { icon: CalendarDays, title: 'Fresh every month', body: 'Standings reset at the start of each calendar month, so there’s always a new race. Past months stay viewable.' },
   { icon: Medal, title: 'Ties go to the winner', body: 'Level on points? Most 1st-place finishes wins, then most podiums (top-3s).' },
 ]
@@ -61,7 +61,7 @@ export function LeaderboardSection({ clubId, clubName, clubEmoji }: { clubId: st
     >
       <p className="mb-2 text-[11px] leading-snug text-text-muted">
         Standings for <b className="text-text-secondary">{clubEmoji} {clubName}</b> — <b className="text-text-secondary">this club only</b>; every club keeps
-        its own board. Points come from finishing in this club's FT Fantasy, Last Longer &amp; Football Squares games (Squares counts half). Resets monthly.
+        its own board. Points come from finishing in this club's FT Fantasy, Last Longer &amp; Squares games (Squares counts half). Resets monthly.
       </p>
       {isLoading ? (
         <Spinner />

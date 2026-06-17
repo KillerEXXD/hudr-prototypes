@@ -44,7 +44,7 @@ export function CreateSquaresSheet({ open, onClose, fixedClubId }: { open: boole
   }
 
   return (
-    <Sheet open={open} onClose={onClose} title="Create Football Squares">
+    <Sheet open={open} onClose={onClose} title="Create Squares">
       <div className="flex flex-col gap-3">
         {!fixedClubId && (
           <div>
@@ -105,7 +105,7 @@ export function CreateSquaresSheet({ open, onClose, fixedClubId }: { open: boole
             </div>
           )}
         </div>
-        <Btn className="w-full" disabled={!canCreate} onClick={submit}><Grid3x3 className="h-4 w-4" />Create Football Squares · {hostCost} cr</Btn>
+        <Btn className="w-full" disabled={!canCreate} onClick={submit}><Grid3x3 className="h-4 w-4" />Create Squares · {hostCost} cr</Btn>
       </div>
     </Sheet>
   )

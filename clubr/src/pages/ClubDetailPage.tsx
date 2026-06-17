@@ -130,7 +130,7 @@ export function ClubDetailPage() {
             <EmptyState
               icon={<Gamepad2 className="h-7 w-7" />}
               title={clubItems.length > 0 ? 'Nothing of that type' : 'No live games right now'}
-              sub={canHostHere ? 'Tap “New game” to host one — FT Fantasy, Last Longer or Football Squares.' : (isMember ? 'Check back when your host starts a game.' : 'Join the club to see its games.')}
+              sub={canHostHere ? 'Tap “New game” to host one — FT Fantasy, Last Longer or Squares.' : (isMember ? 'Check back when your host starts a game.' : 'Join the club to see its games.')}
             />
           )}
         </div>

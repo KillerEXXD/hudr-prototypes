@@ -1,6 +1,6 @@
 // Leaderboard services — swap seam (mock store today, API later). SPEC §20.
 // Computes per-club, per-month standings from settled FT contests, completed
-// Last Longer games, and completed Football Squares boards, using the shared
+// Last Longer games, and completed Squares boards, using the shared
 // per-game award (lib/leaderboard/award) so the board always matches the
 // "+N LP" shown on each game result. App-Admin tunes the formula globally.
 

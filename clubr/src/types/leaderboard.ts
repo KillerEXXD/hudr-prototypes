@@ -19,7 +19,7 @@ export interface LeaderboardConfig {
   depthDivisor: number  // top 1/divisor of the field scores (default 3 → top third)
   ftWeight: number      // FT Fantasy weight (default 1)
   llWeight: number      // Last Longer weight (default 1)
-  squaresWeight: number // Football Squares weight (default 0.5 — chance-discounted)
+  squaresWeight: number // Squares weight (default 0.5 — chance-discounted)
 }
 
 export const DEFAULT_LEADERBOARD: LeaderboardConfig = {

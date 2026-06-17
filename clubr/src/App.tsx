@@ -4,6 +4,7 @@ import { AppShell } from '@/components/layout/AppShell'
 import { LoginScreen } from '@/pages/LoginScreen'
 import { HomePage } from '@/pages/HomePage'
 import { ClubsPage } from '@/pages/ClubsPage'
+import { JoinClubsPage } from '@/pages/JoinClubsPage'
 import { ClubDetailPage } from '@/pages/ClubDetailPage'
 import { FantasyPage } from '@/pages/FantasyPage'
 import { GamesPage } from '@/pages/GamesPage'
@@ -25,6 +26,7 @@ export default function App() {
       <Route element={<AppShell />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/clubs" element={<ClubsPage />} />
+        <Route path="/discover/clubs" element={<JoinClubsPage />} />
         <Route path="/games" element={<GamesPage />} />
         <Route path="/club/:id" element={<ClubDetailPage />} />
         <Route path="/fantasy" element={<FantasyPage />} />

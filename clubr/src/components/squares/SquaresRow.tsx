@@ -13,7 +13,7 @@ export function SquaresRow({ g, showType, clubRole }: { g: SquaresGameView; show
     : g.status === 'registration' ? { tone: 'blue' as const, label: 'Claiming open' } : { tone: 'neutral' as const, label: 'Completed' }
   return (
     <Card onClick={() => navigate(`/squares/${g.id}`)} className="p-3.5">
-      {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-emerald px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Grid3x3 className="h-3.5 w-3.5" />Football Squares</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
+      {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-emerald px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Grid3x3 className="h-3.5 w-3.5" />Squares</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted">
           <span className="text-base">{g.clubEmoji}</span><span className="truncate">{g.clubName}</span>

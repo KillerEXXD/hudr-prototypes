@@ -1,5 +1,5 @@
 // =====================================================================
-// Football Squares — the club's 10×10 squares board on a real game.
+// Squares — the club's 10×10 squares board on a real game.
 // Same transparent-scorekeeper model: members claim squares, digits are
 // sealed until lock, the host enters each period's score and the app
 // highlights the winning square. App holds no cash — settled offline.

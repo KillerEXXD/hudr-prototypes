@@ -1,4 +1,4 @@
-// Football Squares services — swap seam (mock store today, API later).
+// Squares services — swap seam (mock store today, API later).
 import { SQUARES_GAMES } from '@/data/squaresStore'
 import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
@@ -41,7 +41,7 @@ export async function createSquares(clubId: string, hostId: string, input: { tit
   const labels = ['Q1', 'Q2', 'Q3', 'Final']
   SQUARES_GAMES.unshift({
     id, clubId, clubName: club?.name ?? 'Club', clubEmoji: club?.emoji ?? '🃏',
-    title: input.title.trim() || 'Football Squares', homeTeam: input.homeTeam.trim() || 'Home', awayTeam: input.awayTeam.trim() || 'Away',
+    title: input.title.trim() || 'Squares', homeTeam: input.homeTeam.trim() || 'Home', awayTeam: input.awayTeam.trim() || 'Away',
     visibility: input.visibility, accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
     status: 'registration', registrationClosesAt: input.closesAt || undefined, timezone: input.timezone,
     stake: input.stake, hostId, coHostIds: [],

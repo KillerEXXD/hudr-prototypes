@@ -4,7 +4,7 @@ import { Target, Timer, Grid3x3 } from 'lucide-react'
 // =====================================================================
 // Game-type registry — the ONE place a game type is declared. The Games
 // feed, the "+ New game" chooser, filter chips and badges all iterate this
-// list, so adding a game type (e.g. Football Squares) is a registry entry
+// list, so adding a game type (e.g. Squares) is a registry entry
 // plus a card variant + create flow — no nav/feed plumbing changes.
 //
 // Tailwind note: class names are stored as LITERAL strings (not built from
@@ -38,7 +38,7 @@ export const GAME_TYPES: GameTypeDef[] = [
     create: { kind: 'sheet' },
   },
   {
-    id: 'football_squares', label: 'Football Squares', sub: 'A 10×10 squares board on a live game',
+    id: 'football_squares', label: 'Squares', sub: 'A 10×10 squares board on a live game',
     icon: Grid3x3, iconBg: 'bg-accent-emerald', ring: 'border-accent-emerald/30 bg-accent-emerald/10',
     chipActive: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40',
     create: { kind: 'sheet' },
