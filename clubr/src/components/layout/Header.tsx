@@ -12,6 +12,15 @@ const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' |
   player: { label: 'Player', tone: 'blue', icon: UserIcon },
 }
 
+// Demo-account quick-switch — roles plus the two real-data club hosts.
+const SWITCH: { role: AccountRole; userId?: string; label: string; icon: typeof UserIcon }[] = [
+  { role: 'player', label: 'Player', icon: UserIcon },
+  { role: 'host', label: 'Club Host', icon: Crown },
+  { role: 'host', userId: 'u_cc_host', label: 'Champions Club', icon: Crown },
+  { role: 'host', userId: 'u_tch_host', label: 'Texas Card House', icon: Crown },
+  { role: 'admin', label: 'App Admin', icon: ShieldCheck },
+]
+
 export function Header() {
   const { user, loginAs, logout } = useAuth()
   const navigate = useNavigate()
@@ -45,15 +54,12 @@ export function Header() {
           <Badge tone={role.tone} className="ml-auto"><role.icon className="h-3 w-3" />{role.label}</Badge>
         </div>
         <p className="mt-4 mb-2 text-xs font-bold uppercase tracking-wide text-text-muted">Switch demo account</p>
-        <div className="grid grid-cols-3 gap-2">
-          {(['admin', 'host', 'player'] as AccountRole[]).map((r) => {
-            const m = ROLE_META[r]
-            return (
-              <button key={r} onClick={() => { loginAs(r); setAcctOpen(false) }} className="flex flex-col items-center gap-1 rounded-xl border border-border bg-bg-card p-2.5 text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
-                <m.icon className="h-4 w-4 text-accent-blue" />{m.label}
-              </button>
-            )
-          })}
+        <div className="grid grid-cols-2 gap-2">
+          {SWITCH.map((s) => (
+            <button key={s.label} onClick={() => { loginAs(s.role, s.userId); setAcctOpen(false) }} className="flex flex-col items-center gap-1 rounded-xl border border-border bg-bg-card p-2.5 text-center text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
+              <s.icon className="h-4 w-4 text-accent-blue" />{s.label}
+            </button>
+          ))}
         </div>
         <Btn variant="danger" className="mt-4 w-full" onClick={() => { logout(); setAcctOpen(false) }}><LogOut className="h-4 w-4" /> Sign out</Btn>
       </Sheet>

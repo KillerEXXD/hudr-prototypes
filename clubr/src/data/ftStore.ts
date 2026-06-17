@@ -27,14 +27,17 @@ const N = (seat: string, name: string, first: string, last: string, country: str
   const base = FT_PLAYERS.find((p) => p.seat === seat)!
   return { ...base, name, first, last, country }
 }
-// Champions Club, Houston — Fall Poker Open final table (6-handed).
+// Champions Club, Houston — Summer Poker Open $1M GTD Main Event final table (9-handed).
 export const CHAMP_FT: FTPlayer[] = [
-  N('A', 'Shovkovyi', 'Vladyslav', 'Shovkovyi', '🇺🇦'),
-  N('B', 'Rich', 'Bradley', 'Rich', '🇺🇸'),
-  N('C', 'Brooks', 'Randall', 'Brooks', '🇺🇸'),
-  N('D', 'Jolly', 'Brant', 'Jolly', '🇺🇸'),
-  N('E', 'Curry', 'Adrian', 'Curry', '🇺🇸'),
-  N('F', 'Vo', 'Phu', 'Vo', '🇺🇸'),
+  N('A', 'Treviño', 'Joel', 'Vázquez Treviño', '🇲🇽'),
+  N('B', 'Gillis', 'Ted', 'Gillis', '🇺🇸'),
+  N('C', 'Feng', 'Han Ming', 'Feng', '🇺🇸'),
+  N('D', 'Martinez', 'Jesus', 'Martinez', '🇺🇸'),
+  N('E', 'Eyzaguirre', 'Ricardo', 'Eyzaguirre', '🇺🇸'),
+  N('F', 'Turov', 'Danylo', 'Turov', '🇺🇦'),
+  N('G', 'Moreno', 'Andrew', 'Moreno', '🇺🇸'),
+  N('H', 'Shovkovyi', 'Vladyslav', 'Shovkovyi', '🇺🇦'),
+  N('I', 'Monaghan', 'Michael', 'Monaghan', '🇺🇸'),
 ]
 // Texas Card House — $100K Fall Harvest Headliner final table (9-handed).
 export const TCH_FT: FTPlayer[] = [
@@ -180,21 +183,22 @@ export const FT_CONTESTS: FTContest[] = [
     ],
     chat: [cmsg('u_host', 'Winner takes all — Mike scoops the whole pot 💰', '12:40a', 'system')],
   },
-  // ---- Demo: Champions Club, Houston — real Fall Poker Open final table (open) ----
+  // ---- Demo: Champions Club, Houston — real Summer Poker Open $1M final table (open) ----
   {
-    id: 'ct_champ', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆', ftName: 'Fall Poker Open — $750K Main Event FT',
+    id: 'ct_champ', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆', ftName: 'Summer Poker Open — $1M GTD Main Event FT',
     status: 'open', stake: 100, budget: 100000, locksAt: 'in 2h 30m',
-    room: 'Champions Club', prizePool: '$750,000', buyIn: '$2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas', streamLive: false,
+    room: 'Champions Club', prizePool: '$1,000,000', buyIn: '$1,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas', streamLive: false,
     hostId: 'u_cc_host', coHostIds: [],
     players: CHAMP_FT,
     entries: [
-      entry('u_cc_host', 'approved', true, ['A', 'D', 'E', 'F']),
-      entry('u_mike', 'approved', true, ['B', 'C', 'E', 'F']),
-      entry('u_lena', 'approved', true, ['A', 'C', 'F', 'E']),
+      entry('u_cc_host', 'approved', true, ['A', 'D', 'H', 'I']),
+      entry('u_cc_p1', 'approved', true, ['B', 'C', 'F', 'G']),
+      entry('u_cc_p3', 'approved', true, ['A', 'E', 'G', 'I']),
+      entry('u_cc_p6', 'approved', true, ['C', 'D', 'G', 'I']),
       entry('u_player', 'approved', false), // Sam — approved, hasn't drafted yet
-      entry('u_jordan', 'pending', false),
+      entry('u_cc_p2', 'pending', false),
     ],
-    chat: [cmsg('u_cc_host', 'Shovkovyi is the chip leader — draft accordingly 🏆', '6:30p'), cmsg('u_mike', 'fading the leader, loading short stacks', '6:33p')],
+    chat: [cmsg('u_cc_host', 'Treviño came in as chip leader — draft accordingly 🏆', '6:30p'), cmsg('u_cc_p1', 'fading the leader, loading short stacks', '6:33p')],
   },
   // ---- Demo: Texas Card House, Houston — real $100K Fall Harvest final table (open) ----
   {
@@ -205,10 +209,11 @@ export const FT_CONTESTS: FTContest[] = [
     players: TCH_FT,
     entries: [
       entry('u_tch_host', 'approved', true, ['A', 'C', 'H', 'I']),
-      entry('u_gary', 'approved', true, ['B', 'D', 'F', 'G']),
-      entry('u_cody', 'approved', true, ['A', 'E', 'G', 'I']),
+      entry('u_tch_p1', 'approved', true, ['B', 'D', 'F', 'G']),
+      entry('u_tch_p3', 'approved', true, ['A', 'E', 'G', 'I']),
+      entry('u_tch_p4', 'approved', true, ['C', 'D', 'H', 'I']),
       entry('u_player', 'approved', false), // Sam — approved, hasn't drafted yet
-      entry('u_dustin', 'pending', false),
+      entry('u_tch_p2', 'pending', false),
     ],
     chat: [cmsg('u_tch_host', 'Beckenstein came in with a monster stack — good luck all', '7:05p')],
   },
