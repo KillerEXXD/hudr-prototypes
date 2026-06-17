@@ -56,7 +56,7 @@ export function Header() {
         <p className="mt-4 mb-2 text-xs font-bold uppercase tracking-wide text-text-muted">Switch demo account</p>
         <div className="grid grid-cols-2 gap-2">
           {SWITCH.map((s) => (
-            <button key={s.label} onClick={() => { loginAs(s.role, s.userId); setAcctOpen(false) }} className="flex flex-col items-center gap-1 rounded-xl border border-border bg-bg-card p-2.5 text-center text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
+            <button key={s.label} onClick={() => { loginAs(s.role, s.userId); setAcctOpen(false); navigate('/') }} className="flex flex-col items-center gap-1 rounded-xl border border-border bg-bg-card p-2.5 text-center text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
               <s.icon className="h-4 w-4 text-accent-blue" />{s.label}
             </button>
           ))}

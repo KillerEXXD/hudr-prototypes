@@ -311,6 +311,10 @@ pure helpers in `lib/gameSetup.ts`):
     in clubs where you're a member but not the host. Completed games stay on their tabs.
   - **App Admin → the Admin console** as home (all clubs + all users + the FT slate;
     the Back button is hidden when it's the home tab).
+- **Switching demo account routes to that role's home** (`navigate('/')`): the account
+  switcher always lands you on the role‑aware first tab — **Discover** for a Player, the
+  **Home dashboard** for a Host/Admin — instead of leaving you stranded on the previous
+  role's page.
 - **App Admin adds final tables** via an **"Add a final table"** form: event meta + the 9
   finalists by **name & chip stack**; the app **seats them A–I by stack** and
   **auto‑computes each ICM draft price from the stack** (concave ladder, ~13k–35k). A
