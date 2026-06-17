@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Home, Trophy, Clock, ChevronRight, Crown, Users, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { Home, Trophy, Clock, ChevronRight, Users, LayoutGrid, type LucideIcon } from 'lucide-react'
 import { useAvailableFTs } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
@@ -55,7 +55,7 @@ export function HostHomePage() {
         {fts.isLoading ? <Spinner /> : (
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             {(fts.data ?? []).slice(0, 6).map((f) => (
-              <button key={f.id} onClick={() => navigate('/host-ft')} className="flex w-44 shrink-0 flex-col rounded-2xl border border-border bg-bg-card p-3 text-left transition-colors hover:bg-bg-surface active:scale-[0.99] cursor-pointer">
+              <button key={f.id} onClick={() => navigate(`/host-ft?ft=${f.id}`)} className="flex w-44 shrink-0 flex-col rounded-2xl border border-border bg-bg-card p-3 text-left transition-colors hover:bg-bg-surface active:scale-[0.99] cursor-pointer">
                 <Badge tone="purple" className="self-start">{f.room}</Badge>
                 <p className="mt-1.5 line-clamp-2 text-sm font-bold leading-snug text-text-primary">{f.name}</p>
                 <div className="mt-auto pt-2">
@@ -66,9 +66,6 @@ export function HostHomePage() {
             ))}
           </div>
         )}
-        <button onClick={() => navigate('/host-ft')} className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-accent-purple/30 bg-accent-purple/10 px-3 py-2 text-xs font-bold text-accent-purple hover:bg-accent-purple/20 cursor-pointer">
-          <Crown className="h-3.5 w-3.5" /> Host a final table
-        </button>
       </Section>
 
       {/* ---- Active games in your clubs (games you run) — all types, capped ---- */}

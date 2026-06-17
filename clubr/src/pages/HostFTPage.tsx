@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronDown, Target, Clock, Trophy, Ticket } from 'lucide-react'
 import { useAvailableFTs } from '@/hooks/ft'
 import { Badge, Btn, Card, Spinner } from '@/components/common/ui'
@@ -10,9 +10,18 @@ const fmtK = (n: number) => `${Math.round(n / 1000)}k`
 
 export function HostFTPage() {
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+  // ?ft=<id> (from the Host home FT cards) pre-expands that final table.
+  const preselect = params.get('ft')
   const { data, isLoading } = useAvailableFTs()
-  const [expanded, setExpanded] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState<string | null>(preselect)
   const [hostFt, setHostFt] = useState<string | null>(null)
+
+  // Scroll the pre-expanded card into view once the list has loaded.
+  useEffect(() => {
+    if (!preselect || !data) return
+    document.getElementById(`ft-card-${preselect}`)?.scrollIntoView?.({ block: 'center' })
+  }, [preselect, data])
 
   return (
     <div className="animate-fade-up">
@@ -25,7 +34,7 @@ export function HostFTPage() {
           {data?.map((f) => {
             const open = expanded === f.id
             return (
-              <Card key={f.id} className="overflow-hidden p-0">
+              <Card key={f.id} id={`ft-card-${f.id}`} className="overflow-hidden p-0">
                 <button onClick={() => setExpanded(open ? null : f.id)} className="flex w-full items-start gap-2 p-3.5 text-left cursor-pointer">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 text-[11px] text-text-muted"><Badge tone="purple">{f.room}</Badge>{f.date}</div>
