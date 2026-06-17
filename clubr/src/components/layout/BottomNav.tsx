@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils/cn'
 
 const REST = [
   { to: '/clubs', label: 'Clubs', icon: Users, match: (p: string) => p === '/clubs' || p.startsWith('/club/') },
-  { to: '/games', label: 'Games', icon: Gamepad2, match: (p: string) => p.startsWith('/games') || p.startsWith('/fantasy') || p.startsWith('/lastlonger') || p.startsWith('/squares') || p.startsWith('/host-ft') },
+  { to: '/games', label: 'Games', icon: Gamepad2, match: (p: string) => p.startsWith('/games') || p.startsWith('/fantasy') || p.startsWith('/lastlonger') || p.startsWith('/squares') },
   { to: '/me', label: 'Me', icon: CircleUser, match: (p: string) => p.startsWith('/me') || p.startsWith('/admin') },
 ]
 
@@ -14,9 +14,10 @@ export function BottomNav() {
   const navigate = useNavigate()
   const { user } = useAuth()
   // First tab is role-aware: Players browse via "Discover"; Hosts & Admins land on "Home".
+  // /host-ft (choose-an-FT-to-host) is reached from the host Home, so it keeps Home lit.
   const first = user?.role === 'player'
     ? { to: '/', label: 'Discover', icon: Compass, match: (p: string) => p === '/' }
-    : { to: '/', label: 'Home', icon: Home, match: (p: string) => p === '/' }
+    : { to: '/', label: 'Home', icon: Home, match: (p: string) => p === '/' || p.startsWith('/host-ft') }
   const ITEMS = [first, ...REST]
   return (
     <nav className="sticky bottom-0 z-30 border-t border-border bg-bg-secondary/95 backdrop-blur">
