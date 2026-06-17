@@ -60,7 +60,7 @@ export function ContestDetailPage() {
       {(() => { const joined = c.entries.filter((e) => e.status === 'approved').length; return <StakePool stake={c.stake} pool={c.stake * joined}>· {joined} joined</StakePool> })()}
 
       {/* ===== How scoring & pricing work — combined explainer, at the top, by the buy-in/pool ===== */}
-      <div className="mt-3"><HowScoringPricing players={c.players} budget={c.budget} defaultOpen={c.status === 'open'} /></div>
+      <div className="mt-3"><HowScoringPricing players={c.players} budget={c.budget} /></div>
       {c.canManage && c.visibility === 'private' && (
         <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>
       )}
