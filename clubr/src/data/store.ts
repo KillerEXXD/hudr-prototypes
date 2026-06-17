@@ -76,8 +76,8 @@ export const CLUBS: Club[] = [
   {
     id: 'c_highrollers', name: 'High Rollers', emoji: '💎', color: '#a855f7',
     description: 'Big stakes, bigger swings. Invite only.',
-    location: 'Austin, TX',
-    ownerId: 'u_rae', ownerName: 'Rae Rivers', inviteCode: 'HIGH88', createdAt: '2026-06-11',
+    location: 'Austin, TX', visibility: 'private',
+    ownerId: 'u_rae', ownerName: 'Rae Rivers', inviteCode: 'HRX7K2Q9', createdAt: '2026-06-11',
     members: [member('u_rae', 'owner', 'member', '2026-06-11'), member('u_tom', 'member', 'member', '2026-06-12')],
   },
 ]

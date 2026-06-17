@@ -460,3 +460,36 @@ graduation is *where it runs*:
 - **Tests at graduation:** unit‑test `points.ts` (curve shape, depth cutoff, min‑field, Squares
   weighting, tie‑split) + a contract test on the standings endpoint — the app's CI test‑coupling gate
   will require them.
+
+## 21. Private clubs (visibility)
+A club is **public** (default) or **private**. Public clubs are discoverable; **private clubs are
+fully hidden** — and a direct URL must never reveal whether a private club exists.
+
+- **Create:** the create-club form has a **Public / Private** toggle (default Public). A private club
+  gets a **long random 8-char invite code** (ambiguous chars dropped); public clubs keep a short,
+  readable code (e.g. `ACES24`).
+- **Discovery exclusion:** private clubs never appear in **Discover**, **search**, or **by-location**
+  lists for anyone but the admin or an existing member (`listRecentClubs` filters them out).
+- **Non-disclosure gate (the key rule):** opening `/#/club/<id>` for a private club you're not in
+  returns the **same result as a club that doesn't exist** — both render an identical
+  **"Private or unavailable" gate** (invite-code field only). No name / emoji / description /
+  member-count / location / owner is ever shown. So existence can't be probed by URL. `getClub`
+  returns `null` for both cases; the page shows the gate (never "Club not found").
+- **Join (code → request → approve):** entering a code on the gate (or the Join sheet) **silently
+  submits a request**; the response is **generic** ("if a club matches that code, your request was
+  sent — you'll get access once the host admits you") for a private match **and** for no match alike,
+  so a code never confirms a private club exists. A **public** match still reveals the club name.
+  **Pending requesters stay gated** until the host admits them (revealed only on approval).
+- **Invite is copy-only for private:** the Invite sheet **masks the code** (`••••••••`) and offers
+  only **Copy link** — the owner copies & sends, never reads/dictates the code.
+- **Change later:** the host can toggle **Public ⇄ Private** in the Members tab; switching
+  **regenerates the invite code** (a fresh random one when going private).
+- **Member profiles:** a member's **public** clubs are listed by name; **private** clubs show only as
+  a count — **"Private clubs · N"** (names never revealed) — and private-club games stay member-only.
+- **App Admin** sees private clubs (admin console + can open them); the gate applies only to
+  regular non-member users.
+- **Prototype:** "High Rollers" (`c_highrollers`) is seeded private (8-char code) to demo the gate,
+  discovery exclusion, and the "Private clubs · 1" chip on Tom's profile.
+- **Graduation (real app):** add `visibility` to `clubs` + a `getClub` that returns null for
+  private-non-member (identical to not-found); exclude private from discovery queries; make the
+  code-join RPC reveal only public matches; mint long codes for private; gate is client-rendered.

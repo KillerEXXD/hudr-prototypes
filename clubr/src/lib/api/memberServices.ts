@@ -35,12 +35,18 @@ export interface MemberGameSummary {
   result: string
 }
 
+export interface MemberClubSummary { id: string; name: string; emoji: string }
+
 export interface MemberProfile {
   user: User
   ftLifetime: number
   llLifetime: number
   games: MemberGameSummary[]
   canSeeContact: boolean // only a host/admin of a club the member is in
+  /** Public clubs the member belongs to (names shown). */
+  publicClubs: MemberClubSummary[]
+  /** Count of PRIVATE clubs the member is in — shown as "Private clubs · N", never named. */
+  privateClubCount: number
 }
 
 export async function getMemberProfile(targetId: string, viewerId: string, isAdmin = false): Promise<MemberProfile | null> {
@@ -51,6 +57,12 @@ export async function getMemberProfile(targetId: string, viewerId: string, isAdm
   const canSeeContact = isAdmin || CLUBS.some((c) =>
     c.members.some((m) => m.userId === viewerId && (m.role === 'owner' || m.role === 'host')) &&
     c.members.some((m) => m.userId === targetId))
+
+  // Clubs the member is in: public ones are named; private ones are shown only as a
+  // count ("Private clubs · N") so we never reveal which private clubs they belong to.
+  const targetClubs = CLUBS.filter((c) => c.members.some((m) => m.userId === targetId && m.status === 'member'))
+  const publicClubs = targetClubs.filter((c) => c.visibility !== 'private').map((c) => ({ id: c.id, name: c.name, emoji: c.emoji }))
+  const privateClubCount = targetClubs.filter((c) => c.visibility === 'private').length
 
   const ftLifetime = FT_CONTESTS.filter((c) => c.entries.some((e) => e.userId === targetId)).length
   const llLifetime = LL_GAMES.filter((g) => g.participants.some((p) => p.userId === targetId)).length
@@ -77,5 +89,5 @@ export async function getMemberProfile(targetId: string, viewerId: string, isAdm
     games.push({ id: g.id, kind: 'll', title: g.title, clubName: g.clubName, status: g.status, result })
   }
 
-  return { user, ftLifetime, llLifetime, games, canSeeContact }
+  return { user, ftLifetime, llLifetime, games, canSeeContact, publicClubs, privateClubCount }
 }

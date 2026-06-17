@@ -42,6 +42,10 @@ export interface Club {
   description: string
   /** City the club is based in (e.g. "Dallas, TX"). */
   location: string
+  /** 'public' (default) = discoverable (Discover, search, by location, URL).
+   *  'private' = fully hidden: not listed/searchable, a direct URL reveals nothing
+   *  to non-members (existence not disclosed), invite-code only. */
+  visibility?: 'public' | 'private'
   ownerId: string
   ownerName: string
   inviteCode: string

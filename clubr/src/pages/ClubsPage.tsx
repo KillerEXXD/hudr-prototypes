@@ -1,11 +1,12 @@
-import { useState } from 'react'
-import { Plus, Ticket, Users } from 'lucide-react'
+﻿import { useState } from 'react'
+import { Plus, Ticket, Users, Globe, Lock } from 'lucide-react'
 import { useMyClubs, useRecentClubs, useCreateClub, useJoinViaInvite } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
-import { Section, Spinner, Btn, Card, Sheet, Field, EmptyState } from '@/components/common/ui'
+import { Section, Spinner, Btn, Sheet, Field, EmptyState } from '@/components/common/ui'
 import { ClubRow } from '@/components/common/cards'
+import { cn } from '@/lib/utils/cn'
 
 export function ClubsPage() {
   const { user } = useAuth()
@@ -19,9 +20,10 @@ export function ClubsPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [joinOpen, setJoinOpen] = useState(false)
   const [name, setName] = useState('')
-  const [emoji, setEmoji] = useState('🃏')
+  const [emoji, setEmoji] = useState('ðŸƒ')
   const [desc, setDesc] = useState('')
   const [loc, setLoc] = useState('')
+  const [visibility, setVisibility] = useState<'public' | 'private'>('public')
   const [code, setCode] = useState('')
   const [joinMsg, setJoinMsg] = useState('')
 
@@ -63,8 +65,23 @@ export function ClubsPage() {
           </div>
           <Field label="Description" value={desc} onChange={setDesc} placeholder="What's your club about?" />
           <Field label="City" value={loc} onChange={setLoc} placeholder="e.g. Houston, TX" />
-          <Btn className="w-full" disabled={!name.trim() || !loc.trim() || create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; await create.mutateAsync({ name, emoji, description: desc, location: loc }); setCreateOpen(false); setName(''); setDesc(''); setLoc('') }}>
-            Create club — you're the host · {createClubCost} cr
+          <div>
+            <span className="mb-1 block text-xs font-semibold text-text-secondary">Visibility</span>
+            <div className="flex gap-1 rounded-xl border border-border bg-bg-card p-1">
+              {(['public', 'private'] as const).map((v) => (
+                <button key={v} type="button" onClick={() => setVisibility(v)}
+                  className={cn('flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer',
+                    visibility === v ? 'bg-accent-blue text-white' : 'text-text-secondary hover:bg-bg-surface')}>
+                  {v === 'public' ? <><Globe className="h-3.5 w-3.5" />Public</> : <><Lock className="h-3.5 w-3.5" />Private</>}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-[10px] leading-snug text-text-muted">{visibility === 'public'
+              ? 'Discoverable — shows up in Discover and search, and people can request to join.'
+              : 'Hidden — invite-only. Not discoverable or searchable, and a direct link reveals nothing. You share a private code; only invited people can request.'}</p>
+          </div>
+          <Btn className="w-full" disabled={!name.trim() || !loc.trim() || create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; await create.mutateAsync({ name, emoji, description: desc, location: loc, visibility }); setCreateOpen(false); setName(''); setDesc(''); setLoc(''); setVisibility('public') }}>
+            Create club â€” you're the host Â· {createClubCost} cr
           </Btn>
           <p className="text-center text-[11px] text-text-muted">You'll own it, get an invite code, and approve who joins.</p>
         </div>
@@ -73,11 +90,11 @@ export function ClubsPage() {
       <Sheet open={joinOpen} onClose={() => setJoinOpen(false)} title="Join with an invite code">
         <div className="flex flex-col gap-3">
           <Field label="Invite code" value={code} onChange={setCode} placeholder="e.g. ACES24" mono />
-          <Btn className="w-full" disabled={!code.trim() || join.isPending} onClick={async () => { const c = await join.mutateAsync(code); setJoinMsg(c ? `Requested to join ${c.name} — awaiting approval.` : 'No club found for that code.'); if (c) setCode('') }}>
+          <Btn className="w-full" disabled={!code.trim() || join.isPending} onClick={async () => { const c = await join.mutateAsync(code); setJoinMsg(c ? `Requested to join ${c.name} â€” awaiting approval.` : 'If a club matches that code, your request was sent â€” you\'ll get access once the host admits you.'); setCode('') }}>
             Request to join
           </Btn>
           {joinMsg && <p className="text-center text-xs font-semibold text-accent-emerald">{joinMsg}</p>}
-          <p className="text-center text-[11px] text-text-muted">Try <span className="font-mono">ACES24</span>, <span className="font-mono">RIVER1</span>, or <span className="font-mono">HIGH88</span>.</p>
+          <p className="text-center text-[11px] text-text-muted">Public clubs reveal themselves on a match; private ones stay hidden. Try <span className="font-mono">ACES24</span> or <span className="font-mono">RIVER1</span>.</p>
         </div>
       </Sheet>
     </div>

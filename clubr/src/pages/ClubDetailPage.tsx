@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket } from 'lucide-react'
-import { useClub, useApproveMember, useRejectMember, useRequestToJoin } from '@/hooks'
+import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket } from 'lucide-react'
+import { useClub, useApproveMember, useRejectMember, useRequestToJoin, useJoinViaInvite, useSetClubVisibility } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { LeaderboardSection } from '@/components/leaderboard/LeaderboardSection'
@@ -20,6 +20,7 @@ export function ClubDetailPage() {
   const approve = useApproveMember()
   const reject = useRejectMember()
   const request = useRequestToJoin()
+  const setVis = useSetClubVisibility()
   const allGames = useUnifiedGames()
   const [copied, setCopied] = useState(false)
   const [newOpen, setNewOpen] = useState(false)
@@ -28,7 +29,11 @@ export function ClubDetailPage() {
   const [tab, setTab] = useState<'games' | 'leaderboard' | 'members'>('games')
 
   if (isLoading) return <Spinner label="Loading club…" />
-  if (!club) return <EmptyState title="Club not found" />
+  // Non-disclosure: a private club you can't see is indistinguishable from a club that
+  // doesn't exist — both land here. Show an identical invite-code gate, never any detail.
+  if (!club) return <PrivateClubGate />
+
+  const isPrivate = club.visibility === 'private'
 
   const members = club.members.filter((m) => m.status === 'member')
   const pending = club.members.filter((m) => m.status === 'pending')
@@ -63,6 +68,7 @@ export function ClubDetailPage() {
           <h1 className="truncate text-xl font-extrabold tracking-tight text-text-primary">{club.name}</h1>
           <p className="text-xs text-text-muted">{members.length} members · hosted by {club.ownerName}</p>
           {club.location && <p className="mt-0.5 flex items-center gap-1 text-[11px] text-text-muted"><MapPin className="h-3 w-3" />{club.location}</p>}
+          {isPrivate && <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-border bg-bg-surface px-1.5 py-0.5 text-[10px] font-bold text-text-secondary"><Lock className="h-2.5 w-2.5" />Private · invite-only</span>}
         </div>
         <MembershipBadge status={club.myStatus} role={club.myRole} />
       </div>
@@ -174,6 +180,17 @@ export function ClubDetailPage() {
               ))}
             </div>
           </Section>
+
+          <Section title="Visibility">
+            <Card className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="flex items-center gap-1.5 text-sm font-bold text-text-primary">{isPrivate ? <><Lock className="h-3.5 w-3.5 text-text-muted" />Private</> : <><Globe className="h-3.5 w-3.5 text-text-muted" />Public</>}</p>
+                <p className="mt-0.5 text-[11px] leading-snug text-text-muted">{isPrivate ? 'Hidden — invite-only; not discoverable, and a direct link reveals nothing.' : 'Discoverable in Discover & search; anyone can request to join.'}</p>
+              </div>
+              <Btn size="sm" variant="secondary" disabled={setVis.isPending} onClick={() => setVis.mutate({ clubId: club.id, visibility: isPrivate ? 'public' : 'private' })}>{isPrivate ? 'Make public' : 'Make private'}</Btn>
+            </Card>
+            <p className="mt-1.5 text-[10px] text-text-muted">Switching regenerates the invite code{isPrivate ? '' : ' — a long, copy-only one when going private'}.</p>
+          </Section>
         </>
       )}
 
@@ -181,11 +198,39 @@ export function ClubDetailPage() {
 
       <Sheet open={inviteOpen} onClose={() => setInviteOpen(false)} title={`Invite to ${club.name}`}>
         <Card className="flex items-center justify-between">
-          <span className="font-mono text-lg font-bold tracking-widest text-text-primary">{club.inviteCode}</span>
+          <span className="font-mono text-lg font-bold tracking-widest text-text-primary">{isPrivate ? '••••••••' : club.inviteCode}</span>
           <Btn size="sm" variant="secondary" onClick={copyCode}>{copied ? <><Check className="h-3.5 w-3.5 text-accent-emerald" />Copied!</> : <><Copy className="h-3.5 w-3.5" />Copy link</>}</Btn>
         </Card>
-        <p className="mt-2 text-[11px] leading-snug text-text-muted">Share the link — new players sign up &amp; request to join; you admit them after vetting. They appear under <b className="text-text-secondary">Members → Join requests</b>.</p>
+        <p className="mt-2 text-[11px] leading-snug text-text-muted">{isPrivate
+          ? <>This club is <b className="text-text-secondary">private</b> — the code stays hidden, so just <b className="text-text-secondary">copy &amp; send the link</b> to someone you want in. They request access and you admit them under <b className="text-text-secondary">Members → Join requests</b>.</>
+          : <>Share the link — new players sign up &amp; request to join; you admit them after vetting. They appear under <b className="text-text-secondary">Members → Join requests</b>.</>}</p>
       </Sheet>
+    </div>
+  )
+}
+
+// Shown for ANY club a viewer can't see — a private club they're not in OR a club
+// that doesn't exist. Identical either way, so a direct URL never reveals whether a
+// private club exists. Only an invite code lets you request access (host then admits).
+function PrivateClubGate() {
+  const navigate = useNavigate()
+  const join = useJoinViaInvite()
+  const [code, setCode] = useState('')
+  const [msg, setMsg] = useState('')
+  return (
+    <div className="animate-fade-up">
+      <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+      <div className="mt-6 flex flex-col items-center text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-surface text-text-muted"><Lock className="h-6 w-6" /></div>
+        <h1 className="mt-3 text-xl font-extrabold tracking-tight text-text-primary">Private or unavailable</h1>
+        <p className="mt-1 max-w-sm text-sm text-text-secondary">If you have an invite code, enter it to request access — the host will admit you. We don't show anything about a club unless you're a member.</p>
+      </div>
+      <Card className="mt-4">
+        <Field label="Invite code" value={code} onChange={setCode} placeholder="Paste your invite code" mono />
+        <Btn className="mt-2 w-full" disabled={!code.trim() || join.isPending} onClick={async () => { await join.mutateAsync(code.trim()); setMsg("If a club matches that code, your request has been sent — you'll get access once the host admits you."); setCode('') }}>Request access</Btn>
+        {msg && <p className="mt-2 text-center text-xs font-semibold text-accent-emerald">{msg}</p>}
+      </Card>
+      <p className="mt-3 text-center text-[11px] text-text-muted">No ClubR account yet? Sign in first, then use your invite code.</p>
     </div>
   )
 }

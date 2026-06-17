@@ -42,6 +42,26 @@ export function MemberPage() {
         <p className="mt-1.5 text-[11px] text-text-muted">Lifetime totals. The games below are only those you can see (your clubs).</p>
       </Section>
 
+      {(m.publicClubs.length > 0 || m.privateClubCount > 0) && (
+        <Section title="Clubs">
+          <div className="flex flex-col gap-1.5">
+            {m.publicClubs.map((c) => (
+              <button key={c.id} type="button" onClick={() => navigate(`/club/${c.id}`)} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2 text-left transition-colors hover:bg-bg-surface cursor-pointer">
+                <span className="text-lg leading-none">{c.emoji}</span>
+                <span className="min-w-0 flex-1 truncate text-sm text-text-primary">{c.name}</span>
+              </button>
+            ))}
+            {m.privateClubCount > 0 && (
+              <div className="flex items-center gap-2.5 rounded-xl border border-dashed border-border bg-bg-card/50 px-3 py-2">
+                <Lock className="h-4 w-4 shrink-0 text-text-muted" />
+                <span className="flex-1 text-sm text-text-secondary">Private clubs · {m.privateClubCount}</span>
+                <span className="text-[10px] text-text-muted">names hidden</span>
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
+
       <Section title="History">
         {m.games.length === 0 ? (
           <EmptyState title="No shared games" sub="You don't share any games with this member yet." />
