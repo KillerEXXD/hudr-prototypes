@@ -384,8 +384,15 @@ hosting**. Credits are **non‑cash, non‑refundable to money, and non‑transf
 ## 20. Club leaderboards (points)
 **Each club has its OWN leaderboard — there is no app‑wide / cross‑club board.** Members earn
 **Leaderboard Points (LP)** by how they finish in *that club's* games, awarded by a platform
-algorithm. It lives as a **"Club leaderboard" section on the Club Detail page**, between Games and
-Members — never a top‑level nav destination (reinforces club scope).
+algorithm. It lives as the **Leaderboard tab on the Club Detail page** — never a top‑level nav
+destination (reinforces club scope).
+
+**Club Detail page IA (tabbed):** a segmented control under the club header — **Games · Leaderboard ·
+Members** — defaulting to Games. **Members is host/admin‑only** (players never see the roster; the
+header already shows "N members · hosted by X", so there's no member list for non‑hosts). The host's
+**invite link + join‑request queue live inside the Members tab** (not stacked above the page), and the
+**Members tab badges the pending‑request count** so the host still notices new requests. This keeps
+both the player and host club pages to a clean **header → tabs → content**.
 
 - **The formula (field‑scaled, top‑heavy):** `points = round(B × √N ÷ √rank × weight)`, where **N**
   = number of participants and **rank** = the player's finish (1 = best). `√N` makes a **bigger
@@ -448,7 +455,7 @@ graduation is *where it runs*:
   `squaresWeight`) becomes a stored global row, edited in the Admin console, seeded with the defaults
   (10 / 4 / 3 / 1 / 1 / 0.5).
 - **Scope invariant:** **per‑club only** — never a global/cross‑club board (matches the PRD §13 "out"
-  list). The Club Detail "Club leaderboard" section is the only surface; not a nav destination.
+  list). The Club Detail **Leaderboard tab** is the only surface; not a nav destination.
 - **Tests at graduation:** unit‑test `points.ts` (curve shape, depth cutoff, min‑field, Squares
   weighting, tie‑split) + a contract test on the standings endpoint — the app's CI test‑coupling gate
   will require them.
