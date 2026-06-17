@@ -152,6 +152,9 @@ Approval is required to do anything beyond viewing:
 - **Clubs** = your clubs. **Me** = profile + **the 6‑skin appearance picker** (lives in the
   Profile/Me view only — moved out of the header) + Host/Admin consoles. The **header** carries only
   the logo, the role chip, the **credits coin chip** (§19, non‑admin) and the account button.
+  **Picking a skin applies it and immediately returns you to the page you came from** (the picker
+  fires an `onSelect` → `navigate(-1)`), so the new skin is previewed in context rather than on the
+  settings screen.
 - Cards: a single **status** badge top‑right; **Hosting / Entered / In / Private**
   on their own row.
 - **First tab is role-aware:** **Player → Discover**, **Club Host → a Home dashboard**,

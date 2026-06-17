@@ -57,7 +57,7 @@ export function MePage() {
       {user.role === 'host' && <HostConsole />}
 
       <Section title="Appearance" action={<Palette className="h-4 w-4 text-text-muted" />}>
-        <SkinPicker />
+        <SkinPicker onSelect={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))} />
       </Section>
 
       <Btn variant="danger" className="mt-5 w-full" onClick={logout}><LogOut className="h-4 w-4" />Sign out</Btn>

@@ -2,8 +2,12 @@ import { Check } from 'lucide-react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { cn } from '@/lib/utils/cn'
 
-/** The 6-skin picker (shared with the hudr-prototypes appearance system). */
-export function SkinPicker() {
+/**
+ * The 6-skin picker (shared with the hudr-prototypes appearance system).
+ * `onSelect` fires after a skin is applied — MePage uses it to close the
+ * profile view and return the user to where they were.
+ */
+export function SkinPicker({ onSelect }: { onSelect?: () => void }) {
   const { theme, setTheme, themes } = useTheme()
   return (
     <div className="grid grid-cols-2 gap-2">
@@ -12,7 +16,7 @@ export function SkinPicker() {
         return (
           <button
             key={t.name}
-            onClick={() => setTheme(t.name)}
+            onClick={() => { setTheme(t.name); onSelect?.() }}
             className={cn(
               'flex items-center gap-2.5 rounded-xl border p-2.5 text-left transition-all cursor-pointer',
               active ? 'border-accent-blue ring-2 ring-accent-blue/30' : 'border-border hover:bg-bg-surface',
