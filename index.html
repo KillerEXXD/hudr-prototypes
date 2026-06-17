@@ -172,7 +172,7 @@
       font-size: 13px;
     }
     /* Show the Scout prototypes (Engine + Crisp + Stats + Sharp) + the ClubR flow + the ClubR app; hide the rest of the gallery. */
-    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]):not([href^="scout-stats-demo"]):not([href^="scout-sharp-demo"]):not([href^="clubr-flow"]):not([href^="clubr-demo"]) {
+    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]):not([href^="scout-stats-demo"]):not([href^="scout-sharp-demo"]):not([href^="clubr-flow"]):not([href^="clubr-demo"]):not([href^="clubr-qa-guide"]) {
       display: none !important;
     }
   </style>
@@ -727,6 +727,21 @@
           <span class="tag">Mock → API ready</span>
         </div>
         <span class="cta" style="background: linear-gradient(135deg, #10b981, #3b82f6)">Open the app →</span>
+      </a>
+
+      <a href="clubr-qa-guide/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #34d399, #d946ef)"></div>
+        <div class="card-letter" style="background: rgba(52,211,153,0.15); color: #34d399;">QA</div>
+        <h2>ClubR — QA Game Guide</h2>
+        <div class="subtitle">For testers • How the 3 games actually work</div>
+        <p>A plain-English walkthrough of <strong>how each game works</strong>, for QA testers who've never played fantasy or poker pools — read it before you test. Covers <strong>FT Fantasy</strong> (draft 4 of 9 finalists on an ICM budget, finish-points scoring), <strong>Last Longer</strong> (a survival pool with a live chip board, busts &amp; chop), and <strong>Football Squares</strong> (10×10 grid, claim squares, provably-fair digits, period scoring). Each game gets the <strong>concept</strong>, a glossary, <strong>step-by-step with the expected result</strong>, and real prototype screenshots.</p>
+        <div class="tags">
+          <span class="tag">FT Fantasy</span>
+          <span class="tag">Last Longer</span>
+          <span class="tag">Football Squares</span>
+          <span class="tag">Screenshots + expected results</span>
+        </div>
+        <span class="cta" style="background: linear-gradient(135deg, #34d399, #d946ef)">Read the guide →</span>
       </a>
 
       <a href="#" onclick="alert('V7 Beacon — Coming Soon. Prototype not yet built.');return false;" class="card" style="opacity:0.7">

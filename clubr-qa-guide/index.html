@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ClubR — QA Game Guide</title>
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#141a26; --card:#1a2233; --card2:#202a3e;
+    --bd:#283450; --bd2:#36456a; --tx:#e9edf6; --mut:#9aa6be; --mut2:#7b88a3;
+    --ftf:#d946ef; --ll:#f59e0b; --sq:#34d399; --coin:#fbbf24; --ok:#34d399; --warn:#f87171; --info:#60a5fa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;background:
+      radial-gradient(900px 500px at 80% -10%, rgba(217,70,239,.10), transparent 70%),
+      radial-gradient(900px 500px at 0% 0%, rgba(52,211,153,.08), transparent 70%),
+      var(--bg);color:var(--tx);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(11,15,23,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd)}
+  .nav-inner{display:flex;gap:4px;align-items:center;overflow-x:auto;padding:10px 16px}
+  nav a{white-space:nowrap;font-size:13px;font-weight:600;color:var(--mut);text-decoration:none;padding:7px 11px;border-radius:8px;transition:.15s}
+  nav a:hover{color:var(--tx);background:var(--card)}
+  nav a.active{color:#fff;background:linear-gradient(135deg,var(--ftf),var(--ll))}
+  nav a.brand{color:var(--tx);font-weight:800}
+
+  header{padding:54px 0 32px;text-align:center;border-bottom:1px solid var(--bd)}
+  header .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coin);background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);padding:5px 12px;border-radius:999px}
+  header h1{font-size:44px;font-weight:800;letter-spacing:-1px;margin-top:16px;background:linear-gradient(120deg,#f0abfc,#a78bfa,#34d399);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  header p.sub{color:var(--mut);font-size:16px;max-width:760px;margin:14px auto 0}
+
+  section{padding:52px 0 8px;scroll-margin-top:62px}
+  .h2{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .h2 h2{font-size:28px;font-weight:800;letter-spacing:-.3px}
+  .h2 .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;color:#fff}
+  .lead{color:var(--mut);font-size:15px;margin:10px 0 24px;max-width:880px}
+
+  .panel{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:16px}
+  .panel.accent{border-left:3px solid var(--c,var(--info))}
+  .panel h3{font-size:16px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .panel p{color:var(--mut);font-size:14px}
+  .panel p + p{margin-top:8px}
+  .panel b,.panel strong{color:var(--tx)}
+
+  .concept{background:linear-gradient(160deg,rgba(96,165,250,.10),rgba(20,26,38,.4));border:1px solid rgba(96,165,250,.3);border-radius:14px;padding:20px;margin-bottom:18px}
+  .concept .eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--info)}
+  .concept h3{font-size:18px;font-weight:800;margin:4px 0 8px}
+  .concept p{color:var(--tx);font-size:14.5px}
+  .concept .analogy{margin-top:12px;font-size:13.5px;color:var(--mut);border-top:1px dashed var(--bd2);padding-top:12px}
+  .concept .analogy b{color:var(--coin)}
+
+  .terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:6px 0 18px}
+  .term{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:11px 13px}
+  .term .t{font-weight:700;font-size:13.5px;color:var(--tx)}
+  .term .d{font-size:12.5px;color:var(--mut);margin-top:2px}
+
+  .steps{display:grid;grid-template-columns:1fr;gap:0}
+  .step{display:grid;grid-template-columns:34px 1fr;gap:14px;padding:18px 0;border-top:1px solid var(--bd)}
+  .step:first-child{border-top:none}
+  .step .n{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2))}
+  .step .body h4{font-size:15.5px;font-weight:700}
+  .step .body .do{color:var(--mut);font-size:14px;margin-top:4px}
+  .step .body .do b{color:var(--tx)}
+  .expect{margin-top:10px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.3);border-radius:9px;padding:9px 12px;font-size:13px;color:#bdf3dd}
+  .expect b{color:var(--ok)}
+  .grid-2{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:start}
+  @media(max-width:760px){.grid-2{grid-template-columns:1fr}}
+
+  .shot{display:block;width:100%;max-width:300px;border-radius:20px;border:1px solid var(--bd2);box-shadow:0 16px 44px rgba(0,0,0,.45);background:#000}
+  figure{margin:0}
+  figure figcaption{font-size:12px;color:var(--mut2);margin-top:8px;text-align:center}
+  .sticky-shot{position:sticky;top:74px}
+
+  .why{border-radius:14px;padding:16px 18px;margin-top:14px;border:1px solid}
+  .why.f{border-color:rgba(217,70,239,.3);background:rgba(217,70,239,.06)}
+  .why.l{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.06)}
+  .why.s{border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.06)}
+  .why .lbl{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+  .why p{font-size:14px;color:var(--tx);margin-top:4px}
+
+  .pts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .pts .p{font-size:12px;font-weight:700;background:var(--card2);border:1px solid var(--bd);border-radius:7px;padding:4px 9px;color:var(--mut)}
+  .pts .p b{color:var(--coin)}
+  ul.clean{list-style:none;margin-top:8px}
+  ul.clean li{position:relative;padding-left:20px;font-size:14px;color:var(--mut);margin-top:7px}
+  ul.clean li::before{content:"→";position:absolute;left:0;color:var(--mut2)}
+  ul.clean li b{color:var(--tx)}
+  .check li::before{content:"☐";color:var(--mut2)}
+
+  footer{margin-top:60px;border-top:1px solid var(--bd);padding:28px 0 50px;text-align:center;color:var(--mut2);font-size:13px}
+  .toc-tag{font-size:11px;font-weight:700;color:var(--mut2)}
+</style>
+</head>
+<body>
+
+<nav><div class="nav-inner wrap" style="padding-left:0;padding-right:0">
+  <a href="#top" class="brand">🃏 ClubR QA</a>
+  <a href="#start">Start here</a>
+  <a href="#ftf">FT Fantasy</a>
+  <a href="#ll">Last Longer</a>
+  <a href="#sq">Squares</a>
+  <a href="#checklist">Test checklist</a>
+</div></nav>
+
+<header id="top"><div class="wrap">
+  <span class="kicker">For QA testers · understand the games first</span>
+  <h1>ClubR — How the Games Work</h1>
+  <p class="sub">ClubR is a <b>scorekeeper</b> for a poker club's side-games — it tracks and proves the count and the result, but <b>never touches the cash</b> (the club settles up offline). Before you test a game, read its section here so you know what <em>should</em> happen. Never played fantasy or poker pools? That's exactly who this is for.</p>
+</div></header>
+
+<div class="wrap">
+
+<!-- ───────── START HERE ───────── -->
+<section id="start">
+  <div class="h2"><h2>Start here — the 3 games at a glance</h2></div>
+  <p class="lead">ClubR runs three side-games for poker clubs. None of them is "playing poker" inside the app — the app is the <b>referee + scoreboard</b>. Here's the one-line version of each, then read the full section before testing it.</p>
+  <div class="terms" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+    <div class="term" style="border-left:3px solid var(--ftf)"><div class="t">🎯 FT Fantasy <span class="toc-tag">(Stack Draft)</span></div><div class="d">Fantasy poker. You <b>draft 4 of the 9 players</b> at a tournament's final table, then score points based on <b>where they finish</b>. Highest total wins.</div></div>
+    <div class="term" style="border-left:3px solid var(--ll)"><div class="t">🏟️ Last Longer</div><div class="d">A survival pool on your club's own game night. Everyone buys in; <b>whoever busts out last wins</b>. The app keeps the live count public so nobody can hide players.</div></div>
+    <div class="term" style="border-left:3px solid var(--sq)"><div class="t">🏈 Football Squares</div><div class="d">A 10×10 grid party game. You <b>claim squares</b>; secret 0–9 digits are assigned to rows/columns; the <b>teams' scores</b> pick the winning square each quarter.</div></div>
+  </div>
+
+  <div class="panel accent" style="--c:var(--coin)">
+    <h3>🔑 Words you'll see in every game</h3>
+    <div class="terms">
+      <div class="term"><div class="t">Buy-in</div><div class="d">What each player pays to enter (e.g. 100). ClubR only <em>records</em> it — money is settled offline.</div></div>
+      <div class="term"><div class="t">Pool</div><div class="d">Total prize = buy-in × players. Paid out to the winners.</div></div>
+      <div class="term"><div class="t">Host</div><div class="d">The club person who runs the game: admits players, marks who paid, enters results.</div></div>
+      <div class="term"><div class="t">Paid (green toggle)</div><div class="d">Whether a player has settled their buy-in with the host. Tracking only — no payment happens in-app.</div></div>
+      <div class="term"><div class="t">Payouts (e.g. 50/30/20)</div><div class="d">How the pool splits — here, 1st gets 50%, 2nd 30%, 3rd 20%.</div></div>
+      <div class="term"><div class="t">Stakes / coins</div><div class="d">The in-app unit shown on amounts. It's a scorekeeping number, not real currency.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── FT FANTASY ───────── -->
+<section id="ftf">
+  <div class="h2"><h2>🎯 FT Fantasy</h2><span class="tag" style="background:var(--ftf)">Stack Draft</span></div>
+
+  <div class="concept">
+    <div class="eyebrow">What is this game?</div>
+    <h3>Fantasy sports — but for a poker final table.</h3>
+    <p>A big poker tournament ends with a <b>final table</b>: the last <b>9 players</b> left, playing for the title. In FT Fantasy you don't play poker — you act like a fantasy-football manager: you <b>"draft" (pick) 4 of those 9 players</b> before the final table plays out. Then you score points based on <b>where each of your 4 players finishes</b> (1st place is worth the most, 9th the least). Whoever's 4 picks score the most points wins the prize pool.</p>
+    <p class="analogy"><b>Analogy:</b> It's like a fantasy football draft, except your "team" is 4 poker pros and their "stats" are simply how high they finish at the table.</p>
+  </div>
+
+  <h3 style="font-size:15px;margin:0 0 8px;color:var(--mut)">The twist that makes it a game of skill — the budget &amp; ICM</h3>
+  <div class="terms">
+    <div class="term"><div class="t">Chip stack</div><div class="d">How many chips a finalist has. More chips = more likely to finish high. Shown like "35k · 95 BB" (big blinds).</div></div>
+    <div class="term"><div class="t">ICM price</div><div class="d">Each finalist has a <b>price</b> set by their chip stack (ICM = a standard poker formula for "what a stack is worth"). Chip leaders cost the most.</div></div>
+    <div class="term"><div class="t">Budget</div><div class="d">You get a fixed budget (e.g. 100k) and must fit <b>4 players</b> inside it — so you can't just grab the 4 biggest stacks. You balance favourites with cheaper value picks.</div></div>
+    <div class="term"><div class="t">Lock</div><div class="d">Drafting closes at the <b>lock</b> time. Until then you can change your 4. Picks are <b>sealed</b> — the server can't read them before lock, so nobody can copy or cheat.</div></div>
+    <div class="term"><div class="t">Finishing order</div><div class="d">After the table plays out, the host enters the public 1st→9th result. This is known/streamed, so it can't be faked.</div></div>
+    <div class="term"><div class="t">Finish points</div><div class="d">Each place is worth points: <b>1st 100 · 2nd 70 · 3rd 50 · 4th 35 · 5th 25 · 6th 18 · 7th 12 · 8th 6 · 9th 3</b>. Your score = your 4 players' points added up.</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="steps">
+        <div class="step" style="--c1:#d946ef;--c2:#a78bfa"><div class="n">1</div><div class="body">
+          <h4>Find a contest &amp; get in</h4>
+          <div class="do">On <b>Games → FT Fantasy</b>, open a contest that's <b>Open</b>. As a player you request to enter and the host admits you; you'll show as <b>"Entered"</b>.</div>
+          <div class="expect"><b>Expect:</b> the contest lists buy-in, pool, lock time, payouts, and how many players have entered.</div>
+        </div></div>
+        <div class="step" style="--c1:#d946ef;--c2:#a78bfa"><div class="n">2</div><div class="body">
+          <h4>See the final table — 9 players, A–I</h4>
+          <div class="do">Each finalist (seats <b>A–I</b>) shows their <b>chip stack</b> and <b>ICM price</b>. Bigger stack = pricier.</div>
+          <div class="expect"><b>Expect:</b> exactly 9 finalists, each with a country flag, chip count, and big-blind count.</div>
+        </div></div>
+        <div class="step" style="--c1:#d946ef;--c2:#a78bfa"><div class="n">3</div><div class="body">
+          <h4>Draft 4 — stay under budget</h4>
+          <div class="do">Tap players to draft them. The header tracks <b>budget left</b> and <b>4/4 drafted</b>. You must pick exactly 4 and stay within budget; over-budget is blocked.</div>
+          <div class="expect"><b>Expect:</b> "Budget 9k / 100k left · 4/4 drafted" updates as you pick; a 5th pick or going over budget is rejected.</div>
+        </div></div>
+        <div class="step" style="--c1:#d946ef;--c2:#a78bfa"><div class="n">4</div><div class="body">
+          <h4>Lock — picks seal</h4>
+          <div class="do">At the lock time the draft closes. You can change picks <b>before</b> lock; after lock they're frozen and revealed.</div>
+          <div class="expect"><b>Expect:</b> after lock you can no longer edit your draft; the contest shows <b>Locked</b>.</div>
+        </div></div>
+        <div class="step" style="--c1:#d946ef;--c2:#a78bfa"><div class="n">5</div><div class="body">
+          <h4>Host enters the finishing order → scores compute</h4>
+          <div class="do">Once the real table finishes, the host enters who came 1st→9th. ClubR converts that to <b>finish points</b> and adds up each entrant's 4 picks.</div>
+          <div class="expect"><b>Expect:</b> your score = sum of your 4 players' finish points; the highest total wins the pool (split by payouts). E.g. "You finished 1st · 223 pts".</div>
+        </div></div>
+      </div>
+      <div class="why f"><div class="lbl">Why ClubR exists here</div><p>The finishing order is <b>public</b> and the picks were <b>sealed before lock</b> — so the result can't be rigged and nobody can copy a winning draft. ClubR just proves it.</p></div>
+    </div>
+    <figure class="sticky-shot">
+      <img class="shot" src="img/ft-draft.png" alt="FT Fantasy Stack Draft screen — the 9-player final table with chip stacks, the budget, 4 drafted players highlighted, and the finish-points scoring key" />
+      <figcaption>The Stack Draft screen — final table (A–I), budget, 4 drafted, and the scoring key.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ───────── LAST LONGER ───────── -->
+<section id="ll">
+  <div class="h2"><h2>🏟️ Last Longer</h2><span class="tag" style="background:var(--ll)">Survival pool</span></div>
+
+  <div class="concept" style="background:linear-gradient(160deg,rgba(245,158,11,.10),rgba(20,26,38,.4));border-color:rgba(245,158,11,.3)">
+    <div class="eyebrow" style="color:var(--ll)">What is this game?</div>
+    <h3>"Whoever lasts longest wins."</h3>
+    <p>On the club's own poker night, players add a small side-bet on top of the real game: everyone pays a buy-in into one <b>pool</b>, and <b>the player who survives the longest — i.e. busts out LAST — wins it</b>. It has nothing to do with who wins the actual tournament; it's purely about <b>survival</b>. The app is the live, public scoreboard of who's still in.</p>
+    <p class="analogy"><b>Analogy:</b> Last one standing. Like a "who can stay in the pool the longest" bet among friends — ClubR just keeps an honest, public count so nobody can fudge it.</p>
+  </div>
+
+  <div class="terms">
+    <div class="term"><div class="t">Chip count</div><div class="d">How many chips a player has right now. The board sorts by this — chip leader on top. Updated through the night.</div></div>
+    <div class="term"><div class="t">Bust / eliminated</div><div class="d">When a player runs out of chips they're "busted" (out). The host marks them out; they drop to the bottom with a bust time.</div></div>
+    <div class="term"><div class="t">Admit</div><div class="d">The host vets and admits each player onto the board (and marks them paid).</div></div>
+    <div class="term"><div class="t">Chop</div><div class="d">If the remaining players agree, they can split the pool instead of playing it out — a "chop". Needs everyone's agreement.</div></div>
+    <div class="term"><div class="t">The count</div><div class="d">The headcount of who's in vs out. ClubR makes it <b>public &amp; un-hideable</b> — the whole point.</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="steps">
+        <div class="step" style="--c1:#f59e0b;--c2:#fbbf24"><div class="n">1</div><div class="body">
+          <h4>Host opens the game; players join</h4>
+          <div class="do">Host sets buy-in &amp; payouts. Players request to join; the host <b>Admits</b> them (green dot once paid). Admitted players appear on the board.</div>
+          <div class="expect"><b>Expect:</b> a waiting player shows an <b>Admit</b> button; after admit they appear in the leaderboard.</div>
+        </div></div>
+        <div class="step" style="--c1:#f59e0b;--c2:#fbbf24"><div class="n">2</div><div class="body">
+          <h4>The live board — sorted by chips</h4>
+          <div class="do">Everyone still in is listed, <b>chip leader at the top</b>. Each row shows chips, paid status, and last-updated time. You can update your own chip count.</div>
+          <div class="expect"><b>Expect:</b> the list re-sorts when chip counts change; the "· N in · M out" header matches the board.</div>
+        </div></div>
+        <div class="step" style="--c1:#f59e0b;--c2:#fbbf24"><div class="n">3</div><div class="body">
+          <h4>Update chips through the night</h4>
+          <div class="do">As stacks change, players (or the host) update chip counts. The leaderboard re-orders live.</div>
+          <div class="expect"><b>Expect:</b> entering a new chip count and tapping <b>Update</b> moves the player up/down the board.</div>
+        </div></div>
+        <div class="step" style="--c1:#f59e0b;--c2:#fbbf24"><div class="n">4</div><div class="body">
+          <h4>Bust players as they're knocked out</h4>
+          <div class="do">When a player is eliminated, the host taps <b>Out</b> (or the player busts themselves). They move to the bottom, struck through, with a bust time.</div>
+          <div class="expect"><b>Expect:</b> busted players leave the active list and appear at the bottom as "busted Xm ago"; the "out" count goes up.</div>
+        </div></div>
+        <div class="step" style="--c1:#f59e0b;--c2:#fbbf24"><div class="n">5</div><div class="body">
+          <h4>Last one standing — or a chop</h4>
+          <div class="do">Play continues until one player remains (they win), or the remaining players <b>propose a chop</b> and all agree to split the pool.</div>
+          <div class="expect"><b>Expect:</b> a chop needs unanimous agreement; the winner / chop result and payouts (e.g. 50/30/20 for the last 3) are shown.</div>
+        </div></div>
+      </div>
+      <div class="why l"><div class="lbl">Why ClubR exists here</div><p>Run on paper/WhatsApp, a dishonest host could hide players and pocket the early-busted buy-ins. ClubR makes the <b>count public and un-hideable</b> — players see the true headcount the whole time.</p></div>
+    </div>
+    <figure class="sticky-shot">
+      <img class="shot" src="img/ll-board.png" alt="Last Longer live board — your chips, update and bust controls, propose-a-chop, and a leaderboard of active players sorted by chips with paid toggles, plus busted players struck through at the bottom" />
+      <figcaption>The live board — leaderboard by chips, paid toggles, admit/bust, chop, and busted players at the bottom.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ───────── SQUARES ───────── -->
+<section id="sq">
+  <div class="h2"><h2>🏈 Football Squares</h2><span class="tag" style="background:var(--sq);color:#06241a">Grid game</span></div>
+
+  <div class="concept" style="background:linear-gradient(160deg,rgba(52,211,153,.10),rgba(20,26,38,.4));border-color:rgba(52,211,153,.3)">
+    <div class="eyebrow" style="color:var(--sq)">What is this game?</div>
+    <h3>The classic Super Bowl grid — squares win by the score.</h3>
+    <p>A <b>10×10 grid</b> (100 squares) for a football game between two teams. Players <b>claim squares</b> before kickoff. Once the grid is full, each <b>row</b> and each <b>column</b> is secretly assigned a digit <b>0–9</b>. At the end of each scoring period (Q1, Q2, Q3, Final), you take the <b>last digit of each team's score</b> — those two digits point to one square on the grid, and <b>that square's owner wins</b> that period's payout.</p>
+    <p class="analogy"><b>Analogy:</b> A raffle that's decided by the scoreboard. You don't pick numbers — you pick squares; the game's score draws the "winning ticket" each quarter.</p>
+  </div>
+
+  <div class="terms">
+    <div class="term"><div class="t">The grid (10×10)</div><div class="d">100 squares. One team's digits run along the <b>top</b> (columns), the other down the <b>side</b> (rows).</div></div>
+    <div class="term"><div class="t">Claim</div><div class="d">Tap an empty square to claim it (costs one buy-in). You can claim several. Your claim is <b>pending</b> until the host approves it.</div></div>
+    <div class="term"><div class="t">Host approval</div><div class="d">The host taps a pending (amber) square to <b>approve</b> it — then it's <b>locked in</b> to that player.</div></div>
+    <div class="term"><div class="t">Hidden digits (provably fair)</div><div class="d">The 0–9 digits stay <b>"?" hidden</b> until the host <b>locks</b> the board. They're assigned by a provably-fair shuffle — nobody (not even the host) can rig which square gets which digits, and anyone can verify it later.</div></div>
+    <div class="term"><div class="t">Periods &amp; payouts</div><div class="d">Each period pays a share, e.g. <b>Q1 10% · Q2 10% · Q3 10% · Final 70%</b>.</div></div>
+    <div class="term"><div class="t">Winning cell</div><div class="d">At a period's end: side digit = one team's last score digit, top digit = the other's → the square where they cross wins.</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="steps">
+        <div class="step" style="--c1:#34d399;--c2:#22d3ee"><div class="n">1</div><div class="body">
+          <h4>Host opens a board for a matchup</h4>
+          <div class="do">Host creates a Squares game for a game (e.g. <b>Chiefs vs Eagles</b>), sets buy-in and the period payouts. Claiming opens.</div>
+          <div class="expect"><b>Expect:</b> a 10×10 grid with both teams labelled (one on the top axis, one on the side), and "N/100 squares" claimed.</div>
+        </div></div>
+        <div class="step" style="--c1:#34d399;--c2:#22d3ee"><div class="n">2</div><div class="body">
+          <h4>Players claim squares</h4>
+          <div class="do">Tap empty squares to claim. Each claim shows your initials and is <b>pending (amber)</b>. You owe buy-in × squares claimed.</div>
+          <div class="expect"><b>Expect:</b> tapping an empty square marks it pending with your initials; "owed" total = squares × buy-in.</div>
+        </div></div>
+        <div class="step" style="--c1:#34d399;--c2:#22d3ee"><div class="n">3</div><div class="body">
+          <h4>Host approves claims</h4>
+          <div class="do">The host taps each pending square (or "approve all") to lock claims in. An approved square belongs to that player.</div>
+          <div class="expect"><b>Expect:</b> approving a pending square turns it locked/owned; a claimed square can't be taken by someone else.</div>
+        </div></div>
+        <div class="step" style="--c1:#34d399;--c2:#22d3ee"><div class="n">4</div><div class="body">
+          <h4>Lock — the secret digits reveal</h4>
+          <div class="do">When claiming closes, the host <b>locks</b> the board. Only then do the 0–9 digits appear on the rows &amp; columns (assigned by the provably-fair shuffle).</div>
+          <div class="expect"><b>Expect:</b> the "?" headers become digits 0–9 only after lock; the assignment is fixed and verifiable.</div>
+        </div></div>
+        <div class="step" style="--c1:#34d399;--c2:#22d3ee"><div class="n">5</div><div class="body">
+          <h4>Enter scores → the winning square lights up</h4>
+          <div class="do">At each period's end the host enters the score. ClubR takes each team's <b>last digit</b>, finds the crossing square, and that owner wins the period's payout.</div>
+          <div class="expect"><b>Expect:</b> e.g. score 17–24 → side digit 7, top digit 4 → the (7,4) square's owner wins that period's % of the pool.</div>
+        </div></div>
+      </div>
+      <div class="why s"><div class="lbl">Why ClubR exists here</div><p>The digit assignment is <b>provably fair</b> (a committed random seed → deterministic shuffle), so it can't be rigged, and the grid/claims are public. The scoreboard decides — not the host.</p></div>
+    </div>
+    <figure class="sticky-shot">
+      <img class="shot" src="img/sq-board.png" alt="Football Squares board — a 10x10 grid with claimed squares shown by player initials, hidden ? digits on the row and column headers until lock, and the period payouts Q1/Q2/Q3/Final below" />
+      <figcaption>The board — 10×10 grid, claimed squares (initials), hidden "?" digits until lock, and period payouts.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ───────── CHECKLIST ───────── -->
+<section id="checklist">
+  <div class="h2"><h2>✅ Quick test checklist</h2></div>
+  <p class="lead">Only start testing a game once the section above makes sense. Then sanity-check these per game.</p>
+  <div class="terms" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+    <div class="panel accent" style="--c:var(--ftf);margin:0"><h3>🎯 FT Fantasy</h3>
+      <ul class="clean check"><li>Final table shows exactly <b>9</b> players with stacks &amp; prices</li><li>Can draft <b>4</b> within budget; over-budget / 5th pick is blocked</li><li>Draft is editable <b>before</b> lock, frozen <b>after</b></li><li>Score = sum of your 4 players' finish points</li><li>Highest total wins; pool splits by payouts</li></ul>
+    </div>
+    <div class="panel accent" style="--c:var(--ll);margin:0"><h3>🏟️ Last Longer</h3>
+      <ul class="clean check"><li>Host can <b>admit</b> waiting players (paid = green)</li><li>Board sorts by chips; updates re-order it</li><li>Busting moves a player to the bottom with a time</li><li>"in / out" counts match the board</li><li>Chop needs <b>unanimous</b> agreement</li></ul>
+    </div>
+    <div class="panel accent" style="--c:var(--sq);margin:0"><h3>🏈 Football Squares</h3>
+      <ul class="clean check"><li>Claiming a square marks it <b>pending</b> with your initials</li><li>Host <b>approval</b> locks the claim in</li><li>Digits stay <b>"?"</b> until lock, then reveal</li><li>Score's last digits pick the winning square</li><li>Period payouts (e.g. 10/10/10/70) add up to 100%</li></ul>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer><div class="wrap">
+  ClubR QA Game Guide · screenshots from the ClubR prototype (mock data) · the app is the scorekeeper — it proves the count &amp; result, and never touches the cash.
+</div></footer>
+
+<script>
+  // active nav highlight on scroll
+  const links=[...document.querySelectorAll('nav a[href^="#"]')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.toggle('active', l.getAttribute('href')==='#'+e.target.id))}})},{rootMargin:'-45% 0px -50% 0px'});
+  secs.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
