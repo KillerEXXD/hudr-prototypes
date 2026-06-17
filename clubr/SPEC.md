@@ -535,6 +535,16 @@ design is below.
 **Key constraint:** a Telegram bot **cannot silently force-add** a user to a channel — the user must
 tap/join and the bot approves the request. So "auto-join" = **one-tap, bot-approved for approved members**.
 
+**Opt-in at club creation → deferred guided setup (validated):** the **Create a club** sheet has a
+single-screen **"Telegram channel for members"** toggle (with the member-benefit blurb). Telegram does
+**not** let a bot create a channel, so choosing it doesn't auto-create one — instead the new club page
+shows a host-only **"Finish Telegram setup"** card: (1) create a **private broadcast channel**, (2) add
+**`@ClubrAdminBot`** as admin, (3) tap connect — the bot then makes the approval invite link, stores the
+channel, and manages approvals/removals/auto-posts. Once connected it collapses to a subtle "Telegram
+channel connected" line and the member `TelegramJoinChip` lights up. **Channel type = broadcast.**
+**Auto-posts = new games · results (winner, no settlement $) · monthly leaderboard recaps.** Data:
+`Club.telegramSetupPending` (set when the host opts in, cleared on connect).
+
 **Prototype (this build):** `telegramServices` mocks connect/disconnect channel, link account, and the
 approval-gated join (auto-approves an approved+linked member). UI: the host *Telegram channel* panel and
 the big member *Join our Telegram* card remain **hidden** behind `TELEGRAM_ENABLED` while the real bot is

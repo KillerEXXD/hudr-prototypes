@@ -66,6 +66,9 @@ export interface Club {
   members: ClubMember[]
   /** Connected Telegram broadcast channel (host-linked). Members join after approval. */
   telegram?: ClubTelegram
+  /** Host opted into a Telegram channel at club creation but hasn't finished
+   *  connecting it yet → the club page shows a "Finish Telegram setup" card. */
+  telegramSetupPending?: boolean
 }
 
 /** A club enriched with the current user's relationship to it. */

@@ -82,6 +82,49 @@ export function TelegramJoinCard({ clubId }: { clubId: string }) {
   )
 }
 
+// Host-facing guided "Finish Telegram setup" — shown on the club page when the host
+// opted into a channel at club creation but hasn't connected it yet. The bot can't
+// create the channel (Telegram disallows it), so the host makes it + adds the bot;
+// ClubR/bot then wires up the invite link, approvals and auto-posts. Once connected,
+// collapses to a subtle "connected" confirmation.
+export function TelegramSetupCard({ clubId, canManage, pending }: { clubId: string; canManage: boolean; pending?: boolean }) {
+  const { data: st } = useClubTelegram(clubId)
+  const connect = useConnectChannel(clubId)
+  if (!canManage) return null
+
+  if (st?.channel) {
+    return (
+      <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] text-text-muted">
+        <Send className="h-3 w-3 text-accent-blue" />
+        <span className="inline-flex items-center gap-0.5 text-accent-emerald"><Check className="h-3 w-3" />Telegram channel connected</span>
+        <span>· members can join from here</span>
+      </div>
+    )
+  }
+
+  if (!pending) return null
+  return (
+    <Card className="mt-3 border-accent-blue/30 bg-accent-blue/5">
+      <div className="flex items-center gap-2">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-blue/15 text-accent-blue"><Send className="h-4 w-4" /></span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold text-text-primary">Finish Telegram setup</p>
+          <p className="text-[11px] text-text-muted">Give members new-game, results &amp; leaderboard alerts — and one-tap join.</p>
+        </div>
+      </div>
+      <ol className="mt-2.5 flex flex-col gap-1 text-[11px] leading-snug text-text-secondary">
+        <li><b className="text-text-primary">1.</b> In Telegram, create a <b>private broadcast channel</b>.</li>
+        <li><b className="text-text-primary">2.</b> Add <b className="font-mono">@ClubrAdminBot</b> as an <b>admin</b>.</li>
+        <li><b className="text-text-primary">3.</b> Tap below — we detect it and wire up join + auto-posts.</li>
+      </ol>
+      <Btn size="sm" className="mt-2.5 w-full" disabled={connect.isPending} onClick={() => connect.mutate({ link: `https://t.me/+clubr_${clubId}`, title: '' })}>
+        <Check className="h-3.5 w-3.5" />{connect.isPending ? 'Connecting…' : "I've added the bot — connect"}
+      </Btn>
+      <p className="mt-1.5 text-[10px] leading-snug text-text-muted">@ClubrAdminBot creates the invite link and manages approvals/removals — you never touch channel settings. <i>(Prototype — the real bot detects the channel automatically.)</i></p>
+    </Card>
+  )
+}
+
 // Host-facing (Members tab): connect / manage the club's Telegram broadcast channel.
 export function TelegramHostPanel({ clubId }: { clubId: string }) {
   const { data: st } = useClubTelegram(clubId)

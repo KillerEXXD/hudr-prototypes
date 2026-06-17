@@ -21,7 +21,7 @@ const isApprovedMember = (clubId: string, userId: string) =>
 export async function connectChannel(clubId: string, link: string, title: string): Promise<void> {
   await delay(120)
   const c = CLUBS.find((x) => x.id === clubId)
-  if (c) c.telegram = { link: link.trim(), title: title.trim() || `${c.name} channel` }
+  if (c) { c.telegram = { link: link.trim(), title: title.trim() || `${c.name} channel` }; c.telegramSetupPending = false }
 }
 export async function disconnectChannel(clubId: string): Promise<void> {
   await delay(120)

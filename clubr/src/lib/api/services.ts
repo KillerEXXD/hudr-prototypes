@@ -110,7 +110,7 @@ export async function joinViaInvite(code: string, userId: string): Promise<ClubV
   return c && c.visibility !== 'private' ? toView(c, userId, false) : null
 }
 
-export async function createClub(input: { name: string; emoji: string; description: string; location?: string; visibility?: 'public' | 'private' }, userId: string): Promise<ClubView> {
+export async function createClub(input: { name: string; emoji: string; description: string; location?: string; visibility?: 'public' | 'private'; telegram?: boolean }, userId: string): Promise<ClubView> {
   await delay()
   const u = USERS[userId]
   const visibility = input.visibility ?? 'public'
@@ -127,6 +127,8 @@ export async function createClub(input: { name: string; emoji: string; descripti
     inviteCode: codeFor(input.name, visibility),
     createdAt: today(),
     members: [buildMember(userId, 'owner', 'member')],
+    // Opted into Telegram at creation → club page shows "Finish Telegram setup".
+    telegramSetupPending: input.telegram === true,
   }
   CLUBS.unshift(club)
   return toView(club, userId, false)

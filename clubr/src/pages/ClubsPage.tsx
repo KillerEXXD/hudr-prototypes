@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react'
-import { Plus, Ticket, Users, Globe, Lock } from 'lucide-react'
+import { Plus, Ticket, Users, Globe, Lock, Send } from 'lucide-react'
 import { useMyClubs, useRecentClubs, useCreateClub, useJoinViaInvite } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { useEconomy } from '@/hooks/credits'
@@ -24,6 +24,7 @@ export function ClubsPage() {
   const [desc, setDesc] = useState('')
   const [loc, setLoc] = useState('')
   const [visibility, setVisibility] = useState<'public' | 'private'>('public')
+  const [telegram, setTelegram] = useState(false)
   const [code, setCode] = useState('')
   const [joinMsg, setJoinMsg] = useState('')
 
@@ -80,7 +81,16 @@ export function ClubsPage() {
               ? 'Discoverable — shows up in Discover and search, and people can request to join.'
               : 'Hidden — invite-only. Not discoverable or searchable, and a direct link reveals nothing. You share a private code; only invited people can request.'}</p>
           </div>
-          <Btn className="w-full" disabled={!name.trim() || !loc.trim() || create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; await create.mutateAsync({ name, emoji, description: desc, location: loc, visibility }); setCreateOpen(false); setName(''); setDesc(''); setLoc(''); setVisibility('public') }}>
+          <button type="button" onClick={() => setTelegram((v) => !v)} className={cn('flex items-start gap-2.5 rounded-xl border p-2.5 text-left transition-colors cursor-pointer', telegram ? 'border-accent-blue bg-accent-blue/5' : 'border-border hover:bg-bg-surface')}>
+            <span className={cn('mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', telegram ? 'bg-accent-blue/15 text-accent-blue' : 'bg-bg-surface text-text-muted')}><Send className="h-4 w-4" /></span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-1.5 text-sm font-bold text-text-primary">Telegram channel for members
+                <span className={cn('ml-auto flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors', telegram ? 'justify-end bg-accent-blue' : 'justify-start bg-border')}><span className="h-3 w-3 rounded-full bg-white" /></span>
+              </span>
+              <span className="mt-0.5 block text-[11px] leading-snug text-text-muted">Members get instant alerts for <b className="text-text-secondary">new games, results & monthly leaderboard recaps</b> — and one-tap join, auto-managed. You'll connect it in ~30 seconds after creating the club.</span>
+            </span>
+          </button>
+          <Btn className="w-full" disabled={!name.trim() || !loc.trim() || create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; await create.mutateAsync({ name, emoji, description: desc, location: loc, visibility, telegram }); setCreateOpen(false); setName(''); setDesc(''); setLoc(''); setVisibility('public'); setTelegram(false) }}>
             Create club â€” you're the host Â· {createClubCost} cr
           </Btn>
           <p className="text-center text-[11px] text-text-muted">You'll own it, get an invite code, and approve who joins.</p>

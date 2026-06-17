@@ -63,7 +63,7 @@ export function useJoinViaInvite() {
 export function useCreateClub() {
   const { userId } = useIdentity()
   const invalidate = useInvalidateClubs()
-  return useMutation({ mutationFn: (input: { name: string; emoji: string; description: string; location?: string; visibility?: 'public' | 'private' }) => api.createClub(input, userId), onSuccess: invalidate })
+  return useMutation({ mutationFn: (input: { name: string; emoji: string; description: string; location?: string; visibility?: 'public' | 'private'; telegram?: boolean }) => api.createClub(input, userId), onSuccess: invalidate })
 }
 
 export function useSetClubVisibility() {

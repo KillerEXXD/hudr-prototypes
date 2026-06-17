@@ -7,7 +7,7 @@ import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState } 
 import { MembershipBadge } from '@/components/common/cards'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { LeaderboardSection } from '@/components/leaderboard/LeaderboardSection'
-import { TelegramJoinChip, TelegramHostPanel } from '@/components/telegram/ClubTelegram'
+import { TelegramJoinChip, TelegramSetupCard, TelegramHostPanel } from '@/components/telegram/ClubTelegram'
 import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
@@ -77,6 +77,8 @@ export function ClubDetailPage() {
       {/* Subtle, member-only Telegram join — self-hides unless you're an admitted
           member of a club that has a channel. */}
       <div><TelegramJoinChip clubId={club.id} /></div>
+      {/* Host-only: finish the Telegram setup they opted into at club creation. */}
+      <TelegramSetupCard clubId={club.id} canManage={club.canManage} pending={club.telegramSetupPending} />
 
       {/* Host actions — compact, near the club name (above the tabs) */}
       {club.canManage && (
