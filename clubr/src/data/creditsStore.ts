@@ -60,6 +60,6 @@ function seedSpend(userId: string, items: [CreditTxnKind, string, number][]) {
     LEDGER[userId].unshift(txn(kind, label, -amt, BALANCES[userId]))
   }
 }
-seedSpend('u_host', [['create_club', 'Created Aces High', 200], ['host_game', 'Hosted Sunday Squares', 100], ['host_game', 'Hosted WSOP Main FT', 100]]) // 1000 → 600
+seedSpend('u_host', [['create_club', 'Created Aces High', 200], ['host_game', 'Hosted Sunday Squares', 100], ['host_game', 'Hosted Lodge Championship FT', 100]]) // 1000 → 600
 seedSpend('u_player', [['join', 'Joined Cowboys @ Niners Squares', 100]]) // 1000 → 900
 ensureWallet('u_mike'); ensureWallet('u_tom'); ensureWallet('u_jordan')

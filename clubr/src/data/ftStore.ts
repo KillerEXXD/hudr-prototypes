@@ -71,9 +71,9 @@ const cmsg = (userId: string, text: string, ts: string, kind: 'user' | 'system' 
 
 export const FT_CONTESTS: FTContest[] = [
   {
-    id: 'ct_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'WSOP Online — Main FT',
+    id: 'ct_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Lodge Championship — Main Event FT',
     status: 'open', stake: 100, budget: 100000, locksAt: 'in 1h 05m',
-    room: 'WSOP Online', prizePool: '$2,400,000', buyIn: '$1,000', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@WSOP/streams', streamLive: false,
+    room: 'The Lodge', prizePool: '$1,000,000', buyIn: '$1,100', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@TheLodgeCardClub/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
@@ -86,10 +86,10 @@ export const FT_CONTESTS: FTContest[] = [
     chat: [cmsg('u_host', 'Locks in an hour — get your drafts in 🃏', '7:42p'), cmsg('u_mike', 'Loaded up on short stacks 😅', '7:45p')],
   },
   {
-    id: 'ct_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'PokerGO Cup — Event 7 FT',
+    id: 'ct_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'TCH Dallas — Deepstack Main FT',
     visibility: 'private', accessUserIds: ['u_gary', 'u_lena', 'u_player'],
     status: 'open', stake: 250, budget: 100000, locksAt: 'in 3h 40m',
-    room: 'PokerGO', prizePool: '$1,065,000', buyIn: '$10,000', level: '30k / 60k · 60k ante', streamUrl: 'https://www.youtube.com/@PokerGO/streams', streamLive: false,
+    room: 'Texas Card House', prizePool: '$365,000', buyIn: '$400', level: '30k / 60k · 60k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
@@ -100,18 +100,18 @@ export const FT_CONTESTS: FTContest[] = [
     chat: [cmsg('u_gary', 'Big stake tonight — good luck all', '6:10p')],
   },
   {
-    id: 'ct_c', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Triton — Short Deck FT',
+    id: 'ct_c', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Lone Star Poker Series — Bounty FT',
     status: 'open', stake: 100, budget: 100000, locksAt: 'in 5h 20m',
-    room: 'Triton', prizePool: '$6,200,000', buyIn: '$50,000', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@TritonPoker/streams', streamLive: false,
+    room: 'Champions Club', prizePool: '$500,000', buyIn: '$600', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [entry('u_lena', 'approved', true)],
     chat: [],
   },
   {
-    id: 'ct_d', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', ftName: 'EPT Monte Carlo FT',
+    id: 'ct_d', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', ftName: 'Lodge Poker Series — Main Event FT',
     status: 'settled', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-05-15',
-    room: 'EPT', prizePool: '$5,100,000', buyIn: '$5,300', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@PokerStars/streams', streamLive: false,
+    room: 'The Lodge', prizePool: '$750,000', buyIn: '$1,100', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TheLodgeCardClub/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     finishingOrder: ['C', 'F', 'A', 'H', 'B', 'E', 'I', 'D', 'G'],
@@ -124,9 +124,9 @@ export const FT_CONTESTS: FTContest[] = [
     chat: [cmsg('u_gary', 'GG everyone — Mike runs it', '11:20p', 'system')],
   },
   {
-    id: 'ct_h', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'GG Super MILLION$ FT',
+    id: 'ct_h', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Trailblazer Poker Tour — High Roller FT',
     status: 'locked', stake: 100, budget: 100000, locksAt: 'locked · plays in 25m',
-    room: 'GGPoker', prizePool: '$1,800,000', buyIn: '$10,300', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@GGPoker/streams', streamLive: true,
+    room: 'Texas Card House', prizePool: '$1,000,000', buyIn: '$2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: true,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
@@ -137,9 +137,9 @@ export const FT_CONTESTS: FTContest[] = [
     chat: [cmsg('u_gary', 'Locked! Cards in the air soon 🔒', '9:05p', 'system')],
   },
   {
-    id: 'ct_i', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'partypoker MILLIONS FT',
+    id: 'ct_i', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Summer Poker Open — High Roller FT',
     status: 'locked', stake: 250, budget: 100000, locksAt: 'locked · plays in 12m',
-    room: 'partypoker', prizePool: '$5,000,000', buyIn: '$10,300', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@partypokerTV/streams', streamLive: true,
+    room: 'Champions Club', prizePool: '$1,000,000', buyIn: '$2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: true,
     hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
@@ -150,9 +150,9 @@ export const FT_CONTESTS: FTContest[] = [
   },
   // ---- Completed (settled) — POINTS format: top 3 split the pot ----
   {
-    id: 'ct_j', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'WSOP Main Event — Final Table',
+    id: 'ct_j', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Lodge Championship — Final Table',
     status: 'settled', format: 'points', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-06-08',
-    room: 'WSOP', prizePool: '$10,000,000', buyIn: '$10,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@WSOP/streams', streamLive: false,
+    room: 'The Lodge', prizePool: '$1,500,000', buyIn: '$1,700', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TheLodgeCardClub/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
     finishingOrder: ['A', 'C', 'B', 'F', 'D', 'I', 'E', 'G', 'H'],
@@ -168,9 +168,9 @@ export const FT_CONTESTS: FTContest[] = [
   },
   // ---- Completed (settled) — WINNER TAKES ALL: only 1st is paid ----
   {
-    id: 'ct_k', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Triton Invitational — High Roller FT',
+    id: 'ct_k', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Winter Poker Open — High Roller FT',
     status: 'settled', format: 'winner_takes_all', stake: 500, budget: 100000, locksAt: 'settled', settledAt: '2026-05-18',
-    room: 'Triton', prizePool: '$8,900,000', buyIn: '$100,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TritonPoker/streams', streamLive: false,
+    room: 'Champions Club', prizePool: '$1,000,000', buyIn: '$5,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
     finishingOrder: ['B', 'A', 'H', 'C', 'I', 'D', 'E', 'F', 'G'],

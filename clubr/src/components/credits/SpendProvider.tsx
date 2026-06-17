@@ -11,7 +11,7 @@ import type { CreditTxnKind } from '@/types/credits'
 export interface SpendRequest {
   cost: number
   kind: CreditTxnKind
-  label: string        // ledger line, e.g. 'Joined WSOP Main FT'
+  label: string        // ledger line, e.g. 'Joined Lodge Championship FT'
   title: string        // sheet heading, e.g. 'Join this contest'
   verb?: string        // confirm verb, e.g. 'Join' (default 'Confirm')
 }

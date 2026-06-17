@@ -51,10 +51,10 @@ export function CreateFTSheet({ open, onClose }: { open: boolean; onClose: () =>
       </button>
 
       <div className="flex flex-col gap-2.5">
-        <Field label="Event name" value={m.name} onChange={(v) => setM({ ...m, name: v })} placeholder="WSOP Main Event — Final Table" />
+        <Field label="Event name" value={m.name} onChange={(v) => setM({ ...m, name: v })} placeholder="Lone Star Poker Series — Main Event FT" />
         <div className="grid grid-cols-2 gap-2">
-          <Field label="Room / operator" value={m.room} onChange={(v) => setM({ ...m, room: v })} placeholder="WSOP" />
-          <Field label="When" value={m.date} onChange={(v) => setM({ ...m, date: v })} placeholder="Today · 8:00pm ET" />
+          <Field label="Room / operator" value={m.room} onChange={(v) => setM({ ...m, room: v })} placeholder="Champions Club" />
+          <Field label="When" value={m.date} onChange={(v) => setM({ ...m, date: v })} placeholder="Today · 8:00pm CT" />
         </div>
         <div className="grid grid-cols-3 gap-2">
           <Field label="Starts in" value={m.startsIn} onChange={(v) => setM({ ...m, startsIn: v })} placeholder="in 2h" />
