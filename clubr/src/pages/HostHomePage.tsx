@@ -1,28 +1,45 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Home, Trophy, Clock, ChevronRight, Crown, Users } from 'lucide-react'
-import { useContests, useAvailableFTs } from '@/hooks/ft'
-import { useGames } from '@/hooks/ll'
+import { Home, Trophy, Clock, ChevronRight, Crown, Users, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { useAvailableFTs } from '@/hooks/ft'
+import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Badge, Section, Spinner } from '@/components/common/ui'
-import { ContestRow } from '@/pages/FantasyPage'
-import { GameRow } from '@/pages/LastLongerPage'
+import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
+import { renderUnifiedGame } from '@/games/renderGame'
+import { GAME_TYPES, type GameType } from '@/games/types'
+import { cn } from '@/lib/utils/cn'
+import type { MemberRole } from '@/types'
 
-// Club Host home. Three things at a glance: the App-Admin FT slate you can host
-// (compact cards → the Host page), then your active games split into the clubs
-// YOU run vs other clubs you're a member of. Completed games stay on their tabs.
+const GAMES_CAP = 4
+
+function FilterChip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
+  return (
+    <button type="button" onClick={onClick} className={cn('flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? activeClass : 'border-border font-semibold text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
+  )
+}
+
+// Club Host home. The App-Admin FT slate you can host, then your active games —
+// the ones you RUN (owner/co-host) split from other clubs you're just in.
+// All game types in one place (FT Fantasy, Last Longer, Squares).
 export function HostHomePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const contests = useContests()
-  const games = useGames()
   const fts = useAvailableFTs()
+  const myClubs = useMyClubs()
+  const { items, isLoading: gamesLoading } = useUnifiedGames()
+  const [filter, setFilter] = useState<'all' | GameType>('all')
 
-  const activeFt = (contests.data ?? []).filter((c) => c.status !== 'settled')
-  const activeLl = (games.data ?? []).filter((g) => g.status !== 'completed')
-  const yourFt = activeFt.filter((c) => c.canManage)
-  const otherFt = activeFt.filter((c) => !c.canManage)
-  const yourLl = activeLl.filter((g) => g.canManage)
-  const otherLl = activeLl.filter((g) => !g.canManage)
+  // Role per club — chips show owner/co-host on the games you run.
+  const roleByClub = new Map<string, MemberRole>()
+  for (const c of myClubs.data ?? []) if (c.myStatus === 'member' && c.myRole) roleByClub.set(c.id, c.myRole)
+
+  const active = items.filter((g) => !g.finished)
+  const yours = active.filter((g) => g.canManage)
+  const others = active.filter((g) => !g.canManage)
+  const typesPresent = GAME_TYPES.filter((t) => yours.some((g) => g.type === t.id))
+  const yoursShown = yours.filter((g) => matchesType(g, filter))
+  const yoursTop = yoursShown.slice(0, GAMES_CAP)
 
   return (
     <div className="animate-fade-up">
@@ -54,25 +71,27 @@ export function HostHomePage() {
         </button>
       </Section>
 
-      {/* ---- Active games in your clubs (games you run) ---- */}
-      <Section title="Active games in your clubs">
-        {yourFt.length + yourLl.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-border bg-bg-card/50 px-3 py-4 text-center text-xs text-text-muted">Nothing live in your club right now. Host an FT above, or start a Last Longer.</p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {yourFt.map((c) => <ContestRow key={c.id} c={c} showType />)}
-            {yourLl.map((g) => <GameRow key={g.id} g={g} showType />)}
+      {/* ---- Active games in your clubs (games you run) — all types, capped ---- */}
+      <Section title="Active games in your clubs" action={yoursShown.length > GAMES_CAP ? <button type="button" onClick={() => navigate('/games')} className="text-xs font-semibold text-accent-blue cursor-pointer">See all →</button> : undefined}>
+        {typesPresent.length > 1 && (
+          <div className="mb-2 flex gap-1.5 overflow-x-auto no-scrollbar">
+            <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
+            {typesPresent.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.label} icon={t.icon} activeClass={t.chipActive} />)}
           </div>
+        )}
+        {gamesLoading ? (
+          <Spinner />
+        ) : yoursTop.length > 0 ? (
+          <div className="flex flex-col gap-2">{yoursTop.map((g) => renderUnifiedGame(g, true, roleByClub.get(g.clubId)))}</div>
+        ) : (
+          <p className="rounded-xl border border-dashed border-border bg-bg-card/50 px-3 py-4 text-center text-xs text-text-muted">{yours.length > 0 ? 'Nothing of that type right now.' : 'Nothing live in your club right now. Host an FT above, or start a Last Longer.'}</p>
         )}
       </Section>
 
-      {/* ---- Other clubs you're a member of ---- */}
-      {otherFt.length + otherLl.length > 0 && (
+      {/* ---- Other clubs you're a member of (all types) ---- */}
+      {others.length > 0 && (
         <Section title="Other clubs you're in" action={<Badge tone="neutral"><Users className="h-3 w-3" />member</Badge>}>
-          <div className="flex flex-col gap-2">
-            {otherFt.map((c) => <ContestRow key={c.id} c={c} showType />)}
-            {otherLl.map((g) => <GameRow key={g.id} g={g} showType />)}
-          </div>
+          <div className="flex flex-col gap-2">{others.map((g) => renderUnifiedGame(g, true, roleByClub.get(g.clubId)))}</div>
         </Section>
       )}
     </div>
