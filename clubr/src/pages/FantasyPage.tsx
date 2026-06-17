@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Target, Clock, Lock, CheckCircle2, Eye, Shield, Plus, Trophy, UserPlus, HelpCircle } from 'lucide-react'
 import { useContests, useRequestEnter } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
-import { Badge, Btn, Card, Section, Spinner, EmptyState, Sheet } from '@/components/common/ui'
+import { Badge, Btn, Card, Section, Spinner, EmptyState, Sheet, RoleChip } from '@/components/common/ui'
+import type { MemberRole } from '@/types'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { StakePool } from '@/components/common/StakePool'
 import { PayoutBadge } from '@/components/common/GameSetup'
@@ -32,12 +33,12 @@ function CardJoinFT({ c }: { c: FTContestView }) {
   )
 }
 
-export function ContestRow({ c, showType }: { c: FTContestView; showType?: boolean }) {
+export function ContestRow({ c, showType, clubRole }: { c: FTContestView; showType?: boolean; clubRole?: MemberRole }) {
   const navigate = useNavigate()
   const s = c.status === 'open' ? { tone: 'blue' as const, icon: Clock, label: 'Open' } : c.status === 'locked' ? { tone: 'amber' as const, icon: Lock, label: 'Locked' } : { tone: 'neutral' as const, icon: CheckCircle2, label: 'Settled' }
   return (
     <Card onClick={() => navigate(`/fantasy/${c.id}`)} className="p-3.5">
-      {showType && <div className="mb-2"><span className="inline-flex items-center gap-1.5 rounded-md bg-accent-purple px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Target className="h-3.5 w-3.5" />FT Fantasy</span></div>}
+      {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-purple px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Target className="h-3.5 w-3.5" />FT Fantasy</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span><span className="truncate">{c.clubName}</span></div>
         <div className="flex shrink-0 items-center gap-1.5">

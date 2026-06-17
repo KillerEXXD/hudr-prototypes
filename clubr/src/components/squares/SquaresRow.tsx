@@ -1,18 +1,19 @@
 import { useNavigate } from 'react-router-dom'
 import { Grid3x3, Lock, Trophy } from 'lucide-react'
-import { Badge, Card } from '@/components/common/ui'
+import { Badge, Card, RoleChip } from '@/components/common/ui'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { StakePool } from '@/components/common/StakePool'
 import type { SquaresGameView } from '@/types/squares'
+import type { MemberRole } from '@/types'
 
-export function SquaresRow({ g, showType }: { g: SquaresGameView; showType?: boolean }) {
+export function SquaresRow({ g, showType, clubRole }: { g: SquaresGameView; showType?: boolean; clubRole?: MemberRole }) {
   const navigate = useNavigate()
   const s = g.status === 'live'
     ? { tone: 'green' as const, label: '● Live' }
     : g.status === 'registration' ? { tone: 'blue' as const, label: 'Claiming open' } : { tone: 'neutral' as const, label: 'Completed' }
   return (
     <Card onClick={() => navigate(`/squares/${g.id}`)} className="p-3.5">
-      {showType && <div className="mb-2"><span className="inline-flex items-center gap-1.5 rounded-md bg-accent-emerald px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Grid3x3 className="h-3.5 w-3.5" />Football Squares</span></div>}
+      {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-emerald px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Grid3x3 className="h-3.5 w-3.5" />Football Squares</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted">
           <span className="text-base">{g.clubEmoji}</span><span className="truncate">{g.clubName}</span>
