@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom'
 import { type ReactNode } from 'react'
-import { X, Loader2, Crown, Shield, UserCheck } from 'lucide-react'
+import { X, Loader2, Crown, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 // ---- Avatar ----
@@ -36,9 +36,9 @@ export function Badge({ children, tone = 'neutral', className }: { children: Rea
 const CLUB_ROLE = {
   owner: { label: 'Owner', Icon: Crown, cls: 'bg-accent-amber/15 text-accent-amber' },
   host: { label: 'Co-host', Icon: Shield, cls: 'bg-accent-blue/15 text-accent-blue' },
-  member: { label: 'Member', Icon: UserCheck, cls: 'bg-bg-surface text-text-secondary' },
 } as const
 export function RoleChip({ role, className }: { role: 'owner' | 'host' | 'member'; className?: string }) {
+  if (role === 'member') return null // default role — no chip
   const m = CLUB_ROLE[role]
   return <span className={cn('inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold', m.cls, className)}><m.Icon className="h-2.5 w-2.5" />{m.label}</span>
 }
