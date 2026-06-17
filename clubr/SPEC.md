@@ -402,7 +402,11 @@ header already shows "N members · hosted by X", so there's no member list for n
 actions are a compact row under the club title** (above the tabs): an **Invite** button (opens a small
 sheet with the code + copy) and **New game**. The **join‑request queue lives in the Members tab**,
 which **badges the pending count** so new requests aren't missed. Both player and host club pages stay
-a clean **header → (host actions) → tabs → content**.
+a clean **header → (host actions) → tabs → content**. The **Games tab's content sits in a panel that
+connects flush to the tab bar** (the bar's bottom border is the seam, corners squared to meet it), so
+the **per‑type filter chips read as belonging to Games**: a **funnel icon + `All · FTF · LL · Squares`
+row** sits at the top of the panel above a hairline divider, with the game cards in the same tray.
+Built from theme tokens (`bg-bg-card/40`, `border-border`) → subtle and correct in every skin.
 
 - **The formula (field‑scaled, top‑heavy):** `points = round(B × √N ÷ √rank × weight)`, where **N**
   = number of participants and **rank** = the player's finish (1 = best). `√N` makes a **bigger

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, Filter } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin, useJoinViaInvite, useSetClubVisibility } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
@@ -100,7 +100,7 @@ export function ClubDetailPage() {
       {/* Tabs — Games / Leaderboard for everyone; Members for host & admin only.
           The host's invite link + join requests live inside the Members tab to keep
           this page uncluttered (the Members tab badges the pending count). */}
-      <div className="mt-4 flex gap-1 rounded-xl border border-border bg-bg-card p-1">
+      <div className={cn('mt-4 flex gap-1 rounded-xl border border-border bg-bg-card p-1', tab === 'games' && 'rounded-b-none')}>
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -115,11 +115,14 @@ export function ClubDetailPage() {
         ))}
       </div>
 
-      {/* Games tab — all types in one place (club = container) */}
+      {/* Games tab — all types in one place (club = container). The filter chips +
+          game list live in one panel that connects flush to the tab bar above (its
+          bottom border is the seam), so the filters read as "the Games tab's". */}
       {tab === 'games' && (
-        <div className="mt-3">
+        <div className="rounded-b-xl border border-t-0 border-border bg-bg-card/40 p-2.5">
           {typesPresent.length > 1 && (
-            <div className="mb-2 flex flex-wrap gap-1.5">
+            <div className="mb-2.5 flex flex-wrap items-center gap-1.5 border-b border-border/60 pb-2.5">
+              <Filter className="h-3.5 w-3.5 shrink-0 text-text-muted" />
               <button type="button" onClick={() => setGameFilter('all')} className={cn('rounded-full border px-2.5 py-0.5 text-xs cursor-pointer transition-colors', gameFilter === 'all' ? 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' : 'border-border font-semibold text-text-secondary')}>All</button>
               {typesPresent.map((t) => (
                 <button key={t.id} type="button" onClick={() => setGameFilter(t.id)} className={cn('flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs cursor-pointer transition-colors', gameFilter === t.id ? t.chipActive : 'border-border font-semibold text-text-secondary')}><t.icon className="h-3 w-3" />{t.short}</button>
