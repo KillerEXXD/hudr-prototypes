@@ -18,6 +18,19 @@ export interface User {
   location?: string
   role: AccountRole
   avatarColor: string
+  /** Telegram handle once the user links their Telegram account to ClubR (mock). */
+  telegramHandle?: string
+}
+
+/** A club's connected Telegram broadcast channel (host adds @ClubRBot as admin). */
+export interface ClubTelegram { link: string; title: string }
+
+/** The viewer's relationship to a club's Telegram channel (drives the join card). */
+export interface TelegramStatus {
+  channel: ClubTelegram | null // the club's connected channel (null if none)
+  linked: boolean              // the viewer has connected their Telegram to ClubR
+  joined: boolean              // the viewer is in the channel
+  canJoin: boolean             // the viewer is an APPROVED club member (the gate)
 }
 
 /** A member's standing inside one club. */
@@ -51,6 +64,8 @@ export interface Club {
   inviteCode: string
   createdAt: string
   members: ClubMember[]
+  /** Connected Telegram broadcast channel (host-linked). Members join after approval. */
+  telegram?: ClubTelegram
 }
 
 /** A club enriched with the current user's relationship to it. */

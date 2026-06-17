@@ -493,3 +493,36 @@ fully hidden** — and a direct URL must never reveal whether a private club exi
 - **Graduation (real app):** add `visibility` to `clubs` + a `getClub` that returns null for
   private-non-member (identical to not-found); exclude private from discovery queries; make the
   code-join RPC reveal only public matches; mint long codes for private; gate is client-rendered.
+
+## 22. Telegram channel per club (prototype: mock; real: bot + webhook)
+A club host can connect a **Telegram broadcast channel**; **approved members** join it from
+ClubR, gated on club approval. Built as a **mock** in the prototype (no real bot yet); the live
+design is below.
+
+**Flow (validated):**
+- **Host connects a channel:** creates a **private broadcast channel** in Telegram with
+  **"approve new members" ON**, adds **`@ClubRBot` as admin**, and links it in ClubR (Members tab →
+  *Telegram channel*). ClubR stores the channel.
+- **Member links Telegram once:** via a bot deep-link `t.me/ClubRBot?start=<nonce>` — ties their
+  `telegram_user_id` to the ClubR account. **Required** (the bot must match the joiner to a member).
+- **Join is gated on approval:** a *pending* member sees nothing. Once the **host approves** them, a
+  **"Join our Telegram"** card appears: Connect Telegram (if needed) → join-request → the bot
+  **approves** them because they're a **linked, approved member** of the club that owns the channel.
+- **Auto-remove:** when a member leaves / is removed from the club, the bot **kicks** them from the channel.
+- **Auto-posts:** the bot posts **new-game + results announcements + monthly leaderboard recaps**, each with a deep link back to ClubR.
+- **Stray join-requests** (someone with the link who isn't a linked, approved member): the bot
+  **declines**. For a **public** club it DMs a "Join {Club} on ClubR first" link; for a **private**
+  club it stays **generic** (no club name/link) — preserving the §21 non-disclosure.
+
+**Key constraint:** a Telegram bot **cannot silently force-add** a user to a channel — the user must
+tap/join and the bot approves the request. So "auto-join" = **one-tap, bot-approved for approved members**.
+
+**Prototype (this build):** `telegramServices` mocks connect/disconnect channel, link account, and the
+approval-gated join (auto-approves an approved+linked member). UI: host *Telegram channel* panel in the
+Members tab; member *Join our Telegram* card (Connect → Join → Open), self-hidden unless approved. Aces
+High is seeded with a channel.
+
+**Graduation (real app):** one platform bot (`TELEGRAM_BOT_TOKEN` edge secret) · a `telegram-webhook`
+edge function (handles `chat_join_request`, `/start <nonce>` linking, `my_chat_member`) · DB:
+`clubs.telegram_chat_id`, `users.telegram_user_id`, short-lived `telegram_link_tokens` · the webhook
+calls `approveChatJoinRequest` / `declineChatJoinRequest` / `banChatMember` / `sendMessage`.

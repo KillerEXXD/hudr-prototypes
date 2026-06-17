@@ -35,6 +35,7 @@ export const CLUBS: Club[] = [
     id: 'c_aces', name: 'Aces High', emoji: '🂡', color: '#ef4444',
     description: 'Friday night home game crew. Final-table fantasy + our weekly Last Longer.',
     location: 'Houston, TX',
+    telegram: { link: 'https://t.me/+AcesHighDemo', title: 'Aces High 🂡 — announcements' },
     ownerId: 'u_host', ownerName: 'Harper Host', inviteCode: 'ACES24', createdAt: '2026-05-02',
     members: [
       member('u_host', 'owner', 'member', '2026-05-02'),
