@@ -7,7 +7,7 @@ import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState } 
 import { MembershipBadge } from '@/components/common/cards'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { LeaderboardSection } from '@/components/leaderboard/LeaderboardSection'
-import { TelegramJoinCard, TelegramHostPanel } from '@/components/telegram/ClubTelegram'
+import { TelegramJoinChip, TelegramHostPanel } from '@/components/telegram/ClubTelegram'
 import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
@@ -74,6 +74,9 @@ export function ClubDetailPage() {
         <MembershipBadge status={club.myStatus} role={club.myRole} />
       </div>
       <p className="mt-2 text-sm text-text-secondary">{club.description}</p>
+      {/* Subtle, member-only Telegram join — self-hides unless you're an admitted
+          member of a club that has a channel. */}
+      <div><TelegramJoinChip clubId={club.id} /></div>
 
       {/* Host actions — compact, near the club name (above the tabs) */}
       {club.canManage && (
@@ -93,9 +96,6 @@ export function ClubDetailPage() {
       {club.myStatus === 'none' && !club.canManage && (
         <Btn className="mt-3 w-full" onClick={() => request.mutate(club.id)} disabled={request.isPending}><Plus className="h-4 w-4" />Request to join</Btn>
       )}
-
-      {/* Club Telegram — approved members get a one-tap join (self-hides otherwise) */}
-      <TelegramJoinCard clubId={club.id} />
 
       {/* Tabs — Games / Leaderboard for everyone; Members for host & admin only.
           The host's invite link + join requests live inside the Members tab to keep

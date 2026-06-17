@@ -1,11 +1,51 @@
 import { useState } from 'react'
-import { Send, ExternalLink, Link2, Plug } from 'lucide-react'
+import { Send, ExternalLink, Link2, Plug, Check } from 'lucide-react'
 import { Card, Btn, Section, Sheet, Field } from '@/components/common/ui'
 import { useClubTelegram, useConnectChannel, useDisconnectChannel, useLinkTelegram, useJoinChannel } from '@/hooks/telegram'
 
-// Telegram is hidden for now (still being thought through). Flip to `true` to
-// re-enable the mock UI — everything below stays wired. SPEC §22.
+// The host-side connect/manage panel + the big member join card are still hidden
+// while the real bot is wired (flip to `true` to re-enable the mock). The compact
+// member-facing TelegramJoinChip below is brought forward independently. SPEC §22.
 const TELEGRAM_ENABLED = false
+
+// Compact, subtle member-facing join — lives inline in the club header, ONLY for an
+// APPROVED member of a club that has a channel (self-hides otherwise). One tap mirrors
+// the real bot deep-link: it links the member's Telegram and admits them in one go
+// (the bot only admits approved members). After joining it shows "Joined · Open".
+export function TelegramJoinChip({ clubId }: { clubId: string }) {
+  const { data: st } = useClubTelegram(clubId)
+  const link = useLinkTelegram(clubId)
+  const join = useJoinChannel(clubId)
+  if (!st?.channel || !st.canJoin) return null
+
+  if (st.joined) {
+    return (
+      <span className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-medium">
+        <Send className="h-3 w-3 text-accent-blue" />
+        <span className="inline-flex items-center gap-0.5 text-accent-emerald"><Check className="h-3 w-3" />Joined</span>
+        <span className="text-text-muted">·</span>
+        <a href={st.channel.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-accent-blue hover:underline">Open<ExternalLink className="h-2.5 w-2.5" /></a>
+      </span>
+    )
+  }
+
+  const busy = link.isPending || join.isPending
+  const handleJoin = async () => {
+    if (!st.linked) await link.mutateAsync('you') // bot deep-link links the account…
+    await join.mutateAsync()                       // …then admits the approved member
+  }
+  return (
+    <button
+      type="button"
+      disabled={busy}
+      onClick={handleJoin}
+      title="Members-only club announcements on Telegram"
+      className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-accent-blue/30 bg-accent-blue/5 px-2.5 py-1 text-[11px] font-semibold text-accent-blue transition-colors hover:bg-accent-blue/10 disabled:opacity-60 cursor-pointer"
+    >
+      <Send className="h-3 w-3" />{busy ? 'Joining…' : 'Join Telegram'}
+    </button>
+  )
+}
 
 // Member-facing: only shows for an APPROVED member of a club that has a channel.
 // Gated flow: connect Telegram (if needed) → join (the bot admits approved members).

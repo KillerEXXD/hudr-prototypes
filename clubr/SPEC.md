@@ -536,9 +536,14 @@ design is below.
 tap/join and the bot approves the request. So "auto-join" = **one-tap, bot-approved for approved members**.
 
 **Prototype (this build):** `telegramServices` mocks connect/disconnect channel, link account, and the
-approval-gated join (auto-approves an approved+linked member). UI: host *Telegram channel* panel in the
-Members tab; member *Join our Telegram* card (Connect → Join → Open), self-hidden unless approved. Aces
-High is seeded with a channel.
+approval-gated join (auto-approves an approved+linked member). UI: the host *Telegram channel* panel and
+the big member *Join our Telegram* card remain **hidden** behind `TELEGRAM_ENABLED` while the real bot is
+wired. **Brought forward independently** is a subtle **`TelegramJoinChip`** — a small inline chip in the
+**club header** (under the description), shown **only to an admitted member of a club that has a channel**
+(self-hides otherwise). **One tap** mirrors the real bot deep-link (links the account *and* admits the
+approved member in a single action); after joining it collapses to **"✓ Joined · Open ↗"** (Open launches
+the channel). Theme-token styled (accent-blue / accent-emerald) → subtle in every skin. Aces High is
+seeded with a channel.
 
 **Graduation (real app):** one platform bot (`TELEGRAM_BOT_TOKEN` edge secret) · a `telegram-webhook`
 edge function (handles `chat_join_request`, `/start <nonce>` linking, `my_chat_member`) · DB:
