@@ -389,10 +389,11 @@ destination (reinforces club scope).
 
 **Club Detail page IA (tabbed):** a segmented control under the club header — **Games · Leaderboard ·
 Members** — defaulting to Games. **Members is host/admin‑only** (players never see the roster; the
-header already shows "N members · hosted by X", so there's no member list for non‑hosts). The host's
-**invite link + join‑request queue live inside the Members tab** (not stacked above the page), and the
-**Members tab badges the pending‑request count** so the host still notices new requests. This keeps
-both the player and host club pages to a clean **header → tabs → content**.
+header already shows "N members · hosted by X", so there's no member list for non‑hosts). **Host
+actions are a compact row under the club title** (above the tabs): an **Invite** button (opens a small
+sheet with the code + copy) and **New game**. The **join‑request queue lives in the Members tab**,
+which **badges the pending count** so new requests aren't missed. Both player and host club pages stay
+a clean **header → (host actions) → tabs → content**.
 
 - **The formula (field‑scaled, top‑heavy):** `points = round(B × √N ÷ √rank × weight)`, where **N**
   = number of participants and **rank** = the player's finish (1 = best). `√N` makes a **bigger

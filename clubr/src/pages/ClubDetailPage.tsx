@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lock, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { LeaderboardSection } from '@/components/leaderboard/LeaderboardSection'
@@ -23,6 +23,7 @@ export function ClubDetailPage() {
   const allGames = useUnifiedGames()
   const [copied, setCopied] = useState(false)
   const [newOpen, setNewOpen] = useState(false)
+  const [inviteOpen, setInviteOpen] = useState(false)
   const [gameFilter, setGameFilter] = useState<'all' | GameType>('all')
   const [tab, setTab] = useState<'games' | 'leaderboard' | 'members'>('games')
 
@@ -67,6 +68,14 @@ export function ClubDetailPage() {
       </div>
       <p className="mt-2 text-sm text-text-secondary">{club.description}</p>
 
+      {/* Host actions — compact, near the club name (above the tabs) */}
+      {club.canManage && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Btn size="sm" variant="secondary" onClick={() => setInviteOpen(true)}><Ticket className="h-3.5 w-3.5" />Invite</Btn>
+          {canHostHere && <Btn size="sm" onClick={() => setNewOpen(true)}><Plus className="h-3.5 w-3.5" />New game</Btn>}
+        </div>
+      )}
+
       {/* Access state banners */}
       {club.myStatus === 'pending' && (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
@@ -99,11 +108,6 @@ export function ClubDetailPage() {
       {/* Games tab — all types in one place (club = container) */}
       {tab === 'games' && (
         <div className="mt-3">
-          {canHostHere && (
-            <div className="mb-2 flex justify-end">
-              <button type="button" onClick={() => setNewOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue px-2.5 py-1 text-xs font-bold text-white transition-transform active:scale-95 cursor-pointer"><Plus className="h-3.5 w-3.5" />New game</button>
-            </div>
-          )}
           {typesPresent.length > 1 && (
             <div className="mb-2 flex flex-wrap gap-1.5">
               <button type="button" onClick={() => setGameFilter('all')} className={cn('rounded-full border px-2.5 py-0.5 text-xs font-semibold cursor-pointer', gameFilter === 'all' ? 'border-accent-blue bg-accent-blue/10 text-accent-blue' : 'border-border text-text-secondary')}>All</button>
@@ -133,14 +137,6 @@ export function ClubDetailPage() {
           host-management cluster: invite link, join-request queue, and the roster. */}
       {tab === 'members' && club.canManage && (
         <>
-          <Section title="Invite link">
-            <Card className="flex items-center justify-between">
-              <span className="font-mono text-lg font-bold tracking-widest text-text-primary">{club.inviteCode}</span>
-              <Btn size="sm" variant="secondary" onClick={copyCode}>{copied ? <><Check className="h-3.5 w-3.5 text-accent-emerald" />Copied!</> : <><Copy className="h-3.5 w-3.5" />Copy link</>}</Btn>
-            </Card>
-            <p className="mt-1.5 text-[11px] text-text-muted">Share the link — new players sign up &amp; request to join; you admit them after vetting.</p>
-          </Section>
-
           <Section title={`Join requests${pending.length ? ` · ${pending.length}` : ''}`}>
             {pending.length === 0 ? (
               <EmptyState title="No pending requests" sub="When someone requests to join, approve them here." />
@@ -182,6 +178,14 @@ export function ClubDetailPage() {
       )}
 
       <NewGameSheet open={newOpen} onClose={() => setNewOpen(false)} fixedClubId={club.id} />
+
+      <Sheet open={inviteOpen} onClose={() => setInviteOpen(false)} title={`Invite to ${club.name}`}>
+        <Card className="flex items-center justify-between">
+          <span className="font-mono text-lg font-bold tracking-widest text-text-primary">{club.inviteCode}</span>
+          <Btn size="sm" variant="secondary" onClick={copyCode}>{copied ? <><Check className="h-3.5 w-3.5 text-accent-emerald" />Copied!</> : <><Copy className="h-3.5 w-3.5" />Copy link</>}</Btn>
+        </Card>
+        <p className="mt-2 text-[11px] leading-snug text-text-muted">Share the link — new players sign up &amp; request to join; you admit them after vetting. They appear under <b className="text-text-secondary">Members → Join requests</b>.</p>
+      </Sheet>
     </div>
   )
 }
