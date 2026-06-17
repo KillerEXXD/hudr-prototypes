@@ -51,6 +51,42 @@ export const TCH_FT: FTPlayer[] = [
   N('H', 'Danny', 'Danny', '', '🇺🇸'),
   N('I', 'Dustin', 'Dustin', '', '🇺🇸'),
 ]
+// The DogHouse Poker Club, Cypress TX — $150K GTD H.W.M.S Main Event final table (9-handed).
+export const DOGHOUSE_HWMS_FT: FTPlayer[] = [
+  N('A', 'Nguyen', 'Jacob', 'Nguyen', '🇺🇸'),
+  N('B', 'Scott', 'Scott', '', '🇺🇸'),
+  N('C', 'Hammons', 'Zachary', 'Hammons', '🇺🇸'),
+  N('D', 'Thomas', 'Benjamin', 'Thomas', '🇺🇸'),
+  N('E', 'Turner', 'Roy', 'Turner', '🇺🇸'),
+  N('F', 'Fritz', 'Jeffery', 'Fritz', '🇺🇸'),
+  N('G', 'Ngo', 'Sang', 'Ngo', '🇺🇸'),
+  N('H', 'Govori', 'Genc', 'Govori', '🇺🇸'),
+  N('I', 'Corey', 'Corey', '', '🇺🇸'),
+]
+// The DogHouse Poker Club, Cypress TX — $100K GTD SFS Main Event final table (9-handed).
+export const DOGHOUSE_SFS_FT: FTPlayer[] = [
+  N('A', 'Sundara', 'Ravee', 'Sundara', '🇺🇸'),
+  N('B', 'Timmy', 'Timmy', 'T', '🇺🇸'),
+  N('C', 'Chan', 'Tony', 'Chan', '🇺🇸'),
+  N('D', 'Normand', 'Derek', 'Normand', '🇺🇸'),
+  N('E', 'Derek', 'Derek', 'L', '🇺🇸'),
+  N('F', 'Desmonde', 'Desmonde', 'T', '🇺🇸'),
+  N('G', 'Davis', 'William', 'Davis', '🇺🇸'),
+  N('H', 'David', 'David', 'M', '🇺🇸'),
+  N('I', 'Vora', 'Neil', 'Vora', '🇺🇸'),
+]
+// Texas Card House — Austin, $250K GTD Summer Series Main Event final table (9-handed).
+export const TCH_AUSTIN_SS_FT: FTPlayer[] = [
+  N('A', 'Gilliard', 'Richard', 'Gilliard', '🇺🇸'),
+  N('B', 'Shayan', 'Shayan', '', '🇺🇸'),
+  N('C', 'Esfandiary', 'Pasha', 'Esfandiary', '🇺🇸'),
+  N('D', 'Vandever', 'Maxwell', 'Vandever', '🇺🇸'),
+  N('E', 'Perelman', 'Rob', 'Perelman', '🇺🇸'),
+  N('F', 'Tanner', 'Luke', 'Tanner', '🇺🇸'),
+  N('G', 'Park', 'Joon', 'Park', '🇺🇸'),
+  N('H', 'Macey', 'Michael', 'Macey', '🇺🇸'),
+  N('I', 'Dulaney', 'Scott', 'Dulaney', '🇺🇸'),
+]
 
 const PRICE = Object.fromEntries(FT_PLAYERS.map((p) => [p.seat, p.icmPrice]))
 export function spendOf(picks: string[]): number {
@@ -71,11 +107,11 @@ const cmsg = (userId: string, text: string, ts: string, kind: 'user' | 'system' 
 
 export const FT_CONTESTS: FTContest[] = [
   {
-    id: 'ct_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Lodge Championship — Main Event FT',
+    id: 'ct_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'DogHouse $150K H.W.M.S Main Event — FT',
     status: 'open', stake: 100, budget: 100000, locksAt: 'in 1h 05m',
-    room: 'The Lodge', prizePool: '$1,000,000', buyIn: '$1,100', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@TheLodgeCardClub/streams', streamLive: false,
+    room: 'DogHouse Poker Club', prizePool: '$150,000', buyIn: '$380', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@DogHousePokerClub/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
-    players: FT_PLAYERS,
+    players: DOGHOUSE_HWMS_FT,
     entries: [
       entry('u_host', 'approved', true, ['A', 'C', 'H', 'I']),
       entry('u_mike', 'approved', true, ['B', 'D', 'F', 'G']),
@@ -109,11 +145,11 @@ export const FT_CONTESTS: FTContest[] = [
     chat: [],
   },
   {
-    id: 'ct_d', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', ftName: 'Lodge Poker Series — Main Event FT',
+    id: 'ct_d', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', ftName: 'TCH Austin $250K Summer Series Main Event — FT',
     status: 'settled', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-05-15',
-    room: 'The Lodge', prizePool: '$750,000', buyIn: '$1,100', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TheLodgeCardClub/streams', streamLive: false,
+    room: 'Texas Card House', prizePool: '$372,690', buyIn: '$600', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
-    players: FT_PLAYERS,
+    players: TCH_AUSTIN_SS_FT,
     finishingOrder: ['C', 'F', 'A', 'H', 'B', 'E', 'I', 'D', 'G'],
     entries: [
       entry('u_mike', 'approved', true, ['A', 'C', 'H', 'I']),
@@ -150,11 +186,11 @@ export const FT_CONTESTS: FTContest[] = [
   },
   // ---- Completed (settled) — POINTS format: top 3 split the pot ----
   {
-    id: 'ct_j', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Lodge Championship — Final Table',
+    id: 'ct_j', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'DogHouse $100K SFS Main Event — FT',
     status: 'settled', format: 'points', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-06-08',
-    room: 'The Lodge', prizePool: '$1,500,000', buyIn: '$1,700', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TheLodgeCardClub/streams', streamLive: false,
+    room: 'DogHouse Poker Club', prizePool: '$100,000', buyIn: '$300', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@DogHousePokerClub/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
-    players: FT_PLAYERS,
+    players: DOGHOUSE_SFS_FT,
     finishingOrder: ['A', 'C', 'B', 'F', 'D', 'I', 'E', 'G', 'H'],
     entries: [
       entry('u_host', 'approved', true, ['A', 'C', 'F', 'I']), // 223 pts → 1st

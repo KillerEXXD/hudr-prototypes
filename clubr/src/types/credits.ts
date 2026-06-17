@@ -10,7 +10,7 @@ export interface CreditTxn {
   id: string
   ts: string            // display time, e.g. 'now', '2d ago'
   kind: CreditTxnKind
-  label: string         // human line, e.g. 'Joined Lodge Championship FT'
+  label: string         // human line, e.g. 'Joined DogHouse Main Event FT'
   amount: number        // +credits (purchase/refund/seed) or −credits (spend)
   balanceAfter: number
 }

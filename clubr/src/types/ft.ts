@@ -63,7 +63,7 @@ export interface FTContest {
   /** Prize split percentages by place, summing to 100. Length 1 = winner-takes-all. */
   payouts?: number[]
   /** Real-event context for the FT details panel (informational only). */
-  room?: string // 'The Lodge', 'Champions Club', 'Texas Card House'…
+  room?: string // 'DogHouse Poker Club', 'Champions Club', 'Texas Card House'…
   prizePool?: string // the real event's prize pool, e.g. '$5,000,000'
   buyIn?: string // the real event's buy-in, e.g. '$10,300'
   level?: string // current blind level, e.g. '50k / 100k · 100k ante'
