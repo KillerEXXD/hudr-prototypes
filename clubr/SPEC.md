@@ -226,6 +226,12 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
   active players during registration, per‑period host score entry that lights up the winning
   cell (`rowDigits.indexOf(home%10)` × `colDigits.indexOf(away%10)`), `Final` completes the
   game, plus host admit/paid‑toggle controls — same envelope as FT/LL.
+- **Grid legibility & owner readout:** claimed‑cell initials render in `text-text-primary`
+  (high‑contrast in every skin — near‑white on dark cells, dark on the pale avatar tint),
+  not the old muted token. Hovering/focusing any claimed square surfaces the **owner's full
+  name** — a colour‑dot + name (+ `pending approval` / `won …` / `you`) in the board section
+  header (instant, never clipped by the grid's horizontal scroll), plus the native `title`
+  at the cursor. Works the same in the app build.
 
 ## 14. Prototype feedback & analytics (testing instrumentation)
 A floating **Feedback** launcher sits on every screen (mounted in `AppShell`,

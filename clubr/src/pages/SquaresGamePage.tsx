@@ -43,6 +43,7 @@ export function SquaresGamePage() {
   const lock = useLockSquares()
   const setScore = useSetSquaresScore()
   const [howOpen, setHowOpen] = useState(false)
+  const [hover, setHover] = useState<{ name: string; color?: string; status?: string } | null>(null)
 
   if (isLoading) return <Spinner label="Loading squares…" />
   if (!g) return <EmptyState title="Game not found" />
@@ -106,7 +107,13 @@ export function SquaresGamePage() {
       {canClaim && <p className="mt-2 text-[11px] text-text-secondary">Tap an empty square to claim it — your claim is <span className="text-accent-amber font-semibold">pending the host's approval</span>. Tap one of your pending (amber) squares to <b>withdraw</b>; once the host approves it, it's <b>locked in</b>. Digits stay sealed until lock.</p>}
       {hostCanApprove && <p className="mt-2 text-[11px] text-text-secondary">You're the host — <span className="text-accent-amber font-semibold">tap any amber (pending) square to approve it</span>, or use the approval queue below.</p>}
 
-      <Section title={locked ? 'The board' : 'Claim your squares'}>
+      <Section title={locked ? 'The board' : 'Claim your squares'} action={hover ? (
+        <span className="flex items-center gap-1.5 text-xs font-bold text-text-primary">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: hover.color }} />
+          <span className="truncate">{hover.name}</span>
+          {hover.status && <span className="font-normal text-text-muted">· {hover.status}</span>}
+        </span>
+      ) : undefined}>
         <div className="overflow-x-auto">
           <div className="grid min-w-[300px] grid-cols-11 gap-px rounded-lg bg-border p-px">
             <div className="flex items-center justify-center bg-bg-surface text-[8px] font-bold text-text-muted">{g.awayTeam.slice(0, 3)}→</div>
@@ -126,15 +133,17 @@ export function SquaresGamePage() {
                   const canClaimEmpty = canClaim && !cell.userId
                   const canWithdrawHere = canClaim && mine && !cell.approved
                   const interactive = canApproveHere || canClaimEmpty || canWithdrawHere
-                  const onTap = () => { if (canApproveHere) approveCell.mutate({ gameId: g.id, cellIdx: idx }); else claim.mutate({ gameId: g.id, cellIdx: idx }) }
+                  const onTap = () => { if (!interactive) return; if (canApproveHere) approveCell.mutate({ gameId: g.id, cellIdx: idx }); else claim.mutate({ gameId: g.id, cellIdx: idx }) }
+                  const show = cell.userId ? () => setHover({ name: cell.name, color: cell.avatarColor, status: pend ? 'pending approval' : win ? `won ${win}` : mine ? 'you' : undefined }) : undefined
                   return (
-                    <button key={idx} type="button" disabled={!interactive} onClick={onTap}
-                      className={cn('relative flex aspect-square items-center justify-center text-[8px] font-bold',
+                    <button key={idx} type="button" aria-disabled={interactive ? undefined : 'true'} onClick={onTap}
+                      onMouseEnter={show} onMouseLeave={() => setHover(null)} onFocus={show} onBlur={() => setHover(null)}
+                      className={cn('relative flex aspect-square items-center justify-center text-[9px] font-bold',
                         win ? 'bg-accent-emerald text-white'
                           : pend ? cn('border border-dashed border-accent-amber text-text-primary animate-pulse-soft', mine ? 'bg-accent-amber/20' : 'bg-accent-amber/5')
-                            : cell.userId ? (mine ? 'bg-accent-purple/30 text-text-primary' : 'text-text-muted') : 'bg-bg-card/40 text-text-muted',
+                            : cell.userId ? (mine ? 'bg-accent-purple/30 text-text-primary' : 'text-text-primary') : 'bg-bg-card/40 text-text-muted',
                         interactive && 'cursor-pointer hover:brightness-110')}
-                      style={cell.userId && cell.approved && !win && !mine ? { backgroundColor: `${cell.avatarColor}22` } : undefined}
+                      style={cell.userId && cell.approved && !win && !mine ? { backgroundColor: `${cell.avatarColor}33` } : undefined}
                       title={cell.userId ? `${cell.name}${pend ? ' · pending approval' : ''}${win ? ` · won ${win}` : ''}` : ''}>
                       {win ? <Trophy className="h-3 w-3" /> : cell.userId ? initials(cell.name) : ''}
                     </button>
