@@ -33,11 +33,12 @@ function CardJoinLL({ g }: { g: LLGameView }) {
   )
 }
 
-export function GameRow({ g }: { g: LLGameView }) {
+export function GameRow({ g, showType }: { g: LLGameView; showType?: boolean }) {
   const navigate = useNavigate()
   const s = g.status === 'live' ? { tone: 'green' as const, label: '● Live' } : g.status === 'registration' ? { tone: 'blue' as const, label: 'Registering' } : { tone: 'neutral' as const, label: 'Completed' }
   return (
     <Card onClick={() => navigate(`/lastlonger/${g.id}`)} className="p-3.5">
+      {showType && <div className="mb-2"><Badge tone="amber"><Timer className="h-3 w-3" />Last Longer</Badge></div>}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span><span className="truncate">{g.clubName}</span></div>
         <Badge tone={s.tone}>{s.label}</Badge>

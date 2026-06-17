@@ -54,14 +54,14 @@ export function HostHomePage() {
         </button>
       </Section>
 
-      {/* ---- Your club (games you run) ---- */}
-      <Section title="Your club">
+      {/* ---- Active games in your clubs (games you run) ---- */}
+      <Section title="Active games in your clubs">
         {yourFt.length + yourLl.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border bg-bg-card/50 px-3 py-4 text-center text-xs text-text-muted">Nothing live in your club right now. Host an FT above, or start a Last Longer.</p>
         ) : (
           <div className="flex flex-col gap-2">
-            {yourFt.map((c) => <ContestRow key={c.id} c={c} />)}
-            {yourLl.map((g) => <GameRow key={g.id} g={g} />)}
+            {yourFt.map((c) => <ContestRow key={c.id} c={c} showType />)}
+            {yourLl.map((g) => <GameRow key={g.id} g={g} showType />)}
           </div>
         )}
       </Section>
@@ -70,8 +70,8 @@ export function HostHomePage() {
       {otherFt.length + otherLl.length > 0 && (
         <Section title="Other clubs you're in" action={<Badge tone="neutral"><Users className="h-3 w-3" />member</Badge>}>
           <div className="flex flex-col gap-2">
-            {otherFt.map((c) => <ContestRow key={c.id} c={c} />)}
-            {otherLl.map((g) => <GameRow key={g.id} g={g} />)}
+            {otherFt.map((c) => <ContestRow key={c.id} c={c} showType />)}
+            {otherLl.map((g) => <GameRow key={g.id} g={g} showType />)}
           </div>
         </Section>
       )}
