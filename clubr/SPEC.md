@@ -76,7 +76,8 @@ Approval is required to do anything beyond viewing:
 - **Scoring schedule is visible WHILE drafting** (not only at settlement): a collapsible
   **"How scoring works — points per finish"** panel on the contest page (open by default while
   the contest is open) lists **1st 100 · 2nd 70 · 3rd 50 · 4th 35 · 5th 25 · 6th 18 · 7th 12 ·
-  8th 6 · 9th 3**, and the **draft board shows the same one‑line reminder**. Single source of
+  8th 6 · 9th 3**. This panel is the **single place** the schedule is shown on the contest page
+  (the old duplicate one‑line reminder on the draft board was removed). Single source of
   truth = `FINISH_POINTS` (`ScoringSchedule.tsx`). *(Points rank the drafted players; the §15
   payout split divides the pool among entrants — two different things.)*
 - **"How it works?" walkthrough.** A **"How it works"** pill by the FT Fantasy heading opens a
