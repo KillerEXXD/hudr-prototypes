@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { CreateFTSheet } from '@/components/ft/CreateFTSheet'
 import { AdminEconomy } from '@/components/credits/AdminEconomy'
+import { AdminLeaderboard } from '@/components/leaderboard/AdminLeaderboard'
 
 export function AdminPage() {
   const { user } = useAuth()
@@ -34,6 +35,8 @@ export function AdminPage() {
       </div>
 
       <AdminEconomy />
+
+      <AdminLeaderboard />
 
       <Section title="FT slate (operator)" action={<Btn size="sm" onClick={() => setAddOpen(true)}><Plus className="h-3.5 w-3.5" />Add a final table</Btn>}>
         <p className="mb-2 text-[11px] text-text-muted">The priced final tables hosts can run. You supply players &amp; stacks; the app computes each ICM draft price. Hosts only review &amp; host — <span className="text-text-secondary">players never see this slate.</span></p>

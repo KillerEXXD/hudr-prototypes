@@ -380,3 +380,75 @@ hosting**. Credits are **non‑cash, non‑refundable to money, and non‑transf
   for now everything runs on credits).
 - **Prototype seed:** new accounts = 1000 cr; demo **Player (Sam) = 1000** (+ a few ledger entries),
   **Club Host (Harper) = ~600** (shows spend), App Admin = N/A.
+
+## 20. Club leaderboards (points)
+**Each club has its OWN leaderboard — there is no app‑wide / cross‑club board.** Members earn
+**Leaderboard Points (LP)** by how they finish in *that club's* games, awarded by a platform
+algorithm. It lives as a **"Club leaderboard" section on the Club Detail page**, between Games and
+Members — never a top‑level nav destination (reinforces club scope).
+
+- **The formula (field‑scaled, top‑heavy):** `points = round(B × √N ÷ √rank × weight)`, where **N**
+  = number of participants and **rank** = the player's finish (1 = best). `√N` makes a **bigger
+  field worth more**; `1/√rank` makes **winning worth far more** than mid‑pack. Default **B = 10**.
+- **Scoring depth:** only the **top third** of the field (`ceil(N / 3)`) scores; everyone below = 0.
+- **Minimum field:** a game must have **≥ 4 participants** to count at all.
+- **Every game type feeds the same board, equal field‑scaling:**
+  - **FT Fantasy** — rank approved entrants by fantasy score (the existing FINISH_POINTS scoring).
+  - **Last Longer** — rank by finish position (1 = winner). Field = everyone who played.
+  - **Football Squares** — rank period‑winners by **weighted winnings** (Final 70% / each quarter
+    10%), then **× 0.5** (chance‑discounted). Non‑winners score 0.
+  - Tied finishers **split** the points of the positions they jointly occupy, evenly.
+- **Seasons:** points accumulate per **calendar month** (`YYYY‑MM` from the game's completion date);
+  the board **resets monthly** and past months stay viewable via a season selector. Default = current.
+- **Ranking & tiebreak:** sorted by **total points**, then most **wins** (1st‑place finishes), then
+  most **podiums** (top‑3). The viewer's own row is highlighted; tap any row → member profile.
+- **"+N LP" on completed games:** every settled/completed game shows each finisher the LP they earned
+  toward the club board (FT settled result rows + champion, LL eliminated rows, a "Leaderboard
+  points" block on completed Squares) — computed with the **same** algorithm as the board.
+- **Explainer:** a **"How points work"** sheet by the title spells out the rules and, first, that the
+  board is **this club only**.
+- **App‑Admin‑configurable (global):** one `LeaderboardConfig` — `base`, `minField`, `depthDivisor`,
+  `ftWeight`, `llWeight`, `squaresWeight` — tuned in the Admin console (mirrors the §19 Economy card).
+- **Prototype seed:** settled/completed games carry a `settledAt` date spread across recent months so
+  the season selector has content (e.g. Aces High: June = a settled FT + a Last Longer, May = a WTA FT).
+
+### 20.1 Who counts as "played" / the field (per game type)
+- **FT Fantasy:** field = **approved entries** (`status === 'approved'`); pending requests don't count.
+  Rank = entrants sorted by fantasy score desc (sum of FINISH_POINTS for drafted seats vs the
+  `finishingOrder`). A no‑show who was approved but never drafted still counts in the field at score 0.
+- **Last Longer:** field = participants with `status` **active or out** (not `pending`). Rank = `finishPos`.
+- **Football Squares:** field = participants with `status === 'active'`. Only **period‑winners** are
+  ranked (by summed period `pct`); everyone else scores 0 but still counts toward "games played."
+- A member appears on the board once they've **played ≥ 1 counted game** that season (points may be 0).
+
+### 20.2 Worked example (defaults B=10, top‑third, min 4)
+- FT, N=6 → scoring depth `ceil(6/3)=2`: 1st **24**, 2nd **17**, 3rd+ **0**.
+- LL, N=5 → depth 2: 1st **22**, 2nd **16**, 3rd+ **0**.
+- Squares, N=5, ×0.5: top winner **11**, 2nd winner **8**.
+- Aces High **June** board = `ct_j` (FT) + `ll_g` (LL): Harper **40** (1×🥇, 2 podiums), Mike **22**,
+  Tom **17**, rest 0 — matches the "+N LP" shown on each game.
+
+### 20.3 Graduation to the real app (make this turnkey)
+The prototype keeps the algorithm in **pure, portable modules** so the only thing that changes at
+graduation is *where it runs*:
+- **Reference implementation to port verbatim:** `src/lib/leaderboard/points.ts` (curve, depth,
+  min‑field, tie‑split) and `src/lib/leaderboard/award.ts` (per‑game → LP, one function per type).
+  `src/lib/api/leaderboardServices.ts` is the aggregation (bucket by month → sum → rank → tiebreak).
+- **Server‑side, per the prime directive (no business logic in the browser):** the LP math must run
+  on the API. Two viable shapes — (a) a **`leaderboard` edge function** that computes standings
+  on read (one round‑trip, `RETURNS JSONB`, visibility‑gated to club members), or (b) a
+  **`season_standings`** table updated when a game settles. The client just renders what the API sends.
+- **Data the backend needs:** every game needs a **completion timestamp** (`settled_at` on
+  `ft_contests` / `ll_games` / squares) to bucket into a `YYYY‑MM` season — the prototype already
+  added `settledAt`. Field size + per‑game rankings derive from existing result data.
+- **"+N LP" on results:** the API should return each finisher's earned LP on the settled‑game payload
+  (FT entry, LL participant, Squares winner) so result screens show the same number the board uses —
+  never recomputed client‑side.
+- **Config:** `LeaderboardConfig` (`base`, `minField`, `depthDivisor`, `ftWeight`, `llWeight`,
+  `squaresWeight`) becomes a stored global row, edited in the Admin console, seeded with the defaults
+  (10 / 4 / 3 / 1 / 1 / 0.5).
+- **Scope invariant:** **per‑club only** — never a global/cross‑club board (matches the PRD §13 "out"
+  list). The Club Detail "Club leaderboard" section is the only surface; not a nav destination.
+- **Tests at graduation:** unit‑test `points.ts` (curve shape, depth cutoff, min‑field, Squares
+  weighting, tie‑split) + a contract test on the standings endpoint — the app's CI test‑coupling gate
+  will require them.

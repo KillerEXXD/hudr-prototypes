@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
+import { LeaderboardSection } from '@/components/leaderboard/LeaderboardSection'
 import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
@@ -129,6 +130,9 @@ export function ClubDetailPage() {
           />
         )}
       </Section>
+
+      {/* Club standings — points by finish & field size across all game types (this club only) */}
+      <LeaderboardSection clubId={club.id} clubName={club.name} clubEmoji={club.emoji} />
 
       {/* Members — full roster is host/admin only; members see just the owner + count */}
       <Section title={`Members · ${members.length}`}>

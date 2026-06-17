@@ -49,7 +49,7 @@ export const LL_GAMES: LLGame[] = [
   },
   {
     id: 'll_d', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', title: 'Saturday Showdown',
-    status: 'completed', stake: 100, hostId: 'u_gary', coHostIds: [], winnerName: 'Mike Jones',
+    status: 'completed', stake: 100, hostId: 'u_gary', coHostIds: [], winnerName: 'Mike Jones', settledAt: '2026-05-16',
     participants: [
       p('u_mike', 'out', true, 0, '—', false, 1),
       p('u_tom', 'out', true, 0, '—', false, 2, '15m ago'),
@@ -60,7 +60,7 @@ export const LL_GAMES: LLGame[] = [
   },
   {
     id: 'll_e', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', title: "Last Week's Grind",
-    status: 'completed', stake: 250, hostId: 'u_gary', coHostIds: [], winnerName: 'Gary Grind',
+    status: 'completed', stake: 250, hostId: 'u_gary', coHostIds: [], winnerName: 'Gary Grind', settledAt: '2026-05-22',
     location: 'The Card Room', mode: 'in-person',
     participants: [
       p('u_gary', 'out', true, 0, '—', false, 1),
@@ -85,7 +85,7 @@ export const LL_GAMES: LLGame[] = [
   // ---- Aces High (Club Host) — COMPLETED ----
   {
     id: 'll_g', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', title: 'Last Friday Last Longer',
-    status: 'completed', stake: 100, hostId: 'u_host', coHostIds: [], winnerName: 'Mike Jones',
+    status: 'completed', stake: 100, hostId: 'u_host', coHostIds: [], winnerName: 'Mike Jones', settledAt: '2026-06-12',
     location: 'Aces High Card Room', mode: 'in-person',
     participants: [
       p('u_mike', 'out', true, 0, '—', false, 1),

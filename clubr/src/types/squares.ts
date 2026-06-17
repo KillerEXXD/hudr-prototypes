@@ -57,6 +57,8 @@ export interface SquaresGame {
   periods: SquaresPeriod[]
   participants: SquaresParticipant[]
   chat: ChatMsg[]
+  /** Completion date 'YYYY-MM-DD' — buckets the result into a leaderboard month (completed only). */
+  settledAt?: string
 }
 
 export interface SquaresGameView extends SquaresGame {

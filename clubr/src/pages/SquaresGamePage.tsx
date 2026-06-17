@@ -10,6 +10,10 @@ import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { cn } from '@/lib/utils/cn'
 import { useEconomy } from '@/hooks/credits'
+import { useLeaderboardConfig } from '@/hooks/leaderboard'
+import { awardMap, squaresAward } from '@/lib/leaderboard/award'
+import { DEFAULT_LEADERBOARD } from '@/types/leaderboard'
+import { LpBadge } from '@/components/leaderboard/LpBadge'
 import { useSpend } from '@/components/credits/SpendProvider'
 import type { SquaresGameView } from '@/types/squares'
 
@@ -31,6 +35,7 @@ export function SquaresGamePage() {
   const join = useRequestJoinSquares()
   const spend = useSpend()
   const joinCost = useEconomy().data?.costs.joinGameCost ?? 100
+  const lpCfg = useLeaderboardConfig().data ?? DEFAULT_LEADERBOARD
   const approve = useApproveSquares(); const decline = useDeclineSquares()
   const togglePaid = useToggleSquaresPaid()
   const claim = useClaimSquare()
@@ -59,6 +64,13 @@ export function SquaresGamePage() {
 
   const winners = new Map<number, string>()
   g.periods.forEach((p) => { if (p.winnerCell != null) winners.set(p.winnerCell, p.label) })
+
+  // Leaderboard points each winner earned toward the club board (completed only).
+  const lpRows = (g.status === 'completed'
+    ? [...awardMap(squaresAward(g, lpCfg)).entries()]
+      .map(([userId, points]) => ({ userId, points, name: g.participants.find((x) => x.userId === userId)?.name ?? 'Player', avatarColor: g.participants.find((x) => x.userId === userId)?.avatarColor }))
+      .sort((a, b) => b.points - a.points)
+    : [])
 
   return (
     <div className="animate-fade-up">
@@ -151,6 +163,21 @@ export function SquaresGamePage() {
         </div>
         <p className="mt-1.5 text-[10px] text-text-muted">Payouts shown in Stakes — settled offline. The app holds no cash.</p>
       </Section>
+
+      {lpRows.length > 0 && (
+        <Section title="Leaderboard points" action={<Trophy className="h-4 w-4 text-accent-amber" />}>
+          <p className="mb-2 text-[11px] text-text-muted">Earned toward <b className="text-text-secondary">{g.clubName}</b>'s monthly leaderboard — Squares counts half (it's mostly luck).</p>
+          <div className="flex flex-col gap-1.5">
+            {lpRows.map((r) => (
+              <button key={r.userId} type="button" onClick={() => navigate(`/member/${r.userId}`)} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2 text-left hover:bg-bg-surface cursor-pointer">
+                <Avatar name={r.name} color={r.avatarColor} size={28} />
+                <span className="min-w-0 flex-1 truncate text-sm text-text-primary">{r.name}</span>
+                <LpBadge points={r.points} />
+              </button>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {g.canManage && (
         <Section title="Host" action={<Badge tone="green"><Shield className="h-3 w-3" />You manage</Badge>}>

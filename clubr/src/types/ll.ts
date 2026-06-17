@@ -48,6 +48,8 @@ export interface LLGame {
   chat: ChatMsg[]
   chop?: ChopProposal
   winnerName?: string
+  /** Completion date 'YYYY-MM-DD' — buckets the result into a leaderboard month (completed only). */
+  settledAt?: string
 }
 
 export interface LLGameView extends LLGame {

@@ -73,6 +73,8 @@ export interface FTContest {
   coHostIds: string[] // per-game co-hosts (scoped to this contest only)
   players: FTPlayer[]
   finishingOrder?: string[] // seat ids 1st..9th, present when settled
+  /** Completion date 'YYYY-MM-DD' — buckets the result into a leaderboard month (settled only). */
+  settledAt?: string
   entries: ContestEntry[]
   chat: ChatMsg[]
 }

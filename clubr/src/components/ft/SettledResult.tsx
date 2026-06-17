@@ -4,6 +4,10 @@ import { FINISH_POINTS } from '@/types/ft'
 import { Avatar, Badge, Card, Section } from '@/components/common/ui'
 import { cn } from '@/lib/utils/cn'
 import { picksToNames, playerFull } from '@/lib/utils/ftFormat'
+import { useLeaderboardConfig } from '@/hooks/leaderboard'
+import { awardMap, ftAward } from '@/lib/leaderboard/award'
+import { DEFAULT_LEADERBOARD } from '@/types/leaderboard'
+import { LpBadge } from '@/components/leaderboard/LpBadge'
 
 // Split a pot 50 / 30 / 20 across the top three (remainder to 3rd so it sums exact).
 function splitPot(pot: number): number[] {
@@ -24,6 +28,9 @@ export function SettledResult({ c, meId }: { c: FTContestView; meId?: string }) 
   const winner = entries[0]
   const medal = (i: number) => (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`)
   const fmtS = (n: number) => n.toLocaleString('en-US')
+  // Leaderboard points each entrant earned toward the club board (same math as the board).
+  const lpCfg = useLeaderboardConfig().data ?? DEFAULT_LEADERBOARD
+  const lp = awardMap(ftAward(c, lpCfg))
 
   return (
     <>
@@ -54,6 +61,7 @@ export function SettledResult({ c, meId }: { c: FTContestView; meId?: string }) 
               </div>
             </div>
             <div className="relative mt-2 font-mono text-lg font-extrabold text-accent-emerald">+{fmtS(prizeFor(0))} Stakes</div>
+            {lp.get(winner.userId) ? <div className="relative mt-1.5 flex justify-center"><LpBadge points={lp.get(winner.userId)!} /></div> : null}
           </div>
         )}
 
@@ -81,6 +89,7 @@ export function SettledResult({ c, meId }: { c: FTContestView; meId?: string }) 
                   ) : (
                     <div className="text-[11px] text-text-muted">{wta ? 'no payout' : 'out of money'}</div>
                   )}
+                  {lp.get(e.userId) ? <div className="mt-0.5 flex justify-end"><LpBadge points={lp.get(e.userId)!} /></div> : null}
                 </div>
               </div>
             )

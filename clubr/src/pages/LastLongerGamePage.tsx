@@ -10,6 +10,10 @@ import { StakePool } from '@/components/common/StakePool'
 import { GameChat } from '@/components/common/GameChat'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { useEconomy } from '@/hooks/credits'
+import { useLeaderboardConfig } from '@/hooks/leaderboard'
+import { awardMap, llAward } from '@/lib/leaderboard/award'
+import { DEFAULT_LEADERBOARD } from '@/types/leaderboard'
+import { LpBadge } from '@/components/leaderboard/LpBadge'
 import { useSpend } from '@/components/credits/SpendProvider'
 import type { LLParticipant } from '@/types/ll'
 
@@ -32,6 +36,7 @@ export function LastLongerGamePage() {
   const requestJoin = useRequestJoinLL()
   const spend = useSpend()
   const joinCost = useEconomy().data?.costs.joinGameCost ?? 100
+  const lpCfg = useLeaderboardConfig().data ?? DEFAULT_LEADERBOARD
   const approve = useApproveLL(); const decline = useDeclineLL()
   const togglePaid = useTogglePaidLL(); const assignCoHost = useAssignCoHostLL()
   const updateChips = useUpdateChips(); const bust = useBust()
@@ -51,6 +56,8 @@ export function LastLongerGamePage() {
   const out = g.participants.filter((p) => p.status === 'out').sort((a, b) => (a.finishPos ?? 99) - (b.finishPos ?? 99))
   const canChat = me?.status === 'active' || g.canManage
   const statusTone = g.status === 'live' ? 'green' : g.status === 'registration' ? 'blue' : 'neutral'
+  // Leaderboard points earned (completed games only) — same math as the club board.
+  const lp = g.status === 'completed' ? awardMap(llAward(g, lpCfg)) : new Map<string, number>()
 
   return (
     <div className="animate-fade-up">
@@ -155,6 +162,7 @@ export function LastLongerGamePage() {
                 <Avatar name={p.name} color={p.avatarColor} size={28} />
                 <span className="min-w-0 flex-1 truncate text-sm text-text-secondary line-through">{p.name}</span>
               </button>
+              {lp.get(p.userId) ? <LpBadge points={lp.get(p.userId)!} /> : null}
               <span className="text-[11px] text-text-muted">{p.finishPos === 1 ? 'winner 🏆' : p.bustedAgo ? `busted ${p.bustedAgo}` : 'out'}</span>
             </div>
           ))}

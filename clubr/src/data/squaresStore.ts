@@ -55,7 +55,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️',
     title: 'Cowboys @ Niners Squares', homeTeam: 'Niners', awayTeam: 'Cowboys',
-    visibility: 'public', status: 'completed', timezone: 'PT',
+    visibility: 'public', status: 'completed', timezone: 'PT', settledAt: '2026-06-09',
     stake: 250, hostId: 'u_gary', coHostIds: [],
     cells: doneCells, rowDigits, colDigits,
     periods: [

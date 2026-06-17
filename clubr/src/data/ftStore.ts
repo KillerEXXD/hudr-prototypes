@@ -79,7 +79,7 @@ export const FT_CONTESTS: FTContest[] = [
   },
   {
     id: 'ct_d', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', ftName: 'EPT Monte Carlo FT',
-    status: 'settled', stake: 250, budget: 100000, locksAt: 'settled',
+    status: 'settled', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-05-15',
     room: 'EPT', prizePool: '$5,100,000', buyIn: '$5,300', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@PokerStars/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
@@ -120,7 +120,7 @@ export const FT_CONTESTS: FTContest[] = [
   // ---- Completed (settled) — POINTS format: top 3 split the pot ----
   {
     id: 'ct_j', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'WSOP Main Event — Final Table',
-    status: 'settled', format: 'points', stake: 250, budget: 100000, locksAt: 'settled',
+    status: 'settled', format: 'points', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-06-08',
     room: 'WSOP', prizePool: '$10,000,000', buyIn: '$10,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@WSOP/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
@@ -138,7 +138,7 @@ export const FT_CONTESTS: FTContest[] = [
   // ---- Completed (settled) — WINNER TAKES ALL: only 1st is paid ----
   {
     id: 'ct_k', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Triton Invitational — High Roller FT',
-    status: 'settled', format: 'winner_takes_all', stake: 500, budget: 100000, locksAt: 'settled',
+    status: 'settled', format: 'winner_takes_all', stake: 500, budget: 100000, locksAt: 'settled', settledAt: '2026-05-18',
     room: 'Triton', prizePool: '$8,900,000', buyIn: '$100,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TritonPoker/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
