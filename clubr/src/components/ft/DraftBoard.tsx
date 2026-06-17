@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils/cn'
 import { type FTPlayer } from '@/types/ft'
+import { playerFull } from '@/lib/utils/ftFormat'
 
 const fmtK = (n: number) => `${Math.round(n / 1000)}k`
 
@@ -37,7 +38,7 @@ export function DraftBoard({ players, budget, value, onChange, max = 4, disabled
                 !picked && !affordable && 'opacity-40')}
             >
               <span className={cn('flex h-6 w-6 items-center justify-center rounded-md text-xs font-extrabold', picked ? 'bg-accent-purple text-white' : 'bg-bg-surface text-text-secondary')}>{p.seat}</span>
-              <span className="flex max-w-full items-center gap-0.5 truncate text-[11px] font-semibold text-text-primary"><span className="leading-none">{p.country ?? '🃏'}</span>{p.name}</span>
+              <span className="flex max-w-full items-center gap-0.5 truncate text-[11px] font-semibold text-text-primary"><span className="leading-none">{p.country ?? '🃏'}</span>{playerFull(p)}</span>
               <span className="font-mono text-[10px] text-text-muted">{fmtK(p.icmPrice)}</span>
               <span className="text-[9px] text-text-muted">{p.bbStack} BB</span>
             </button>
