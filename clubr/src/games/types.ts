@@ -28,19 +28,19 @@ export const GAME_TYPES: GameTypeDef[] = [
   {
     id: 'ft_fantasy', label: 'FT Fantasy', sub: 'Draft a streamed final table (Stack Draft)',
     icon: Target, iconBg: 'bg-accent-purple', ring: 'border-accent-purple/30 bg-accent-purple/10',
-    chipActive: 'border-accent-purple bg-accent-purple/10 text-accent-purple',
+    chipActive: 'border-accent-purple bg-accent-purple/20 text-accent-purple font-bold ring-1 ring-accent-purple/40',
     create: { kind: 'route', to: '/host-ft' },
   },
   {
     id: 'last_longer', label: 'Last Longer', sub: "Your club's own live tournament",
     icon: Timer, iconBg: 'bg-accent-amber', ring: 'border-accent-amber/30 bg-accent-amber/10',
-    chipActive: 'border-accent-amber bg-accent-amber/10 text-accent-amber',
+    chipActive: 'border-accent-amber bg-accent-amber/20 text-accent-amber font-bold ring-1 ring-accent-amber/40',
     create: { kind: 'sheet' },
   },
   {
     id: 'football_squares', label: 'Football Squares', sub: 'A 10×10 squares board on a live game',
     icon: Grid3x3, iconBg: 'bg-accent-emerald', ring: 'border-accent-emerald/30 bg-accent-emerald/10',
-    chipActive: 'border-accent-emerald bg-accent-emerald/10 text-accent-emerald',
+    chipActive: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40',
     create: { kind: 'sheet' },
   },
 ]

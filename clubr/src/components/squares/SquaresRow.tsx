@@ -1,21 +1,22 @@
 import { useNavigate } from 'react-router-dom'
 import { Grid3x3, Lock, Trophy } from 'lucide-react'
-import { Badge, Card } from '@/components/common/ui'
+import { Badge, Card, GameTypeBadge } from '@/components/common/ui'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { StakePool } from '@/components/common/StakePool'
 import type { SquaresGameView } from '@/types/squares'
 
-export function SquaresRow({ g }: { g: SquaresGameView }) {
+export function SquaresRow({ g, showType }: { g: SquaresGameView; showType?: boolean }) {
   const navigate = useNavigate()
   const s = g.status === 'live'
     ? { tone: 'green' as const, label: '● Live' }
     : g.status === 'registration' ? { tone: 'blue' as const, label: 'Claiming open' } : { tone: 'neutral' as const, label: 'Completed' }
   return (
     <Card onClick={() => navigate(`/squares/${g.id}`)} className="p-3.5">
+      {showType && <div className="mb-2"><GameTypeBadge kind="sq" /></div>}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted">
           <span className="text-base">{g.clubEmoji}</span><span className="truncate">{g.clubName}</span>
-          <Badge tone="green"><Grid3x3 className="h-3 w-3" />Squares</Badge>
+          {!showType && <Badge tone="green"><Grid3x3 className="h-3 w-3" />Squares</Badge>}
         </div>
         <Badge tone={s.tone}>{s.label}</Badge>
       </div>
