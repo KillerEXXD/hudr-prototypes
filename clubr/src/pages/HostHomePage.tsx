@@ -73,7 +73,7 @@ export function HostHomePage() {
         {typesPresent.length > 1 && (
           <div className="mb-2 flex gap-1.5 overflow-x-auto no-scrollbar">
             <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
-            {typesPresent.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.label} icon={t.icon} activeClass={t.chipActive} />)}
+            {typesPresent.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
           </div>
         )}
         {gamesLoading ? (

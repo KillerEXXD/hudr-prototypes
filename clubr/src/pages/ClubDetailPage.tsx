@@ -122,7 +122,7 @@ export function ClubDetailPage() {
             <div className="mb-2 flex flex-wrap gap-1.5">
               <button type="button" onClick={() => setGameFilter('all')} className={cn('rounded-full border px-2.5 py-0.5 text-xs cursor-pointer transition-colors', gameFilter === 'all' ? 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' : 'border-border font-semibold text-text-secondary')}>All</button>
               {typesPresent.map((t) => (
-                <button key={t.id} type="button" onClick={() => setGameFilter(t.id)} className={cn('flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs cursor-pointer transition-colors', gameFilter === t.id ? t.chipActive : 'border-border font-semibold text-text-secondary')}><t.icon className="h-3 w-3" />{t.label}</button>
+                <button key={t.id} type="button" onClick={() => setGameFilter(t.id)} className={cn('flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs cursor-pointer transition-colors', gameFilter === t.id ? t.chipActive : 'border-border font-semibold text-text-secondary')}><t.icon className="h-3 w-3" />{t.short}</button>
               ))}
             </div>
           )}

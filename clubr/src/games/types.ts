@@ -16,6 +16,7 @@ export type GameType = 'ft_fantasy' | 'last_longer' | 'football_squares'
 export interface GameTypeDef {
   id: GameType
   label: string
+  short: string          // abbreviated label — used ONLY in filter tabs/chips
   sub: string            // one-line description for the chooser
   icon: LucideIcon
   iconBg: string         // chooser icon chip background (literal class)
@@ -26,19 +27,19 @@ export interface GameTypeDef {
 
 export const GAME_TYPES: GameTypeDef[] = [
   {
-    id: 'ft_fantasy', label: 'FT Fantasy', sub: 'Draft a streamed final table (Stack Draft)',
+    id: 'ft_fantasy', label: 'FT Fantasy', short: 'FTF', sub: 'Draft a streamed final table (Stack Draft)',
     icon: Target, iconBg: 'bg-accent-purple', ring: 'border-accent-purple/30 bg-accent-purple/10',
     chipActive: 'border-accent-purple bg-accent-purple/20 text-accent-purple font-bold ring-1 ring-accent-purple/40',
     create: { kind: 'route', to: '/host-ft' },
   },
   {
-    id: 'last_longer', label: 'Last Longer', sub: "Your club's own live tournament",
+    id: 'last_longer', label: 'Last Longer', short: 'LL', sub: "Your club's own live tournament",
     icon: Timer, iconBg: 'bg-accent-amber', ring: 'border-accent-amber/30 bg-accent-amber/10',
     chipActive: 'border-accent-amber bg-accent-amber/20 text-accent-amber font-bold ring-1 ring-accent-amber/40',
     create: { kind: 'sheet' },
   },
   {
-    id: 'football_squares', label: 'Squares', sub: 'A 10×10 squares board on a live game',
+    id: 'football_squares', label: 'Squares', short: 'Squares', sub: 'A 10×10 squares board on a live game',
     icon: Grid3x3, iconBg: 'bg-accent-emerald', ring: 'border-accent-emerald/30 bg-accent-emerald/10',
     chipActive: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40',
     create: { kind: 'sheet' },

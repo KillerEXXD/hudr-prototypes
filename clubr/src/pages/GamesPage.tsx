@@ -52,7 +52,7 @@ export function GamesPage() {
       {/* type filter — driven by the registry; single scrollable row, never wraps */}
       <div className="mt-3 flex gap-1.5 overflow-x-auto no-scrollbar">
         <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
-        {GAME_TYPES.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.label} icon={t.icon} activeClass={t.chipActive} />)}
+        {GAME_TYPES.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
       </div>
 
       {isLoading ? <Spinner /> : (
