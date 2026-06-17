@@ -12,7 +12,7 @@ const ROLE_ACCOUNT: Record<AccountRole, string> = { admin: 'u_admin', host: 'u_h
 
 interface AuthCtx {
   user: User | null
-  loginAs: (role: AccountRole) => void
+  loginAs: (role: AccountRole, userId?: string) => void
   signUp: (name: string, email: string, phone: string, location?: string) => User
   logout: () => void
 }
@@ -37,8 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch { /* ignore */ }
   }
 
-  const loginAs = useCallback((role: AccountRole) => {
-    const u = USERS[ROLE_ACCOUNT[role]]
+  const loginAs = useCallback((role: AccountRole, userId?: string) => {
+    const u = USERS[userId ?? ROLE_ACCOUNT[role]]
     setUser(u); persist(u)
   }, [])
 

@@ -96,4 +96,53 @@ export const LL_GAMES: LLGame[] = [
     ],
     chat: [cmsg('u_host', 'GG all — Mike takes it down 🏆', '11:48p', 'system')],
   },
+  // ---- Demo: Champions Club, Houston ----
+  {
+    id: 'll_champ_done', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆', title: 'Fall Open — Day 1 Last Longer',
+    status: 'completed', stake: 100, hostId: 'u_cc_host', coHostIds: [], winnerName: 'Lena Park', settledAt: '2026-06-07',
+    location: 'Champions Club Houston', mode: 'in-person',
+    participants: [
+      p('u_lena', 'out', true, 0, '—', false, 1),
+      p('u_mike', 'out', true, 0, '—', false, 2, '25m ago'),
+      p('u_player', 'out', true, 0, '—', false, 3, '1h ago'),
+      p('u_jordan', 'out', true, 0, '—', false, 4, '1h 45m ago'),
+      p('u_cody', 'out', true, 0, '—', false, 5, '2h 30m ago'),
+    ],
+    chat: [cmsg('u_cc_host', 'Lena outlasts the field 🏆 — Sam a solid 3rd', '11:20p', 'system')],
+  },
+  {
+    id: 'll_champ_reg', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆', title: 'Saturday Night Last Longer',
+    status: 'registration', stake: 100, hostId: 'u_cc_host', coHostIds: [],
+    location: 'Champions Club Houston', mode: 'in-person',
+    participants: [
+      p('u_cc_host', 'active', true, 0, 'now'),
+      p('u_mike', 'active', true, 0, 'now'),
+      p('u_jordan', 'active', false, 0, 'now'),
+    ],
+    chat: [cmsg('u_cc_host', 'Registration open — last longer wins the pool. Cards at 8 🃏', '6:50p', 'system')],
+  },
+  // ---- Demo: Texas Card House, Houston ----
+  {
+    id: 'll_tch_done', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏', title: 'Fall Harvest — Last Longer',
+    status: 'completed', stake: 250, hostId: 'u_tch_host', coHostIds: [], winnerName: 'Gary Grind', settledAt: '2026-06-05',
+    location: 'Texas Card House Houston', mode: 'in-person',
+    participants: [
+      p('u_gary', 'out', true, 0, '—', false, 1),
+      p('u_cody', 'out', true, 0, '—', false, 2, '18m ago'),
+      p('u_player', 'out', true, 0, '—', false, 3, '50m ago'),
+      p('u_dustin', 'out', true, 0, '—', false, 4, '1h 35m ago'),
+    ],
+    chat: [cmsg('u_tch_host', 'Gary takes the Harvest 🏆', '10:30p', 'system')],
+  },
+  {
+    id: 'll_tch_reg', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏', title: 'Midweek Deep Stack Last Longer',
+    status: 'registration', stake: 100, hostId: 'u_tch_host', coHostIds: [],
+    location: 'Texas Card House Houston', mode: 'in-person',
+    participants: [
+      p('u_tch_host', 'active', true, 0, 'now'),
+      p('u_gary', 'active', true, 0, 'now'),
+      p('u_dustin', 'active', false, 0, 'now'),
+    ],
+    chat: [cmsg('u_tch_host', 'Deep stacks tonight — register now 🃏', '5:40p', 'system')],
+  },
 ]

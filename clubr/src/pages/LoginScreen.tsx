@@ -6,9 +6,11 @@ import { Btn, Field } from '@/components/common/ui'
 import * as api from '@/lib/api/services'
 import type { AccountRole } from '@/types'
 
-const ROLES: { role: AccountRole; label: string; who: string; icon: typeof UserIcon; color: string }[] = [
+const ROLES: { role: AccountRole; label: string; who: string; icon: typeof UserIcon; color: string; userId?: string }[] = [
   { role: 'player', label: 'Player', who: 'Sam Rivers · joins clubs & plays', icon: UserIcon, color: '#3b82f6' },
   { role: 'host', label: 'Club Host', who: 'Harper · owns "Aces High", approves members', icon: Crown, color: '#10b981' },
+  { role: 'host', label: 'Champions Club', who: 'Marcus · owns "Champions Club, Houston"', icon: Crown, color: '#a855f7', userId: 'u_cc_host' },
+  { role: 'host', label: 'Texas Card House', who: 'Diana · owns "Texas Card House, Houston"', icon: Crown, color: '#dc2626', userId: 'u_tch_host' },
   { role: 'admin', label: 'App Admin', who: 'Avery · manages all clubs & users', icon: ShieldCheck, color: '#8b5cf6' },
 ]
 
@@ -50,7 +52,7 @@ export function LoginScreen() {
               {ROLES.map((r) => (
                 <button
                   key={r.role}
-                  onClick={() => loginAs(r.role)}
+                  onClick={() => loginAs(r.role, r.userId)}
                   className="flex items-center gap-3 rounded-2xl border border-border bg-bg-card p-3.5 text-left transition-colors hover:bg-bg-surface cursor-pointer"
                 >
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl text-white" style={{ background: r.color }}><r.icon className="h-5 w-5" /></span>

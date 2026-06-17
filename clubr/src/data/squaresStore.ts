@@ -31,6 +31,21 @@ const winAt = (home: number, away: number) => {
   return { winnerCell: idx, winnerUserId: doneCells[idx].userId }
 }
 
+// ---- Demo Texas clubs: completed boards (full grid + digits + period winners) ----
+const winIn = (cells: SquaresCell[], rowD: number[], colD: number[], home: number, away: number) => {
+  const idx = rowD.indexOf(home % 10) * 10 + colD.indexOf(away % 10)
+  return { winnerCell: idx, winnerUserId: cells[idx].userId }
+}
+const champDone = emptyGrid()
+for (let i = 0; i < 100; i++) claim(champDone, i, ['u_player', 'u_mike', 'u_lena', 'u_jordan', 'u_cody'][i % 5])
+const tchDone = emptyGrid()
+for (let i = 0; i < 100; i++) claim(tchDone, i, ['u_player', 'u_gary', 'u_cody', 'u_dustin', 'u_mike'][i % 5])
+// ---- registration boards (partial claims → joinable) ----
+const champReg = emptyGrid()
+;([[2, 'u_mike'], [14, 'u_lena'], [27, 'u_jordan'], [38, 'u_cody'], [45, 'u_cc_host'], [56, 'u_mike'], [63, 'u_lena'], [71, 'u_jordan'], [88, 'u_cc_host']] as [number, string][]).forEach(([i, id]) => claim(champReg, i, id))
+const tchReg = emptyGrid()
+;([[1, 'u_gary'], [9, 'u_cody'], [22, 'u_dustin'], [33, 'u_gary'], [44, 'u_tch_host'], [55, 'u_cody'], [67, 'u_dustin'], [79, 'u_gary'], [90, 'u_tch_host']] as [number, string][]).forEach(([i, id]) => claim(tchReg, i, id))
+
 export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_c', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡',
@@ -65,6 +80,58 @@ export const SQUARES_GAMES: SquaresGame[] = [
       { label: 'Final', pct: 70, homeScore: 24, awayScore: 20, ...winAt(24, 20) },
     ],
     participants: [part('u_gary', 'active', true), part('u_player', 'active', true), part('u_lena', 'active', true), part('u_mike', 'active', true), part('u_tom', 'active', true)],
+    chat: [],
+  },
+  // ---- Demo: Champions Club, Houston ----
+  {
+    id: 'sq_champ_done', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆',
+    title: 'Texans @ Cowboys Squares', homeTeam: 'Texans', awayTeam: 'Cowboys',
+    visibility: 'public', status: 'completed', timezone: 'CT', settledAt: '2026-06-08',
+    stake: 50, hostId: 'u_cc_host', coHostIds: [],
+    cells: champDone, rowDigits, colDigits,
+    periods: [
+      { label: 'Q1', pct: 10, homeScore: 7, awayScore: 0, ...winIn(champDone, rowDigits, colDigits, 7, 0) },
+      { label: 'Q2', pct: 10, homeScore: 14, awayScore: 10, ...winIn(champDone, rowDigits, colDigits, 14, 10) },
+      { label: 'Q3', pct: 10, homeScore: 21, awayScore: 13, ...winIn(champDone, rowDigits, colDigits, 21, 13) },
+      { label: 'Final', pct: 70, homeScore: 27, awayScore: 24, ...winIn(champDone, rowDigits, colDigits, 27, 24) },
+    ],
+    participants: [part('u_cc_host', 'active', true), part('u_player', 'active', true), part('u_mike', 'active', true), part('u_lena', 'active', true), part('u_jordan', 'active', true), part('u_cody', 'active', true)],
+    chat: [],
+  },
+  {
+    id: 'sq_champ_reg', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆',
+    title: 'Sunday Squares — Texans @ Colts', homeTeam: 'Texans', awayTeam: 'Colts',
+    visibility: 'public', status: 'registration', timezone: 'CT',
+    stake: 50, hostId: 'u_cc_host', coHostIds: [],
+    cells: champReg, rowDigits: [], colDigits: [],
+    periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
+    participants: [part('u_cc_host', 'active', true), part('u_mike', 'active', true), part('u_lena', 'active', true), part('u_jordan', 'active', true)],
+    chat: [],
+  },
+  // ---- Demo: Texas Card House, Houston ----
+  {
+    id: 'sq_tch_done', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏',
+    title: 'Cowboys @ Eagles Squares', homeTeam: 'Eagles', awayTeam: 'Cowboys',
+    visibility: 'public', status: 'completed', timezone: 'CT', settledAt: '2026-06-04',
+    stake: 100, hostId: 'u_tch_host', coHostIds: [],
+    cells: tchDone, rowDigits, colDigits,
+    periods: [
+      { label: 'Q1', pct: 10, homeScore: 3, awayScore: 7, ...winIn(tchDone, rowDigits, colDigits, 3, 7) },
+      { label: 'Q2', pct: 10, homeScore: 10, awayScore: 14, ...winIn(tchDone, rowDigits, colDigits, 10, 14) },
+      { label: 'Q3', pct: 10, homeScore: 20, awayScore: 17, ...winIn(tchDone, rowDigits, colDigits, 20, 17) },
+      { label: 'Final', pct: 70, homeScore: 31, awayScore: 27, ...winIn(tchDone, rowDigits, colDigits, 31, 27) },
+    ],
+    participants: [part('u_tch_host', 'active', true), part('u_player', 'active', true), part('u_gary', 'active', true), part('u_cody', 'active', true), part('u_dustin', 'active', true), part('u_mike', 'active', true)],
+    chat: [],
+  },
+  {
+    id: 'sq_tch_reg', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏',
+    title: 'Game Day Squares — Cowboys @ Giants', homeTeam: 'Cowboys', awayTeam: 'Giants',
+    visibility: 'public', status: 'registration', timezone: 'CT',
+    stake: 100, hostId: 'u_tch_host', coHostIds: [],
+    cells: tchReg, rowDigits: [], colDigits: [],
+    periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
+    participants: [part('u_tch_host', 'active', true), part('u_gary', 'active', true), part('u_cody', 'active', true), part('u_dustin', 'active', true)],
     chat: [],
   },
 ]

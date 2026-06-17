@@ -22,6 +22,9 @@ export const USERS: Record<string, User> = {
   u_jordan: { id: 'u_jordan', name: 'Jordan Lee', handle: 'jordan', email: 'jordan@example.com', phone: '+1 (305) 555‑0164', location: 'Houston, TX', role: 'player', avatarColor: '#f97316' },
   u_dustin: { id: 'u_dustin', name: 'Dustin Cole', handle: 'dustin', email: 'dustin@example.com', phone: '+1 (408) 555‑0125', location: 'Dallas, TX', role: 'player', avatarColor: '#a855f7' },
   u_cody: { id: 'u_cody', name: 'Cody Banks', handle: 'cody', email: 'cody@example.com', location: 'Austin, TX', role: 'player', avatarColor: '#eab308' },
+  // ---- Demo clubs seeded from real TournamentPro venues (Champions Club + Texas Card House) ----
+  u_cc_host: { id: 'u_cc_host', name: 'Marcus Reyes', handle: 'marcus', email: 'marcus@championsclub.example', location: 'Houston, TX', role: 'host', avatarColor: '#a855f7' },
+  u_tch_host: { id: 'u_tch_host', name: 'Diana Cole', handle: 'diana', email: 'diana@texascardhouse.example', location: 'Houston, TX', role: 'host', avatarColor: '#dc2626' },
 }
 
 const u = USERS
@@ -80,6 +83,38 @@ export const CLUBS: Club[] = [
     location: 'Austin, TX', visibility: 'private',
     ownerId: 'u_rae', ownerName: 'Rae Rivers', inviteCode: 'HRX7K2Q9', createdAt: '2026-06-11',
     members: [member('u_rae', 'owner', 'member', '2026-06-11'), member('u_tom', 'member', 'member', '2026-06-12')],
+  },
+  // ---- Demo: Champions Club, Houston (real final-table data in its FT) ----
+  {
+    id: 'c_champions', name: 'Champions Club, Houston', emoji: '🏆', color: '#a855f7',
+    description: 'Houston’s home for big-field final tables. Fantasy the FT, run Last Longers & Squares.',
+    location: 'Houston, TX',
+    ownerId: 'u_cc_host', ownerName: 'Marcus Reyes', inviteCode: 'CHAMP1', createdAt: '2026-05-10',
+    members: [
+      member('u_cc_host', 'owner', 'member', '2026-05-10'),
+      member('u_player', 'member', 'member', '2026-06-16'),
+      member('u_mike', 'member', 'member', '2026-05-12'),
+      member('u_tom', 'member', 'member', '2026-05-14'),
+      member('u_lena', 'member', 'member', '2026-05-18'),
+      member('u_jordan', 'member', 'member', '2026-05-20'),
+      member('u_cody', 'member', 'member', '2026-05-22'),
+    ],
+  },
+  // ---- Demo: Texas Card House, Houston (real final-table data in its FT) ----
+  {
+    id: 'c_tch', name: 'Texas Card House, Houston', emoji: '🃏', color: '#dc2626',
+    description: 'TCH Houston crew — final-table fantasy, weekly Last Longer, and Squares on game day.',
+    location: 'Houston, TX',
+    ownerId: 'u_tch_host', ownerName: 'Diana Cole', inviteCode: 'TCH777', createdAt: '2026-05-08',
+    members: [
+      member('u_tch_host', 'owner', 'member', '2026-05-08'),
+      member('u_player', 'member', 'member', '2026-06-16'),
+      member('u_gary', 'member', 'member', '2026-05-11'),
+      member('u_rae', 'member', 'member', '2026-05-13'),
+      member('u_cody', 'member', 'member', '2026-05-15'),
+      member('u_dustin', 'member', 'member', '2026-05-17'),
+      member('u_mike', 'member', 'member', '2026-05-19'),
+    ],
   },
 ]
 

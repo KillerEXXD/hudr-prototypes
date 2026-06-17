@@ -21,6 +21,34 @@ export const FT_PLAYERS: FTPlayer[] = [
   { seat: 'I', name: 'Seidel', first: 'Erik', last: 'Seidel', country: '🇺🇸', bbStack: 7, chips: 700_000, icmPrice: 13000, icmCash: 190_000 },
 ]
 
+// Real final tables (TournamentPro) — same seat→price ladder as FT_PLAYERS so the
+// 100k budget math is identical; only the names change.
+const N = (seat: string, name: string, first: string, last: string, country: string) => {
+  const base = FT_PLAYERS.find((p) => p.seat === seat)!
+  return { ...base, name, first, last, country }
+}
+// Champions Club, Houston — Fall Poker Open final table (6-handed).
+export const CHAMP_FT: FTPlayer[] = [
+  N('A', 'Shovkovyi', 'Vladyslav', 'Shovkovyi', '🇺🇦'),
+  N('B', 'Rich', 'Bradley', 'Rich', '🇺🇸'),
+  N('C', 'Brooks', 'Randall', 'Brooks', '🇺🇸'),
+  N('D', 'Jolly', 'Brant', 'Jolly', '🇺🇸'),
+  N('E', 'Curry', 'Adrian', 'Curry', '🇺🇸'),
+  N('F', 'Vo', 'Phu', 'Vo', '🇺🇸'),
+]
+// Texas Card House — $100K Fall Harvest Headliner final table (9-handed).
+export const TCH_FT: FTPlayer[] = [
+  N('A', 'Beckenstein', 'Josh', 'Beckenstein', '🇺🇸'),
+  N('B', 'Patel', 'Harshit', 'Patel', '🇮🇳'),
+  N('C', 'Mixson', 'Cameron', 'Mixson', '🇺🇸'),
+  N('D', 'Khavboshin', 'Sergei', 'Khavboshin', '🇺🇸'),
+  N('E', 'Rathi', 'Mahesh', 'Rathi', '🇮🇳'),
+  N('F', 'Joshua', 'Josh', 'Joshua', '🇺🇸'),
+  N('G', 'Nate', 'Nate', '', '🇺🇸'),
+  N('H', 'Danny', 'Danny', '', '🇺🇸'),
+  N('I', 'Dustin', 'Dustin', '', '🇺🇸'),
+]
+
 const PRICE = Object.fromEntries(FT_PLAYERS.map((p) => [p.seat, p.icmPrice]))
 export function spendOf(picks: string[]): number {
   return picks.reduce((s, seat) => s + (PRICE[seat] ?? 0), 0)
@@ -151,6 +179,38 @@ export const FT_CONTESTS: FTContest[] = [
       entry('u_tom', 'approved', true, ['C', 'D', 'E', 'F']), // 71 pts
     ],
     chat: [cmsg('u_host', 'Winner takes all — Mike scoops the whole pot 💰', '12:40a', 'system')],
+  },
+  // ---- Demo: Champions Club, Houston — real Fall Poker Open final table (open) ----
+  {
+    id: 'ct_champ', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆', ftName: 'Fall Poker Open — $750K Main Event FT',
+    status: 'open', stake: 100, budget: 100000, locksAt: 'in 2h 30m',
+    room: 'Champions Club', prizePool: '$750,000', buyIn: '$2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas', streamLive: false,
+    hostId: 'u_cc_host', coHostIds: [],
+    players: CHAMP_FT,
+    entries: [
+      entry('u_cc_host', 'approved', true, ['A', 'D', 'E', 'F']),
+      entry('u_mike', 'approved', true, ['B', 'C', 'E', 'F']),
+      entry('u_lena', 'approved', true, ['A', 'C', 'F', 'E']),
+      entry('u_player', 'approved', false), // Sam — approved, hasn't drafted yet
+      entry('u_jordan', 'pending', false),
+    ],
+    chat: [cmsg('u_cc_host', 'Shovkovyi is the chip leader — draft accordingly 🏆', '6:30p'), cmsg('u_mike', 'fading the leader, loading short stacks', '6:33p')],
+  },
+  // ---- Demo: Texas Card House, Houston — real $100K Fall Harvest final table (open) ----
+  {
+    id: 'ct_tch', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏', ftName: '$100K Fall Harvest Headliner — FT',
+    status: 'open', stake: 250, budget: 100000, locksAt: 'in 4h 10m',
+    room: 'Texas Card House', prizePool: '$100,000', buyIn: '$1,100', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse', streamLive: false,
+    hostId: 'u_tch_host', coHostIds: [],
+    players: TCH_FT,
+    entries: [
+      entry('u_tch_host', 'approved', true, ['A', 'C', 'H', 'I']),
+      entry('u_gary', 'approved', true, ['B', 'D', 'F', 'G']),
+      entry('u_cody', 'approved', true, ['A', 'E', 'G', 'I']),
+      entry('u_player', 'approved', false), // Sam — approved, hasn't drafted yet
+      entry('u_dustin', 'pending', false),
+    ],
+    chat: [cmsg('u_tch_host', 'Beckenstein came in with a monster stack — good luck all', '7:05p')],
   },
 ]
 
