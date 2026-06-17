@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
+import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { GameChat } from '@/components/common/GameChat'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { useEconomy } from '@/hooks/credits'
@@ -72,6 +73,7 @@ export function LastLongerGamePage() {
         <button type="button" onClick={() => setHowOpen(true)} className="flex items-center gap-1 rounded-full border border-border px-2 py-0.5 font-semibold text-text-secondary hover:text-text-primary cursor-pointer"><HelpCircle className="h-3.5 w-3.5" />How it works</button>
       </div>
       {(() => { const joined = g.participants.filter((p) => p.status !== 'pending').length; return <StakePool stake={g.stake} pool={g.stake * joined}>· {joined} joined</StakePool> })()}
+      {g.status === 'registration' && <div className="mt-3"><CountdownBanner deadline={regDeadline(g.id, g.registrationClosesAt)} sub="Registration closes — join before the clock hits zero" /></div>}
       {(g.location || g.mode) && (
         <p className="mt-1 flex items-center gap-1.5 text-[11px] text-text-muted">
           {g.mode === 'online' ? <Wifi className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}

@@ -12,6 +12,7 @@ import { FinalTableDetails } from '@/components/ft/FinalTableDetails'
 import { SettledResult } from '@/components/ft/SettledResult'
 import { StakePool } from '@/components/common/StakePool'
 import { HowScoringPricing } from '@/components/ft/HowScoringPricing'
+import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
 import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
@@ -55,9 +56,12 @@ export function ContestDetailPage() {
         <Badge tone={statusTone}>{c.status === 'open' ? 'Open' : c.status === 'locked' ? 'Locked' : 'Settled'}</Badge>
         {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}
         <span className="font-mono">{c.stake} Stakes</span><span className="text-text-muted">· budget {fmtK(c.budget)}</span>
-        <span className="ml-auto text-text-muted">{c.locksAt}</span>
+        {c.status !== 'open' && <span className="ml-auto text-text-muted">{c.locksAt}</span>}
       </div>
       {(() => { const joined = c.entries.filter((e) => e.status === 'approved').length; return <StakePool stake={c.stake} pool={c.stake * joined}>· {joined} joined</StakePool> })()}
+
+      {/* ===== Ticking "Closes in" countdown — draft locks at the deadline ===== */}
+      {c.status === 'open' && <div className="mt-3"><CountdownBanner deadline={regDeadline(c.id, c.locksAt)} sub="Draft locks when the clock hits zero — get your picks in" /></div>}
 
       {/* ===== How scoring & pricing work — combined explainer, at the top, by the buy-in/pool ===== */}
       <div className="mt-3"><HowScoringPricing players={c.players} budget={c.budget} /></div>

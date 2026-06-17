@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
-import { Countdown, regDeadline } from '@/components/common/Countdown'
+import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { cn } from '@/lib/utils/cn'
 import { useEconomy } from '@/hooks/credits'
@@ -82,9 +82,9 @@ export function SquaresGamePage() {
       <div className="mt-1.5 flex items-center gap-2 text-xs">
         <Badge tone={statusTone}>{g.status === 'live' ? '● Live' : g.status === 'registration' ? 'Claiming open' : 'Completed'}</Badge>
         <button type="button" onClick={() => setHowOpen(true)} className="flex items-center gap-1 rounded-full border border-border px-2 py-0.5 font-semibold text-text-secondary hover:text-text-primary cursor-pointer"><HelpCircle className="h-3.5 w-3.5" />How it works</button>
-        {g.status === 'registration' && <span className="ml-auto"><Countdown deadline={regDeadline(g.id, g.registrationClosesAt)} prefix="Closes" /></span>}
       </div>
       <StakePool stake={g.stake} pool={g.stake * g.claimedCount}>· {g.claimedCount}/100 squares</StakePool>
+      {g.status === 'registration' && <div className="mt-3"><CountdownBanner deadline={regDeadline(g.id, g.registrationClosesAt)} sub="Claiming closes — grab your squares before the clock hits zero" /></div>}
 
       {!g.isMemberOfClub && !g.canManage ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to claim squares.</p></Card>
