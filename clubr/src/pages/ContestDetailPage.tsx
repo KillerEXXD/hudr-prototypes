@@ -11,7 +11,7 @@ import { DraftBoard } from '@/components/ft/DraftBoard'
 import { FinalTableDetails } from '@/components/ft/FinalTableDetails'
 import { SettledResult } from '@/components/ft/SettledResult'
 import { StakePool } from '@/components/common/StakePool'
-import { ScoringSchedule } from '@/components/ft/ScoringSchedule'
+import { HowScoringPricing } from '@/components/ft/HowScoringPricing'
 import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
 import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
@@ -58,6 +58,9 @@ export function ContestDetailPage() {
         <span className="ml-auto text-text-muted">{c.locksAt}</span>
       </div>
       {(() => { const joined = c.entries.filter((e) => e.status === 'approved').length; return <StakePool stake={c.stake} pool={c.stake * joined}>· {joined} joined</StakePool> })()}
+
+      {/* ===== How scoring & pricing work — combined explainer, at the top, by the buy-in/pool ===== */}
+      <div className="mt-3"><HowScoringPricing players={c.players} budget={c.budget} defaultOpen={c.status === 'open'} /></div>
       {c.canManage && c.visibility === 'private' && (
         <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>
       )}
@@ -94,9 +97,6 @@ export function ContestDetailPage() {
           )}
         </Section>
       )}
-
-      {/* ===== Scoring — points per finish (every state; open by default while drafting) ===== */}
-      <div className="mt-3"><ScoringSchedule defaultOpen={c.status === 'open'} /></div>
 
       {/* ===== Full FT details — roster, stacks, prices, live stream (everyone) ===== */}
       <FinalTableDetails contest={c} />
