@@ -16,8 +16,8 @@ const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' |
 const SWITCH: { role: AccountRole; userId?: string; label: string; icon: typeof UserIcon }[] = [
   { role: 'player', label: 'Player', icon: UserIcon },
   { role: 'host', label: 'Club Host', icon: Crown },
-  { role: 'host', userId: 'u_cc_host', label: 'Champions Club', icon: Crown },
-  { role: 'host', userId: 'u_tch_host', label: 'Texas Card House', icon: Crown },
+  { role: 'host', userId: 'u_cc_host', label: 'Bayou City Poker Club Host', icon: Crown },
+  { role: 'host', userId: 'u_tch_host', label: 'Gulf Coast Card Club Host', icon: Crown },
   { role: 'admin', label: 'App Admin', icon: ShieldCheck },
 ]
 

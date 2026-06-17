@@ -96,11 +96,11 @@ export const LL_GAMES: LLGame[] = [
     ],
     chat: [cmsg('u_host', 'GG all — Mike takes it down 🏆', '11:48p', 'system')],
   },
-  // ---- Demo: Champions Club, Houston — real Lone Star Poker Series $1M field ----
+  // ---- Demo: Bayou City Poker Club — real Lone Star Poker Series $1M field ----
   {
-    id: 'll_champ_done', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆', title: 'Lone Star Poker Series — $1M Main Event',
+    id: 'll_champ_done', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆', title: 'Lone Star Poker Series — $1M Main Event',
     status: 'completed', stake: 250, hostId: 'u_cc_host', coHostIds: [], winnerName: 'Joon Park', settledAt: '2026-06-07',
-    location: 'Champions Club Houston', mode: 'in-person',
+    location: 'Bayou City Poker Club', mode: 'in-person',
     participants: [
       p('u_cc_p1', 'out', true, 0, '—', false, 1),
       p('u_cc_p2', 'out', true, 0, '—', false, 2, '14m ago'),
@@ -115,9 +115,9 @@ export const LL_GAMES: LLGame[] = [
     chat: [cmsg('u_cc_host', 'Joon Park outlasts a stacked field — Lone Star $1M champ 🏆', '11:55p', 'system')],
   },
   {
-    id: 'll_champ_live', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆', title: 'Friday Night Last Longer',
+    id: 'll_champ_live', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆', title: 'Friday Night Last Longer',
     status: 'live', stake: 100, hostId: 'u_cc_host', coHostIds: [],
-    location: 'Champions Club Houston', mode: 'in-person',
+    location: 'Bayou City Poker Club', mode: 'in-person',
     participants: [
       p('u_cc_p3', 'active', true, 420000, 'now'),
       p('u_player', 'active', true, 305000, '4m'),
@@ -129,9 +129,9 @@ export const LL_GAMES: LLGame[] = [
     chat: [cmsg('u_cc_host', 'Down to 4 — Kevin chip leads', '9:20p', 'system')],
   },
   {
-    id: 'll_champ_reg', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆', title: 'Saturday Night Last Longer',
+    id: 'll_champ_reg', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆', title: 'Saturday Night Last Longer',
     status: 'registration', stake: 100, hostId: 'u_cc_host', coHostIds: [],
-    location: 'Champions Club Houston', mode: 'in-person',
+    location: 'Bayou City Poker Club', mode: 'in-person',
     participants: [
       p('u_cc_host', 'active', true, 0, 'now'),
       p('u_cc_p2', 'active', true, 0, 'now'),
@@ -140,11 +140,11 @@ export const LL_GAMES: LLGame[] = [
     ],
     chat: [cmsg('u_cc_host', 'Registration open — last longer wins the pool. Cards at 8 🃏', '6:50p', 'system')],
   },
-  // ---- Demo: Texas Card House, Houston — real Trailblazer $1M Main Event field ----
+  // ---- Demo: Gulf Coast Card Club — real Trailblazer $1M Main Event field ----
   {
-    id: 'll_tch_done', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏', title: 'Trailblazer Poker Tour — $1M Main Event',
+    id: 'll_tch_done', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏', title: 'Trailblazer Poker Tour — $1M Main Event',
     status: 'completed', stake: 250, hostId: 'u_tch_host', coHostIds: [], winnerName: 'Travis Preng', settledAt: '2026-06-05',
-    location: 'Texas Card House Houston', mode: 'in-person',
+    location: 'Gulf Coast Card Club', mode: 'in-person',
     participants: [
       p('u_tch_p1', 'out', true, 0, '—', false, 1),
       p('u_tch_p2', 'out', true, 0, '—', false, 2, '16m ago'),
@@ -159,9 +159,9 @@ export const LL_GAMES: LLGame[] = [
     chat: [cmsg('u_tch_host', 'Travis Preng takes down the Trailblazer $1M 🏆', '10:30p', 'system')],
   },
   {
-    id: 'll_tch_live', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏', title: 'Thursday Last Longer',
+    id: 'll_tch_live', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏', title: 'Thursday Last Longer',
     status: 'live', stake: 100, hostId: 'u_tch_host', coHostIds: [],
-    location: 'Texas Card House Houston', mode: 'in-person',
+    location: 'Gulf Coast Card Club', mode: 'in-person',
     participants: [
       p('u_tch_p1', 'active', true, 380000, 'now'),
       p('u_player', 'active', true, 290000, '6m'),
@@ -172,9 +172,9 @@ export const LL_GAMES: LLGame[] = [
     chat: [cmsg('u_tch_host', 'Travis chip leads again 😅', '9:05p', 'system')],
   },
   {
-    id: 'll_tch_reg', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏', title: 'Midweek Deep Stack Last Longer',
+    id: 'll_tch_reg', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏', title: 'Midweek Deep Stack Last Longer',
     status: 'registration', stake: 100, hostId: 'u_tch_host', coHostIds: [],
-    location: 'Texas Card House Houston', mode: 'in-person',
+    location: 'Gulf Coast Card Club', mode: 'in-person',
     participants: [
       p('u_tch_host', 'active', true, 0, 'now'),
       p('u_tch_p2', 'active', true, 0, 'now'),

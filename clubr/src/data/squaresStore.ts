@@ -82,9 +82,9 @@ export const SQUARES_GAMES: SquaresGame[] = [
     participants: [part('u_gary', 'active', true), part('u_player', 'active', true), part('u_lena', 'active', true), part('u_mike', 'active', true), part('u_tom', 'active', true)],
     chat: [],
   },
-  // ---- Demo: Champions Club, Houston ----
+  // ---- Demo: Bayou City Poker Club ----
   {
-    id: 'sq_champ_done', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆',
+    id: 'sq_champ_done', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆',
     title: 'Texans @ Cowboys Squares', homeTeam: 'Texans', awayTeam: 'Cowboys',
     visibility: 'public', status: 'completed', timezone: 'CT', settledAt: '2026-06-08',
     stake: 50, hostId: 'u_cc_host', coHostIds: [],
@@ -99,7 +99,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
     chat: [],
   },
   {
-    id: 'sq_champ_reg', clubId: 'c_champions', clubName: 'Champions Club, Houston', clubEmoji: '🏆',
+    id: 'sq_champ_reg', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆',
     title: 'Sunday Squares — Texans @ Colts', homeTeam: 'Texans', awayTeam: 'Colts',
     visibility: 'public', status: 'registration', timezone: 'CT',
     stake: 50, hostId: 'u_cc_host', coHostIds: [],
@@ -108,9 +108,9 @@ export const SQUARES_GAMES: SquaresGame[] = [
     participants: [part('u_cc_host', 'active', true), part('u_cc_p2', 'active', true), part('u_cc_p5', 'active', true), part('u_cc_p7', 'active', true)],
     chat: [],
   },
-  // ---- Demo: Texas Card House, Houston ----
+  // ---- Demo: Gulf Coast Card Club ----
   {
-    id: 'sq_tch_done', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏',
+    id: 'sq_tch_done', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏',
     title: 'Cowboys @ Eagles Squares', homeTeam: 'Eagles', awayTeam: 'Cowboys',
     visibility: 'public', status: 'completed', timezone: 'CT', settledAt: '2026-06-04',
     stake: 100, hostId: 'u_tch_host', coHostIds: [],
@@ -125,7 +125,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
     chat: [],
   },
   {
-    id: 'sq_tch_reg', clubId: 'c_tch', clubName: 'Texas Card House, Houston', clubEmoji: '🃏',
+    id: 'sq_tch_reg', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏',
     title: 'Game Day Squares — Cowboys @ Giants', homeTeam: 'Cowboys', awayTeam: 'Giants',
     visibility: 'public', status: 'registration', timezone: 'CT',
     stake: 100, hostId: 'u_tch_host', coHostIds: [],

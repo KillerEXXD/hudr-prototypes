@@ -22,10 +22,10 @@ export const USERS: Record<string, User> = {
   u_jordan: { id: 'u_jordan', name: 'Jordan Lee', handle: 'jordan', email: 'jordan@example.com', phone: '+1 (305) 555‑0164', location: 'Houston, TX', role: 'player', avatarColor: '#f97316' },
   u_dustin: { id: 'u_dustin', name: 'Dustin Cole', handle: 'dustin', email: 'dustin@example.com', phone: '+1 (408) 555‑0125', location: 'Dallas, TX', role: 'player', avatarColor: '#a855f7' },
   u_cody: { id: 'u_cody', name: 'Cody Banks', handle: 'cody', email: 'cody@example.com', location: 'Austin, TX', role: 'player', avatarColor: '#eab308' },
-  // ---- Demo clubs seeded from real TournamentPro venues (Champions Club + Texas Card House) ----
+  // ---- Demo clubs seeded from real TournamentPro venues (Bayou City Poker Club + Gulf Coast Card Club) ----
   u_cc_host: { id: 'u_cc_host', name: 'Marcus Reyes', handle: 'marcus', email: 'marcus@championsclub.example', location: 'Houston, TX', role: 'host', avatarColor: '#a855f7' },
   u_tch_host: { id: 'u_tch_host', name: 'Diana Cole', handle: 'diana', email: 'diana@texascardhouse.example', location: 'Houston, TX', role: 'host', avatarColor: '#dc2626' },
-  // Champions Club members — real Lone Star Poker Series $1M field (finishing order).
+  // Bayou City Poker Club members — real Lone Star Poker Series $1M field (finishing order).
   u_cc_p1: { id: 'u_cc_p1', name: 'Joon Park', handle: 'joonpark', email: 'joon@example', location: 'Austin, TX', role: 'player', avatarColor: '#ef4444' },
   u_cc_p2: { id: 'u_cc_p2', name: 'Harry Wright', handle: 'harryw', email: 'harry@example', location: 'De Queen, AR', role: 'player', avatarColor: '#f97316' },
   u_cc_p3: { id: 'u_cc_p3', name: 'Kevin Kaylor', handle: 'kevink', email: 'kevin@example', location: 'Houston, TX', role: 'player', avatarColor: '#eab308' },
@@ -35,7 +35,7 @@ export const USERS: Record<string, User> = {
   u_cc_p7: { id: 'u_cc_p7', name: 'Nick Shkolnik', handle: 'nicks', email: 'nick@example', location: 'Sun Valley, CA', role: 'player', avatarColor: '#3b82f6' },
   u_cc_p8: { id: 'u_cc_p8', name: 'Christopher Doan', handle: 'chrisd', email: 'chris@example', location: 'Hacienda Heights, CA', role: 'player', avatarColor: '#8b5cf6' },
   u_cc_p9: { id: 'u_cc_p9', name: 'Jared Hemingway', handle: 'jaredh', email: 'jaredh@example', location: 'Houston, TX', role: 'player', avatarColor: '#ec4899' },
-  // Texas Card House members — real Trailblazer $1M Main Event field (finishing order).
+  // Gulf Coast Card Club members — real Trailblazer $1M Main Event field (finishing order).
   u_tch_p1: { id: 'u_tch_p1', name: 'Travis Preng', handle: 'travisp', email: 'travis@example', location: 'Dallas, TX', role: 'player', avatarColor: '#ef4444' },
   u_tch_p2: { id: 'u_tch_p2', name: 'Young Ki Choi', handle: 'youngki', email: 'young@example', location: 'Dallas, TX', role: 'player', avatarColor: '#f97316' },
   u_tch_p3: { id: 'u_tch_p3', name: 'Paul Velasco', handle: 'paulv', email: 'paul@example', location: 'Houston, TX', role: 'player', avatarColor: '#eab308' },
@@ -104,9 +104,9 @@ export const CLUBS: Club[] = [
     ownerId: 'u_rae', ownerName: 'Rae Rivers', inviteCode: 'HRX7K2Q9', createdAt: '2026-06-11',
     members: [member('u_rae', 'owner', 'member', '2026-06-11'), member('u_tom', 'member', 'member', '2026-06-12')],
   },
-  // ---- Demo: Champions Club, Houston (real final-table data in its FT) ----
+  // ---- Demo: Bayou City Poker Club (real final-table data in its FT) ----
   {
-    id: 'c_champions', name: 'Champions Club, Houston', emoji: '🏆', color: '#a855f7',
+    id: 'c_champions', name: 'Bayou City Poker Club', emoji: '🏆', color: '#a855f7',
     description: 'Houston’s home for big-field final tables. Fantasy the FT, run Last Longers & Squares.',
     location: 'Houston, TX',
     ownerId: 'u_cc_host', ownerName: 'Marcus Reyes', inviteCode: 'CHAMP1', createdAt: '2026-05-10',
@@ -126,9 +126,9 @@ export const CLUBS: Club[] = [
       member('u_lena', 'member', 'pending', '2026-06-15'),
     ],
   },
-  // ---- Demo: Texas Card House, Houston (real final-table data in its FT) ----
+  // ---- Demo: Gulf Coast Card Club (real final-table data in its FT) ----
   {
-    id: 'c_tch', name: 'Texas Card House, Houston', emoji: '🃏', color: '#dc2626',
+    id: 'c_tch', name: 'Gulf Coast Card Club', emoji: '🃏', color: '#dc2626',
     description: 'TCH Houston crew — final-table fantasy, weekly Last Longer, and Squares on game day.',
     location: 'Houston, TX',
     ownerId: 'u_tch_host', ownerName: 'Diana Cole', inviteCode: 'TCH777', createdAt: '2026-05-08',
