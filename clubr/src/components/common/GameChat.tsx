@@ -43,11 +43,11 @@ export function GameChat({ messages, onSend, canSend, currentUserId }: { message
       </div>
       {canSend ? (
         <div className="flex items-center gap-2">
-          <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Message the table…" className="flex-1 rounded-xl border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
+          <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Message the players…" className="flex-1 rounded-xl border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
           <button onClick={send} className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-blue text-white cursor-pointer" aria-label="Send"><Send className="h-4 w-4" /></button>
         </div>
       ) : (
-        <p className="flex items-center justify-center gap-1 py-1 text-[11px] text-text-muted"><MessageCircle className="h-3 w-3" />Get admitted to chat with the table.</p>
+        <p className="flex items-center justify-center gap-1 py-1 text-[11px] text-text-muted"><MessageCircle className="h-3 w-3" />Get admitted to chat with the players.</p>
       )}
     </div>
   )
