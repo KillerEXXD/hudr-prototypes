@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Clock, CheckCircle2, Users, Crown, Shield, MapPin } from 'lucide-react'
+import { Clock, CheckCircle2, Users, Crown, Shield, MapPin, Lock } from 'lucide-react'
 import { Avatar, Badge, Card } from './ui'
 import type { ClubView } from '@/types'
 
@@ -18,7 +18,14 @@ export function ClubRow({ club, right }: { club: ClubView; right?: React.ReactNo
     <Card onClick={() => navigate(`/club/${club.id}`)} className="flex items-center gap-3 p-3">
       <Avatar emoji={club.emoji} color={club.color} size={44} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-text-primary">{club.name}</p>
+        <p className="flex items-center gap-1.5 text-sm font-bold text-text-primary">
+          <span className="min-w-0 truncate">{club.name}</span>
+          {club.visibility === 'private' && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent-amber/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-accent-amber ring-1 ring-accent-amber/40" title="Private — invite-only">
+              <Lock className="h-3 w-3" />Private
+            </span>
+          )}
+        </p>
         <p className="truncate text-xs text-text-muted">{club.location ? <><MapPin className="mr-0.5 inline h-3 w-3" />{club.location} · </> : null}<Users className="mr-1 inline h-3 w-3" />{memberCount} members</p>
       </div>
       {right ?? <MembershipBadge status={club.myStatus} role={club.myRole} />}

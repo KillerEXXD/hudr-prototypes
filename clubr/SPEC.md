@@ -498,6 +498,9 @@ fully hidden** — and a direct URL must never reveal whether a private club exi
   sent — you'll get access once the host admits you") for a private match **and** for no match alike,
   so a code never confirms a private club exists. A **public** match still reveals the club name.
   **Pending requesters stay gated** until the host admits them (revealed only on approval).
+- **Private badge on club rows:** wherever you can see a private club (your clubs, admin console),
+  its row shows a prominent **amber `🔒 Private` badge** next to the name (accent‑toned, legible in
+  every skin). Public clubs show no badge.
 - **Invite is copy-only for private:** the Invite sheet **masks the code** (`••••••••`) and offers
   only **Copy link** — the owner copies & sends, never reads/dictates the code.
 - **Change later:** the host can toggle **Public ⇄ Private** in the Members tab; switching
