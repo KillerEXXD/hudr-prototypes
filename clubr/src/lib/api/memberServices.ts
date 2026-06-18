@@ -54,9 +54,11 @@ export async function getMemberProfile(targetId: string, viewerId: string, isAdm
   const user = USERS[targetId]
   if (!user) return null
 
+  // A host/admin sees contact for anyone in a club they manage — including a
+  // PENDING applicant — so they can vet a join request with email/phone.
   const canSeeContact = isAdmin || CLUBS.some((c) =>
     c.members.some((m) => m.userId === viewerId && (m.role === 'owner' || m.role === 'host')) &&
-    c.members.some((m) => m.userId === targetId))
+    c.members.some((m) => m.userId === targetId && (m.status === 'member' || m.status === 'pending')))
 
   // Clubs the member is in: public ones are named; private ones are shown only as a
   // count ("Private clubs · N") so we never reveal which private clubs they belong to.
