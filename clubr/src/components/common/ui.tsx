@@ -57,7 +57,7 @@ export function Avatar({ name, color, size = 36, emoji }: { name?: string; color
 }
 
 // ---- Badge / pill ----
-export function Badge({ children, tone = 'neutral', className }: { children: ReactNode; tone?: 'neutral' | 'blue' | 'green' | 'amber' | 'red' | 'purple'; className?: string }) {
+export function Badge({ children, tone = 'neutral', className }: { children: ReactNode; tone?: 'neutral' | 'blue' | 'green' | 'amber' | 'red' | 'purple' | 'dark'; className?: string }) {
   const tones: Record<string, string> = {
     neutral: 'bg-bg-surface text-text-secondary border-border',
     blue: 'bg-accent-blue/12 text-accent-blue border-accent-blue/30',
@@ -65,6 +65,7 @@ export function Badge({ children, tone = 'neutral', className }: { children: Rea
     amber: 'bg-accent-amber/12 text-accent-amber border-accent-amber/30',
     red: 'bg-accent-red/12 text-accent-red border-accent-red/30',
     purple: 'bg-accent-purple/12 text-accent-purple border-accent-purple/30',
+    dark: 'bg-neutral-900 text-white border-neutral-700',
   }
   return <span className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold', tones[tone], className)}>{children}</span>
 }
