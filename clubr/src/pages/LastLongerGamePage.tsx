@@ -136,8 +136,7 @@ export function LastLongerGamePage() {
       )}
 
       {/* Host actions */}
-      {/* Chop is a near-the-end move — only surface it in the final few (interim: ≤3 left). */}
-      {g.canManage && g.status === 'live' && g.activeCount > 1 && g.activeCount <= 3 && !g.chop && (
+      {g.canManage && g.status === 'live' && g.activeCount > 1 && !g.chop && (
         <Btn variant="secondary" className="mt-3 w-full" loading={proposeChop.isPending} onClick={() => proposeChop.mutate(g.id)}><Scissors className="h-4 w-4" />Propose a chop</Btn>
       )}
 
