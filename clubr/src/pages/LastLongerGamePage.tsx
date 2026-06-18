@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, HelpCircle, Coins } from 'lucide-react'
-import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useUpdateChips, useBust, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
+import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, HelpCircle, Coins, RotateCcw } from 'lucide-react'
+import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
@@ -40,12 +40,13 @@ export function LastLongerGamePage() {
   const lpCfg = useLeaderboardConfig().data ?? DEFAULT_LEADERBOARD
   const approve = useApproveLL(); const decline = useDeclineLL()
   const togglePaid = useTogglePaidLL(); const assignCoHost = useAssignCoHostLL()
-  const updateChips = useUpdateChips(); const bust = useBust()
+  const updateChips = useUpdateChips(); const bust = useBust(); const reinstate = useReinstate()
   const postChat = usePostChatLL(); const proposeChop = useProposeChop(); const agreeChop = useAgreeChop()
   const invite = useInviteToGame()
   const [chipInput, setChipInput] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
+  const [confirmBust, setConfirmBust] = useState<{ target: string; name: string; self: boolean } | null>(null)
 
   if (isLoading) return <Spinner label="Loading game…" />
   if (!g) return <EmptyState title="Game not found" />
@@ -124,7 +125,7 @@ export function LastLongerGamePage() {
                 <input value={chipInput} onChange={(e) => setChipInput(digitsOnly(e.target.value))} placeholder="Update chip count…" inputMode="numeric" pattern="[0-9]*" className="flex-1 rounded-xl border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
                 <Btn variant="secondary" disabled={!chipInput} loading={updateChips.isPending} onClick={() => { updateChips.mutate({ gameId: g.id, chips: Number(chipInput) || 0 }); setChipInput('') }}>Update</Btn>
               </div>
-              <Btn variant="danger" className="mt-2 w-full" loading={bust.isPending && bust.variables?.target === me.userId} onClick={() => bust.mutate({ gameId: g.id, target: me.userId })}>I'm out — bust myself</Btn>
+              <Btn variant="danger" className="mt-2 w-full" loading={bust.isPending && bust.variables?.target === me.userId} onClick={() => setConfirmBust({ target: me.userId, name: 'yourself', self: true })}>I'm out — bust myself</Btn>
             </Card>
           ) : (
             <Card className="text-sm text-text-secondary">You finished <span className="font-bold text-text-primary">{medal(me.finishPos)}{typeof me.finishPos === 'number' && me.finishPos > 3 ? ord(me.finishPos) : ''}</span>. GG!</Card>
@@ -147,7 +148,7 @@ export function LastLongerGamePage() {
               bustBusy={bust.isPending && bust.variables?.target === p.userId}
               coHostBusy={assignCoHost.isPending && assignCoHost.variables?.userId === p.userId}
               onPaid={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })}
-              onBust={() => bust.mutate({ gameId: g.id, target: p.userId })}
+              onBust={() => setConfirmBust({ target: p.userId, name: p.name, self: false })}
               onCoHost={() => assignCoHost.mutate({ gameId: g.id, userId: p.userId })}
               onProfile={g.canManage ? () => navigate(`/member/${p.userId}`) : undefined} />
           ))}
@@ -170,6 +171,9 @@ export function LastLongerGamePage() {
               </button>
               {lp.get(p.userId) ? <LpBadge points={lp.get(p.userId)!} /> : null}
               <span className="text-[11px] text-text-muted">{p.finishPos === 1 ? 'winner 🏆' : p.bustedAgo ? `busted ${p.bustedAgo}` : 'out'}</span>
+              {g.canManage && p.finishPos !== 1 && (
+                <Btn size="sm" variant="secondary" loading={reinstate.isPending && reinstate.variables?.target === p.userId} onClick={() => reinstate.mutate({ gameId: g.id, target: p.userId })}><RotateCcw className="h-3.5 w-3.5" />Reinstate</Btn>
+              )}
             </div>
           ))}
         </div>
@@ -182,6 +186,21 @@ export function LastLongerGamePage() {
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={g.clubId} accessUserIds={g.accessUserIds ?? []} accent="amber" onInvite={(ids) => invite.mutate({ gameId: g.id, userIds: ids })} isPending={invite.isPending} />
       <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="Last Longer — how it works">
         <HowItWorks steps={LL_STEPS} dotBg="bg-accent-amber" iconColor="text-accent-amber" />
+      </Sheet>
+
+      {/* Bust confirmation — guards both the host "Out" and the self-bust action. */}
+      <Sheet open={!!confirmBust} onClose={() => setConfirmBust(null)} title={confirmBust?.self ? 'Bust yourself out?' : `Bust ${confirmBust?.name}?`}>
+        <div className="flex flex-col gap-3">
+          <p className="text-sm leading-snug text-text-secondary">
+            {confirmBust?.self
+              ? "You'll be eliminated and placed by your current chip order. The host can reinstate you if it's a mistake."
+              : `${confirmBust?.name} will be eliminated and placed by current chip order. You can reinstate them from the leaderboard if it's a mistake.`}
+          </p>
+          <div className="flex gap-2">
+            <Btn variant="secondary" className="flex-1" onClick={() => setConfirmBust(null)}>Cancel</Btn>
+            <Btn variant="danger" className="flex-1" onClick={() => { if (confirmBust) bust.mutate({ gameId: g.id, target: confirmBust.target }); setConfirmBust(null) }}>{confirmBust?.self ? "I'm out" : 'Bust'}</Btn>
+          </div>
+        </div>
       </Sheet>
     </div>
   )

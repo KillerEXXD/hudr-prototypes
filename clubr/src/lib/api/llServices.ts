@@ -121,6 +121,21 @@ export async function bust(gameId: string, target: string, byUserId: string): Pr
   else announceLeadChange(g, prevLeaderId) // bust shifted the chip lead → chat
 }
 
+// Host/co-host undoes an accidental bust → the player returns to active. If the
+// bust had auto-completed the game, reopen it + reactivate the auto-declared winner.
+export async function reinstate(gameId: string, target: string): Promise<void> {
+  await delay(150)
+  const g = LL_GAMES.find((x) => x.id === gameId)
+  const p = g?.participants.find((x) => x.userId === target)
+  if (!g || !p || p.status !== 'out') return
+  p.status = 'active'; p.finishPos = undefined; p.bustedAgo = undefined
+  if (g.status === 'completed') {
+    const w = g.participants.find((x) => x.finishPos === 1); if (w) { w.status = 'active'; w.finishPos = undefined }
+    g.status = 'live'; g.winnerName = undefined
+  }
+  g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: p.name, avatarColor: p.avatarColor, text: `${p.name} was reinstated by the host`, ts: 'now', kind: 'system' })
+}
+
 export async function postChat(gameId: string, userId: string, text: string): Promise<void> {
   await delay(80)
   const g = LL_GAMES.find((x) => x.id === gameId)

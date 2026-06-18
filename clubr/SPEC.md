@@ -108,7 +108,11 @@ Approval is required to do anything beyond viewing:
   chips** (stale‑pulse reminder). Eliminated players show **when they busted**
   ("52m ago").
 - **Eliminations:** host/co‑host can OUT anyone; **a player can self‑bust ("I'm
-  out")**; host decides disputes. Every host action is logged.
+  out")**; host decides disputes. Every host action is logged. **Both bust paths
+  ask for confirmation first** (easy to mis‑tap). **Accidental busts are reversible:**
+  the host/co‑host gets a **Reinstate** button on each eliminated row — the player
+  returns to active (finish place + bust time cleared; they re‑enter chips); if the
+  bust had auto‑completed the game, reinstate **reopens it** and reactivates the winner.
 - **Chop:** host proposes → players agree → game settles.
 - **Per‑game chat** among the players.
 - **Auto-updates in chat.** The app posts **system chat lines** automatically: when
