@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { MessageCircle } from 'lucide-react'
 import { Sheet } from './ui'
 import { GameChat } from './GameChat'
@@ -44,7 +45,7 @@ export function FloatingChat({ messages, onSend, canSend, currentUserId }: {
     prevUnread.current = unread
   }, [unread])
 
-  return (
+  return createPortal(
     <>
       {!open && (
         <button
@@ -69,6 +70,7 @@ export function FloatingChat({ messages, onSend, canSend, currentUserId }: {
       <Sheet open={open} onClose={() => setOpen(false)} title="Table chat">
         <GameChat bare messages={messages} onSend={onSend} canSend={canSend} currentUserId={currentUserId} />
       </Sheet>
-    </>
+    </>,
+    document.body,
   )
 }
