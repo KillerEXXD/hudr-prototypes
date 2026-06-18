@@ -162,7 +162,10 @@ Approval is required to do anything beyond viewing:
   **open/live** contests & games (no settled history). **Clubs in the user's city are
   surfaced first** under a "Near you in &lt;city&gt;" section. A **location** (city, e.g.
   "Houston, TX") is captured on the **user at signup** and on the **club at creation**,
-  and shown on each club row.
+  and shown on each club row. **Every city input uses one shared `CityField` backed by
+  **Google Places Autocomplete** (cities‑only) — onboarding, club create, profile edit,
+  and the LL game location — falling back to a bundled list when no key is set
+  (`VITE_GOOGLE_PLACES_KEY`).
 - **Fantasy / Last Longer** = **active** games front‑and‑center, split **"You're
   hosting"** vs **"Playing in"**; **completed/your results** now show in an **always-visible "Completed (N)"**
   section (scoped to games you entered/hosted).

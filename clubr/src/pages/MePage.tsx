@@ -4,6 +4,7 @@ import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Co
 import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Field } from '@/components/common/ui'
+import { CityField } from '@/components/common/CityField'
 import { SkinPicker } from '@/components/common/SkinPicker'
 import type { AccountRole, User } from '@/types'
 
@@ -54,13 +55,14 @@ function EditProfileSheet({ open, onClose, user }: { open: boolean; onClose: () 
   const { updateProfile } = useAuth()
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)
+  const [city, setCity] = useState(user.location ?? '')
   const [err, setErr] = useState('')
-  useEffect(() => { if (open) { setName(user.name); setEmail(user.email); setErr('') } }, [open, user.name, user.email])
+  useEffect(() => { if (open) { setName(user.name); setEmail(user.email); setCity(user.location ?? ''); setErr('') } }, [open, user.name, user.email, user.location])
   const emailChanged = email.trim().toLowerCase() !== (user.email ?? '').toLowerCase()
   function save() {
     if (!name.trim()) { setErr('Name is required'); return }
     if (!/.+@.+\..+/.test(email.trim())) { setErr('Enter a valid email'); return }
-    updateProfile({ name, email })
+    updateProfile({ name, email, city })
     onClose()
   }
   return (
@@ -68,6 +70,7 @@ function EditProfileSheet({ open, onClose, user }: { open: boolean; onClose: () 
       <div className="flex flex-col gap-3">
         <Field label="Name" value={name} onChange={(v) => { setName(v); setErr('') }} placeholder="Your name" />
         <Field label="Email" value={email} onChange={(v) => { setEmail(v); setErr('') }} type="email" placeholder="you@example.com" />
+        <CityField label="City" value={city} onChange={(v) => { setCity(v); setErr('') }} />
         {emailChanged && <p className="text-[11px] leading-snug text-accent-amber">Changing your email marks it unverified — you'll need to verify the new address.</p>}
         {err && <p className="text-xs font-semibold text-accent-red">{err}</p>}
         <Btn className="w-full" onClick={save}>Save changes</Btn>

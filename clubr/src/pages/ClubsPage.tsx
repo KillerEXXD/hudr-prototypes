@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
 import { Section, Spinner, Btn, Sheet, Field, EmptyState } from '@/components/common/ui'
+import { CityField } from '@/components/common/CityField'
 import { ClubRow } from '@/components/common/cards'
 import { cn } from '@/lib/utils/cn'
 
@@ -82,7 +83,7 @@ export function ClubsPage() {
             <div className="flex-1"><Field label="Club name" value={name} onChange={setName} placeholder="e.g. Friday Night Crew" /></div>
           </div>
           <Field label="Description" value={desc} onChange={setDesc} placeholder="What's your club about?" />
-          <Field label="City" value={loc} onChange={setLoc} placeholder="e.g. Houston, TX" />
+          <CityField label="City" value={loc} onChange={setLoc} />
           <div>
             <span className="mb-1 block text-xs font-semibold text-text-secondary">Visibility</span>
             <div className="flex gap-1 rounded-xl border border-border bg-bg-card p-1">

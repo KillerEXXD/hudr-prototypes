@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { ShieldCheck, Crown, User as UserIcon, Ticket, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Btn, Field } from '@/components/common/ui'
+import { CityField } from '@/components/common/CityField'
 import * as api from '@/lib/api/services'
 import type { AccountRole } from '@/types'
 
@@ -86,7 +87,7 @@ export function LoginScreen() {
               <Field label="Phone number *" value={phone} onChange={setPhone} type="tel" placeholder="+1 (555) 123‑4567" />
               <Field label="Your name *" value={name} onChange={setName} placeholder="First & last name" />
               <Field label="Email *" value={email} onChange={setEmail} type="email" placeholder="you@example.com" />
-              <Field label="Your city *" value={location} onChange={setLocation} placeholder="e.g. Houston, TX" />
+              <CityField label="Your city *" value={location} onChange={setLocation} />
               {!joinCode && <Field label="Invite code *" value={code} onChange={setCode} placeholder="e.g. ACES24" mono />}
               <Btn className="w-full" onClick={joinWithLink} disabled={!canJoin}>Join club</Btn>
               {msg && <p className="text-center text-xs font-semibold text-accent-emerald">{msg}</p>}

@@ -15,7 +15,7 @@ interface AuthCtx {
   loginAs: (role: AccountRole, userId?: string) => void
   signUp: (name: string, email: string, phone: string, location?: string) => User
   /** Update the signed-in user's name/email. Changing the email marks it unverified. */
-  updateProfile: (patch: { name: string; email: string }) => void
+  updateProfile: (patch: { name: string; email: string; city?: string }) => void
   /** Mock email verification (the real app confirms via a magic link). */
   verifyEmail: () => void
   /** Re-read the signed-in user from the store (e.g. after creating a club promotes the role). */
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return u
   }, [])
 
-  const updateProfile = useCallback((patch: { name: string; email: string }) => {
+  const updateProfile = useCallback((patch: { name: string; email: string; city?: string }) => {
     setUser((prev) => {
       if (!prev) return prev
       const email = patch.email.trim()
@@ -69,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ...prev,
         name: patch.name.trim() || prev.name,
         email,
+        location: patch.city !== undefined ? patch.city.trim() : prev.location,
         // Changing the email un-verifies it until the user re-verifies.
         emailVerified: emailChanged ? false : prev.emailVerified,
       }

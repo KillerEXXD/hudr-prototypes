@@ -6,6 +6,7 @@ import { useCreateGame } from '@/hooks/ll'
 import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
 import { Sheet, Btn, Field } from '@/components/common/ui'
+import { CityField } from '@/components/common/CityField'
 import { ScheduleFields, PayoutEditor } from '@/components/common/GameSetup'
 import { defaultCloseLocal, DEFAULT_PAYOUTS, arePayoutsValid } from '@/lib/gameSetup'
 import { cn } from '@/lib/utils/cn'
@@ -62,7 +63,7 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
           </div>
         )}
         <Field label="Tournament name" value={title} onChange={setTitle} placeholder="e.g. Friday Night Last Longer" />
-        <Field label="Location" value={loc} onChange={setLoc} placeholder="e.g. Mike's basement, or a site name" />
+        <CityField label="Location" value={loc} onChange={setLoc} placeholder="e.g. a city, or a venue name" />
         <div>
           <span className="mb-1 block text-xs font-semibold text-text-secondary">Format</span>
           <div className="flex gap-2">
