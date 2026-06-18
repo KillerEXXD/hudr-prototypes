@@ -6,7 +6,7 @@ import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
-import { GameChat } from '@/components/common/GameChat'
+import { FloatingChat } from '@/components/common/FloatingChat'
 import { DraftBoard } from '@/components/ft/DraftBoard'
 import { FinalTableDetails } from '@/components/ft/FinalTableDetails'
 import { SettledResult } from '@/components/ft/SettledResult'
@@ -175,10 +175,8 @@ export function ContestDetailPage() {
         </Section>
       )}
 
-      {/* ===== Chat ===== */}
-      <Section title="Table chat">
-        <GameChat messages={c.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ contestId: c.id, text })} />
-      </Section>
+      {/* ===== Chat — floating bubble + slide-up sheet, scoped to this contest (key={c.id}) ===== */}
+      <FloatingChat key={c.id} messages={c.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ contestId: c.id, text })} />
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={c.clubId} accessUserIds={c.accessUserIds ?? []} accent="purple" onInvite={(ids) => invite.mutate({ contestId: c.id, userIds: ids })} isPending={invite.isPending} />
     </div>

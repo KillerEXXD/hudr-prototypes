@@ -9,7 +9,7 @@ import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, Processi
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
-import { GameChat } from '@/components/common/GameChat'
+import { FloatingChat } from '@/components/common/FloatingChat'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { useEconomy } from '@/hooks/credits'
 import { useLeaderboardConfig } from '@/hooks/leaderboard'
@@ -179,9 +179,8 @@ export function LastLongerGamePage() {
         </div>
       </Section>
 
-      <Section title="Table chat">
-        <GameChat messages={g.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ gameId: g.id, text })} />
-      </Section>
+      {/* Per-game chat — floating bubble + slide-up sheet, scoped to this game (key={g.id}). */}
+      <FloatingChat key={g.id} messages={g.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ gameId: g.id, text })} />
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={g.clubId} accessUserIds={g.accessUserIds ?? []} accent="amber" onInvite={(ids) => invite.mutate({ gameId: g.id, userIds: ids })} isPending={invite.isPending} />
       <CoHostSheet open={coHostOpen} onClose={() => setCoHostOpen(false)} g={g} assign={assignCoHost} remove={removeCoHost} />

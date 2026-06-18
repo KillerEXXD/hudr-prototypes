@@ -6,7 +6,7 @@ import type { ChatMsg } from '@/types/ft'
 
 // Per-game chat — reused by FT Fantasy and Last Longer. Players in the game
 // chat among themselves; system lines mark joins/eliminations.
-export function GameChat({ messages, onSend, canSend, currentUserId }: { messages: ChatMsg[]; onSend: (text: string) => void; canSend: boolean; currentUserId: string }) {
+export function GameChat({ messages, onSend, canSend, currentUserId, bare = false }: { messages: ChatMsg[]; onSend: (text: string) => void; canSend: boolean; currentUserId: string; bare?: boolean }) {
   const [text, setText] = useState('')
   function send() { if (text.trim()) { onSend(text); setText('') } }
 
@@ -26,8 +26,8 @@ export function GameChat({ messages, onSend, canSend, currentUserId }: { message
   }, [messages.length])
 
   return (
-    <div className="rounded-2xl border border-border bg-bg-card p-3">
-      <div ref={scrollRef} className="mb-2 flex max-h-64 flex-col gap-2 overflow-y-auto scrollbar-thin pr-1">
+    <div className={bare ? 'flex flex-1 flex-col' : 'rounded-2xl border border-border bg-bg-card p-3'}>
+      <div ref={scrollRef} className={cn('mb-2 flex flex-col gap-2 overflow-y-auto scrollbar-thin pr-1', bare ? 'max-h-[58vh] flex-1' : 'max-h-64')}>
         {messages.length === 0 && <p className="py-4 text-center text-xs text-text-muted">No messages yet. Say hi 👋</p>}
         {messages.map((m) => m.kind === 'system' ? (
           <p key={m.id} className="self-center rounded-full border border-border bg-bg-surface px-2.5 py-1 text-center text-[11px] font-medium text-text-secondary">{m.text}</p>

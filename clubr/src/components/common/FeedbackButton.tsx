@@ -3,18 +3,26 @@ import { createPortal } from 'react-dom'
 import { MessageSquarePlus, X, Send, CheckCircle2, ClipboardList, ArrowRight } from 'lucide-react'
 import { captureQuickNote, getIdentity } from '@/lib/analytics'
 import ReviewWizard from '@/components/common/ReviewWizard'
+import { useLocation } from 'react-router-dom'
 
 // Floating "Feedback" launcher for the ClubR prototype. Leads with a
 // frictionless quick note — type a line, hit send, done (no rating, no required
 // name/email). The longer guided review (which rates each feature) stays one
 // tap away. Captures the current screen + session replay via PostHog. Pinned
 // inside the centered phone frame, above the bottom nav (mounted in AppShell).
+// Hidden on a game-detail page, where it collided with row actions and the
+// per-game chat bubble owns the bottom-right corner.
+
+const GAME_DETAIL = /^\/(lastlonger|fantasy|squares)\/[^/]+$/
 
 export default function FeedbackButton() {
+  const location = useLocation()
   const [open, setOpen] = useState(false)
   const [reviewOpen, setReviewOpen] = useState(false)
   const [sent, setSent] = useState(false)
   const [note, setNote] = useState('')
+
+  if (GAME_DETAIL.test(location.pathname)) return null
 
   const canSend = note.trim().length > 0
 
