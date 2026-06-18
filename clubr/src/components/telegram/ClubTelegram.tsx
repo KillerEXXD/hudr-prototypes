@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Send, ExternalLink, Link2, Plug, Check } from 'lucide-react'
 import { Card, Btn, Section, Sheet, Field, Processing } from '@/components/common/ui'
 import { useClubTelegram, useConnectChannel, useDisconnectChannel, useLinkTelegram, useJoinChannel } from '@/hooks/telegram'
+import { TelegramSetupWizard, TELEGRAM_BOT_HANDLE } from './TelegramSetupWizard'
 
 // The host-side connect/manage panel + the big member join card are still hidden
 // while the real bot is wired (flip to `true` to re-enable the mock). The compact
@@ -89,7 +90,7 @@ export function TelegramJoinCard({ clubId }: { clubId: string }) {
 // collapses to a subtle "connected" confirmation.
 export function TelegramSetupCard({ clubId, canManage, pending }: { clubId: string; canManage: boolean; pending?: boolean }) {
   const { data: st } = useClubTelegram(clubId)
-  const connect = useConnectChannel(clubId)
+  const [open, setOpen] = useState(false)
   if (!canManage) return null
 
   if (st?.channel) {
@@ -112,15 +113,11 @@ export function TelegramSetupCard({ clubId, canManage, pending }: { clubId: stri
           <p className="text-[11px] text-text-muted">Give members new-game, results &amp; leaderboard alerts — and one-tap join.</p>
         </div>
       </div>
-      <ol className="mt-2.5 flex flex-col gap-1 text-[11px] leading-snug text-text-secondary">
-        <li><b className="text-text-primary">1.</b> In Telegram, create a <b>private broadcast channel</b>.</li>
-        <li><b className="text-text-primary">2.</b> Add <b className="font-mono">@ClubrAdminBot</b> as an <b>admin</b>.</li>
-        <li><b className="text-text-primary">3.</b> Tap below — we detect it and wire up join + auto-posts.</li>
-      </ol>
-      <Btn size="sm" className="mt-2.5 w-full" loading={connect.isPending} onClick={() => connect.mutate({ link: `https://t.me/+clubr_${clubId}`, title: '' })}>
-        <Check className="h-3.5 w-3.5" />{connect.isPending ? 'Connecting…' : "I've added the bot — connect"}
+      <Btn size="sm" className="mt-2.5 w-full" onClick={() => setOpen(true)}>
+        Finish Telegram setup
       </Btn>
-      <p className="mt-1.5 text-[10px] leading-snug text-text-muted">@ClubrAdminBot creates the invite link and manages approvals/removals — you never touch channel settings. <i>(Prototype — the real bot detects the channel automatically.)</i></p>
+      <p className="mt-1.5 text-[10px] leading-snug text-text-muted">A quick 3-step guide — create a private channel, add {TELEGRAM_BOT_HANDLE}, post a code. You never touch channel settings after that.</p>
+      <TelegramSetupWizard open={open} onClose={() => setOpen(false)} clubId={clubId} />
     </Card>
   )
 }
