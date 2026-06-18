@@ -406,7 +406,10 @@ Members** — defaulting to Games. **Members is host/admin‑only** (players nev
 header already shows "N members · hosted by X", so there's no member list for non‑hosts). **Host
 actions are a compact row under the club title** (above the tabs): an **Invite** button (opens a small
 sheet with the code + copy) and **New game**. The **join‑request queue lives in the Members tab**,
-which **badges the pending count** so new requests aren't missed. Both player and host club pages stay
+which **badges the pending count** so new requests aren't missed. **On the My Clubs list**, a host's
+club row with pending requests shows a prominent **amber "N waiting" pill** (accent‑toned, every skin)
+that **expands inline to Approve/Reject** each applicant — approvals happen straight from the list,
+no need to open the club. Both player and host club pages stay
 a clean **header → (host actions) → tabs → content**. The **Games tab's content sits in a panel that
 connects flush to the tab bar** (the bar's bottom border is the seam, corners squared to meet it), so
 the **per‑type filter chips read as belonging to Games**: a **funnel icon + `All · FTF · LL · Squares`
