@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Send, MessageCircle } from 'lucide-react'
 import { Avatar } from './ui'
 import { cn } from '@/lib/utils/cn'
@@ -9,9 +9,25 @@ import type { ChatMsg } from '@/types/ft'
 export function GameChat({ messages, onSend, canSend, currentUserId }: { messages: ChatMsg[]; onSend: (text: string) => void; canSend: boolean; currentUserId: string }) {
   const [text, setText] = useState('')
   function send() { if (text.trim()) { onSend(text); setText('') } }
+
+  // Pin the chat's OWN scroll to the bottom (latest message). We set the
+  // container's scrollTop directly — NOT scrollIntoView, which would also scroll
+  // the window and drag the whole page down to the chat. So the page stays at the
+  // top; the chat just opens already showing the newest messages. On later
+  // messages we only re-pin if the user is already near the bottom.
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const mounted = useRef(false)
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80
+    if (!mounted.current || nearBottom) el.scrollTop = el.scrollHeight
+    mounted.current = true
+  }, [messages.length])
+
   return (
     <div className="rounded-2xl border border-border bg-bg-card p-3">
-      <div className="mb-2 flex max-h-64 flex-col gap-2 overflow-y-auto scrollbar-thin pr-1">
+      <div ref={scrollRef} className="mb-2 flex max-h-64 flex-col gap-2 overflow-y-auto scrollbar-thin pr-1">
         {messages.length === 0 && <p className="py-4 text-center text-xs text-text-muted">No messages yet. Say hi 👋</p>}
         {messages.map((m) => m.kind === 'system' ? (
           <p key={m.id} className="self-center rounded-full border border-border bg-bg-surface px-2.5 py-1 text-center text-[11px] font-medium text-text-secondary">{m.text}</p>
