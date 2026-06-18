@@ -6,6 +6,7 @@ import { useMyClubs } from '@/hooks'
 import { Badge, Btn, Card, Section, Spinner, EmptyState, RoleChip } from '@/components/common/ui'
 import type { MemberRole } from '@/types'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
+import { StatusBadge } from '@/components/common/StatusBadge'
 import { StakePool } from '@/components/common/StakePool'
 import { PayoutBadge } from '@/components/common/GameSetup'
 import { CreateGameSheet } from '@/components/ll/CreateGameSheet'
@@ -36,13 +37,12 @@ function CardJoinLL({ g }: { g: LLGameView }) {
 
 export function GameRow({ g, showType, clubRole }: { g: LLGameView; showType?: boolean; clubRole?: MemberRole }) {
   const navigate = useNavigate()
-  const s = g.status === 'live' ? { tone: 'green' as const, label: '● Live' } : g.status === 'registration' ? { tone: 'blue' as const, label: 'Registering' } : { tone: 'neutral' as const, label: 'Completed' }
   return (
     <Card onClick={() => navigate(`/lastlonger/${g.id}`)} className="p-3.5">
       {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-amber px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Timer className="h-3.5 w-3.5" />Last Longer</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span><span className="truncate">{g.clubName}</span></div>
-        <Badge tone={s.tone}>{s.label}</Badge>
+        <StatusBadge phase={g.status} />
       </div>
       <p className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-text-primary"><Timer className="h-4 w-4 shrink-0 text-accent-amber" /><span className="truncate">{g.title}</span></p>
       {(() => {

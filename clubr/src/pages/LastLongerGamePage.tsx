@@ -9,6 +9,7 @@ import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, Processi
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
+import { StatusBadge } from '@/components/common/StatusBadge'
 import { FloatingChat } from '@/components/common/FloatingChat'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { useEconomy } from '@/hooks/credits'
@@ -59,7 +60,6 @@ export function LastLongerGamePage() {
   const waiting = g.participants.filter((p) => p.status === 'pending')
   const out = g.participants.filter((p) => p.status === 'out').sort((a, b) => (a.finishPos ?? 99) - (b.finishPos ?? 99))
   const canChat = me?.status === 'active' || g.canManage
-  const statusTone = g.status === 'live' ? 'green' : g.status === 'registration' ? 'blue' : 'neutral'
   // Leaderboard points earned (completed games only) — same math as the club board.
   const lp = g.status === 'completed' ? awardMap(llAward(g, lpCfg)) : new Map<string, number>()
 
@@ -70,13 +70,13 @@ export function LastLongerGamePage() {
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
       <h1 className="mt-1 flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}</h1>
       <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-secondary">
-        <Badge tone={statusTone}>{g.status === 'live' ? '● Live' : g.status === 'registration' ? 'Registering' : 'Completed'}</Badge>
+        <StatusBadge phase={g.status} />
         <span className="font-mono">{g.stake} Stakes</span>
         <span className="text-text-muted">· {g.activeCount} in · {out.length} out</span>
         <button type="button" onClick={() => setHowOpen(true)} className="flex items-center gap-1 rounded-full border border-border px-2 py-0.5 font-semibold text-text-secondary hover:text-text-primary cursor-pointer"><HelpCircle className="h-3.5 w-3.5" />How it works</button>
       </div>
       {(() => { const joined = g.participants.filter((p) => p.status !== 'pending').length; return <StakePool stake={g.stake} pool={g.stake * joined}>· {joined} joined</StakePool> })()}
-      {g.status === 'registration' && <div className="mt-3"><CountdownBanner deadline={regDeadline(g.id, g.registrationClosesAt)} sub="Registration closes — join before the clock hits zero" /></div>}
+      {g.status === 'registration' && <div className="mt-3"><CountdownBanner deadline={regDeadline(g.id, g.registrationClosesAt)} sub="Registration closes — join before the clock hits zero" closedLabel="Awaiting host" /></div>}
       {(g.location || g.mode) && (
         <p className="mt-1 flex items-center gap-1.5 text-[11px] text-text-muted">
           {g.mode === 'online' ? <Wifi className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}

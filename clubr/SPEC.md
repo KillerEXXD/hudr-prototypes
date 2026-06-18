@@ -314,6 +314,15 @@ pure helpers in `lib/gameSetup.ts`):
   60/40" / "Top 3 · 50/30/20"), and a **live ticking countdown** (`Countdown`) shows how long
   registration stays open — **green normally, red under 10 minutes, pulsing under 2**.
 
+### Unified lifecycle badge (all three games)
+All games share ONE status badge so the wording never drifts: **Registration open** →
+**Live** (with a **pulsing red "live now" dot**) → **Completed**. Single source of truth:
+`lib/gameStatus.ts` (`lifecycleBadge` + the `ftPhase` normalizer) rendered via
+`components/common/StatusBadge.tsx`. FT internally maps `open/locked/settled` onto the same
+three labels. The badge follows the game's **status** (server/host‑driven), not the countdown:
+when the registration deadline elapses the badge stays **Registration open** and the
+`CountdownBanner` reads **Awaiting host** for host‑started games (LL, Squares).
+
 ## 16. Roles, entry flow & navigation
 - **App Admin is overseer‑only.** Admins **cannot join a club or participate in a game** —
   Join/Create (Clubs tab), Request‑to‑join (club page), and the FT **"Your entry"** / LL
