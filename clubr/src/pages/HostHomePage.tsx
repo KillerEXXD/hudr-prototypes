@@ -39,6 +39,7 @@ export function HostHomePage() {
   const others = active.filter((g) => !g.canManage)
   const typesPresent = GAME_TYPES.filter((t) => yours.some((g) => g.type === t.id))
   const yoursShown = yours.filter((g) => matchesType(g, filter))
+  const othersShown = others.filter((g) => matchesType(g, filter))
   const yoursTop = yoursShown.slice(0, GAMES_CAP)
 
   return (
@@ -85,10 +86,10 @@ export function HostHomePage() {
         )}
       </Section>
 
-      {/* ---- Other clubs you're a member of (all types) ---- */}
-      {others.length > 0 && (
+      {/* ---- Other clubs you're a member of (all types) — same filter applies ---- */}
+      {othersShown.length > 0 && (
         <Section title="Other clubs you're in" action={<Badge tone="neutral"><Users className="h-3 w-3" />member</Badge>}>
-          <div className="flex flex-col gap-2">{others.map((g) => renderUnifiedGame(g, true, roleByClub.get(g.clubId)))}</div>
+          <div className="flex flex-col gap-2">{othersShown.map((g) => renderUnifiedGame(g, true, roleByClub.get(g.clubId)))}</div>
         </Section>
       )}
     </div>
