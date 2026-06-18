@@ -1,21 +1,35 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Mail, Phone, Target, Timer, Lock, MapPin } from 'lucide-react'
 import { useMemberProfile } from '@/hooks'
-import { Avatar, Badge, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
 
 export function MemberPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
-  const { data: m, isLoading } = useMemberProfile(id)
+  const { data: m, isLoading, isError, refetch } = useMemberProfile(id)
 
-  if (isLoading) return <Spinner label="Loading member…" />
-  if (!m) return <EmptyState title="Member not found" />
+  // A Back button is available in EVERY state so a deep link never traps the user.
+  const back = (
+    <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+  )
+
+  if (isLoading) return <div className="animate-fade-up">{back}<Spinner label="Loading member…" /></div>
+  if (isError) return (
+    <div className="animate-fade-up">
+      {back}
+      <div className="flex flex-col items-center gap-3 py-2">
+        <EmptyState title="Couldn't load this member" sub="Check your connection and try again." />
+        <Btn variant="secondary" onClick={() => refetch()}>Retry</Btn>
+      </div>
+    </div>
+  )
+  if (!m) return <div className="animate-fade-up">{back}<EmptyState title="Member not found" /></div>
 
   const roleTone = { admin: 'purple', host: 'green', player: 'blue' } as const
 
   return (
     <div className="animate-fade-up">
-      <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+      {back}
 
       <div className="flex items-center gap-3">
         <Avatar name={m.user.name} color={m.user.avatarColor} size={56} />
