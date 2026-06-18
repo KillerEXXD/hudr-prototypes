@@ -127,7 +127,7 @@ export function LastLongerGamePage() {
                 <input value={chipInput} onChange={(e) => setChipInput(digitsOnly(e.target.value))} placeholder="Update chip count…" inputMode="numeric" pattern="[0-9]*" className="flex-1 rounded-xl border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
                 <Btn variant="secondary" disabled={!chipInput} loading={updateChips.isPending} onClick={() => { updateChips.mutate({ gameId: g.id, chips: Number(chipInput) || 0 }); setChipInput('') }}>Update</Btn>
               </div>
-              <Btn variant="danger" className="mt-2 w-full" loading={bust.isPending && bust.variables?.target === me.userId} onClick={() => setConfirmBust({ target: me.userId, name: 'yourself', self: true })}>I'm out — bust myself</Btn>
+              <Btn variant="danger" className="mt-2 w-full" loading={bust.isPending && bust.variables?.target === me.userId} onClick={() => setConfirmBust({ target: me.userId, name: 'yourself', self: true })}>Busted — I'm out</Btn>
             </Card>
           ) : (
             <Card className="text-sm text-text-secondary">You finished <span className="font-bold text-text-primary">{medal(me.finishPos)}{typeof me.finishPos === 'number' && me.finishPos > 3 ? ord(me.finishPos) : ''}</span>. GG!</Card>
@@ -136,13 +136,14 @@ export function LastLongerGamePage() {
       )}
 
       {/* Host actions */}
-      {g.canManage && g.status === 'live' && g.activeCount > 1 && !g.chop && (
+      {/* Chop is a near-the-end move — only surface it in the final few (interim: ≤3 left). */}
+      {g.canManage && g.status === 'live' && g.activeCount > 1 && g.activeCount <= 3 && !g.chop && (
         <Btn variant="secondary" className="mt-3 w-full" loading={proposeChop.isPending} onClick={() => proposeChop.mutate(g.id)}><Scissors className="h-4 w-4" />Propose a chop</Btn>
       )}
 
-      {/* Leaderboard */}
-      <Section title={`Leaderboard · ${g.participants.length}`} action={g.canManage ? <button type="button" onClick={() => setCoHostOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue/15 px-2.5 py-1 text-[11px] font-bold text-accent-blue ring-1 ring-accent-blue/30 hover:bg-accent-blue/25 cursor-pointer"><Shield className="h-3 w-3" />Add co-host</button> : undefined}>
-        {g.canManage && <p className="mb-2 text-[11px] text-text-muted">Admit players · green dot = paid · "Out" to bust. Co-hosts are set with “Add co-host”.</p>}
+      {/* Standings (was "Leaderboard" — distinct from the club Leaderboard tab) */}
+      <Section title={`Standings · ${active.length} in · ${out.length} out`} action={g.canManage ? <button type="button" onClick={() => setCoHostOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue/15 px-2.5 py-1 text-[11px] font-bold text-accent-blue ring-1 ring-accent-blue/30 hover:bg-accent-blue/25 cursor-pointer"><Shield className="h-3 w-3" />Add co-host</button> : undefined}>
+        {g.canManage && <p className="mb-2 text-[11px] text-text-muted">Admit players · green dot = paid · "Bust" to eliminate. Co-hosts are set with “Add co-host”.</p>}
         <div className="flex flex-col gap-1.5">
           {active.map((p, i) => (
             <Row key={p.userId} p={p} rank={i + 1} g={g} me={user?.id ?? ''} canManage={g.canManage}
@@ -199,7 +200,7 @@ export function LastLongerGamePage() {
           <div className="flex gap-2">
             <Btn variant="secondary" className="flex-1" onClick={() => setConfirmBust(null)}>Cancel</Btn>
             {/* processing-exempt: closes the confirm on click; the busted player's leaderboard row shows the ProcessingOverlay */}
-            <Btn variant="danger" className="flex-1" onClick={() => { if (confirmBust) bust.mutate({ gameId: g.id, target: confirmBust.target }); setConfirmBust(null) }}>{confirmBust?.self ? "I'm out" : 'Bust'}</Btn>
+            <Btn variant="danger" className="flex-1" onClick={() => { if (confirmBust) bust.mutate({ gameId: g.id, target: confirmBust.target }); setConfirmBust(null) }}>{confirmBust?.self ? 'Busted' : 'Bust'}</Btn>
           </div>
         </div>
       </Sheet>
@@ -229,7 +230,7 @@ function Row({ p, rank, g, me, canManage, paidBusy, bustBusy, onPaid, onBust, on
         </span>
       </div>
       {(canManage || p.userId === me) && <PaidToggle paid={p.paid} editable={canManage} busy={paidBusy} onToggle={onPaid} />}
-      {canManage && <button onClick={onBust} className="rounded-lg border border-accent-red/30 bg-accent-red/10 px-2 py-1 text-[11px] font-bold text-accent-red hover:bg-accent-red/20 cursor-pointer">Out</button>}
+      {canManage && <button onClick={onBust} className="rounded-lg border border-accent-red/30 bg-accent-red/10 px-2 py-1 text-[11px] font-bold text-accent-red hover:bg-accent-red/20 cursor-pointer">Bust</button>}
     </div>
   )
 }
