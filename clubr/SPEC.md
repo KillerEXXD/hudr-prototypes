@@ -196,6 +196,17 @@ Approval is required to do anything beyond viewing:
   Telegram bot; payments.
 - **Next game (queued):** **Football Squares** — see §13. Reuses the rails; net‑new is
   the 10×10 grid UI + random digit assignment + period scoring.
+- **Live updates (no refresh).** Every game page (LL, Squares, FT) updates for **all**
+  viewers in real time — admissions, chip counts, busts, claims, scores, lock/settle,
+  and chat appear within ~1s without a reload. Mechanism: **Supabase Realtime**
+  `postgres_changes` on each game's parent + child tables (`ll_games`/`ll_participants`/
+  `chat_messages`, `squares_games`/`cells`/`participants`/`periods`,
+  `ft_contests`/`contest_entries`/`chat_messages`). A change is a *signal* — the client
+  refetches the authoritative view through the API (it never renders the raw payload).
+  **The realtime socket is authorized as the signed‑in user** (the session JWT is pushed
+  to the socket, not just the REST layer) because these tables' RLS only grants SELECT to
+  `authenticated`; an anon socket receives nothing. A single shared `useRealtimeGame`
+  hook wires all three. (Prototype runs on the mock store, so this is real‑app behavior.)
 
 ## 13. Football Squares (built — live on the rails)
 A **third club side‑game** on the same rails as FT Fantasy & Last Longer. Widely run in
