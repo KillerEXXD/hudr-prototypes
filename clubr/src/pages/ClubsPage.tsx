@@ -28,6 +28,12 @@ export function ClubsPage() {
   const [code, setCode] = useState('')
   const [joinMsg, setJoinMsg] = useState('')
 
+  // Clubs you're in, split by whether you manage them. This is the single home
+  // for clubs — the old Me > Host Console duplicated the "Hosting" subset.
+  const mine = clubs.data ?? []
+  const hosting = mine.filter((c) => c.canManage)
+  const member = mine.filter((c) => !c.canManage)
+
   return (
     <div className="animate-fade-up">
       <div className="flex items-center justify-between">
@@ -48,14 +54,25 @@ export function ClubsPage() {
             <EmptyState icon={<Users className="h-7 w-7" />} title="No clubs yet" sub="Clubs created by hosts will show up here." />
           )}
         </Section>
-      ) : (
+      ) : clubs.isLoading ? (
+        <Section title="Clubs you're in"><Spinner /></Section>
+      ) : mine.length === 0 ? (
         <Section title="Clubs you're in">
-          {clubs.isLoading ? <Spinner /> : clubs.data && clubs.data.length > 0 ? (
-            <div className="flex flex-col gap-2">{clubs.data.map((c) => <ClubRow key={c.id} club={c} />)}</div>
-          ) : (
-            <EmptyState icon={<Users className="h-7 w-7" />} title="No clubs yet" sub="Discover a club and request to join, create your own, or join with an invite code." />
-          )}
+          <EmptyState icon={<Users className="h-7 w-7" />} title="No clubs yet" sub="Discover a club and request to join, create your own, or join with an invite code." />
         </Section>
+      ) : (
+        <>
+          {hosting.length > 0 && (
+            <Section title="Hosting" action={<span className="text-xs text-text-muted">you manage {hosting.length === 1 ? 'this club' : `these ${hosting.length}`}</span>}>
+              <div className="flex flex-col gap-2">{hosting.map((c) => <ClubRow key={c.id} club={c} />)}</div>
+            </Section>
+          )}
+          {member.length > 0 && (
+            <Section title={hosting.length > 0 ? 'Member' : "Clubs you're in"}>
+              <div className="flex flex-col gap-2">{member.map((c) => <ClubRow key={c.id} club={c} />)}</div>
+            </Section>
+          )}
+        </>
       )}
 
       <Sheet open={createOpen} onClose={() => setCreateOpen(false)} title="Create a club">

@@ -160,12 +160,17 @@ Approval is required to do anything beyond viewing:
 - **Fantasy / Last Longer** = **active** games front‑and‑center, split **"You're
   hosting"** vs **"Playing in"**; **completed/your results** now show in an **always-visible "Completed (N)"**
   section (scoped to games you entered/hosted).
-- **Clubs** = your clubs. **Me** = profile + **the 6‑skin appearance picker** (lives in the
-  Profile/Me view only — moved out of the header) + Host/Admin consoles. The **header** carries only
-  the logo, the role chip, the **credits coin chip** (§19, non‑admin) and the account button.
-  **Picking a skin applies it and immediately returns you to the page you came from** (the picker
-  fires an `onSelect` → `navigate(-1)`), so the new skin is previewed in context rather than on the
-  settings screen.
+- **Clubs** = your clubs, in **one** place, split **"Hosting"** (clubs you manage) vs
+  **"Member"**. There is **no separate "Host Console"** on Me — it duplicated this list;
+  a host's owned clubs already live here (linking to the same club page, with pending
+  badges). **Me** = the single **account home**: profile + email + wallet + **the 6‑skin
+  appearance picker** + (admin) the Admin console + (prototype) the demo account‑switcher.
+- **One account surface.** The **header** carries only the logo, the role chip, the
+  **credits coin chip** (§19, non‑admin) and the **avatar**, where the avatar is a
+  **shortcut to the Me tab** (`navigate('/me')`) — *not* a second account panel. This
+  follows the mobile convention (Instagram/LinkedIn): the bottom **Me** tab is the
+  canonical profile; the avatar just jumps there. **Picking a skin applies it and
+  immediately returns you to the page you came from** (`onSelect` → `navigate(-1)`).
 - Cards: a single **status** badge top‑right; **Hosting / Entered / In / Private**
   on their own row.
 - **First tab is role-aware:** **Player → Discover**, **Club Host → a Home dashboard**,

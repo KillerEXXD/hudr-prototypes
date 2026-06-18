@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins, MailCheck, MailWarning, Pencil } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useMyClubs } from '@/hooks'
 import { useWallet } from '@/hooks/credits'
-import { Avatar, Badge, Btn, Card, Section, Spinner, Sheet, Field } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Section, Sheet, Field } from '@/components/common/ui'
 import { SkinPicker } from '@/components/common/SkinPicker'
 import type { AccountRole, User } from '@/types'
 
@@ -13,6 +12,17 @@ const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' |
   host: { label: 'Club Host', tone: 'green', icon: Crown },
   player: { label: 'Player', tone: 'blue', icon: UserIcon },
 }
+
+// Demo-account quick-switch — roles plus the real-data club hosts. (Prototype
+// only: the gallery lets reviewers explore each role. Lives on /me so the app
+// has one account home; the header avatar is just a shortcut here.)
+const SWITCH: { role: AccountRole; userId?: string; label: string; icon: typeof UserIcon }[] = [
+  { role: 'player', label: 'Player', icon: UserIcon },
+  { role: 'host', label: 'Aces High Host', icon: Crown },
+  { role: 'host', userId: 'u_cc_host', label: 'Bayou City Poker Club Host', icon: Crown },
+  { role: 'host', userId: 'u_tch_host', label: 'Gulf Coast Card Club Host', icon: Crown },
+  { role: 'admin', label: 'App Admin', icon: ShieldCheck },
+]
 
 /** Email row: a verified tick, or an 'Unverified' badge + a Verify button. */
 function EmailVerifyCard({ user }: { user: User }) {
@@ -67,7 +77,7 @@ function EditProfileSheet({ open, onClose, user }: { open: boolean; onClose: () 
 }
 
 export function MePage() {
-  const { user, logout } = useAuth()
+  const { user, logout, loginAs } = useAuth()
   const navigate = useNavigate()
   const wallet = useWallet()
   const [editOpen, setEditOpen] = useState(false)
@@ -114,37 +124,22 @@ export function MePage() {
         </Section>
       )}
 
-      {user.role === 'host' && <HostConsole />}
-
       <Section title="Appearance" action={<Palette className="h-4 w-4 text-text-muted" />}>
         <SkinPicker onSelect={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))} />
+      </Section>
+
+      <Section title="Switch demo account">
+        <div className="grid grid-cols-2 gap-2">
+          {SWITCH.map((s) => (
+            <button key={s.label} onClick={() => { loginAs(s.role, s.userId); navigate('/') }} className="flex flex-col items-center gap-1 rounded-xl border border-border bg-bg-card p-2.5 text-center text-xs font-semibold text-text-secondary hover:bg-bg-surface cursor-pointer">
+              <s.icon className="h-4 w-4 text-accent-blue" />{s.label}
+            </button>
+          ))}
+        </div>
       </Section>
 
       <Btn variant="danger" className="mt-5 w-full" onClick={logout}><LogOut className="h-4 w-4" />Sign out</Btn>
       <p className="mt-4 text-center text-[11px] text-text-muted">ClubR prototype · mock data behind a swappable services layer</p>
     </div>
-  )
-}
-
-function HostConsole() {
-  const navigate = useNavigate()
-  const clubs = useMyClubs()
-  const owned = clubs.data?.filter((c) => c.canManage) ?? []
-  return (
-    <Section title="Host console">
-      {clubs.isLoading ? <Spinner /> : owned.length === 0 ? (
-        <Card className="text-sm text-text-secondary">You don't host any clubs yet. Create one from the <span className="font-semibold text-text-primary">Clubs</span> tab.</Card>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {owned.map((c) => (
-            <Card key={c.id} onClick={() => navigate(`/club/${c.id}`)} className="flex items-center gap-3 p-3">
-              <Avatar emoji={c.emoji} color={c.color} size={38} />
-              <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold text-text-primary">{c.name}</p><p className="text-xs text-text-muted">{c.members.filter((m) => m.status === 'member').length} members · code {c.inviteCode}</p></div>
-              {c.pendingCount > 0 && <Badge tone="amber">{c.pendingCount} pending</Badge>}
-            </Card>
-          ))}
-        </div>
-      )}
-    </Section>
   )
 }
