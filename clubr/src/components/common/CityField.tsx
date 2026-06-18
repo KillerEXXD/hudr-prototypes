@@ -1,32 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
-import { fetchCitySuggestions, newSessionToken } from '@/lib/cityAutocomplete'
+import { fetchCitySuggestions } from '@/lib/cityAutocomplete'
 
 /**
- * City typeahead. Backed by Google Places Autocomplete (cities-only) when a key
- * is configured (VITE_GOOGLE_PLACES_KEY), else a bundled list. Keystrokes are
- * debounced and stale requests aborted; free text is always allowed (so it also
- * works for venue-style entries). One shared component for every city input —
- * onboarding, club create, profile edit, game location.
+ * City typeahead. Backed by the server-side geocoder proxy (Nominatim, free; see
+ * cityAutocomplete.ts) with a bundled-list fallback. Keystrokes are debounced and
+ * out-of-order responses dropped via a request-id guard. Free text is always
+ * allowed (so it also works for venue-style entries). One shared component for
+ * every city input — onboarding, club create, profile edit, game location.
  */
 export function CityField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
   const [open, setOpen] = useState(false)
   const [matches, setMatches] = useState<string[]>([])
-  const token = useRef('')
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const abort = useRef<AbortController | null>(null)
+  const reqId = useRef(0)
 
   // Debounced lookup whenever the value changes while the menu is open.
   useEffect(() => {
     if (!open) return
-    if (!token.current) token.current = newSessionToken()
     if (debounce.current) clearTimeout(debounce.current)
     debounce.current = setTimeout(async () => {
-      abort.current?.abort()
-      const ac = new AbortController()
-      abort.current = ac
-      const out = await fetchCitySuggestions(value, token.current, ac.signal)
-      if (!ac.signal.aborted) setMatches(out)
+      const id = ++reqId.current
+      const out = await fetchCitySuggestions(value)
+      if (id === reqId.current) setMatches(out) // ignore stale (out-of-order) responses
     }, 280)
     return () => { if (debounce.current) clearTimeout(debounce.current) }
   }, [value, open])
@@ -35,7 +31,6 @@ export function CityField({ label, value, onChange, placeholder }: { label: stri
     onChange(c)
     setOpen(false)
     setMatches([])
-    token.current = '' // selection ends the billing session
   }
 
   return (
