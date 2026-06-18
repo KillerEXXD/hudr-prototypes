@@ -37,7 +37,9 @@ export function HostHomePage() {
   const active = items.filter((g) => !g.finished)
   const yours = active.filter((g) => g.canManage)
   const others = active.filter((g) => !g.canManage)
-  const typesPresent = GAME_TYPES.filter((t) => yours.some((g) => g.type === t.id))
+  // Chips reflect every type ON THE PAGE (games you run + clubs you're only a
+  // member of) so a type like FT Fantasy you don't host can still be filtered.
+  const typesPresent = GAME_TYPES.filter((t) => active.some((g) => g.type === t.id))
   const yoursShown = yours.filter((g) => matchesType(g, filter))
   const othersShown = others.filter((g) => matchesType(g, filter))
   const yoursTop = yoursShown.slice(0, GAMES_CAP)
