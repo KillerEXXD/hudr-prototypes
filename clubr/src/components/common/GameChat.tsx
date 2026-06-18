@@ -14,13 +14,13 @@ export function GameChat({ messages, onSend, canSend, currentUserId }: { message
       <div className="mb-2 flex max-h-64 flex-col gap-2 overflow-y-auto scrollbar-thin pr-1">
         {messages.length === 0 && <p className="py-4 text-center text-xs text-text-muted">No messages yet. Say hi 👋</p>}
         {messages.map((m) => m.kind === 'system' ? (
-          <p key={m.id} className="self-center rounded-full bg-bg-surface px-2.5 py-1 text-center text-[11px] text-text-muted">{m.text}</p>
+          <p key={m.id} className="self-center rounded-full border border-border bg-bg-surface px-2.5 py-1 text-center text-[11px] font-medium text-text-secondary">{m.text}</p>
         ) : (
           <div key={m.id} className={cn('flex items-start gap-2', m.userId === currentUserId && 'flex-row-reverse')}>
             <Avatar name={m.name} color={m.avatarColor} size={26} />
-            <div className={cn('max-w-[78%] rounded-2xl px-3 py-1.5', m.userId === currentUserId ? 'bg-accent-blue text-white' : 'bg-bg-surface text-text-primary')}>
-              {m.userId !== currentUserId && <p className="text-[10px] font-bold opacity-70">{m.name}</p>}
-              <p className="text-[13px] leading-snug">{m.text}</p>
+            <div className={cn('max-w-[78%] rounded-2xl px-3 py-1.5', m.userId === currentUserId ? 'bg-accent-blue text-white shadow-sm' : 'border border-border bg-bg-surface text-text-primary')}>
+              {m.userId !== currentUserId && <p className="text-[11px] font-bold" style={{ color: m.avatarColor }}>{m.name}</p>}
+              <p className="text-sm leading-snug">{m.text}</p>
             </div>
           </div>
         ))}

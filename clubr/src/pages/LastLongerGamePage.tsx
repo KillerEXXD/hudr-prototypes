@@ -196,11 +196,18 @@ function Row({ p, rank, g, me, canManage, paidBusy, bustBusy, coHostBusy, onPaid
       <span className="w-5 text-center text-sm font-extrabold text-text-muted">{rank}</span>
       <button onClick={onProfile} disabled={!onProfile} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
         <Avatar name={p.name} color={p.avatarColor} size={32} />
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{p.userId === me && <span className="text-[10px] text-accent-blue">(you)</span>}{isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co</Badge>}</p>
-          <p className="flex items-center gap-1 font-mono text-[11px] text-text-muted">{fmtChips(p.chips)}{p.stale && <span className="inline-block h-1.5 w-1.5 animate-pulse-soft rounded-full bg-accent-red" title={`stale · ${p.chipsUpdatedAgo}`} />}<span className="text-text-muted/70"> · {p.chipsUpdatedAgo}</span></p>
-        </div>
+        <span className="flex min-w-0 items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{p.userId === me && <span className="text-[10px] text-accent-blue">(you)</span>}{isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co</Badge>}</span>
       </button>
+      {/* Prominent chip stack — headline metric, right-aligned; time as a small subline. */}
+      <div className="flex shrink-0 flex-col items-end leading-none">
+        <span className="font-mono text-base font-extrabold tabular-nums text-text-primary">{fmtChips(p.chips)}</span>
+        <span className="mt-1 flex items-center gap-0.5 text-[10px] font-medium text-text-muted">
+          {p.stale
+            ? <span className="inline-block h-1.5 w-1.5 animate-pulse-soft rounded-full bg-accent-red" title={`stale · updated ${p.chipsUpdatedAgo}`} />
+            : <Timer className="h-2.5 w-2.5" />}
+          {p.chipsUpdatedAgo}
+        </span>
+      </div>
       {(canManage || p.userId === me) && <PaidToggle paid={p.paid} editable={canManage} busy={paidBusy} onToggle={onPaid} />}
       {canManage && !isHost && !isCo && <button onClick={onCoHost} title="Make co-host" className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer"><Shield className="h-3.5 w-3.5" /></button>}
       {canManage && <button onClick={onBust} className="rounded-lg border border-accent-red/30 bg-accent-red/10 px-2 py-1 text-[11px] font-bold text-accent-red hover:bg-accent-red/20 cursor-pointer">Out</button>}
