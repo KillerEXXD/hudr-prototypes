@@ -64,13 +64,14 @@ export async function requestJoin(gameId: string, userId: string): Promise<void>
   const u = USERS[userId]
   const isHost = g.hostId === userId || g.coHostIds.includes(userId)
   g.participants.push({ userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status: isHost ? 'active' : 'pending', paid: false, chips: 0, chipsUpdatedAgo: isHost ? 'now' : '—', stale: false })
-  g.chat.push({ id: `lm_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: isHost ? `${u?.name ?? 'The host'} joined as a player` : `${u?.name ?? 'A player'} requested to join`, ts: 'now', kind: 'system' })
+  g.chat.push({ id: `lm_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: isHost ? `🪑 ${u?.name ?? 'The host'} joined as a player` : `🙋 ${u?.name ?? 'A player'} requested to join`, ts: 'now', kind: 'system' })
 }
 
 export async function approve(gameId: string, target: string): Promise<void> {
   await delay(150)
-  const p = LL_GAMES.find((x) => x.id === gameId)?.participants.find((x) => x.userId === target)
-  if (p) { p.status = 'active'; p.chipsUpdatedAgo = 'now' }
+  const g = LL_GAMES.find((x) => x.id === gameId)
+  const p = g?.participants.find((x) => x.userId === target)
+  if (g && p) { p.status = 'active'; p.chipsUpdatedAgo = 'now'; g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: p.name, avatarColor: p.avatarColor, text: `✅ ${p.name} was admitted`, ts: 'now', kind: 'system' }) }
 }
 
 export async function decline(gameId: string, target: string): Promise<void> {
@@ -91,7 +92,11 @@ export async function togglePaid(gameId: string, target: string): Promise<void> 
 export async function assignCoHost(gameId: string, target: string): Promise<void> {
   await delay(150)
   const g = LL_GAMES.find((x) => x.id === gameId)
-  if (g && !g.coHostIds.includes(target)) g.coHostIds.push(target)
+  if (g && !g.coHostIds.includes(target)) {
+    g.coHostIds.push(target)
+    const u = USERS[target]
+    g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `🛡️ ${u?.name ?? 'A player'} is now a co-host`, ts: 'now', kind: 'system' })
+  }
 }
 
 export async function updateChips(gameId: string, userId: string, chips: number): Promise<void> {
@@ -114,7 +119,7 @@ export async function bust(gameId: string, target: string, byUserId: string): Pr
   const activeCount = g.participants.filter((x) => x.status === 'active').length
   p.status = 'out'; p.finishPos = activeCount; p.chips = 0; p.bustedAgo = 'now'
   const self = byUserId === target
-  g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: p.name, avatarColor: p.avatarColor, text: self ? `${p.name} self-busted — out in ${activeCount}${ord(activeCount)}` : `${p.name} eliminated — ${activeCount}${ord(activeCount)}`, ts: 'now', kind: 'system' })
+  g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: p.name, avatarColor: p.avatarColor, text: self ? `🚪 ${p.name} self-busted — out in ${activeCount}${ord(activeCount)}` : `💥 ${p.name} eliminated — ${activeCount}${ord(activeCount)}`, ts: 'now', kind: 'system' })
   // last one standing → completed
   const remaining = g.participants.filter((x) => x.status === 'active')
   if (remaining.length === 1) { remaining[0].finishPos = 1; remaining[0].status = 'out'; g.status = 'completed'; g.winnerName = remaining[0].name }
@@ -133,7 +138,7 @@ export async function reinstate(gameId: string, target: string): Promise<void> {
     const w = g.participants.find((x) => x.finishPos === 1); if (w) { w.status = 'active'; w.finishPos = undefined }
     g.status = 'live'; g.winnerName = undefined
   }
-  g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: p.name, avatarColor: p.avatarColor, text: `${p.name} was reinstated by the host`, ts: 'now', kind: 'system' })
+  g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: p.name, avatarColor: p.avatarColor, text: `↩️ ${p.name} was reinstated by the host`, ts: 'now', kind: 'system' })
 }
 
 export async function postChat(gameId: string, userId: string, text: string): Promise<void> {
@@ -149,7 +154,7 @@ export async function proposeChop(gameId: string, byUserId: string): Promise<voi
   if (!g) return
   const active = g.participants.filter((p) => p.status === 'active')
   g.chop = { proposedByName: USERS[byUserId]?.name ?? 'Host', agreements: active.map((p) => ({ userId: p.userId, name: p.name, agreed: p.userId === byUserId })) }
-  g.chat.push({ id: `lm_${Date.now()}`, userId: byUserId, name: USERS[byUserId]?.name ?? '', avatarColor: '#6b7280', text: `${USERS[byUserId]?.name ?? 'Host'} proposed a chop`, ts: 'now', kind: 'system' })
+  g.chat.push({ id: `lm_${Date.now()}`, userId: byUserId, name: USERS[byUserId]?.name ?? '', avatarColor: '#6b7280', text: `✂️ ${USERS[byUserId]?.name ?? 'Host'} proposed a chop`, ts: 'now', kind: 'system' })
 }
 
 export async function agreeChop(gameId: string, userId: string): Promise<void> {
@@ -190,6 +195,6 @@ export async function inviteToGame(gameId: string, userIds: string[]): Promise<v
   g.accessUserIds = Array.from(new Set([...(g.accessUserIds ?? []), ...userIds]))
   userIds.forEach((uid, i) => {
     const u = USERS[uid]
-    g.chat.push({ id: `lm_inv_${Date.now()}_${i}`, userId: uid, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `${u?.name ?? 'A member'} was invited`, ts: 'now', kind: 'system' })
+    g.chat.push({ id: `lm_inv_${Date.now()}_${i}`, userId: uid, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `📨 ${u?.name ?? 'A member'} was invited`, ts: 'now', kind: 'system' })
   })
 }

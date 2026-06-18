@@ -115,9 +115,15 @@ Approval is required to do anything beyond viewing:
   bust had auto‑completed the game, reinstate **reopens it** and reactivates the winner.
 - **Chop:** host proposes → players agree → game settles.
 - **Per‑game chat** among the players.
-- **Auto-updates in chat.** The app posts **system chat lines** automatically: when
-  the **chip lead changes** ("👑 … takes the chip lead — …") and on every
-  **bust / elimination**. The **final bust auto-completes** the game and crowns the winner.
+- **Auto-updates in chat.** The app posts **system chat lines** automatically for the
+  whole lifecycle, each prefixed with a **distinct icon** so the table can scan the
+  feed at a glance:
+  - 🙋 join request · 🪑 host joins as a player
+  - ✅ admitted · 🛡️ co‑host added · 📨 invited (private games)
+  - 👑 chip lead changes ("👑 … takes the chip lead — …")
+  - 💥 eliminated (with finishing position) · 🚪 self‑busted · ↩️ reinstated
+  - ✂️ chop proposed · 🏆 winner crowned
+  The **final bust auto-completes** the game and crowns the winner.
 
 ## 6. Paid status (the green/grey toggle)
 - A subtle **green = paid / grey = unpaid** toggle, no heading.
