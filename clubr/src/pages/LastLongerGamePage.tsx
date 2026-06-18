@@ -17,7 +17,7 @@ import { DEFAULT_LEADERBOARD } from '@/types/leaderboard'
 import { LpBadge } from '@/components/leaderboard/LpBadge'
 import { useSpend } from '@/components/credits/SpendProvider'
 import type { LLParticipant } from '@/types/ll'
-import { fmtChips } from '@/lib/utils/chipFormat'
+import { fmtChips, digitsOnly } from '@/lib/utils/chipFormat'
 
 const LL_STEPS: HowStep[] = [
   { icon: UserPlus, title: 'Join the game', body: 'Request to join your club’s live tournament — the host admits you and marks you paid.' },
@@ -121,7 +121,7 @@ export function LastLongerGamePage() {
                 <span className="flex items-center gap-1.5 text-xs text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></span>
               </div>
               <div className="mt-2 flex gap-2">
-                <input value={chipInput} onChange={(e) => setChipInput(e.target.value)} placeholder="Update chip count…" inputMode="numeric" className="flex-1 rounded-xl border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
+                <input value={chipInput} onChange={(e) => setChipInput(digitsOnly(e.target.value))} placeholder="Update chip count…" inputMode="numeric" pattern="[0-9]*" className="flex-1 rounded-xl border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
                 <Btn variant="secondary" disabled={!chipInput} loading={updateChips.isPending} onClick={() => { updateChips.mutate({ gameId: g.id, chips: Number(chipInput) || 0 }); setChipInput('') }}>Update</Btn>
               </div>
               <Btn variant="danger" className="mt-2 w-full" loading={bust.isPending && bust.variables?.target === me.userId} onClick={() => bust.mutate({ gameId: g.id, target: me.userId })}>I'm out — bust myself</Btn>
