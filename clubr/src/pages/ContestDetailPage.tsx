@@ -13,6 +13,8 @@ import { SettledResult } from '@/components/ft/SettledResult'
 import { StakePool } from '@/components/common/StakePool'
 import { HowScoringPricing } from '@/components/ft/HowScoringPricing'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
+import { ftPhase } from '@/lib/gameStatus'
+import { StatusBadge } from '@/components/common/StatusBadge'
 import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
 import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
@@ -44,7 +46,6 @@ export function ContestDetailPage() {
   const isAdmin = user?.role === 'admin'
   const approved = me?.status === 'approved'
   const canChat = approved || c.canManage
-  const statusTone = c.status === 'open' ? 'blue' : c.status === 'locked' ? 'amber' : 'neutral'
 
   return (
     <div className="animate-fade-up pb-20">
@@ -53,7 +54,7 @@ export function ContestDetailPage() {
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span>{c.clubName}<Badge tone="purple">Stack Draft</Badge></div>
       <h1 className="mt-1 flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />{c.ftName}</h1>
       <div className="mt-1.5 flex items-center gap-2 text-xs text-text-secondary">
-        <Badge tone={statusTone}>{c.status === 'open' ? 'Open' : c.status === 'locked' ? 'Locked' : 'Settled'}</Badge>
+        <StatusBadge phase={ftPhase(c.status)} />
         {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}
         <span className="font-mono">{c.stake} Stakes</span><span className="text-text-muted">· budget {fmtK(c.budget)}</span>
         {c.status !== 'open' && <span className="ml-auto text-text-muted">{c.locksAt}</span>}

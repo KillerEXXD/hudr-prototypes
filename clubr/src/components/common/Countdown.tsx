@@ -89,7 +89,7 @@ export function Countdown({ deadline, prefix = 'Closes in' }: { deadline: number
  * HH:MM:SS clock so the closing deadline is impossible to miss:
  *   emerald (plenty of time) → amber (< 30m) → red (< 10m) → pulses (< 2m).
  */
-export function CountdownBanner({ deadline, label = 'Closes in', sub, className }: { deadline: number; label?: string; sub?: string; className?: string }) {
+export function CountdownBanner({ deadline, label = 'Closes in', closedLabel = 'Closed', sub, className }: { deadline: number; label?: string; closedLabel?: string; sub?: string; className?: string }) {
   useTicker()
   const ms = deadline - Date.now()
   const closed = ms <= 0
@@ -105,7 +105,7 @@ export function CountdownBanner({ deadline, label = 'Closes in', sub, className 
     <div className={cn('flex items-center gap-3 rounded-xl border px-3.5 py-2.5', tone, !closed && ms < 2 * 60_000 && 'animate-pulse', className)}>
       <Clock className="h-5 w-5 shrink-0" />
       <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">{closed ? 'Registration closed' : label}</p>
+        <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">{closed ? closedLabel : label}</p>
         {sub && !closed && <p className="truncate text-[11px] leading-tight text-text-muted">{sub}</p>}
       </div>
       <span className="font-mono text-2xl font-extrabold tabular-nums tracking-tight leading-none">{closed ? '00:00' : fmtClock(ms)}</span>
