@@ -9,8 +9,10 @@ import type { ChatMsg } from '@/types/ft'
 // opens the game's conversation in a slide-up sheet. It only ever renders the
 // messages it's given — scoped to ONE game (g.chat / c.chat) — so chat never
 // crosses between games. Render it with key={gameId} per page so the unread
-// count resets on navigation. Sits bottom-LEFT (clears the right-side row
-// actions) and fades out while you scroll the list, back in when you stop.
+// count resets on navigation. Sits bottom-RIGHT (Instagram/Messenger DM
+// placement) as a solid-blue puck for contrast, and fades out while you scroll
+// the list, back in when you stop. Pages that render it add bottom padding so
+// the last row's right-side actions never sit under the puck at rest.
 export function FloatingChat({ messages, onSend, canSend, currentUserId }: {
   messages: ChatMsg[]; onSend: (text: string) => void; canSend: boolean; currentUserId: string
 }) {
@@ -50,13 +52,13 @@ export function FloatingChat({ messages, onSend, canSend, currentUserId }: {
           onClick={() => setOpen(true)}
           aria-label={unread > 0 ? `Open table chat, ${unread} unread` : 'Open table chat'}
           className={cn(
-            'fixed bottom-20 left-4 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-bg-elevated text-accent-blue shadow-md ring-2 ring-bg-primary transition-all duration-200 active:scale-95 cursor-pointer',
+            'fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent-blue to-blue-600 text-white shadow-lg shadow-accent-blue/30 ring-2 ring-bg-primary transition-all duration-200 active:scale-95 cursor-pointer',
             scrolling ? 'pointer-events-none translate-y-2 opacity-0' : 'opacity-100',
           )}
         >
           {/* brief expanding ring when a new message lands */}
-          {ping && <span className="absolute inset-0 rounded-full bg-accent-blue/30 animate-ping" aria-hidden />}
-          <MessageCircle className="relative h-[18px] w-[18px]" />
+          {ping && <span className="absolute inset-0 rounded-full bg-accent-blue/40 animate-ping" aria-hidden />}
+          <MessageCircle className="relative h-[22px] w-[22px]" />
           {unread > 0 && (
             <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent-red px-1 text-[10px] font-extrabold leading-none text-white ring-2 ring-bg-primary">
               {unread > 99 ? '99+' : unread}
