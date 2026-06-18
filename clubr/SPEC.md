@@ -33,8 +33,14 @@ truth for *how the app behaves*; update it as decisions change.
   computes ICM prices; enters the public finishing order to score. **HUDR replaces
   this in Phase 2.**
 
-Login: phone + OTP (mock). The prototype seeds one account per role
-(Player / Club Host / App Admin) + an invite‑link signup path.
+**Login is one front door: phone + OTP** (Twilio Verify live; mocked in the
+prototype). There is **no pre‑verification sign‑up form** — name/email/city are
+collected once, *after* verification, in onboarding. An **invite link**
+(`/?join=CODE`) leads straight to that phone flow and **shows an invite banner**;
+the code rides the URL and the join is applied automatically once signed in (the
+single applier is `useApplyInviteOnLogin`, so a brand‑new user post‑onboarding and
+an existing user who opens the link behave identically). The prototype seeds one
+account per role (Player / Club Host / App Admin); it mocks the phone step.
 
 ## 2. Approval model (mandatory everywhere)
 Approval is required to do anything beyond viewing:

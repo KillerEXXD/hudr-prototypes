@@ -28,7 +28,10 @@ export function LoginScreen() {
   useEffect(() => { if (joinCode) { setJoinOpen(true); setCode(joinCode.toUpperCase()) } }, [joinCode])
 
   const emailOk = /.+@.+\..+/.test(email)
-  const canJoin = !!name.trim() && emailOk && !!phone.trim() && !!location.trim() && !!code.trim()
+  // One front door (mirrors live): verify (phone) + name/email/city. The invite
+  // code rides the URL (live: applied post-verify by useApplyInviteOnLogin).
+  // Demo mocks the phone verification.
+  const canJoin = !!phone.trim() && !!name.trim() && emailOk && !!location.trim() && !!code.trim()
   async function joinWithLink() {
     if (!canJoin) return
     const u = signUp(name, email, phone, location)
@@ -71,14 +74,20 @@ export function LoginScreen() {
           </>
         ) : (
           <div className="rounded-2xl border border-border bg-bg-card p-4">
-            <h2 className="mb-1 text-base font-bold text-text-primary">Create your login</h2>
-            <p className="mb-3 text-xs text-text-muted">Your host shared an invite code. Name, email, phone &amp; city are required — your host needs them to vet &amp; admit you, and your city helps us show clubs near you.</p>
+            {joinCode && (
+              <div className="mb-3 flex items-start gap-2.5 rounded-2xl border border-accent-emerald/40 bg-accent-emerald/10 p-3">
+                <Ticket className="mt-0.5 h-4 w-4 shrink-0 text-accent-emerald" />
+                <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">You've been invited to a club.</span> Verify to continue — we'll add you right after.</p>
+              </div>
+            )}
+            <h2 className="mb-1 text-base font-bold text-text-primary">Verify &amp; continue</h2>
+            <p className="mb-3 text-xs text-text-muted">In the live app you verify your phone first; then just these. (Demo mocks the verification.)</p>
             <div className="flex flex-col gap-3">
+              <Field label="Phone number *" value={phone} onChange={setPhone} type="tel" placeholder="+1 (555) 123‑4567" />
               <Field label="Your name *" value={name} onChange={setName} placeholder="First & last name" />
               <Field label="Email *" value={email} onChange={setEmail} type="email" placeholder="you@example.com" />
-              <Field label="Phone number *" value={phone} onChange={setPhone} type="tel" placeholder="+1 (555) 123‑4567" />
               <Field label="Your city *" value={location} onChange={setLocation} placeholder="e.g. Houston, TX" />
-              <Field label="Invite code *" value={code} onChange={setCode} placeholder="e.g. ACES24" mono />
+              {!joinCode && <Field label="Invite code *" value={code} onChange={setCode} placeholder="e.g. ACES24" mono />}
               <Btn className="w-full" onClick={joinWithLink} disabled={!canJoin}>Join club</Btn>
               {msg && <p className="text-center text-xs font-semibold text-accent-emerald">{msg}</p>}
               <button onClick={() => { setJoinOpen(false); setMsg('') }} className="text-center text-xs text-text-muted hover:text-text-secondary cursor-pointer">← back to sign in</button>
