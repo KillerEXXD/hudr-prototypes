@@ -26,8 +26,8 @@ function CardJoinFT({ c }: { c: FTContestView }) {
   const req = useRequestEnter()
   return (
     <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-      <Btn size="sm" variant="secondary" className="w-full" disabled={req.isPending} onClick={() => req.mutate(c.id)}>
-        <UserPlus className="h-3.5 w-3.5" />{req.isPending ? 'Requesting…' : 'Request to enter'}
+      <Btn size="sm" variant="secondary" className="w-full" loading={req.isPending} onClick={() => req.mutate(c.id)}>
+        <UserPlus className="h-3.5 w-3.5" />Request to enter
       </Btn>
     </div>
   )

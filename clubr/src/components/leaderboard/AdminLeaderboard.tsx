@@ -44,7 +44,7 @@ export function AdminLeaderboard() {
               </label>
             ))}
           </div>
-          <Btn size="sm" className="mt-2 w-full" disabled={update.isPending} onClick={() => update.mutate(cfg)}>Save formula</Btn>
+          <Btn size="sm" className="mt-2 w-full" loading={update.isPending} onClick={() => update.mutate(cfg)}>Save formula</Btn>
         </Card>
       )}
     </Section>

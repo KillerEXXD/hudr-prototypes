@@ -34,7 +34,7 @@ export function CreateSquaresSheet({ open, onClose, fixedClubId }: { open: boole
   const club = managed.find((c) => c.id === clubId)
   const members = (club?.members ?? []).filter((m) => m.status === 'member')
   const sumOk = arePayoutsValid(payouts)
-  const canCreate = !!clubId && !!title.trim() && !!home.trim() && !!away.trim() && !!closesAt && sumOk && !create.isPending
+  const canCreate = !!clubId && !!title.trim() && !!home.trim() && !!away.trim() && !!closesAt && sumOk
 
   async function submit() {
     if (!(await spend({ cost: hostCost, kind: 'host_game', label: `Hosted ${title.trim() || 'a Squares board'}`, title: 'Host this Squares board', verb: 'Host' }))) return
@@ -105,7 +105,7 @@ export function CreateSquaresSheet({ open, onClose, fixedClubId }: { open: boole
             </div>
           )}
         </div>
-        <Btn className="w-full" disabled={!canCreate} onClick={submit}><Grid3x3 className="h-4 w-4" />Create Squares · {hostCost} cr</Btn>
+        <Btn className="w-full" disabled={!canCreate} loading={create.isPending} onClick={submit}><Grid3x3 className="h-4 w-4" />Create Squares · {hostCost} cr</Btn>
       </div>
     </Sheet>
   )

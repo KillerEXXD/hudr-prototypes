@@ -9,8 +9,8 @@ import type { ClubView } from '@/types'
 function RequestButton({ club }: { club: ClubView }) {
   const req = useRequestToJoin()
   return (
-    <Btn size="sm" variant="secondary" onClick={() => req.mutate(club.id)} disabled={req.isPending}>
-      <Plus className="h-3.5 w-3.5" /> {req.isPending ? '…' : 'Request'}
+    <Btn size="sm" variant="secondary" onClick={() => req.mutate(club.id)} loading={req.isPending}>
+      <Plus className="h-3.5 w-3.5" /> Request
     </Btn>
   )
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Coins, Plus, Trash2, Pencil } from 'lucide-react'
 import { useEconomy, useUpdateCosts, useUpsertPackage, useDeletePackage } from '@/hooks/credits'
-import { Section, Card, Btn, Sheet, Field, Spinner } from '@/components/common/ui'
+import { Section, Card, Btn, Sheet, Field, Spinner, ProcessingOverlay } from '@/components/common/ui'
 import { cn } from '@/lib/utils/cn'
 import type { CreditPackage, EconomyConfig } from '@/types/credits'
 
@@ -38,7 +38,7 @@ export function AdminEconomy() {
                 </label>
               ))}
             </div>
-            <Btn size="sm" className="mt-2 w-full" disabled={updateCosts.isPending} onClick={() => updateCosts.mutate(costs)}>Save costs</Btn>
+            <Btn size="sm" className="mt-2 w-full" loading={updateCosts.isPending} onClick={() => updateCosts.mutate(costs)}>Save costs</Btn>
           </Card>
 
           {/* packages */}
@@ -48,7 +48,8 @@ export function AdminEconomy() {
           </div>
           <div className="flex flex-col gap-1.5">
             {packages.map((p) => (
-              <div key={p.id} className={cn('flex items-center gap-2.5 rounded-xl border bg-bg-card px-3 py-2', p.active ? 'border-border' : 'border-dashed border-border opacity-60')}>
+              <div key={p.id} className={cn('relative flex items-center gap-2.5 rounded-xl border bg-bg-card px-3 py-2', p.active ? 'border-border' : 'border-dashed border-border opacity-60')}>
+                {del.isPending && del.variables === p.id && <ProcessingOverlay label="Deleting…" />}
                 <Coins className="h-4 w-4 shrink-0 text-accent-amber" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-bold text-text-primary">{fmt(p.credits)} cr <span className="font-normal text-text-muted">· {p.label}</span></p>

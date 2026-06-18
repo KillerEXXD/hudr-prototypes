@@ -111,7 +111,7 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
             </div>
           )}
         </div>
-        <Btn className="w-full" disabled={!clubId || !title.trim() || !closesAt || !arePayoutsValid(payouts) || create.isPending} onClick={submit}>Create Last Longer · {hostCost} cr</Btn>
+        <Btn className="w-full" disabled={!clubId || !title.trim() || !closesAt || !arePayoutsValid(payouts)} loading={create.isPending} onClick={submit}>Create Last Longer · {hostCost} cr</Btn>
       </div>
     </Sheet>
   )

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Send, ExternalLink, Link2, Plug, Check } from 'lucide-react'
-import { Card, Btn, Section, Sheet, Field } from '@/components/common/ui'
+import { Card, Btn, Section, Sheet, Field, Processing } from '@/components/common/ui'
 import { useClubTelegram, useConnectChannel, useDisconnectChannel, useLinkTelegram, useJoinChannel } from '@/hooks/telegram'
 
 // The host-side connect/manage panel + the big member join card are still hidden
@@ -42,7 +42,7 @@ export function TelegramJoinChip({ clubId }: { clubId: string }) {
       title="Members-only club announcements on Telegram"
       className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-accent-blue/30 bg-accent-blue/5 px-2.5 py-1 text-[11px] font-semibold text-accent-blue transition-colors hover:bg-accent-blue/10 disabled:opacity-60 cursor-pointer"
     >
-      <Send className="h-3 w-3" />{busy ? 'Joining…' : 'Join Telegram'}
+      {busy ? <Processing size={13} /> : <Send className="h-3 w-3" />}{busy ? 'Joining…' : 'Join Telegram'}
     </button>
   )
 }
@@ -66,9 +66,9 @@ export function TelegramJoinCard({ clubId }: { clubId: string }) {
         {st.joined ? (
           <a href={st.channel.link} target="_blank" rel="noreferrer" className="flex shrink-0 items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-bold text-text-secondary hover:bg-bg-surface"><ExternalLink className="h-3.5 w-3.5" />Open</a>
         ) : !st.linked ? (
-          <Btn size="sm" disabled={link.isPending} onClick={() => link.mutate('you')}><Link2 className="h-3.5 w-3.5" />Connect Telegram</Btn>
+          <Btn size="sm" loading={link.isPending} onClick={() => link.mutate('you')}><Link2 className="h-3.5 w-3.5" />Connect Telegram</Btn>
         ) : (
-          <Btn size="sm" disabled={join.isPending} onClick={() => join.mutate()}><Send className="h-3.5 w-3.5" />Join channel</Btn>
+          <Btn size="sm" loading={join.isPending} onClick={() => join.mutate()}><Send className="h-3.5 w-3.5" />Join channel</Btn>
         )}
       </div>
       {!st.joined && (
@@ -117,7 +117,7 @@ export function TelegramSetupCard({ clubId, canManage, pending }: { clubId: stri
         <li><b className="text-text-primary">2.</b> Add <b className="font-mono">@ClubrAdminBot</b> as an <b>admin</b>.</li>
         <li><b className="text-text-primary">3.</b> Tap below — we detect it and wire up join + auto-posts.</li>
       </ol>
-      <Btn size="sm" className="mt-2.5 w-full" disabled={connect.isPending} onClick={() => connect.mutate({ link: `https://t.me/+clubr_${clubId}`, title: '' })}>
+      <Btn size="sm" className="mt-2.5 w-full" loading={connect.isPending} onClick={() => connect.mutate({ link: `https://t.me/+clubr_${clubId}`, title: '' })}>
         <Check className="h-3.5 w-3.5" />{connect.isPending ? 'Connecting…' : "I've added the bot — connect"}
       </Btn>
       <p className="mt-1.5 text-[10px] leading-snug text-text-muted">@ClubrAdminBot creates the invite link and manages approvals/removals — you never touch channel settings. <i>(Prototype — the real bot detects the channel automatically.)</i></p>
@@ -144,7 +144,7 @@ export function TelegramHostPanel({ clubId }: { clubId: string }) {
             <p className="truncate text-sm font-bold text-text-primary">{st.channel.title}</p>
             <a href={st.channel.link} target="_blank" rel="noreferrer" className="truncate text-[11px] text-accent-blue hover:underline">{st.channel.link}</a>
           </div>
-          <Btn size="sm" variant="secondary" disabled={disconnect.isPending} onClick={() => disconnect.mutate()}>Disconnect</Btn>
+          <Btn size="sm" variant="secondary" loading={disconnect.isPending} onClick={() => disconnect.mutate()}>Disconnect</Btn>
         </Card>
       ) : (
         <Card className="flex items-center justify-between gap-3">
@@ -163,7 +163,7 @@ export function TelegramHostPanel({ clubId }: { clubId: string }) {
           </ol>
           <Field label="Channel invite link" value={link} onChange={setLink} placeholder="https://t.me/+…" mono />
           <Field label="Display name" value={title} onChange={setTitle} placeholder="e.g. Aces High — announcements" />
-          <Btn className="w-full" disabled={!link.trim() || connect.isPending} onClick={async () => { await connect.mutateAsync({ link, title }); setOpen(false); setLink(''); setTitle('') }}>Connect channel</Btn>
+          <Btn className="w-full" disabled={!link.trim()} loading={connect.isPending} onClick={async () => { await connect.mutateAsync({ link, title }); setOpen(false); setLink(''); setTitle('') }}>Connect channel</Btn>
         </div>
       </Sheet>
     </Section>

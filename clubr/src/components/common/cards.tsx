@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Clock, CheckCircle2, Users, Crown, Shield, MapPin, Lock, UserCheck, X, ChevronDown } from 'lucide-react'
-import { Avatar, Badge, Btn, Card } from './ui'
+import { Avatar, Badge, Btn, Card, Processing } from './ui'
 import { useApproveMember, useRejectMember } from '@/hooks'
 import type { ClubView } from '@/types'
 
@@ -61,8 +61,8 @@ export function ClubRow({ club, right }: { club: ClubView; right?: React.ReactNo
             <div key={m.userId} className="flex items-center gap-2 rounded-lg bg-bg-card px-2 py-1.5">
               <Avatar name={m.name} color={m.avatarColor} size={26} />
               <span className="min-w-0 flex-1 truncate text-sm font-semibold text-text-primary">{m.name}</span>
-              <Btn size="sm" disabled={approve.isPending} onClick={() => approve.mutate({ clubId: club.id, userId: m.userId })}><UserCheck className="h-3.5 w-3.5" />Approve</Btn>
-              <button type="button" onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-accent-red/10 hover:text-accent-red cursor-pointer" aria-label={`Reject ${m.name}`}><X className="h-3.5 w-3.5" /></button>
+              <Btn size="sm" loading={approve.isPending && approve.variables?.userId === m.userId} onClick={() => approve.mutate({ clubId: club.id, userId: m.userId })}><UserCheck className="h-3.5 w-3.5" />Approve</Btn>
+              <button type="button" disabled={reject.isPending && reject.variables?.userId === m.userId} onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-accent-red/10 hover:text-accent-red cursor-pointer" aria-label={`Reject ${m.name}`}>{reject.isPending && reject.variables?.userId === m.userId ? <Processing size={13} /> : <X className="h-3.5 w-3.5" />}</button>
             </div>
           ))}
         </div>

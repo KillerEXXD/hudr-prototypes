@@ -4,7 +4,7 @@ import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors
 import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useUpdateChips, useBust, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
@@ -98,7 +98,7 @@ export function LastLongerGamePage() {
             {g.chop.agreements.map((a) => (
               <div key={a.userId} className="flex items-center justify-between text-xs">
                 <span className="text-text-secondary">{a.name}</span>
-                {a.agreed ? <Badge tone="green"><Check className="h-3 w-3" />Agreed</Badge> : a.userId === user?.id ? <Btn size="sm" onClick={() => agreeChop.mutate(g.id)}>Agree</Btn> : <span className="text-text-muted">pending</span>}
+                {a.agreed ? <Badge tone="green"><Check className="h-3 w-3" />Agreed</Badge> : a.userId === user?.id ? <Btn size="sm" loading={agreeChop.isPending} onClick={() => agreeChop.mutate(g.id)}>Agree</Btn> : <span className="text-text-muted">pending</span>}
               </div>
             ))}
           </div>
@@ -111,7 +111,7 @@ export function LastLongerGamePage() {
           {!g.isMemberOfClub && !g.canManage ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to play.</p></Card>
           ) : !me ? (
-            <Btn className="w-full" disabled={requestJoin.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${g.title}`, title: g.canManage ? 'Join your game' : 'Join this game', verb: 'Join' })) requestJoin.mutate(g.id) }}><UserPlus className="h-4 w-4" />{g.canManage ? 'Join as a player' : 'Request to join'} · {joinCost} cr</Btn>
+            <Btn className="w-full" loading={requestJoin.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${g.title}`, title: g.canManage ? 'Join your game' : 'Join this game', verb: 'Join' })) requestJoin.mutate(g.id) }}><UserPlus className="h-4 w-4" />{g.canManage ? 'Join as a player' : 'Request to join'} · {joinCost} cr</Btn>
           ) : me.status === 'pending' ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Awaiting host approval.</span> Read-only until the host admits you.</p></Card>
           ) : me.status === 'active' ? (
@@ -122,9 +122,9 @@ export function LastLongerGamePage() {
               </div>
               <div className="mt-2 flex gap-2">
                 <input value={chipInput} onChange={(e) => setChipInput(e.target.value)} placeholder="Update chip count…" inputMode="numeric" className="flex-1 rounded-xl border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue" />
-                <Btn variant="secondary" disabled={!chipInput || updateChips.isPending} onClick={() => { updateChips.mutate({ gameId: g.id, chips: Number(chipInput) || 0 }); setChipInput('') }}>Update</Btn>
+                <Btn variant="secondary" disabled={!chipInput} loading={updateChips.isPending} onClick={() => { updateChips.mutate({ gameId: g.id, chips: Number(chipInput) || 0 }); setChipInput('') }}>Update</Btn>
               </div>
-              <Btn variant="danger" className="mt-2 w-full" onClick={() => bust.mutate({ gameId: g.id, target: me.userId })}>I'm out — bust myself</Btn>
+              <Btn variant="danger" className="mt-2 w-full" loading={bust.isPending && bust.variables?.target === me.userId} onClick={() => bust.mutate({ gameId: g.id, target: me.userId })}>I'm out — bust myself</Btn>
             </Card>
           ) : (
             <Card className="text-sm text-text-secondary">You finished <span className="font-bold text-text-primary">{medal(me.finishPos)}{typeof me.finishPos === 'number' && me.finishPos > 3 ? ord(me.finishPos) : ''}</span>. GG!</Card>
@@ -134,7 +134,7 @@ export function LastLongerGamePage() {
 
       {/* Host actions */}
       {g.canManage && g.status === 'live' && g.activeCount > 1 && !g.chop && (
-        <Btn variant="secondary" className="mt-3 w-full" onClick={() => proposeChop.mutate(g.id)}><Scissors className="h-4 w-4" />Propose a chop</Btn>
+        <Btn variant="secondary" className="mt-3 w-full" loading={proposeChop.isPending} onClick={() => proposeChop.mutate(g.id)}><Scissors className="h-4 w-4" />Propose a chop</Btn>
       )}
 
       {/* Leaderboard */}
@@ -143,18 +143,22 @@ export function LastLongerGamePage() {
         <div className="flex flex-col gap-1.5">
           {active.map((p, i) => (
             <Row key={p.userId} p={p} rank={i + 1} g={g} me={user?.id ?? ''} canManage={g.canManage}
+              paidBusy={togglePaid.isPending && togglePaid.variables?.userId === p.userId}
+              bustBusy={bust.isPending && bust.variables?.target === p.userId}
+              coHostBusy={assignCoHost.isPending && assignCoHost.variables?.userId === p.userId}
               onPaid={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })}
               onBust={() => bust.mutate({ gameId: g.id, target: p.userId })}
               onCoHost={() => assignCoHost.mutate({ gameId: g.id, userId: p.userId })}
               onProfile={g.canManage ? () => navigate(`/member/${p.userId}`) : undefined} />
           ))}
           {waiting.map((p) => (
-            <div key={p.userId} className="flex items-center gap-2.5 rounded-xl border border-dashed border-accent-amber/40 bg-accent-amber/5 px-3 py-2">
+            <div key={p.userId} className="relative flex items-center gap-2.5 rounded-xl border border-dashed border-accent-amber/40 bg-accent-amber/5 px-3 py-2">
+              {decline.isPending && decline.variables?.userId === p.userId && <ProcessingOverlay label="Declining…" />}
               <button onClick={() => navigate(`/member/${p.userId}`)} disabled={!g.canManage} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
                 <Avatar name={p.name} color={p.avatarColor} size={30} />
                 <span className="min-w-0 flex-1 truncate text-sm text-text-primary">{p.name} <Badge tone="amber">Waiting</Badge></span>
               </button>
-              {g.canManage && <><Btn size="sm" onClick={() => approve.mutate({ gameId: g.id, userId: p.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn><button onClick={() => decline.mutate({ gameId: g.id, userId: p.userId })} className="text-[11px] text-text-muted hover:text-accent-red cursor-pointer">✕</button></>}
+              {g.canManage && <><Btn size="sm" loading={approve.isPending && approve.variables?.userId === p.userId} onClick={() => approve.mutate({ gameId: g.id, userId: p.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn><button onClick={() => decline.mutate({ gameId: g.id, userId: p.userId })} className="text-[11px] text-text-muted hover:text-accent-red cursor-pointer">✕</button></>}
             </div>
           ))}
           {out.map((p) => (
@@ -183,11 +187,12 @@ export function LastLongerGamePage() {
   )
 }
 
-function Row({ p, rank, g, me, canManage, onPaid, onBust, onCoHost, onProfile }: { p: LLParticipant; rank: number; g: { hostId: string; coHostIds: string[] }; me: string; canManage: boolean; onPaid: () => void; onBust: () => void; onCoHost: () => void; onProfile?: () => void }) {
+function Row({ p, rank, g, me, canManage, paidBusy, bustBusy, coHostBusy, onPaid, onBust, onCoHost, onProfile }: { p: LLParticipant; rank: number; g: { hostId: string; coHostIds: string[] }; me: string; canManage: boolean; paidBusy?: boolean; bustBusy?: boolean; coHostBusy?: boolean; onPaid: () => void; onBust: () => void; onCoHost: () => void; onProfile?: () => void }) {
   const isHost = p.userId === g.hostId
   const isCo = g.coHostIds.includes(p.userId)
   return (
-    <div className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
+    <div className="relative flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
+      {(bustBusy || coHostBusy) && <ProcessingOverlay label={bustBusy ? 'Busting…' : 'Making co-host…'} />}
       <span className="w-5 text-center text-sm font-extrabold text-text-muted">{rank}</span>
       <button onClick={onProfile} disabled={!onProfile} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
         <Avatar name={p.name} color={p.avatarColor} size={32} />
@@ -196,7 +201,7 @@ function Row({ p, rank, g, me, canManage, onPaid, onBust, onCoHost, onProfile }:
           <p className="flex items-center gap-1 font-mono text-[11px] text-text-muted">{fmtChips(p.chips)}{p.stale && <span className="inline-block h-1.5 w-1.5 animate-pulse-soft rounded-full bg-accent-red" title={`stale · ${p.chipsUpdatedAgo}`} />}<span className="text-text-muted/70"> · {p.chipsUpdatedAgo}</span></p>
         </div>
       </button>
-      {(canManage || p.userId === me) && <PaidToggle paid={p.paid} editable={canManage} onToggle={onPaid} />}
+      {(canManage || p.userId === me) && <PaidToggle paid={p.paid} editable={canManage} busy={paidBusy} onToggle={onPaid} />}
       {canManage && !isHost && !isCo && <button onClick={onCoHost} title="Make co-host" className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer"><Shield className="h-3.5 w-3.5" /></button>}
       {canManage && <button onClick={onBust} className="rounded-lg border border-accent-red/30 bg-accent-red/10 px-2 py-1 text-[11px] font-bold text-accent-red hover:bg-accent-red/20 cursor-pointer">Out</button>}
     </div>

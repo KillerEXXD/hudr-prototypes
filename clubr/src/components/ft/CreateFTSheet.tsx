@@ -87,8 +87,8 @@ export function CreateFTSheet({ open, onClose }: { open: boolean; onClose: () =>
         ))}
       </div>
 
-      <Btn className="mt-4 w-full" disabled={!canSave || add.isPending} onClick={submit}>
-        {add.isPending ? 'Adding…' : `Add to slate${filled.length ? ` · ${filled.length} finalists` : ''}`}
+      <Btn className="mt-4 w-full" disabled={!canSave} loading={add.isPending} onClick={submit}>
+        {`Add to slate${filled.length ? ` · ${filled.length} finalists` : ''}`}
       </Btn>
       <p className="mt-1.5 text-center text-[10px] text-text-muted">Hosts will see this under “FTs to host”. Players never see the slate.</p>
     </Sheet>

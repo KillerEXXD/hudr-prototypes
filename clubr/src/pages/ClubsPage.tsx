@@ -90,7 +90,7 @@ export function ClubsPage() {
               <span className="mt-0.5 block text-[11px] leading-snug text-text-muted">Members get instant alerts for <b className="text-text-secondary">new games, results & monthly leaderboard recaps</b> — and one-tap join, auto-managed. You'll connect it in ~30 seconds after creating the club.</span>
             </span>
           </button>
-          <Btn className="w-full" disabled={!name.trim() || !loc.trim() || create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; await create.mutateAsync({ name, emoji, description: desc, location: loc, visibility, telegram }); setCreateOpen(false); setName(''); setDesc(''); setLoc(''); setVisibility('public'); setTelegram(false) }}>
+          <Btn className="w-full" disabled={!name.trim() || !loc.trim()} loading={create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; await create.mutateAsync({ name, emoji, description: desc, location: loc, visibility, telegram }); setCreateOpen(false); setName(''); setDesc(''); setLoc(''); setVisibility('public'); setTelegram(false) }}>
             Create club â€” you're the host Â· {createClubCost} cr
           </Btn>
           <p className="text-center text-[11px] text-text-muted">You'll own it, get an invite code, and approve who joins.</p>
@@ -100,7 +100,7 @@ export function ClubsPage() {
       <Sheet open={joinOpen} onClose={() => setJoinOpen(false)} title="Join with an invite code">
         <div className="flex flex-col gap-3">
           <Field label="Invite code" value={code} onChange={setCode} placeholder="e.g. ACES24" mono />
-          <Btn className="w-full" disabled={!code.trim() || join.isPending} onClick={async () => { const c = await join.mutateAsync(code); setJoinMsg(c ? `Requested to join ${c.name} â€” awaiting approval.` : 'If a club matches that code, your request was sent â€” you\'ll get access once the host admits you.'); setCode('') }}>
+          <Btn className="w-full" disabled={!code.trim()} loading={join.isPending} onClick={async () => { const c = await join.mutateAsync(code); setJoinMsg(c ? `Requested to join ${c.name} â€” awaiting approval.` : 'If a club matches that code, your request was sent â€” you\'ll get access once the host admits you.'); setCode('') }}>
             Request to join
           </Btn>
           {joinMsg && <p className="text-center text-xs font-semibold text-accent-emerald">{joinMsg}</p>}

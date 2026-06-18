@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, Filter } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin, useJoinViaInvite, useSetClubVisibility } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { LeaderboardSection } from '@/components/leaderboard/LeaderboardSection'
@@ -96,7 +96,7 @@ export function ClubDetailPage() {
         </Card>
       )}
       {club.myStatus === 'none' && !club.canManage && (
-        <Btn className="mt-3 w-full" onClick={() => request.mutate(club.id)} disabled={request.isPending}><Plus className="h-4 w-4" />Request to join</Btn>
+        <Btn className="mt-3 w-full" onClick={() => request.mutate(club.id)} loading={request.isPending}><Plus className="h-4 w-4" />Request to join</Btn>
       )}
 
       {/* Tabs — Games / Leaderboard for everyone; Members for host & admin only.
@@ -158,12 +158,14 @@ export function ClubDetailPage() {
             ) : (
               <div className="flex flex-col gap-2">
                 {pending.map((m) => (
-                  <Card key={m.userId} className="flex items-center gap-3 p-3">
+                  <Card key={m.userId} className="relative flex items-center gap-3 p-3">
+                    {approve.isPending && approve.variables?.userId === m.userId && <ProcessingOverlay label="Admitting…" />}
+                    {reject.isPending && reject.variables?.userId === m.userId && <ProcessingOverlay label="Removing…" />}
                     <button onClick={() => navigate(`/member/${m.userId}`)} className="flex min-w-0 flex-1 items-center gap-3 text-left cursor-pointer">
                       <Avatar name={m.name} color={m.avatarColor} size={36} />
                       <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-text-primary">{m.name}</p><p className="text-xs text-text-muted">{m.handle ? <>@{m.handle} · </> : null}tap to vet →</p></div>
                     </button>
-                    <Btn size="sm" onClick={() => approve.mutate({ clubId: club.id, userId: m.userId })}><UserCheck className="h-3.5 w-3.5" />Admit</Btn>
+                    <Btn size="sm" loading={approve.isPending && approve.variables?.userId === m.userId} onClick={() => approve.mutate({ clubId: club.id, userId: m.userId })}><UserCheck className="h-3.5 w-3.5" />Admit</Btn>
                     <button onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer" aria-label="Reject"><X className="h-4 w-4" /></button>
                   </Card>
                 ))}
@@ -175,7 +177,8 @@ export function ClubDetailPage() {
             <p className="mb-2 text-[11px] text-text-muted">Tap a member to view, ✕ to remove.</p>
             <div className="flex flex-col gap-1.5">
               {members.map((m) => (
-                <div key={m.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
+                <div key={m.userId} className="relative flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
+                  {reject.isPending && reject.variables?.userId === m.userId && <ProcessingOverlay label="Removing…" />}
                   <button onClick={() => navigate(`/member/${m.userId}`)} className="flex min-w-0 flex-1 items-center gap-2.5 text-left cursor-pointer">
                     <Avatar name={m.name} color={m.avatarColor} size={30} />
                     <span className="truncate text-sm text-text-primary">{m.name}</span>
@@ -196,7 +199,7 @@ export function ClubDetailPage() {
                 <p className="flex items-center gap-1.5 text-sm font-bold text-text-primary">{isPrivate ? <><Lock className="h-3.5 w-3.5 text-text-muted" />Private</> : <><Globe className="h-3.5 w-3.5 text-text-muted" />Public</>}</p>
                 <p className="mt-0.5 text-[11px] leading-snug text-text-muted">{isPrivate ? 'Hidden — invite-only; not discoverable, and a direct link reveals nothing.' : 'Discoverable in Discover & search; anyone can request to join.'}</p>
               </div>
-              <Btn size="sm" variant="secondary" disabled={setVis.isPending} onClick={() => setVis.mutate({ clubId: club.id, visibility: isPrivate ? 'public' : 'private' })}>{isPrivate ? 'Make public' : 'Make private'}</Btn>
+              <Btn size="sm" variant="secondary" loading={setVis.isPending} onClick={() => setVis.mutate({ clubId: club.id, visibility: isPrivate ? 'public' : 'private' })}>{isPrivate ? 'Make public' : 'Make private'}</Btn>
             </Card>
             <p className="mt-1.5 text-[10px] text-text-muted">Switching regenerates the invite code{isPrivate ? '' : ' — a long, copy-only one when going private'}.</p>
           </Section>
@@ -238,7 +241,7 @@ function PrivateClubGate() {
       </div>
       <Card className="mt-4">
         <Field label="Invite code" value={code} onChange={setCode} placeholder="Paste your invite code" mono />
-        <Btn className="mt-2 w-full" disabled={!code.trim() || join.isPending} onClick={async () => { await join.mutateAsync(code.trim()); setMsg("If a club matches that code, your request has been sent — you'll get access once the host admits you."); setCode('') }}>Request access</Btn>
+        <Btn className="mt-2 w-full" disabled={!code.trim()} loading={join.isPending} onClick={async () => { await join.mutateAsync(code.trim()); setMsg("If a club matches that code, your request has been sent — you'll get access once the host admits you."); setCode('') }}>Request access</Btn>
         {msg && <p className="mt-2 text-center text-xs font-semibold text-accent-emerald">{msg}</p>}
       </Card>
       <p className="mt-3 text-center text-[11px] text-text-muted">No ClubR account yet? Sign in first, then use your invite code.</p>

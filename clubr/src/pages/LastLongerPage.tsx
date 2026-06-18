@@ -27,8 +27,8 @@ function CardJoinLL({ g }: { g: LLGameView }) {
   const req = useRequestJoinLL()
   return (
     <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-      <Btn size="sm" variant="secondary" className="w-full" disabled={req.isPending} onClick={() => req.mutate(g.id)}>
-        <UserPlus className="h-3.5 w-3.5" />{req.isPending ? 'Requesting…' : 'Request to join'}
+      <Btn size="sm" variant="secondary" className="w-full" loading={req.isPending} onClick={() => req.mutate(g.id)}>
+        <UserPlus className="h-3.5 w-3.5" />Request to join
       </Btn>
     </div>
   )

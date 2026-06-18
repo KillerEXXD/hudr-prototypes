@@ -107,7 +107,7 @@ export function WalletPage() {
                 <CreditCard className="mx-auto mb-1 h-5 w-5" />
                 Mock checkout — no real charge in the prototype.<br />A real payment step plugs in here at launch.
               </div>
-              <Btn className="w-full" disabled={buy.isPending} onClick={pay}><Plus className="h-4 w-4" />Pay ${checkout.priceUSD} (mock) → +{fmt(checkout.credits)} cr</Btn>
+              <Btn className="w-full" loading={buy.isPending} onClick={pay}><Plus className="h-4 w-4" />Pay ${checkout.priceUSD} (mock) → +{fmt(checkout.credits)} cr</Btn>
             </div>
           )
         )}

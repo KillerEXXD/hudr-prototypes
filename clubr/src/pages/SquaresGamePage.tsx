@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, HelpCircle, Hand, Dice5, Coins, Stamp } from 'lucide-react'
 import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares } from '@/hooks/squares'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, Processing, ProcessingOverlay } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
@@ -89,7 +89,7 @@ export function SquaresGamePage() {
       {!g.isMemberOfClub && !g.canManage ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to claim squares.</p></Card>
       ) : !me && !isAdmin ? (
-        <Btn className="mt-3 w-full" disabled={join.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${g.title}`, title: g.canManage ? 'Join your board' : 'Join this board', verb: 'Join' })) join.mutate(g.id) }}><UserPlus className="h-4 w-4" />{g.canManage ? 'Join as a player' : 'Request to join'} · {joinCost} cr</Btn>
+        <Btn className="mt-3 w-full" loading={join.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${g.title}`, title: g.canManage ? 'Join your board' : 'Join this board', verb: 'Join' })) join.mutate(g.id) }}><UserPlus className="h-4 w-4" />{g.canManage ? 'Join as a player' : 'Request to join'} · {joinCost} cr</Btn>
       ) : me?.status === 'pending' ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary"><b className="text-text-primary">Awaiting host approval.</b> You can claim squares once admitted.</p></Card>
       ) : me?.status === 'active' ? (
@@ -146,6 +146,7 @@ export function SquaresGamePage() {
                       style={cell.userId && cell.approved && !win && !mine ? { backgroundColor: `${cell.avatarColor}33` } : undefined}
                       title={cell.userId ? `${cell.name}${pend ? ' · pending approval' : ''}${win ? ` · won ${win}` : ''}` : ''}>
                       {win ? <Trophy className="h-3 w-3" /> : cell.userId ? initials(cell.name) : ''}
+                      {((claim.isPending && claim.variables?.cellIdx === idx) || (approveCell.isPending && approveCell.variables?.cellIdx === idx)) && (<span className="absolute inset-0 flex items-center justify-center bg-bg-card/75"><Processing size={11} count={1} /></span>)}
                     </button>
                   )
                 })}
@@ -194,11 +195,12 @@ export function SquaresGamePage() {
             <div className="mb-3 rounded-xl border border-accent-amber/40 bg-accent-amber/5 p-2.5">
               <div className="mb-1.5 flex items-center justify-between gap-2">
                 <p className="flex items-center gap-1.5 text-xs font-bold text-text-primary"><Stamp className="h-3.5 w-3.5 text-accent-amber" />Square approvals · <span className="text-accent-amber">{pendingClaims.length} pending</span></p>
-                <Btn size="sm" disabled={approveAll.isPending} onClick={() => approveAll.mutate(g.id)}><CheckCheck className="h-3.5 w-3.5" />Approve all</Btn>
+                <Btn size="sm" loading={approveAll.isPending} onClick={() => approveAll.mutate(g.id)}><CheckCheck className="h-3.5 w-3.5" />Approve all</Btn>
               </div>
               <div className="flex max-h-56 flex-col gap-1.5 overflow-y-auto scrollbar-thin">
                 {pendingClaims.map(({ c, i }) => (
-                  <div key={i} className="flex items-center gap-2 rounded-lg border border-border bg-bg-card px-2.5 py-1.5">
+                  <div key={i} className="relative flex items-center gap-2 rounded-lg border border-border bg-bg-card px-2.5 py-1.5">
+                    {((approveCell.isPending && approveCell.variables?.cellIdx === i) || (rejectCell.isPending && rejectCell.variables?.cellIdx === i)) && <ProcessingOverlay className="rounded-lg" />}
                     <Avatar name={c.name} color={c.avatarColor} size={24} />
                     <button onClick={() => navigate(`/member/${c.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{c.name}</button>
                     <span className="font-mono text-[10px] text-text-muted">R{Math.floor(i / 10) + 1}·C{(i % 10) + 1}</span>
@@ -213,19 +215,20 @@ export function SquaresGamePage() {
           {pending.length > 0 && (
             <div className="mb-2 flex flex-col gap-1.5">
               {pending.map((p) => (
-                <div key={p.userId} className="flex items-center gap-2.5 rounded-xl border border-dashed border-accent-amber/40 bg-accent-amber/5 px-3 py-2">
+                <div key={p.userId} className="relative flex items-center gap-2.5 rounded-xl border border-dashed border-accent-amber/40 bg-accent-amber/5 px-3 py-2">
+                  {decline.isPending && decline.variables?.userId === p.userId && <ProcessingOverlay label="Declining…" className="rounded-xl" />}
                   <Avatar name={p.name} color={p.avatarColor} size={28} />
                   <button onClick={() => navigate(`/member/${p.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{p.name}</button>
-                  <Btn size="sm" onClick={() => approve.mutate({ gameId: g.id, userId: p.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn>
+                  <Btn size="sm" loading={approve.isPending && approve.variables?.userId === p.userId} onClick={() => approve.mutate({ gameId: g.id, userId: p.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn>
                   <button onClick={() => decline.mutate({ gameId: g.id, userId: p.userId })} className="text-[11px] text-text-muted hover:text-accent-red cursor-pointer">✕</button>
                 </div>
               ))}
             </div>
           )}
           {g.status === 'registration' && (
-            <Btn className="w-full" disabled={lock.isPending} onClick={() => lock.mutate(g.id)}><Lock className="h-4 w-4" />Lock &amp; assign digits</Btn>
+            <Btn className="w-full" loading={lock.isPending} onClick={() => lock.mutate(g.id)}><Lock className="h-4 w-4" />Lock &amp; assign digits</Btn>
           )}
-          {g.status === 'live' && <ScoreEntry g={g} onSet={(label, home, away) => setScore.mutate({ gameId: g.id, label, home, away })} />}
+          {g.status === 'live' && <ScoreEntry g={g} busy={setScore.isPending} onSet={(label, home, away) => setScore.mutate({ gameId: g.id, label, home, away })} />}
           {active.length > 0 && (
             <div className="mt-2 flex flex-col gap-1.5">
               <p className="text-[11px] text-text-muted">Players · squares chosen &amp; owed · toggle the green dot when they've paid.</p>
@@ -241,7 +244,7 @@ export function SquaresGamePage() {
                       <div className="font-mono text-[10px] text-text-muted">{n} sq{pend ? <span className="text-accent-amber"> · {pend} pend</span> : ''}</div>
                       <div className="font-mono text-[10px] font-bold text-accent-emerald">{(n * g.stake).toLocaleString()}</div>
                     </div>
-                    <PaidToggle paid={p.paid} editable onToggle={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })} />
+                    <PaidToggle paid={p.paid} editable busy={togglePaid.isPending && togglePaid.variables?.userId === p.userId} onToggle={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })} />
                   </div>
                 )
               })}
@@ -257,7 +260,7 @@ export function SquaresGamePage() {
   )
 }
 
-function ScoreEntry({ g, onSet }: { g: SquaresGameView; onSet: (label: string, home: number, away: number) => void }) {
+function ScoreEntry({ g, onSet, busy }: { g: SquaresGameView; onSet: (label: string, home: number, away: number) => void; busy?: boolean }) {
   const [label, setLabel] = useState(g.periods.find((p) => p.homeScore == null)?.label ?? 'Q1')
   const [home, setHome] = useState('')
   const [away, setAway] = useState('')
@@ -269,7 +272,7 @@ function ScoreEntry({ g, onSet }: { g: SquaresGameView; onSet: (label: string, h
         <input value={home} onChange={(e) => setHome(e.target.value)} inputMode="numeric" placeholder={g.homeTeam} className="w-16 rounded-lg border border-border bg-bg-surface px-2 py-1.5 text-center text-sm" />
         <span className="text-text-muted">–</span>
         <input value={away} onChange={(e) => setAway(e.target.value)} inputMode="numeric" placeholder={g.awayTeam} className="w-16 rounded-lg border border-border bg-bg-surface px-2 py-1.5 text-center text-sm" />
-        <Btn size="sm" disabled={home === '' || away === ''} onClick={() => onSet(label, Number(home) || 0, Number(away) || 0)}>Set</Btn>
+        <Btn size="sm" disabled={home === '' || away === ''} loading={busy} onClick={() => onSet(label, Number(home) || 0, Number(away) || 0)}>Set</Btn>
       </div>
     </div>
   )

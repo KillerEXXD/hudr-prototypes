@@ -1,7 +1,47 @@
 import { createPortal } from 'react-dom'
 import { type ReactNode } from 'react'
-import { X, Loader2, Crown, Shield } from 'lucide-react'
+import { X, Loader2, Crown, Shield, Spade, Heart, Diamond, Club } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
+
+// ---- Processing (CRUD activity indicator) ----
+// The four card suits pop in sequence — our consistent "the app is working on it"
+// signal for every create / update / delete / pick / admit. Scales from a tiny
+// inline glyph inside a <Btn> up to a centered <ProcessingOverlay>.
+const PROC_SUITS = [
+  { Icon: Spade, cls: 'text-text-primary' },
+  { Icon: Heart, cls: 'text-accent-red' },
+  { Icon: Diamond, cls: 'text-accent-red' },
+  { Icon: Club, cls: 'text-text-primary' },
+] as const
+
+export function Processing({ size = 16, label, count = 4, className }: { size?: number; label?: string; count?: number; className?: string }) {
+  const suits = PROC_SUITS.slice(0, Math.max(1, Math.min(4, count)))
+  return (
+    <span role="status" aria-label={label ?? 'Processing'} className={cn('inline-flex items-center gap-0.5', className)}>
+      {suits.map(({ Icon, cls }, i) => (
+        <Icon
+          key={i}
+          aria-hidden
+          fill="currentColor"
+          strokeWidth={0}
+          className={cn('clubr-suit shrink-0', cls)}
+          style={{ width: size, height: size, animationDelay: `${i * 0.14}s` }}
+        />
+      ))}
+      {label && <span className="ml-1.5 text-text-muted">{label}</span>}
+    </span>
+  )
+}
+
+// Card/section-level processing veil. Parent MUST be `relative`.
+export function ProcessingOverlay({ label, className }: { label?: string; className?: string }) {
+  return (
+    <div className={cn('absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 rounded-[inherit] bg-bg-card/70 backdrop-blur-sm', className)}>
+      <Processing size={22} />
+      {label && <span className="text-xs font-semibold text-text-muted">{label}</span>}
+    </div>
+  )
+}
 
 // ---- Avatar ----
 export function Avatar({ name, color, size = 36, emoji }: { name?: string; color?: string; size?: number; emoji?: string }) {
@@ -57,8 +97,10 @@ export function Card({ children, className, onClick, id }: { children: ReactNode
 }
 
 // ---- Button ----
-export function Btn({ children, onClick, variant = 'primary', size = 'md', disabled, className, type = 'button' }: {
-  children: ReactNode; onClick?: () => void; variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; size?: 'sm' | 'md'; disabled?: boolean; className?: string; type?: 'button' | 'submit'
+// `loading` shows the suit <Processing> in place of the label and auto-disables —
+// pass it the mutation's isPending so every CRUD button signals work consistently.
+export function Btn({ children, onClick, variant = 'primary', size = 'md', disabled, loading, className, type = 'button' }: {
+  children: ReactNode; onClick?: () => void; variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; size?: 'sm' | 'md'; disabled?: boolean; loading?: boolean; className?: string; type?: 'button' | 'submit'
 }) {
   const variants: Record<string, string> = {
     primary: 'bg-accent-blue text-white hover:brightness-110',
@@ -70,7 +112,8 @@ export function Btn({ children, onClick, variant = 'primary', size = 'md', disab
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
+      aria-busy={loading}
       className={cn(
         'inline-flex items-center justify-center gap-1.5 rounded-xl font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer',
         size === 'sm' ? 'px-3 py-1.5 text-xs' : 'px-4 py-2.5 text-sm',
@@ -78,7 +121,7 @@ export function Btn({ children, onClick, variant = 'primary', size = 'md', disab
         className,
       )}
     >
-      {children}
+      {loading ? <Processing size={size === 'sm' ? 13 : 15} /> : children}
     </button>
   )
 }
