@@ -18,6 +18,8 @@ interface AuthCtx {
   updateProfile: (patch: { name: string; email: string }) => void
   /** Mock email verification (the real app confirms via a magic link). */
   verifyEmail: () => void
+  /** Re-read the signed-in user from the store (e.g. after creating a club promotes the role). */
+  refreshUser: () => void
   logout: () => void
 }
 
@@ -84,9 +86,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const refreshUser = useCallback(() => {
+    setUser((prev) => (prev && USERS[prev.id] ? { ...USERS[prev.id] } : prev))
+  }, [])
+
   const logout = useCallback(() => { setUser(null); persist(null) }, [])
 
-  return <Ctx.Provider value={{ user, loginAs, signUp, updateProfile, verifyEmail, logout }}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={{ user, loginAs, signUp, updateProfile, verifyEmail, refreshUser, logout }}>{children}</Ctx.Provider>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

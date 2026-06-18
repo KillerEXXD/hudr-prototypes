@@ -85,8 +85,8 @@ export function MePage() {
           <p className="truncate text-xs text-text-muted">{user.email}</p>
         </div>
         <div className="flex flex-col items-end gap-1.5">
-          <Badge tone={role.tone}><role.icon className="h-3 w-3" />{role.label}</Badge>
           <button type="button" onClick={() => setEditOpen(true)} className="flex items-center gap-1 text-xs font-semibold text-accent-blue hover:underline cursor-pointer"><Pencil className="h-3 w-3" />Edit</button>
+          <Badge tone={role.tone}><role.icon className="h-3 w-3" />{role.label}</Badge>
         </div>
       </Card>
 

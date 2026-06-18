@@ -131,6 +131,8 @@ export async function createClub(input: { name: string; emoji: string; descripti
     telegramSetupPending: input.telegram === true,
   }
   CLUBS.unshift(club)
+  // Creating a club makes you a host — Club Host takes precedence over Player.
+  if (u && u.role === 'player') u.role = 'host'
   return toView(club, userId, false)
 }
 

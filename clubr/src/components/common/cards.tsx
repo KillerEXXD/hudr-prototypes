@@ -5,7 +5,7 @@ import type { ClubView } from '@/types'
 
 export function MembershipBadge({ status, role }: { status: ClubView['myStatus']; role?: ClubView['myRole'] }) {
   if (status === 'pending') return <Badge tone="amber"><Clock className="h-3 w-3" />Pending</Badge>
-  if (role === 'owner') return <Badge tone="green"><Crown className="h-3 w-3" />Owner</Badge>
+  if (role === 'owner') return <Badge tone="purple"><Crown className="h-3 w-3" />Owner</Badge>
   if (role === 'host') return <Badge tone="blue"><Shield className="h-3 w-3" />Host</Badge>
   if (status === 'member') return <Badge tone="green"><CheckCircle2 className="h-3 w-3" />Member</Badge>
   return null
