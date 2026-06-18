@@ -88,7 +88,7 @@ export function TelegramJoinCard({ clubId }: { clubId: string }) {
 // create the channel (Telegram disallows it), so the host makes it + adds the bot;
 // ClubR/bot then wires up the invite link, approvals and auto-posts. Once connected,
 // collapses to a subtle "connected" confirmation.
-export function TelegramSetupCard({ clubId, canManage, pending }: { clubId: string; canManage: boolean; pending?: boolean }) {
+export function TelegramSetupCard({ clubId, canManage, pending, clubName }: { clubId: string; canManage: boolean; pending?: boolean; clubName?: string }) {
   const { data: st } = useClubTelegram(clubId)
   const [open, setOpen] = useState(false)
   if (!canManage) return null
@@ -117,7 +117,7 @@ export function TelegramSetupCard({ clubId, canManage, pending }: { clubId: stri
         Finish Telegram setup
       </Btn>
       <p className="mt-1.5 text-[10px] leading-snug text-text-muted">A quick 3-step guide — create a private channel, add {TELEGRAM_BOT_HANDLE}, post a code. You never touch channel settings after that.</p>
-      <TelegramSetupWizard open={open} onClose={() => setOpen(false)} clubId={clubId} />
+      <TelegramSetupWizard open={open} onClose={() => setOpen(false)} clubId={clubId} clubName={clubName} />
     </Card>
   )
 }

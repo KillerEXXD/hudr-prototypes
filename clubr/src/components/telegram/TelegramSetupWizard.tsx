@@ -96,7 +96,9 @@ function fakeCode(clubId: string): string {
   return h.toString(16).toUpperCase().padStart(6, '0').slice(0, 6)
 }
 
-export function TelegramSetupWizard({ open, onClose, clubId }: { open: boolean; onClose: () => void; clubId: string }) {
+export function TelegramSetupWizard({ open, onClose, clubId, clubName }: { open: boolean; onClose: () => void; clubId: string; clubName?: string }) {
+  // Suggest a channel name close to the club so members recognize it in Telegram.
+  const channelNameHint = `${(clubName ?? '').trim() || 'Aces High'} Alerts`
   const [step, setStep] = useState(0)
   const [code, setCode] = useState<string | null>(null)
   const { data: st } = useClubTelegram(clubId)
@@ -127,7 +129,7 @@ export function TelegramSetupWizard({ open, onClose, clubId }: { open: boolean; 
         <div className="flex-1 overflow-y-auto scrollbar-thin p-4">
           {step === 0 && (
             <Step n={1} title="Create a private channel">
-              In Telegram, tap the <b className="text-text-primary">pencil ✎</b> (top-right) → <b className="text-text-primary">New Channel</b>. Give it a name, then set the type to <b className="text-text-primary">Private</b>. A channel is a one-way broadcast — perfect for club alerts.
+              In Telegram, tap the <b className="text-text-primary">pencil ✎</b> (top-right) → <b className="text-text-primary">New Channel</b>. Name it <b className="text-text-primary">close to your club</b> — e.g. <b className="text-text-primary">"{channelNameHint}"</b> — so members recognize it, then set the type to <b className="text-text-primary">Private</b>. A channel is a one-way broadcast for club alerts.
               <CreateChannelArt />
             </Step>
           )}

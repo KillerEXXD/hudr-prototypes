@@ -78,7 +78,7 @@ export function ClubDetailPage() {
           member of a club that has a channel. */}
       <div><TelegramJoinChip clubId={club.id} /></div>
       {/* Host-only: finish the Telegram setup they opted into at club creation. */}
-      <TelegramSetupCard clubId={club.id} canManage={club.canManage} pending={club.telegramSetupPending} />
+      <TelegramSetupCard clubId={club.id} canManage={club.canManage} pending={club.telegramSetupPending} clubName={club.name} />
 
       {/* Host actions — compact, near the club name (above the tabs) */}
       {club.canManage && (
