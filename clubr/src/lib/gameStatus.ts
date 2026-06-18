@@ -16,7 +16,7 @@
  */
 export type GamePhase = 'registration' | 'live' | 'completed'
 
-export type LifecycleTone = 'blue' | 'green' | 'neutral'
+export type LifecycleTone = 'blue' | 'green' | 'dark'
 
 export interface LifecycleBadge {
   tone: LifecycleTone
@@ -28,7 +28,7 @@ export interface LifecycleBadge {
 const LIFECYCLE_BADGES: Record<GamePhase, LifecycleBadge> = {
   registration: { tone: 'blue', label: 'Registration open', live: false },
   live: { tone: 'green', label: 'Live', live: true },
-  completed: { tone: 'neutral', label: 'Completed', live: false },
+  completed: { tone: 'dark', label: 'Completed', live: false },
 }
 
 /** Unified badge (tone + label) for a canonical lifecycle phase. */
