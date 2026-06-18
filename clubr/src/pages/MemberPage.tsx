@@ -19,7 +19,7 @@ export function MemberPage() {
 
       <div className="flex items-center gap-3">
         <Avatar name={m.user.name} color={m.user.avatarColor} size={56} />
-        <div className="min-w-0 flex-1"><h1 className="truncate text-xl font-extrabold tracking-tight text-text-primary">{m.user.name}</h1><p className="flex items-center gap-1 text-xs text-text-muted">@{m.user.handle}{m.user.location ? <> · <MapPin className="h-3 w-3" />{m.user.location}</> : null}</p></div>
+        <div className="min-w-0 flex-1"><h1 className="truncate text-xl font-extrabold tracking-tight text-text-primary">{m.user.name}</h1><p className="flex items-center gap-1 text-xs text-text-muted">{m.user.handle ? <>@{m.user.handle}</> : null}{m.user.location ? <>{m.user.handle ? ' · ' : null}<MapPin className="h-3 w-3" />{m.user.location}</> : null}</p></div>
         <Badge tone={roleTone[m.user.role]}>{m.user.role}</Badge>
       </div>
 
