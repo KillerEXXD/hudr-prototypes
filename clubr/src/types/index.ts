@@ -18,6 +18,8 @@ export interface User {
   location?: string
   role: AccountRole
   avatarColor: string
+  /** Whether the email has been confirmed (mock). Changing the email resets this to false. */
+  emailVerified?: boolean
   /** Telegram handle once the user links their Telegram account to ClubR (mock). */
   telegramHandle?: string
 }

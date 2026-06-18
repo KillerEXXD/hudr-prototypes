@@ -11,9 +11,9 @@ import type { Club, User } from '@/types'
 
 // ---- Accounts (one per login role) + extra people who populate clubs ----
 export const USERS: Record<string, User> = {
-  u_admin: { id: 'u_admin', name: 'Avery Admin', handle: 'avery', email: 'avery@clubr.app', location: 'Las Vegas, NV', role: 'admin', avatarColor: '#8b5cf6' },
-  u_host: { id: 'u_host', name: 'Harper Host', handle: 'harper', email: 'harper@aceshigh.club', location: 'Houston, TX', role: 'host', avatarColor: '#10b981' },
-  u_player: { id: 'u_player', name: 'Sam Rivers', handle: 'sam', email: 'sam@example.com', phone: '+1 (415) 555‑0182', location: 'Houston, TX', role: 'player', avatarColor: '#3b82f6' },
+  u_admin: { id: 'u_admin', name: 'Avery Admin', handle: 'avery', email: 'avery@clubr.app', location: 'Las Vegas, NV', role: 'admin', avatarColor: '#8b5cf6', emailVerified: true },
+  u_host: { id: 'u_host', name: 'Harper Host', handle: 'harper', email: 'harper@aceshigh.club', location: 'Houston, TX', role: 'host', avatarColor: '#10b981', emailVerified: true },
+  u_player: { id: 'u_player', name: 'Sam Rivers', handle: 'sam', email: 'sam@example.com', phone: '+1 (415) 555‑0182', location: 'Houston, TX', role: 'player', avatarColor: '#3b82f6', emailVerified: true },
   u_gary: { id: 'u_gary', name: 'Gary Grind', handle: 'gary', email: 'gary@grinders.club', phone: '+1 (312) 555‑0143', location: 'Dallas, TX', role: 'host', avatarColor: '#f59e0b' },
   u_rae: { id: 'u_rae', name: 'Rae Rivers', handle: 'rae', email: 'rae@riverrats.club', location: 'Austin, TX', role: 'host', avatarColor: '#06b6d4' },
   u_mike: { id: 'u_mike', name: 'Mike Jones', handle: 'mikej', email: 'mike@example.com', phone: '+1 (646) 555‑0110', location: 'Houston, TX', role: 'player', avatarColor: '#ef4444' },
@@ -23,8 +23,8 @@ export const USERS: Record<string, User> = {
   u_dustin: { id: 'u_dustin', name: 'Dustin Cole', handle: 'dustin', email: 'dustin@example.com', phone: '+1 (408) 555‑0125', location: 'Dallas, TX', role: 'player', avatarColor: '#a855f7' },
   u_cody: { id: 'u_cody', name: 'Cody Banks', handle: 'cody', email: 'cody@example.com', location: 'Austin, TX', role: 'player', avatarColor: '#eab308' },
   // ---- Demo clubs seeded from real TournamentPro venues (Bayou City Poker Club + Gulf Coast Card Club) ----
-  u_cc_host: { id: 'u_cc_host', name: 'Marcus Reyes', handle: 'marcus', email: 'marcus@championsclub.example', location: 'Houston, TX', role: 'host', avatarColor: '#a855f7' },
-  u_tch_host: { id: 'u_tch_host', name: 'Diana Cole', handle: 'diana', email: 'diana@texascardhouse.example', location: 'Houston, TX', role: 'host', avatarColor: '#dc2626' },
+  u_cc_host: { id: 'u_cc_host', name: 'Marcus Reyes', handle: 'marcus', email: 'marcus@championsclub.example', location: 'Houston, TX', role: 'host', avatarColor: '#a855f7', emailVerified: true },
+  u_tch_host: { id: 'u_tch_host', name: 'Diana Cole', handle: 'diana', email: 'diana@texascardhouse.example', location: 'Houston, TX', role: 'host', avatarColor: '#dc2626', emailVerified: true },
   // Bayou City Poker Club members — real Lone Star Poker Series $1M field (finishing order).
   u_cc_p1: { id: 'u_cc_p1', name: 'Joon Park', handle: 'joonpark', email: 'joon@example', location: 'Austin, TX', role: 'player', avatarColor: '#ef4444' },
   u_cc_p2: { id: 'u_cc_p2', name: 'Harry Wright', handle: 'harryw', email: 'harry@example', location: 'De Queen, AR', role: 'player', avatarColor: '#f97316' },

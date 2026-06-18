@@ -14,6 +14,10 @@ interface AuthCtx {
   user: User | null
   loginAs: (role: AccountRole, userId?: string) => void
   signUp: (name: string, email: string, phone: string, location?: string) => User
+  /** Update the signed-in user's name/email. Changing the email marks it unverified. */
+  updateProfile: (patch: { name: string; email: string }) => void
+  /** Mock email verification (the real app confirms via a magic link). */
+  verifyEmail: () => void
   logout: () => void
 }
 
@@ -47,15 +51,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const u: User = {
       id, name: name.trim() || 'New Player', handle: (name.trim().split(' ')[0] || 'player').toLowerCase(),
       email: email.trim(), phone: phone.trim(), location: location?.trim() || undefined, role: 'player', avatarColor: '#3b82f6',
+      emailVerified: false,
     }
     USERS[id] = u
     setUser(u); persist(u)
     return u
   }, [])
 
+  const updateProfile = useCallback((patch: { name: string; email: string }) => {
+    setUser((prev) => {
+      if (!prev) return prev
+      const email = patch.email.trim()
+      const emailChanged = email.toLowerCase() !== (prev.email ?? '').toLowerCase()
+      const u: User = {
+        ...prev,
+        name: patch.name.trim() || prev.name,
+        email,
+        // Changing the email un-verifies it until the user re-verifies.
+        emailVerified: emailChanged ? false : prev.emailVerified,
+      }
+      USERS[u.id] = u; persist(u)
+      return u
+    })
+  }, [])
+
+  const verifyEmail = useCallback(() => {
+    setUser((prev) => {
+      if (!prev) return prev
+      const u: User = { ...prev, emailVerified: true }
+      USERS[u.id] = u; persist(u)
+      return u
+    })
+  }, [])
+
   const logout = useCallback(() => { setUser(null); persist(null) }, [])
 
-  return <Ctx.Provider value={{ user, loginAs, signUp, logout }}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={{ user, loginAs, signUp, updateProfile, verifyEmail, logout }}>{children}</Ctx.Provider>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
