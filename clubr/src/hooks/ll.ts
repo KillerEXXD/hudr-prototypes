@@ -26,6 +26,7 @@ export function useApproveLL() { const inv = useInvalidate(); return useMutation
 export function useDeclineLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; userId: string }) => ll.decline(v.gameId, v.userId), onSuccess: inv }) }
 export function useTogglePaidLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; userId: string }) => ll.togglePaid(v.gameId, v.userId), onSuccess: inv }) }
 export function useAssignCoHostLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; userId: string }) => ll.assignCoHost(v.gameId, v.userId), onSuccess: inv }) }
+export function useRemoveCoHostLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; userId: string }) => ll.removeCoHost(v.gameId, v.userId), onSuccess: inv }) }
 export function useUpdateChips() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; chips: number }) => ll.updateChips(v.gameId, userId, v.chips), onSuccess: inv }) }
 export function useBust() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; target: string }) => ll.bust(v.gameId, v.target, userId), onSuccess: inv }) }
 export function useReinstate() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; target: string }) => ll.reinstate(v.gameId, v.target), onSuccess: inv }) }

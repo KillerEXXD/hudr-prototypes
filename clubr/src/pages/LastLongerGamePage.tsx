@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, HelpCircle, Coins, RotateCcw } from 'lucide-react'
-import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
+import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
 import { InviteSheet } from '@/components/common/InviteSheet'
+import { CoHostSheet } from '@/components/ll/CoHostSheet'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
@@ -39,13 +40,14 @@ export function LastLongerGamePage() {
   const joinCost = useEconomy().data?.costs.joinGameCost ?? 100
   const lpCfg = useLeaderboardConfig().data ?? DEFAULT_LEADERBOARD
   const approve = useApproveLL(); const decline = useDeclineLL()
-  const togglePaid = useTogglePaidLL(); const assignCoHost = useAssignCoHostLL()
+  const togglePaid = useTogglePaidLL(); const assignCoHost = useAssignCoHostLL(); const removeCoHost = useRemoveCoHostLL()
   const updateChips = useUpdateChips(); const bust = useBust(); const reinstate = useReinstate()
   const postChat = usePostChatLL(); const proposeChop = useProposeChop(); const agreeChop = useAgreeChop()
   const invite = useInviteToGame()
   const [chipInput, setChipInput] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
+  const [coHostOpen, setCoHostOpen] = useState(false)
   const [confirmBust, setConfirmBust] = useState<{ target: string; name: string; self: boolean } | null>(null)
 
   if (isLoading) return <Spinner label="Loading game…" />
@@ -139,17 +141,15 @@ export function LastLongerGamePage() {
       )}
 
       {/* Leaderboard */}
-      <Section title={`Leaderboard · ${g.participants.length}`} action={g.canManage ? <Badge tone="green"><Shield className="h-3 w-3" />You manage</Badge> : undefined}>
-        {g.canManage && <p className="mb-2 text-[11px] text-text-muted">Admit players · green dot = paid · tap a name to make a co-host · "Out" to bust.</p>}
+      <Section title={`Leaderboard · ${g.participants.length}`} action={g.canManage ? <button type="button" onClick={() => setCoHostOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue/15 px-2.5 py-1 text-[11px] font-bold text-accent-blue ring-1 ring-accent-blue/30 hover:bg-accent-blue/25 cursor-pointer"><Shield className="h-3 w-3" />Add co-host</button> : undefined}>
+        {g.canManage && <p className="mb-2 text-[11px] text-text-muted">Admit players · green dot = paid · "Out" to bust. Co-hosts are set with “Add co-host”.</p>}
         <div className="flex flex-col gap-1.5">
           {active.map((p, i) => (
             <Row key={p.userId} p={p} rank={i + 1} g={g} me={user?.id ?? ''} canManage={g.canManage}
               paidBusy={togglePaid.isPending && togglePaid.variables?.userId === p.userId}
               bustBusy={bust.isPending && bust.variables?.target === p.userId}
-              coHostBusy={assignCoHost.isPending && assignCoHost.variables?.userId === p.userId}
               onPaid={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })}
               onBust={() => setConfirmBust({ target: p.userId, name: p.name, self: false })}
-              onCoHost={() => assignCoHost.mutate({ gameId: g.id, userId: p.userId })}
               onProfile={g.canManage ? () => navigate(`/member/${p.userId}`) : undefined} />
           ))}
           {waiting.map((p) => (
@@ -184,6 +184,7 @@ export function LastLongerGamePage() {
       </Section>
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={g.clubId} accessUserIds={g.accessUserIds ?? []} accent="amber" onInvite={(ids) => invite.mutate({ gameId: g.id, userIds: ids })} isPending={invite.isPending} />
+      <CoHostSheet open={coHostOpen} onClose={() => setCoHostOpen(false)} g={g} assign={assignCoHost} remove={removeCoHost} />
       <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="Last Longer — how it works">
         <HowItWorks steps={LL_STEPS} dotBg="bg-accent-amber" iconColor="text-accent-amber" />
       </Sheet>
@@ -207,12 +208,12 @@ export function LastLongerGamePage() {
   )
 }
 
-function Row({ p, rank, g, me, canManage, paidBusy, bustBusy, coHostBusy, onPaid, onBust, onCoHost, onProfile }: { p: LLParticipant; rank: number; g: { hostId: string; coHostIds: string[] }; me: string; canManage: boolean; paidBusy?: boolean; bustBusy?: boolean; coHostBusy?: boolean; onPaid: () => void; onBust: () => void; onCoHost: () => void; onProfile?: () => void }) {
+function Row({ p, rank, g, me, canManage, paidBusy, bustBusy, onPaid, onBust, onProfile }: { p: LLParticipant; rank: number; g: { hostId: string; coHostIds: string[] }; me: string; canManage: boolean; paidBusy?: boolean; bustBusy?: boolean; onPaid: () => void; onBust: () => void; onProfile?: () => void }) {
   const isHost = p.userId === g.hostId
   const isCo = g.coHostIds.includes(p.userId)
   return (
     <div className="relative flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
-      {(bustBusy || coHostBusy) && <ProcessingOverlay label={bustBusy ? 'Busting…' : 'Making co-host…'} />}
+      {bustBusy && <ProcessingOverlay label="Busting…" />}
       <span className="w-5 text-center text-sm font-extrabold text-text-muted">{rank}</span>
       <button onClick={onProfile} disabled={!onProfile} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
         <Avatar name={p.name} color={p.avatarColor} size={32} />
@@ -229,7 +230,6 @@ function Row({ p, rank, g, me, canManage, paidBusy, bustBusy, coHostBusy, onPaid
         </span>
       </div>
       {(canManage || p.userId === me) && <PaidToggle paid={p.paid} editable={canManage} busy={paidBusy} onToggle={onPaid} />}
-      {canManage && !isHost && !isCo && <button onClick={onCoHost} title="Make co-host" className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer"><Shield className="h-3.5 w-3.5" /></button>}
       {canManage && <button onClick={onBust} className="rounded-lg border border-accent-red/30 bg-accent-red/10 px-2 py-1 text-[11px] font-bold text-accent-red hover:bg-accent-red/20 cursor-pointer">Out</button>}
     </div>
   )

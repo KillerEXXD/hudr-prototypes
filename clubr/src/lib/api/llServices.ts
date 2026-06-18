@@ -98,6 +98,15 @@ export async function assignCoHost(gameId: string, target: string): Promise<void
     g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `🛡️ ${u?.name ?? 'A player'} is now a co-host`, ts: 'now', kind: 'system' })
   }
 }
+export async function removeCoHost(gameId: string, target: string): Promise<void> {
+  await delay(150)
+  const g = LL_GAMES.find((x) => x.id === gameId)
+  if (g && target !== g.hostId && g.coHostIds.includes(target)) {
+    g.coHostIds = g.coHostIds.filter((x) => x !== target)
+    const u = USERS[target]
+    g.chat.push({ id: `lm_${Date.now()}`, userId: target, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `${u?.name ?? 'A player'} is no longer a co-host`, ts: 'now', kind: 'system' })
+  }
+}
 
 export async function updateChips(gameId: string, userId: string, chips: number): Promise<void> {
   await delay(120)
