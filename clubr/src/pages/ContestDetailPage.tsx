@@ -4,7 +4,7 @@ import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield 
 import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest } from '@/hooks/ft'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { GameChat } from '@/components/common/GameChat'
 import { DraftBoard } from '@/components/ft/DraftBoard'
@@ -80,7 +80,7 @@ export function ContestDetailPage() {
           ) : !me ? (
             <>
               <Card className="text-sm text-text-secondary">{c.canManage ? "You're hosting this contest — you can also join and draft like a player." : 'Request to enter — the host will admit you, then you can draft.'}</Card>
-              <Btn className="mt-2 w-full" disabled={requestEnter.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${c.ftName}`, title: c.canManage ? 'Join your contest' : 'Join this contest', verb: 'Join' })) requestEnter.mutate(c.id) }}><UserPlus className="h-4 w-4" />{c.canManage ? 'Join as a player' : 'Request to enter'} · {joinCost} cr</Btn>
+              <Btn className="mt-2 w-full" loading={requestEnter.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${c.ftName}`, title: c.canManage ? 'Join your contest' : 'Join this contest', verb: 'Join' })) requestEnter.mutate(c.id) }}><UserPlus className="h-4 w-4" />{c.canManage ? 'Join as a player' : 'Request to enter'} · {joinCost} cr</Btn>
             </>
           ) : me.status === 'pending' ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
@@ -94,7 +94,7 @@ export function ContestDetailPage() {
                 <span className="flex items-center gap-1.5 text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></span>
               </div>
               <DraftBoard players={c.players} budget={c.budget} value={picks} onChange={setPicks} />
-              <Btn className="mt-2 w-full" disabled={picks.length !== 4 || savePicks.isPending} onClick={() => savePicks.mutate({ contestId: c.id, picks })}>
+              <Btn className="mt-2 w-full" disabled={picks.length !== 4} loading={savePicks.isPending} onClick={() => savePicks.mutate({ contestId: c.id, picks })}>
                 {me.picks.length === 4 ? 'Update draft' : 'Submit draft'} {picks.length !== 4 && `· pick ${4 - picks.length} more`}
               </Btn>
             </>
@@ -146,7 +146,7 @@ export function ContestDetailPage() {
               const isHost = e.userId === c.hostId
               const isCo = c.coHostIds.includes(e.userId)
               return (
-                <Card key={e.userId} className="flex items-center gap-2.5 p-2.5">
+                <Card key={e.userId} className="relative flex items-center gap-2.5 p-2.5">
                   <button onClick={() => navigate(`/member/${e.userId}`)} className="flex min-w-0 flex-1 items-center gap-2.5 text-left cursor-pointer">
                     <Avatar name={e.name} color={e.avatarColor} size={34} />
                     <div className="min-w-0 flex-1">
@@ -157,9 +157,9 @@ export function ContestDetailPage() {
                     </div>
                   </button>
                   {e.status === 'pending' ? (
-                    <Btn size="sm" onClick={() => approve.mutate({ contestId: c.id, userId: e.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn>
+                    <Btn size="sm" loading={approve.isPending && approve.variables?.userId === e.userId} onClick={() => approve.mutate({ contestId: c.id, userId: e.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn>
                   ) : (
-                    <PaidToggle paid={e.paid} editable onToggle={() => togglePaid.mutate({ contestId: c.id, userId: e.userId })} />
+                    <PaidToggle paid={e.paid} editable busy={togglePaid.isPending && togglePaid.variables?.userId === e.userId} onToggle={() => togglePaid.mutate({ contestId: c.id, userId: e.userId })} />
                   )}
                   {e.status === 'approved' && !isHost && !isCo && (
                     <button onClick={() => assignCoHost.mutate({ contestId: c.id, userId: e.userId })} title="Make co-host" className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer"><Shield className="h-3.5 w-3.5" /></button>
@@ -167,6 +167,7 @@ export function ContestDetailPage() {
                   {e.status === 'pending' && (
                     <button onClick={() => decline.mutate({ contestId: c.id, userId: e.userId })} className="text-[11px] text-text-muted hover:text-accent-red cursor-pointer">✕</button>
                   )}
+                  {((decline.isPending && decline.variables?.userId === e.userId) || (assignCoHost.isPending && assignCoHost.variables?.userId === e.userId)) && <ProcessingOverlay className="rounded-2xl" />}
                 </Card>
               )
             })}

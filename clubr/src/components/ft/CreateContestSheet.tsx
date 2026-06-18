@@ -116,7 +116,7 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
         </div>
       )}
 
-      <Btn className="mt-3 w-full" disabled={!clubId || !ftId || !closesAt || !arePayoutsValid(payouts) || create.isPending} onClick={submit}>Host this FT · {hostCost} cr</Btn>
+      <Btn className="mt-3 w-full" disabled={!clubId || !ftId || !closesAt || !arePayoutsValid(payouts)} loading={create.isPending} onClick={submit}>Host this FT · {hostCost} cr</Btn>
     </Sheet>
   )
 }

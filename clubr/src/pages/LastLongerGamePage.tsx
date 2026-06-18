@@ -198,6 +198,7 @@ export function LastLongerGamePage() {
           </p>
           <div className="flex gap-2">
             <Btn variant="secondary" className="flex-1" onClick={() => setConfirmBust(null)}>Cancel</Btn>
+            {/* processing-exempt: closes the confirm on click; the busted player's leaderboard row shows the ProcessingOverlay */}
             <Btn variant="danger" className="flex-1" onClick={() => { if (confirmBust) bust.mutate({ gameId: g.id, target: confirmBust.target }); setConfirmBust(null) }}>{confirmBust?.self ? "I'm out" : 'Bust'}</Btn>
           </div>
         </div>

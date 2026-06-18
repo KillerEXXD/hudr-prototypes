@@ -33,6 +33,7 @@ export function InviteSheet({ open, onClose, clubId, accessUserIds, accent = 'pu
           })}
         </div>
       )}
+      {/* processing-exempt: closes the sheet on click (onClose); the invite resolves in the background and the roster updates */}
       <Btn className="mt-3 w-full" disabled={sel.length === 0 || !!isPending} onClick={() => { onInvite(sel); setSel([]); onClose() }}><UserPlus className="h-4 w-4" />Invite{sel.length ? ` ${sel.length}` : ''}</Btn>
     </Sheet>
   )
