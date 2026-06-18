@@ -5,11 +5,10 @@ import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
 import { ECONOMY, refund } from '@/data/creditsStore'
 import type { LLGame, LLGameView, LLParticipant } from '@/types/ll'
+import { fmtChips } from '@/lib/utils/chipFormat'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 const isMember = (clubId: string, userId: string) => !!CLUBS.find((c) => c.id === clubId)?.members.some((m) => m.userId === userId && m.status === 'member')
-
-const fmtChips = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(n % 1e6 ? 1 : 0)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}K` : String(n))
 
 /** Current chip leader among ACTIVE players (null if nobody has chips yet). */
 function chipLeader(g: LLGame): LLParticipant | null {

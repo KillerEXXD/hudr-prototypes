@@ -17,6 +17,7 @@ import { DEFAULT_LEADERBOARD } from '@/types/leaderboard'
 import { LpBadge } from '@/components/leaderboard/LpBadge'
 import { useSpend } from '@/components/credits/SpendProvider'
 import type { LLParticipant } from '@/types/ll'
+import { fmtChips } from '@/lib/utils/chipFormat'
 
 const LL_STEPS: HowStep[] = [
   { icon: UserPlus, title: 'Join the game', body: 'Request to join your club’s live tournament — the host admits you and marks you paid.' },
@@ -26,7 +27,6 @@ const LL_STEPS: HowStep[] = [
   { icon: Coins, title: 'Split the pool', body: 'Pool = entry × players joined, paid by finish place per the host’s split. Settled offline — the app holds no cash.' },
 ]
 
-const fmtChips = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(n % 1e6 ? 1 : 0)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}K` : String(n))
 const medal = (n?: number) => (n === 1 ? '🥇' : n === 2 ? '🥈' : n === 3 ? '🥉' : `${n}`)
 
 export function LastLongerGamePage() {
