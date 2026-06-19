@@ -11,6 +11,7 @@ import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, Processi
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
+import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { FloatingChat } from '@/components/common/FloatingChat'
@@ -82,7 +83,12 @@ export function LastLongerGamePage() {
         <HowItWorksButton onClick={() => setHowOpen(true)} />
       </div>
       {(() => { const joined = g.participants.filter((p) => p.status !== 'pending').length; return <StakePool stake={g.stake} pool={g.stake * joined}>· {joined} joined</StakePool> })()}
-      {g.status === 'registration' && <div className="mt-3"><CountdownBanner deadline={regDeadline(g.id, g.registrationClosesAt)} sub="Registration closes — join before the clock hits zero" closedLabel="Awaiting host" /></div>}
+      {g.status === 'registration' && (
+        <div className="mt-3">
+          <CountdownBanner deadline={regDeadline(g.registrationClosesAt)} sub="Registration closes — join before the clock hits zero" closedLabel="Awaiting host" />
+          <CloseTimeLabel utcISO={g.registrationClosesAt} className="mt-1 block text-[11px] text-text-muted" />
+        </div>
+      )}
       {(g.location || g.mode) && (
         <p className="mt-1 flex items-center gap-1.5 text-[11px] text-text-muted">
           {g.mode === 'online' ? <Wifi className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}

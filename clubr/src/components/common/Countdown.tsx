@@ -2,15 +2,12 @@ import { useEffect, useState } from 'react'
 import { Clock } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
-// Stable per-session anchor — keeps countdowns ticking smoothly and stops them
-// resetting whenever React Query refetches the list.
+// Prototype note: the live app drives the countdown off SERVER time (see
+// lib/time/serverClock.ts) so it's identical across devices/timezones. The mock
+// has no server, so this demo ticks off the device clock — fine for a single
+// local viewer. Relative seed labels ("in 1h 05m") anchor to a stable session
+// start so they don't reset on every refetch.
 const SESSION_START = Date.now()
-
-function hash(s: string): number {
-  let h = 0
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0
-  return Math.abs(h)
-}
 
 /** Parse a relative label like "in 1h 05m" / "in 25m" → minutes (null if not relative). */
 function parseRelative(s: string): number | null {
@@ -20,19 +17,17 @@ function parseRelative(s: string): number | null {
 }
 
 /**
- * Resolve a registration / lock deadline (epoch ms). Uses the explicit ISO from
- * the data when present (the real API will send one); next tries a relative
- * label like "in 1h 05m" (the FT mock uses these); otherwise derives a stable,
- * per-item demo deadline 6–54 minutes out so each card ticks down believably.
+ * Resolve an absolute deadline (epoch ms) from an ISO timestamp (real games) or a
+ * relative seed label (mock). Returns null when there's no usable time — callers
+ * render a neutral state rather than a fabricated countdown.
  */
-export function regDeadline(id: string, explicit?: string): number {
-  if (explicit) {
-    const t = Date.parse(explicit)
-    if (!Number.isNaN(t)) return t
-    const rel = parseRelative(explicit)
-    if (rel != null) return SESSION_START + rel * 60_000
-  }
-  return SESSION_START + (6 + (hash(id) % 49)) * 60_000
+export function regDeadline(iso?: string | null): number | null {
+  if (!iso) return null
+  const t = Date.parse(iso)
+  if (!Number.isNaN(t)) return t
+  const rel = parseRelative(iso)
+  if (rel != null) return SESSION_START + rel * 60_000
+  return null
 }
 
 /** "1h 04m" — compact, for tight list-row pills. */
@@ -66,8 +61,15 @@ function useTicker() {
 }
 
 /** Live, ticking "closes in …" pill (turns red + pulses as the deadline nears). */
-export function Countdown({ deadline, prefix = 'Closes in' }: { deadline: number; prefix?: string }) {
+export function Countdown({ deadline, prefix = 'Closes in' }: { deadline: number | null; prefix?: string }) {
   useTicker()
+  if (deadline == null) {
+    return (
+      <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-text-muted">
+        <Clock className="h-3 w-3" />Scheduled
+      </span>
+    )
+  }
   const ms = deadline - Date.now()
   if (ms <= 0) {
     return (
@@ -89,11 +91,12 @@ export function Countdown({ deadline, prefix = 'Closes in' }: { deadline: number
  * HH:MM:SS clock so the closing deadline is impossible to miss:
  *   emerald (plenty of time) → amber (< 30m) → red (< 10m) → pulses (< 2m).
  */
-export function CountdownBanner({ deadline, label = 'Closes in', closedLabel = 'Closed', sub, className }: { deadline: number; label?: string; closedLabel?: string; sub?: string; className?: string }) {
+export function CountdownBanner({ deadline, label = 'Closes in', closedLabel = 'Closed', sub, className }: { deadline: number | null; label?: string; closedLabel?: string; sub?: string; className?: string }) {
   useTicker()
-  const ms = deadline - Date.now()
-  const closed = ms <= 0
-  const tone = closed
+  const ms = deadline == null ? null : deadline - Date.now()
+  const pending = ms == null
+  const closed = ms != null && ms <= 0
+  const tone = pending || closed
     ? 'border-border bg-bg-surface/60 text-text-muted'
     : ms < 10 * 60_000
       ? 'border-accent-red/40 bg-accent-red/10 text-accent-red'
@@ -102,13 +105,13 @@ export function CountdownBanner({ deadline, label = 'Closes in', closedLabel = '
         : 'border-accent-emerald/40 bg-accent-emerald/10 text-accent-emerald'
 
   return (
-    <div className={cn('flex items-center gap-3 rounded-xl border px-3.5 py-2.5', tone, !closed && ms < 2 * 60_000 && 'animate-pulse', className)}>
+    <div className={cn('flex items-center gap-3 rounded-xl border px-3.5 py-2.5', tone, !pending && !closed && ms < 2 * 60_000 && 'animate-pulse', className)}>
       <Clock className="h-5 w-5 shrink-0" />
       <div className="min-w-0 flex-1">
         <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">{closed ? closedLabel : label}</p>
         {sub && !closed && <p className="truncate text-[11px] leading-tight text-text-muted">{sub}</p>}
       </div>
-      <span className="font-mono text-2xl font-extrabold tabular-nums tracking-tight leading-none">{closed ? '00:00' : fmtClock(ms)}</span>
+      <span className="font-mono text-2xl font-extrabold tabular-nums tracking-tight leading-none">{pending ? '—:—' : closed ? '00:00' : fmtClock(ms)}</span>
     </div>
   )
 }

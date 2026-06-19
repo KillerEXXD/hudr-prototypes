@@ -8,7 +8,7 @@ import { useSpend } from '@/components/credits/SpendProvider'
 import { Sheet, Btn, Field } from '@/components/common/ui'
 import { CityField } from '@/components/common/CityField'
 import { ScheduleFields, PayoutEditor } from '@/components/common/GameSetup'
-import { defaultCloseLocal, DEFAULT_PAYOUTS, arePayoutsValid } from '@/lib/gameSetup'
+import { defaultCloseLocal, detectZone, zonedWallToUtcISO, DEFAULT_PAYOUTS, arePayoutsValid } from '@/lib/gameSetup'
 import { cn } from '@/lib/utils/cn'
 
 // Shared "create a Last Longer" sheet. Pass `fixedClubId` from a club page
@@ -28,7 +28,7 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
   const [visibility, setVisibility] = useState<'public' | 'private'>('public')
   const [access, setAccess] = useState<string[]>([])
   const [closesAt, setClosesAt] = useState(defaultCloseLocal())
-  const [tz, setTz] = useState('ET')
+  const [tz, setTz] = useState(detectZone())
   const [payouts, setPayouts] = useState<number[]>(DEFAULT_PAYOUTS)
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
 
   async function submit() {
     if (!(await spend({ cost: hostCost, kind: 'host_game', label: `Hosted ${title.trim() || 'a Last Longer'}`, title: 'Host this Last Longer', verb: 'Host' }))) return
-    const newId = await create.mutateAsync({ clubId, title, location: loc, mode, stake, visibility, accessUserIds: access, closesAt, timezone: tz, payouts })
+    const newId = await create.mutateAsync({ clubId, title, location: loc, mode, stake, visibility, accessUserIds: access, closesAt: zonedWallToUtcISO(closesAt, tz), timezone: tz, payouts })
     onClose(); setTitle(''); setLoc('')
     if (newId) navigate(`/lastlonger/${newId}`)
   }

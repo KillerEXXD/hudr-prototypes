@@ -34,19 +34,19 @@ export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } 
     ...(contests.data ?? []).map((c): UnifiedGame => ({
       type: 'ft_fantasy', id: c.id, clubId: c.clubId, canManage: c.canManage,
       finished: c.status === 'settled', phase: c.status === 'settled' ? 'closed' : c.status === 'locked' ? 'live' : 'reg', mine: c.myEntry != null,
-      sort: c.status === 'settled' ? Number.MAX_SAFE_INTEGER : regDeadline(c.id, c.locksAtTs),
+      sort: c.status === 'settled' ? Number.MAX_SAFE_INTEGER : (regDeadline(c.locksAtTs ?? c.locksAt) ?? Number.MAX_SAFE_INTEGER),
       ft: c,
     })),
     ...(games.data ?? []).map((g): UnifiedGame => ({
       type: 'last_longer', id: g.id, clubId: g.clubId, canManage: g.canManage,
       finished: g.status === 'completed', phase: g.status === 'completed' ? 'closed' : g.status === 'live' ? 'live' : 'reg', mine: g.me != null,
-      sort: g.status === 'completed' ? Number.MAX_SAFE_INTEGER : (g.status === 'live' ? 0 : regDeadline(g.id, g.registrationClosesAt)),
+      sort: g.status === 'completed' ? Number.MAX_SAFE_INTEGER : (g.status === 'live' ? 0 : (regDeadline(g.registrationClosesAt) ?? Number.MAX_SAFE_INTEGER)),
       ll: g,
     })),
     ...(squares.data ?? []).map((s): UnifiedGame => ({
       type: 'football_squares', id: s.id, clubId: s.clubId, canManage: s.canManage,
       finished: s.status === 'completed', phase: s.status === 'completed' ? 'closed' : s.status === 'live' ? 'live' : 'reg', mine: s.me != null,
-      sort: s.status === 'completed' ? Number.MAX_SAFE_INTEGER : (s.status === 'live' ? 0 : regDeadline(s.id, s.registrationClosesAt)),
+      sort: s.status === 'completed' ? Number.MAX_SAFE_INTEGER : (s.status === 'live' ? 0 : (regDeadline(s.registrationClosesAt) ?? Number.MAX_SAFE_INTEGER)),
       sq: s,
     })),
   ].sort((a, b) => a.sort - b.sort)

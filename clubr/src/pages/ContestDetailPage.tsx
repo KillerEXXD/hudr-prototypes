@@ -16,6 +16,7 @@ import { StakePool } from '@/components/common/StakePool'
 import { HowItWorksFT } from '@/components/ft/HowItWorks'
 import { HowScoringPricing } from '@/components/ft/HowScoringPricing'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
+import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
@@ -65,12 +66,17 @@ export function ContestDetailPage() {
         {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}
         <span className="font-mono">{c.stake} Stakes</span><span className="text-text-muted">· budget {fmtK(c.budget)}</span>
         <HowItWorksButton onClick={() => setHowOpen(true)} />
-        {c.status !== 'open' && <span className="ml-auto text-text-muted">{c.locksAt}</span>}
+        {c.status !== 'open' && (c.locksAtTs ? <CloseTimeLabel utcISO={c.locksAtTs} prefix="Locked " className="ml-auto text-text-muted" /> : <span className="ml-auto text-text-muted">{c.locksAt}</span>)}
       </div>
       {(() => { const joined = c.entries.filter((e) => e.status === 'approved').length; return <StakePool stake={c.stake} pool={c.stake * joined}>· {joined} joined</StakePool> })()}
 
       {/* ===== Ticking "Closes in" countdown — draft locks at the deadline ===== */}
-      {c.status === 'open' && <div className="mt-3"><CountdownBanner deadline={regDeadline(c.id, c.locksAt)} sub="Draft locks when the clock hits zero — get your picks in" /></div>}
+      {c.status === 'open' && (
+        <div className="mt-3">
+          <CountdownBanner deadline={regDeadline(c.locksAtTs ?? c.locksAt)} sub="Draft locks when the clock hits zero — get your picks in" />
+          <CloseTimeLabel utcISO={c.locksAtTs} className="mt-1 block text-[11px] text-text-muted" />
+        </div>
+      )}
 
       {c.canManage && c.visibility === 'private' && (
         <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>

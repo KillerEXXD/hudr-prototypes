@@ -1,17 +1,23 @@
 import { Trophy, Plus, Minus, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
-import { TIMEZONES, PAYOUT_PRESETS, payoutsSum, arePayoutsValid, payoutSummary } from '@/lib/gameSetup'
+import { COMMON_ZONES, allZones, zoneOptionLabel, PAYOUT_PRESETS, payoutsSum, arePayoutsValid, payoutSummary } from '@/lib/gameSetup'
 
 type Accent = 'purple' | 'amber'
 const ords = (n: number) => `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}`
 
 // ---- Registration close time + timezone (mandatory at creation) ----
+// The time entered is a WALL time IN the chosen IANA zone; the create sheet
+// converts it to one absolute UTC instant before saving (see gameSetup.ts).
 export function ScheduleFields({ accent, closesAt, onCloseChange, tz, onTzChange }: {
   accent: Accent
   closesAt: string; onCloseChange: (v: string) => void
   tz: string; onTzChange: (v: string) => void
 }) {
   const ring = accent === 'amber' ? 'focus:ring-accent-amber' : 'focus:ring-accent-purple'
+  const common = new Set(COMMON_ZONES)
+  const others = allZones().filter((z) => !common.has(z))
+  // Surface the host's auto-detected zone even if it isn't in our curated list.
+  const extra = !common.has(tz) && !others.includes(tz) ? [tz] : []
   return (
     <div>
       <span className="mb-1 flex items-center gap-1 text-xs font-semibold text-text-secondary"><Clock className="h-3.5 w-3.5" />Registration closes *</span>
@@ -25,13 +31,19 @@ export function ScheduleFields({ accent, closesAt, onCloseChange, tz, onTzChange
         <select
           value={tz}
           onChange={(e) => onTzChange(e.target.value)}
-          className={cn('rounded-xl border border-border bg-bg-surface px-2 py-2 text-sm font-semibold text-text-primary focus:outline-none focus:ring-2', ring)}
+          className={cn('max-w-[44%] rounded-xl border border-border bg-bg-surface px-2 py-2 text-sm font-semibold text-text-primary focus:outline-none focus:ring-2', ring)}
           aria-label="Time zone"
         >
-          {TIMEZONES.map((z) => <option key={z.id} value={z.id}>{z.id}</option>)}
+          {extra.map((z) => <option key={z} value={z}>{zoneOptionLabel(z)}</option>)}
+          <optgroup label="Common">
+            {COMMON_ZONES.map((z) => <option key={z} value={z}>{zoneOptionLabel(z)}</option>)}
+          </optgroup>
+          <optgroup label="All time zones">
+            {others.map((z) => <option key={z} value={z}>{zoneOptionLabel(z)}</option>)}
+          </optgroup>
         </select>
       </div>
-      <p className="mt-1 text-[11px] text-text-muted">Players can register until this time — a live countdown shows on the card.</p>
+      <p className="mt-1 text-[11px] text-text-muted">Set in your time zone — everyone sees the same deadline, shown in their own zone too.</p>
     </div>
   )
 }

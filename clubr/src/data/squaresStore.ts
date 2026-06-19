@@ -50,7 +50,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_c', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡',
     title: 'Sunday Night Squares', homeTeam: 'Ravens', awayTeam: 'Bills',
-    visibility: 'public', status: 'registration', timezone: 'CT',
+    visibility: 'public', status: 'registration', registrationClosesAt: 'in 1h 20m', timezone: 'CT',
     stake: 50, hostId: 'u_host', coHostIds: [],
     cells: apprCells, rowDigits: [], colDigits: [],
     periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
@@ -60,7 +60,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡',
     title: 'Sunday Squares', homeTeam: 'Chiefs', awayTeam: 'Eagles',
-    visibility: 'public', status: 'registration', timezone: 'CT',
+    visibility: 'public', status: 'registration', registrationClosesAt: 'in 2h 40m', timezone: 'CT',
     stake: 100, hostId: 'u_host', coHostIds: [],
     cells: regCells, rowDigits: [], colDigits: [],
     periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
@@ -101,7 +101,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_champ_reg', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆',
     title: 'Sunday Squares — Texans @ Colts', homeTeam: 'Texans', awayTeam: 'Colts',
-    visibility: 'public', status: 'registration', timezone: 'CT',
+    visibility: 'public', status: 'registration', registrationClosesAt: 'in 35m', timezone: 'CT',
     stake: 50, hostId: 'u_cc_host', coHostIds: [],
     cells: champReg, rowDigits: [], colDigits: [],
     periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
@@ -127,7 +127,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_tch_reg', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏',
     title: 'Game Day Squares — Cowboys @ Giants', homeTeam: 'Cowboys', awayTeam: 'Giants',
-    visibility: 'public', status: 'registration', timezone: 'CT',
+    visibility: 'public', status: 'registration', registrationClosesAt: 'in 4h 10m', timezone: 'CT',
     stake: 100, hostId: 'u_tch_host', coHostIds: [],
     cells: tchReg, rowDigits: [], colDigits: [],
     periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],

@@ -9,6 +9,7 @@ import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, Processi
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
+import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
@@ -88,7 +89,12 @@ export function SquaresGamePage() {
         <HowItWorksButton onClick={() => setHowOpen(true)} />
       </div>
       <StakePool stake={g.stake} pool={g.stake * g.claimedCount}>· {g.claimedCount}/100 squares</StakePool>
-      {g.status === 'registration' && <div className="mt-3"><CountdownBanner deadline={regDeadline(g.id, g.registrationClosesAt)} sub="Claiming closes — grab your squares before the clock hits zero" closedLabel="Awaiting host" /></div>}
+      {g.status === 'registration' && (
+        <div className="mt-3">
+          <CountdownBanner deadline={regDeadline(g.registrationClosesAt)} sub="Claiming closes — grab your squares before the clock hits zero" closedLabel="Awaiting host" />
+          <CloseTimeLabel utcISO={g.registrationClosesAt} className="mt-1 block text-[11px] text-text-muted" />
+        </div>
+      )}
 
       {!g.isMemberOfClub && !g.canManage ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to claim squares.</p></Card>

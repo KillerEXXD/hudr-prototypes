@@ -41,7 +41,7 @@ export function GameRow({ g, showType, clubRole }: { g: LLGameView; showType?: b
           <StakePool
             stake={g.stake}
             pool={g.stake * entered}
-            right={g.status === 'registration' ? <Countdown deadline={regDeadline(g.id, g.registrationClosesAt)} /> : undefined}
+            right={g.status === 'registration' ? <Countdown deadline={regDeadline(g.registrationClosesAt)} /> : undefined}
           >· {g.activeCount} in{out ? ` · ${out} out` : ''}</StakePool>
         )
       })()}

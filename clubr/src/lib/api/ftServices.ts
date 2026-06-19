@@ -5,7 +5,7 @@ import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
 import { ECONOMY, refund } from '@/data/creditsStore'
 import { FINISH_POINTS, type AvailableFT, type ContestEntry, type FTContest, type FTContestView, type FTPlayer } from '@/types/ft'
-import { formatClose } from '@/lib/gameSetup'
+import { formatCloseInZone } from '@/lib/gameSetup'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 
@@ -163,7 +163,7 @@ export async function createContest(clubId: string, hostId: string, input: { ftI
     visibility: input.visibility,
     accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
     status: 'open', stake: input.stake, budget: input.budget,
-    locksAt: input.closesAt ? `Closes ${formatClose(input.closesAt, input.timezone)}` : `${ft.startsIn} · locks 10m before`,
+    locksAt: input.closesAt ? `Closes ${formatCloseInZone(input.closesAt, input.timezone)}` : `${ft.startsIn} · locks 10m before`,
     locksAtTs: input.closesAt || undefined, timezone: input.timezone, payouts: input.payouts,
     hostId, coHostIds: [], players: ft.players,
     entries: [], // host is NOT auto-entered — they join as a player only if they want

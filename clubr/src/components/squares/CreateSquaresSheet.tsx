@@ -7,7 +7,7 @@ import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
 import { Sheet, Btn, Field } from '@/components/common/ui'
 import { ScheduleFields } from '@/components/common/GameSetup'
-import { defaultCloseLocal, arePayoutsValid, payoutsSum } from '@/lib/gameSetup'
+import { defaultCloseLocal, detectZone, zonedWallToUtcISO, arePayoutsValid, payoutsSum } from '@/lib/gameSetup'
 import { DEFAULT_PERIOD_PAYOUTS, SQUARES_PERIODS } from '@/types/squares'
 import { cn } from '@/lib/utils/cn'
 
@@ -26,7 +26,7 @@ export function CreateSquaresSheet({ open, onClose, fixedClubId }: { open: boole
   const [visibility, setVisibility] = useState<'public' | 'private'>('public')
   const [access, setAccess] = useState<string[]>([])
   const [closesAt, setClosesAt] = useState(defaultCloseLocal())
-  const [tz, setTz] = useState('ET')
+  const [tz, setTz] = useState(detectZone())
   const [payouts, setPayouts] = useState<number[]>(DEFAULT_PERIOD_PAYOUTS)
 
   useEffect(() => { if (fixedClubId) setClubId(fixedClubId); else if (managed.length === 1) setClubId(managed[0].id) }, [fixedClubId, managed.length])
@@ -38,7 +38,7 @@ export function CreateSquaresSheet({ open, onClose, fixedClubId }: { open: boole
 
   async function submit() {
     if (!(await spend({ cost: hostCost, kind: 'host_game', label: `Hosted ${title.trim() || 'a Squares board'}`, title: 'Host this Squares board', verb: 'Host' }))) return
-    const id = await create.mutateAsync({ clubId, title, homeTeam: home, awayTeam: away, stake, visibility, accessUserIds: access, closesAt, timezone: tz, periodPayouts: payouts })
+    const id = await create.mutateAsync({ clubId, title, homeTeam: home, awayTeam: away, stake, visibility, accessUserIds: access, closesAt: zonedWallToUtcISO(closesAt, tz), timezone: tz, periodPayouts: payouts })
     onClose(); setTitle(''); setHome(''); setAway('')
     if (id) navigate(`/squares/${id}`)
   }

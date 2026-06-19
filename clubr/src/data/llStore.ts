@@ -43,7 +43,7 @@ export const LL_GAMES: LLGame[] = [
   },
   {
     id: 'll_c', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', title: 'Sunday Sweat',
-    status: 'registration', stake: 100, hostId: 'u_gary', coHostIds: [],
+    status: 'registration', registrationClosesAt: 'in 2h 15m', stake: 100, hostId: 'u_gary', coHostIds: [],
     participants: [p('u_gary', 'active', true, 0, 'now'), p('u_lena', 'active', true, 0, 'now')],
     chat: [],
   },
@@ -72,7 +72,7 @@ export const LL_GAMES: LLGame[] = [
   // ---- Aces High (Club Host) — REGISTERING ----
   {
     id: 'll_f', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', title: 'Saturday Deep Stack Last Longer',
-    status: 'registration', stake: 100, hostId: 'u_host', coHostIds: [],
+    status: 'registration', registrationClosesAt: 'in 45m', stake: 100, hostId: 'u_host', coHostIds: [],
     location: 'Aces High Card Room', mode: 'in-person',
     participants: [
       p('u_host', 'active', true, 0, 'now'),
@@ -130,7 +130,7 @@ export const LL_GAMES: LLGame[] = [
   },
   {
     id: 'll_champ_reg', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆', title: 'Saturday Night Last Longer',
-    status: 'registration', stake: 100, hostId: 'u_cc_host', coHostIds: [],
+    status: 'registration', registrationClosesAt: 'in 3h 30m', stake: 100, hostId: 'u_cc_host', coHostIds: [],
     location: 'Bayou City Poker Club', mode: 'in-person',
     participants: [
       p('u_cc_host', 'active', true, 0, 'now'),
@@ -173,7 +173,7 @@ export const LL_GAMES: LLGame[] = [
   },
   {
     id: 'll_tch_reg', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏', title: 'Midweek Deep Stack Last Longer',
-    status: 'registration', stake: 100, hostId: 'u_tch_host', coHostIds: [],
+    status: 'registration', registrationClosesAt: 'in 1h 50m', stake: 100, hostId: 'u_tch_host', coHostIds: [],
     location: 'Gulf Coast Card Club', mode: 'in-person',
     participants: [
       p('u_tch_host', 'active', true, 0, 'now'),

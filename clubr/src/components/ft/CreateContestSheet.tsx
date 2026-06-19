@@ -7,7 +7,7 @@ import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
 import { Sheet, Btn } from '@/components/common/ui'
 import { ScheduleFields, PayoutEditor } from '@/components/common/GameSetup'
-import { defaultCloseLocal, DEFAULT_PAYOUTS, arePayoutsValid } from '@/lib/gameSetup'
+import { defaultCloseLocal, detectZone, zonedWallToUtcISO, DEFAULT_PAYOUTS, arePayoutsValid } from '@/lib/gameSetup'
 import { cn } from '@/lib/utils/cn'
 
 // Shared "host an FT Fantasy contest" sheet. Pass `fixedClubId` from a club
@@ -26,7 +26,7 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
   const [visibility, setVisibility] = useState<'public' | 'private'>('public')
   const [access, setAccess] = useState<string[]>([])
   const [closesAt, setClosesAt] = useState(defaultCloseLocal())
-  const [tz, setTz] = useState('ET')
+  const [tz, setTz] = useState(detectZone())
   const [payouts, setPayouts] = useState<number[]>(DEFAULT_PAYOUTS)
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
   async function submit() {
     const ftName = availableFts.data?.find((f) => f.id === ftId)?.name ?? 'FT contest'
     if (!(await spend({ cost: hostCost, kind: 'host_game', label: `Hosted ${ftName}`, title: 'Host this final table', verb: 'Host' }))) return
-    const newId = await create.mutateAsync({ clubId, ftId, stake, budget: 100000, visibility, accessUserIds: access, closesAt, timezone: tz, payouts })
+    const newId = await create.mutateAsync({ clubId, ftId, stake, budget: 100000, visibility, accessUserIds: access, closesAt: zonedWallToUtcISO(closesAt, tz), timezone: tz, payouts })
     onClose(); setFtId('')
     if (newId) navigate(`/fantasy/${newId}`)
   }

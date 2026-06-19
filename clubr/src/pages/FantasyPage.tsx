@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Badge, Btn, Card, Section, Spinner, EmptyState, RoleChip } from '@/components/common/ui'
 import type { MemberRole } from '@/types'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
+import { formatCloseInZone, detectZone } from '@/lib/gameSetup'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { GameRelationshipChip } from '@/components/common/GameRelationshipChip'
@@ -42,8 +43,8 @@ export function ContestRow({ c, showType, clubRole }: { c: FTContestView; showTy
             stake={c.stake}
             pool={c.stake * entered}
             right={c.status === 'open'
-              ? <Countdown deadline={regDeadline(c.id, c.locksAtTs)} prefix="Locks" />
-              : <span className="text-text-muted">{c.locksAt}</span>}
+              ? <Countdown deadline={regDeadline(c.locksAtTs ?? c.locksAt)} prefix="Locks" />
+              : <span className="text-text-muted">{formatCloseInZone(c.locksAtTs, detectZone()) || c.locksAt}</span>}
           >· {entered} entered</StakePool>
         )
       })()}
