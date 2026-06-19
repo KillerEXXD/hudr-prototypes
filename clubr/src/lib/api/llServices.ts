@@ -171,7 +171,12 @@ export async function agreeChop(gameId: string, userId: string): Promise<void> {
   const g = LL_GAMES.find((x) => x.id === gameId)
   const a = g?.chop?.agreements.find((x) => x.userId === userId)
   if (a) a.agreed = true
-  if (g?.chop && g.chop.agreements.every((x) => x.agreed)) { g.status = 'completed'; g.winnerName = 'Chopped' }
+  if (g?.chop && g.chop.agreements.every((x) => x.agreed)) {
+    // Chop accepted: every survivor is a joint winner (finish 1st) — they split the pool
+    // equally. Mark them 'out' so the completed game shows winners (not "still in").
+    g.participants.forEach((p) => { if (p.status === 'active') { p.status = 'out'; p.finishPos = 1 } })
+    g.status = 'completed'; g.winnerName = 'Chopped'
+  }
 }
 
 function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th' }

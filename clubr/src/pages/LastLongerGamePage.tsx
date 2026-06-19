@@ -151,34 +151,43 @@ export function LastLongerGamePage() {
       )}
 
       {/* Standings (was "Leaderboard" — distinct from the club Leaderboard tab) */}
-      <Section title={`Standings · ${active.length} in · ${out.length} out`} action={g.canManage ? <button type="button" onClick={() => setCoHostOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue/15 px-2.5 py-1 text-[11px] font-bold text-accent-blue ring-1 ring-accent-blue/30 hover:bg-accent-blue/25 cursor-pointer"><Shield className="h-3 w-3" />Add co-host</button> : undefined}>
-        {g.canManage && <p className="mb-2 text-[11px] text-text-muted">Admit players · green dot = paid · "Bust" to eliminate. Co-hosts are set with “Add co-host”.</p>}
+      <Section title={r.completed ? `Final standings · ${r.finishers.length}` : `Standings · ${active.length} in · ${out.length} out`} action={!r.completed && g.canManage ? <button type="button" onClick={() => setCoHostOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue/15 px-2.5 py-1 text-[11px] font-bold text-accent-blue ring-1 ring-accent-blue/30 hover:bg-accent-blue/25 cursor-pointer"><Shield className="h-3 w-3" />Add co-host</button> : undefined}>
+        {!r.completed && g.canManage && <p className="mb-2 text-[11px] text-text-muted">Admit players · green dot = paid · "Bust" to eliminate. Co-hosts are set with “Add co-host”.</p>}
         <div className="flex flex-col gap-1.5">
-          {active.map((p, i) => (
-            <Row key={p.userId} p={p} rank={i + 1} g={g} me={user?.id ?? ''} canManage={g.canManage}
-              paidBusy={togglePaid.isPending && togglePaid.variables?.userId === p.userId}
-              bustBusy={bust.isPending && bust.variables?.target === p.userId}
-              onPaid={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })}
-              onBust={() => setConfirmBust({ target: p.userId, name: p.name, self: false })}
-              onProfile={g.canManage ? () => navigate(`/member/${p.userId}`) : undefined} />
-          ))}
-          {waiting.map((p) => (
-            <div key={p.userId} className="relative flex items-center gap-2.5 rounded-xl border border-dashed border-accent-amber/40 bg-accent-amber/5 px-3 py-2">
-              {decline.isPending && decline.variables?.userId === p.userId && <ProcessingOverlay label="Declining…" />}
-              <button onClick={() => navigate(`/member/${p.userId}`)} disabled={!g.canManage} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
-                <Avatar name={p.name} color={p.avatarColor} size={30} />
-                <span className="min-w-0 flex-1 truncate text-sm text-text-primary">{p.name} <Badge tone="amber">Waiting</Badge></span>
-              </button>
-              {g.canManage && <><Btn size="sm" loading={approve.isPending && approve.variables?.userId === p.userId} onClick={() => approve.mutate({ gameId: g.id, userId: p.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn><button onClick={() => decline.mutate({ gameId: g.id, userId: p.userId })} className="text-[11px] text-text-muted hover:text-accent-red cursor-pointer">✕</button></>}
-            </div>
-          ))}
-          {out.map((p) => (
-            <BustedRow key={p.userId} p={p} medalLabel={medal(p.finishPos)} lpPoints={lp.get(p.userId)} canManage={g.canManage}
-              onProfile={() => navigate(`/member/${p.userId}`, { state: { from: `/lastlonger/${g.id}` } })}
-              action={g.canManage && p.finishPos !== 1
-                ? <Btn size="sm" variant="secondary" loading={reinstate.isPending && reinstate.variables?.target === p.userId} onClick={() => reinstate.mutate({ gameId: g.id, target: p.userId })}><RotateCcw className="h-3.5 w-3.5" />Reinstate</Btn>
-                : undefined} />
-          ))}
+          {r.completed ? (
+            r.finishers.map((p) => (
+              <BustedRow key={p.userId} p={p} medalLabel={medal(p.finishPos)} lpPoints={lp.get(p.userId)} amountWon={r.amountWon(p)} chop={r.isChop && p.finishPos === 1} canManage={false}
+                onProfile={() => navigate(`/member/${p.userId}`, { state: { from: `/lastlonger/${g.id}` } })} />
+            ))
+          ) : (
+            <>
+              {active.map((p, i) => (
+                <Row key={p.userId} p={p} rank={i + 1} g={g} me={user?.id ?? ''} canManage={g.canManage}
+                  paidBusy={togglePaid.isPending && togglePaid.variables?.userId === p.userId}
+                  bustBusy={bust.isPending && bust.variables?.target === p.userId}
+                  onPaid={() => togglePaid.mutate({ gameId: g.id, userId: p.userId })}
+                  onBust={() => setConfirmBust({ target: p.userId, name: p.name, self: false })}
+                  onProfile={g.canManage ? () => navigate(`/member/${p.userId}`) : undefined} />
+              ))}
+              {waiting.map((p) => (
+                <div key={p.userId} className="relative flex items-center gap-2.5 rounded-xl border border-dashed border-accent-amber/40 bg-accent-amber/5 px-3 py-2">
+                  {decline.isPending && decline.variables?.userId === p.userId && <ProcessingOverlay label="Declining…" />}
+                  <button onClick={() => navigate(`/member/${p.userId}`)} disabled={!g.canManage} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
+                    <Avatar name={p.name} color={p.avatarColor} size={30} />
+                    <span className="min-w-0 flex-1 truncate text-sm text-text-primary">{p.name} <Badge tone="amber">Waiting</Badge></span>
+                  </button>
+                  {g.canManage && <><Btn size="sm" loading={approve.isPending && approve.variables?.userId === p.userId} onClick={() => approve.mutate({ gameId: g.id, userId: p.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn><button onClick={() => decline.mutate({ gameId: g.id, userId: p.userId })} className="text-[11px] text-text-muted hover:text-accent-red cursor-pointer">✕</button></>}
+                </div>
+              ))}
+              {out.map((p) => (
+                <BustedRow key={p.userId} p={p} medalLabel={medal(p.finishPos)} lpPoints={lp.get(p.userId)} canManage={g.canManage}
+                  onProfile={() => navigate(`/member/${p.userId}`, { state: { from: `/lastlonger/${g.id}` } })}
+                  action={g.canManage && p.finishPos !== 1
+                    ? <Btn size="sm" variant="secondary" loading={reinstate.isPending && reinstate.variables?.target === p.userId} onClick={() => reinstate.mutate({ gameId: g.id, target: p.userId })}><RotateCcw className="h-3.5 w-3.5" />Reinstate</Btn>
+                    : undefined} />
+              ))}
+            </>
+          )}
         </div>
       </Section>
 
