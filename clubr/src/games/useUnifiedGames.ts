@@ -14,10 +14,16 @@ import type { SquaresGameView } from '@/types/squares'
 // To add a game type: add its list hook + one more `.map(...)` spread below,
 // and a render case wherever items are drawn. Nothing else changes.
 
+// Lifecycle phase, normalized across the 3 game types:
+//   reg    = registration open  (FT 'open',   LL/SQ 'registration')
+//   live   = in play / locked   (FT 'locked', LL/SQ 'live')
+//   closed = done               (FT 'settled', LL/SQ 'completed')  == `finished`
+export type GamePhase = 'reg' | 'live' | 'closed'
+
 export type UnifiedGame =
-  | { type: 'ft_fantasy'; id: string; clubId: string; canManage: boolean; finished: boolean; mine: boolean; sort: number; ft: FTContestView }
-  | { type: 'last_longer'; id: string; clubId: string; canManage: boolean; finished: boolean; mine: boolean; sort: number; ll: LLGameView }
-  | { type: 'football_squares'; id: string; clubId: string; canManage: boolean; finished: boolean; mine: boolean; sort: number; sq: SquaresGameView }
+  | { type: 'ft_fantasy'; id: string; clubId: string; canManage: boolean; finished: boolean; phase: GamePhase; mine: boolean; sort: number; ft: FTContestView }
+  | { type: 'last_longer'; id: string; clubId: string; canManage: boolean; finished: boolean; phase: GamePhase; mine: boolean; sort: number; ll: LLGameView }
+  | { type: 'football_squares'; id: string; clubId: string; canManage: boolean; finished: boolean; phase: GamePhase; mine: boolean; sort: number; sq: SquaresGameView }
 
 export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } {
   const contests = useContests()
@@ -27,19 +33,19 @@ export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } 
   const items: UnifiedGame[] = [
     ...(contests.data ?? []).map((c): UnifiedGame => ({
       type: 'ft_fantasy', id: c.id, clubId: c.clubId, canManage: c.canManage,
-      finished: c.status === 'settled', mine: c.myEntry != null,
+      finished: c.status === 'settled', phase: c.status === 'settled' ? 'closed' : c.status === 'locked' ? 'live' : 'reg', mine: c.myEntry != null,
       sort: c.status === 'settled' ? Number.MAX_SAFE_INTEGER : regDeadline(c.id, c.locksAtTs),
       ft: c,
     })),
     ...(games.data ?? []).map((g): UnifiedGame => ({
       type: 'last_longer', id: g.id, clubId: g.clubId, canManage: g.canManage,
-      finished: g.status === 'completed', mine: g.me != null,
+      finished: g.status === 'completed', phase: g.status === 'completed' ? 'closed' : g.status === 'live' ? 'live' : 'reg', mine: g.me != null,
       sort: g.status === 'completed' ? Number.MAX_SAFE_INTEGER : (g.status === 'live' ? 0 : regDeadline(g.id, g.registrationClosesAt)),
       ll: g,
     })),
     ...(squares.data ?? []).map((s): UnifiedGame => ({
       type: 'football_squares', id: s.id, clubId: s.clubId, canManage: s.canManage,
-      finished: s.status === 'completed', mine: s.me != null,
+      finished: s.status === 'completed', phase: s.status === 'completed' ? 'closed' : s.status === 'live' ? 'live' : 'reg', mine: s.me != null,
       sort: s.status === 'completed' ? Number.MAX_SAFE_INTEGER : (s.status === 'live' ? 0 : regDeadline(s.id, s.registrationClosesAt)),
       sq: s,
     })),
@@ -50,3 +56,7 @@ export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } 
 
 /** Filter helper for the type-chip row. */
 export const matchesType = (g: UnifiedGame, filter: 'all' | GameType) => filter === 'all' || g.type === filter
+
+// Home-feed ordering lives in a hook-free module (so it's unit-testable in
+// isolation); re-exported here for ergonomic imports alongside useUnifiedGames.
+export { orderActiveGames } from './gameOrdering'

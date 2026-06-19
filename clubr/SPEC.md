@@ -428,6 +428,11 @@ later). Navigation is by **entity/activity, never by game type**:
 - **Games tab** (`/games`, `GamesPage.tsx`) = the unified, cross‑club feed of every game type,
   **urgency‑sorted** (live first, then by registration countdown) and split **You're hosting /
   Open & live / Completed**, with a **type‑filter chip row** (All · FT Fantasy · Last Longer · …).
+- **Host Home feed** (`HostHomePage`) = below the "FTs to host" slate, **one merged "Open & live
+  games" list** of every active game you can see (host **or** member, per‑card chip shows which).
+  **Registration‑Open first, then Live; CLOSED games are dropped** (history lives on the Games
+  tab). **No cap** — it **lazy‑renders** (`<InfiniteList/>`, load‑more‑on‑scroll). Order is the
+  shared hook‑free `orderActiveGames` (drop closed → reg before live → urgency within group).
 - **Club = container:** a club detail page renders a **single "Games" section** driven by the same
   `useUnifiedGames` (filtered to that club) + the shared `renderUnifiedGame` — **all types in one
   place** with a per‑type filter chip row (only the types actually present) and a host‑only
