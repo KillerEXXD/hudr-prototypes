@@ -7,6 +7,7 @@ import { useSpend } from '@/components/credits/SpendProvider'
 import { Section, Spinner, Btn, Sheet, Field, EmptyState } from '@/components/common/ui'
 import { CityField } from '@/components/common/CityField'
 import { ClubRow } from '@/components/common/cards'
+import { hostsClub } from '@/lib/clubRole'
 import { cn } from '@/lib/utils/cn'
 
 export function ClubsPage() {
@@ -29,11 +30,12 @@ export function ClubsPage() {
   const [code, setCode] = useState('')
   const [joinMsg, setJoinMsg] = useState('')
 
-  // Clubs you're in, split by whether you manage them. This is the single home
-  // for clubs — the old Me > Host Console duplicated the "Hosting" subset.
+  // Clubs you're in, split by your actual membership role (owner/host) — NOT
+  // canManage, which is true for admins on every club and would file clubs you
+  // merely belong to under "Hosting". See lib/clubRole.ts.
   const mine = clubs.data ?? []
-  const hosting = mine.filter((c) => c.canManage)
-  const member = mine.filter((c) => !c.canManage)
+  const hosting = mine.filter((c) => hostsClub(c.myRole))
+  const member = mine.filter((c) => !hostsClub(c.myRole))
 
   return (
     <div className="animate-fade-up">
