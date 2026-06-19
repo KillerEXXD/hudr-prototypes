@@ -14,6 +14,7 @@ import { FinalTableDetails } from '@/components/ft/FinalTableDetails'
 import { SettledResult } from '@/components/ft/SettledResult'
 import { StakePool } from '@/components/common/StakePool'
 import { HowItWorksFT } from '@/components/ft/HowItWorks'
+import { HowScoringPricing } from '@/components/ft/HowScoringPricing'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
@@ -40,6 +41,7 @@ export function ContestDetailPage() {
   const [picks, setPicks] = useState<string[]>([])
   const [inviteOpen, setInviteOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
+  const [icmOpen, setIcmOpen] = useState(false)
 
   useEffect(() => { if (c?.myEntry) setPicks(c.myEntry.picks) }, [c?.myEntry?.picks?.join(',')]) // eslint-disable-line
 
@@ -185,6 +187,17 @@ export function ContestDetailPage() {
 
       <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="How FT Fantasy works">
         <HowItWorksFT />
+        <button
+          type="button"
+          onClick={() => setIcmOpen(true)}
+          className="mt-3 w-full rounded-lg border border-border bg-bg-surface/60 px-3 py-2 text-left text-xs font-bold text-accent-blue hover:bg-bg-surface cursor-pointer"
+        >
+          See ICM pricing &amp; scoring details →
+        </button>
+      </Sheet>
+
+      <Sheet open={icmOpen} onClose={() => setIcmOpen(false)} title="How ICM pricing & scoring work">
+        <HowScoringPricing players={c.players} budget={c.budget} />
       </Sheet>
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={c.clubId} accessUserIds={c.accessUserIds ?? []} accent="purple" onInvite={(ids) => invite.mutate({ contestId: c.id, userIds: ids })} isPending={invite.isPending} />
