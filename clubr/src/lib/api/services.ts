@@ -110,6 +110,21 @@ export async function joinViaInvite(code: string, userId: string): Promise<ClubV
   return c && c.visibility !== 'private' ? toView(c, userId, false) : null
 }
 
+/** Richer invite-link outcome (mirrors the live API): a valid PRIVATE code confirms
+ *  'private-requested' (request recorded, club NOT disclosed) vs 'club' vs 'not-found'. */
+export type InviteOutcome =
+  | { kind: 'club'; club: ClubView }
+  | { kind: 'private-requested' }
+  | { kind: 'not-found' }
+
+export async function applyInviteCode(code: string, userId: string): Promise<InviteOutcome> {
+  await delay()
+  const c = CLUBS.find((x) => x.inviteCode.toUpperCase() === code.trim().toUpperCase())
+  if (!c) return { kind: 'not-found' }
+  if (!c.members.some((m) => m.userId === userId)) c.members.push(buildMember(userId, 'member', 'pending'))
+  return c.visibility === 'private' ? { kind: 'private-requested' } : { kind: 'club', club: toView(c, userId, false) }
+}
+
 export async function createClub(input: { name: string; emoji: string; description: string; location?: string; visibility?: 'public' | 'private'; telegram?: boolean }, userId: string): Promise<ClubView> {
   await delay()
   const u = USERS[userId]

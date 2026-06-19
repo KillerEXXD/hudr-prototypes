@@ -38,10 +38,11 @@ export function LoginScreen() {
   async function joinWithLink() {
     if (!canJoin) return
     const u = signUp(name, email, phone, location)
-    const club = await api.joinViaInvite(code, u.id)
-    // Mirror live: route to the club with the join outcome so it shows the right
-    // banner ("already a member" vs "request sent — host notified").
-    if (club) navigate(`/club/${club.id}`, { state: { joinResult: club.myStatus === 'member' ? 'already-member' : 'pending' } })
+    const r = await api.applyInviteCode(code, u.id)
+    // Mirror live: public → club page with the outcome banner; valid private code →
+    // home with a "Request sent" confirmation (club not disclosed); no match → message.
+    if (r.kind === 'club') navigate(`/club/${r.club.id}`, { state: { joinResult: r.club.myStatus === 'member' ? 'already-member' : 'pending' } })
+    else if (r.kind === 'private-requested') navigate('/', { state: { inviteSent: true } })
     else setMsg('No club found for that code (try ACES24).')
   }
 

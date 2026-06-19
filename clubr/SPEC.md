@@ -160,11 +160,18 @@ Approval is required to do anything beyond viewing:
   applier** once signed in (`useApplyInviteOnLogin`), so the link behaves identically
   for a **brand‑new** user (just finished phone‑OTP + onboarding) and an **existing**
   user (already has an account). It joins, strips the param, and routes to the club.
-- **Outcome is explicit on the club page:**
-  - **Already a member** → a green *"You're already a member of &lt;club&gt;"* welcome banner.
-  - **Not a member** → a pending request is created and a green *"Request sent — pending
+- **Outcome is explicit:**
+  - **Already a member** (public) → a green *"You're already a member of &lt;club&gt;"* welcome banner on the club page.
+  - **Not a member** (public) → a pending request is created and a green *"Request sent — pending
     approval. The host has been notified"* banner shows (the persistent amber
     "read‑only — awaiting approval" banner covers later visits).
+  - **Private club code** → the club is **never disclosed** (non‑disclosure), so instead
+    of the club page the user gets a generic **"Request sent"** confirmation (with a
+    **Back** button) — the request is still recorded and the host still notified. The
+    join‑by‑code API returns a third outcome `requested` (vs the full club, vs not‑found)
+    so the client can confirm without leaking that a private club exists.
+- **Logged‑in users are never re‑prompted to log in** — the invite applies to their
+  current account. Re‑auth only happens if there's no session.
 - **The host is notified.** A new join request (invite‑code **or** Discover) creates an
   in‑app **notification** for every club manager (owner + hosts); admitting a member
   notifies that member. See §8b.
