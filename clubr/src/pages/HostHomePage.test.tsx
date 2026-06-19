@@ -28,12 +28,15 @@ describe('HostHomePage', () => {
     expect(screen.getByText(/Upcoming final tables available for you to host as Fantasy games in your club/)).toBeInTheDocument()
   })
 
-  it('uses ONE merged "Open & live games" feed — no two-section split', () => {
+  it('shows the relationship pills (Available · Playing · Hosting) under a "Games" section — no old two-section split', () => {
     games.items = [game('ft_fantasy', 'reg')]
     render(<MemoryRouter><HostHomePage /></MemoryRouter>)
-    expect(screen.getByText(/Open & live games/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Games' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Available/ })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Playing/ })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Hosting/ })).toBeInTheDocument()
+    expect(screen.queryByText(/Open & live games/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Active games in your clubs/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Other clubs you're in/i)).not.toBeInTheDocument()
   })
 
   it('shows abbreviated type-filter chips (FTF / LL / Squares) when more than one type is active', () => {
@@ -45,9 +48,9 @@ describe('HostHomePage', () => {
     expect(screen.getByText('Squares')).toBeInTheDocument()
   })
 
-  it('drops CLOSED games — an all-closed feed shows the empty state', () => {
+  it('drops CLOSED games — an all-closed feed shows the (Hosting) empty state', () => {
     games.items = [game('ft_fantasy', 'closed'), game('last_longer', 'closed')]
     render(<MemoryRouter><HostHomePage /></MemoryRouter>)
-    expect(screen.getByText(/Nothing open or live right now/i)).toBeInTheDocument()
+    expect(screen.getByText(/not hosting any open or running games/i)).toBeInTheDocument()
   })
 })

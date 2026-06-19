@@ -6,7 +6,9 @@ import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { InfiniteList } from '@/components/common/InfiniteList'
+import { RelationshipPills } from '@/components/games/RelationshipPills'
 import { useUnifiedGames, matchesType, orderActiveGames } from '@/games/useUnifiedGames'
+import { relationshipOf, defaultRelationship, type Relationship } from '@/games/gameRelationship'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { cn } from '@/lib/utils/cn'
@@ -28,15 +30,20 @@ export function HostHomePage() {
   const fts = useAvailableFTs()
   const myClubs = useMyClubs()
   const { items, isLoading: gamesLoading } = useUnifiedGames()
+  const [rel, setRel] = useState<Relationship>(defaultRelationship(true)) // host home → 'hosting'
   const [filter, setFilter] = useState<'all' | GameType>('all')
+  const pickRel = (r: Relationship) => { setRel(r); setFilter('all') } // type chips reset per bucket
 
   // Role per club — chips show owner/co-host/member on each card.
   const roleByClub = new Map<string, MemberRole>()
   for (const c of myClubs.data ?? []) if (c.myStatus === 'member' && c.myRole) roleByClub.set(c.id, c.myRole)
 
-  const active = orderActiveGames(items) // closed dropped; reg-open before live
-  const typesPresent = GAME_TYPES.filter((t) => active.some((g) => g.type === t.id))
-  const shown = active.filter((g) => matchesType(g, filter))
+  const active = orderActiveGames(items) // closed dropped; reg-open before running
+  const counts = { available: 0, playing: 0, hosting: 0 }
+  for (const g of active) { const r = relationshipOf(g); if (r) counts[r]++ }
+  const byRel = active.filter((g) => relationshipOf(g) === rel)
+  const typesPresent = GAME_TYPES.filter((t) => byRel.some((g) => g.type === t.id))
+  const shown = byRel.filter((g) => matchesType(g, filter))
 
   return (
     <div className="animate-fade-up">
@@ -65,27 +72,30 @@ export function HostHomePage() {
         )}
       </Section>
 
-      {/* ---- One merged feed: Registration-Open then Live, no closed, lazy-loaded ---- */}
-      <Section title="Open & live games">
+      {/* ---- Games: relationship pill (Available · Playing · Hosting) + type chips, lazy ---- */}
+      <Section title="Games">
+        <RelationshipPills value={rel} onChange={pickRel} isHost counts={counts} />
         {typesPresent.length > 1 && (
-          <div className="mb-2 flex gap-1.5 overflow-x-auto no-scrollbar">
+          <div className="mt-2 flex gap-1.5 overflow-x-auto no-scrollbar">
             <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
             {typesPresent.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
           </div>
         )}
-        {gamesLoading ? (
-          <Spinner />
-        ) : shown.length > 0 ? (
-          <InfiniteList
-            items={shown}
-            batch={8}
-            resetKey={filter}
-            className="flex flex-col gap-2"
-            renderItem={(g) => renderUnifiedGame(g, true, roleByClub.get(g.clubId))}
-          />
-        ) : (
-          <EmptyState icon={<Gamepad2 className="h-7 w-7" />} title="Nothing open or live right now" sub="Host an FT above, or start a Last Longer / Squares." />
-        )}
+        <div className="mt-2">
+          {gamesLoading ? (
+            <Spinner />
+          ) : shown.length > 0 ? (
+            <InfiniteList
+              items={shown}
+              batch={8}
+              resetKey={`${rel}:${filter}`}
+              className="flex flex-col gap-2"
+              renderItem={(g) => renderUnifiedGame(g, true, roleByClub.get(g.clubId))}
+            />
+          ) : (
+            <EmptyState icon={<Gamepad2 className="h-7 w-7" />} title={rel === 'hosting' ? 'You’re not hosting any open or running games' : rel === 'playing' ? 'You’re not playing in any games yet' : 'No games available to join right now'} sub={rel === 'hosting' ? 'Host an FT above, or start a Last Longer / Squares.' : 'Check the other tabs above.'} />
+          )}
+        </div>
       </Section>
     </div>
   )

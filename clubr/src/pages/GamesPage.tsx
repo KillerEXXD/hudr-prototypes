@@ -2,20 +2,22 @@ import { useState } from 'react'
 import { Gamepad2, Plus, LayoutGrid, type LucideIcon } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
-import { Section, Spinner, EmptyState } from '@/components/common/ui'
+import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { InfiniteList } from '@/components/common/InfiniteList'
+import { RelationshipPills } from '@/components/games/RelationshipPills'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { GAME_TYPES, type GameType } from '@/games/types'
-import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
+import { useUnifiedGames, matchesType, orderActiveGames } from '@/games/useUnifiedGames'
+import { relationshipOf, defaultRelationship, type Relationship } from '@/games/gameRelationship'
 import { renderUnifiedGame as renderGame } from '@/games/renderGame'
 import { cn } from '@/lib/utils/cn'
 
-// Unified games feed across all game types — the single surface that replaces
-// the per-game bottom tabs. Driven by the game-type registry + useUnifiedGames,
-// so a new type plugs in via the registry + a render case in renderUnifiedGame.
+// Unified games feed across all game types. Active games are sliced by the
+// relationship pill (Available · Playing · Hosting); Completed is its own section.
 
 function FilterChip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
   return (
-    <button type="button" onClick={onClick} className={cn('flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? activeClass : 'border-border font-semibold text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
+    <button type="button" onClick={onClick} className={cn('flex items-center gap-1 rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? activeClass : 'border-border font-semibold text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
   )
 }
 
@@ -24,18 +26,23 @@ export function GamesPage() {
   const myClubs = useMyClubs()
   const canHost = (myClubs.data ?? []).some((c) => c.canManage)
   const isAdmin = user?.role === 'admin'
+  const isHost = canHost || isAdmin
+  const [rel, setRel] = useState<Relationship>(defaultRelationship(isHost))
   const [filter, setFilter] = useState<'all' | GameType>('all')
+  const pickRel = (r: Relationship) => { setRel(r); setFilter('all') }
   const [newOpen, setNewOpen] = useState(false)
 
   const { isLoading, items } = useUnifiedGames()
-  // Under "All" the feed mixes types, so each card shows its game-type badge;
-  // when filtered to one type the badge is redundant and hidden.
   const showAll = filter === 'all'
-  const shown = items.filter((g) => matchesType(g, filter))
-  const active = shown.filter((g) => !g.finished)
-  const hosting = active.filter((g) => g.canManage)
-  const playing = active.filter((g) => !g.canManage)
-  const done = shown.filter((g) => g.finished && (g.mine || g.canManage))
+
+  // Active games: ordered (reg-open → running), bucketed by relationship + type.
+  const active = orderActiveGames(items)
+  const counts = { available: 0, playing: 0, hosting: 0 }
+  for (const g of active) { const r = relationshipOf(g); if (r) counts[r]++ }
+  const shownActive = active.filter((g) => relationshipOf(g) === rel).filter((g) => matchesType(g, filter))
+
+  // Completed (history): yours/hosted, with a "Hosted / Played" tag.
+  const done = items.filter((g) => g.finished && (g.mine || g.canManage)).filter((g) => matchesType(g, filter))
 
   return (
     <div className="animate-fade-up">
@@ -49,20 +56,38 @@ export function GamesPage() {
       </div>
       <p className="mt-1 text-sm text-text-secondary">Everything happening across your clubs — all game types in one place.</p>
 
-      {/* type filter — driven by the registry; single scrollable row, never wraps */}
-      <div className="mt-3 flex gap-1.5 overflow-x-auto no-scrollbar">
+      {/* relationship pill + type filter */}
+      <div className="mt-3"><RelationshipPills value={rel} onChange={pickRel} isHost={isHost} counts={counts} /></div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
         <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
         {GAME_TYPES.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
       </div>
 
       {isLoading ? <Spinner /> : (
         <>
-          {hosting.length > 0 && <Section title="You're hosting"><div className="flex flex-col gap-2">{hosting.map((g) => renderGame(g, showAll))}</div></Section>}
-          {playing.length > 0 && <Section title={hosting.length > 0 ? 'Open & live' : 'Open & live games'}><div className="flex flex-col gap-2">{playing.map((g) => renderGame(g, showAll))}</div></Section>}
-          {hosting.length + playing.length === 0 && (
-            <Section title="Games"><EmptyState icon={<Gamepad2 className="h-7 w-7" />} title="Nothing live right now" sub={canHost && !isAdmin ? 'Tap “New game” to host one.' : 'Join a club and check back when your host starts a game.'} /></Section>
+          <Section title="Games">
+            {shownActive.length > 0 ? (
+              <InfiniteList items={shownActive} batch={8} resetKey={`${rel}:${filter}`} className="flex flex-col gap-2" renderItem={(g) => renderGame(g, showAll)} />
+            ) : (
+              <EmptyState
+                icon={<Gamepad2 className="h-7 w-7" />}
+                title={rel === 'hosting' ? "You're not hosting any games right now" : rel === 'playing' ? "You're not playing in any games yet" : 'No games available to join right now'}
+                sub={rel === 'hosting' && canHost && !isAdmin ? 'Tap “New game” to host one.' : 'Check the other tabs above.'}
+              />
+            )}
+          </Section>
+          {done.length > 0 && (
+            <Section title={`Completed (${done.length})`}>
+              <div className="flex flex-col gap-2">
+                {done.map((g) => (
+                  <div key={g.id} className="flex flex-col gap-1">
+                    <Badge tone={g.canManage ? 'purple' : 'green'} className="self-start">{g.canManage ? 'You hosted' : 'You played'}</Badge>
+                    {renderGame(g, showAll)}
+                  </div>
+                ))}
+              </div>
+            </Section>
           )}
-          {done.length > 0 && <Section title={`Completed (${done.length})`}><div className="flex flex-col gap-2">{done.map((g) => renderGame(g, showAll))}</div></Section>}
         </>
       )}
 

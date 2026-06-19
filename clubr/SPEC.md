@@ -425,14 +425,21 @@ later). Navigation is by **entity/activity, never by game type**:
   icon, colors, create route/sheet). **`useUnifiedGames()`** merges all types into one sorted feed.
   The Games tab, filter chips and "+ New game" chooser all **iterate the registry** — so a new type
   is a registry entry + a render case + a create flow, with no plumbing changes.
-- **Games tab** (`/games`, `GamesPage.tsx`) = the unified, cross‑club feed of every game type,
-  **urgency‑sorted** (live first, then by registration countdown) and split **You're hosting /
-  Open & live / Completed**, with a **type‑filter chip row** (All · FT Fantasy · Last Longer · …).
-- **Host Home feed** (`HostHomePage`) = below the "FTs to host" slate, **one merged "Open & live
-  games" list** of every active game you can see (host **or** member, per‑card chip shows which).
-  **Registration‑Open first, then Live; CLOSED games are dropped** (history lives on the Games
-  tab). **No cap** — it **lazy‑renders** (`<InfiniteList/>`, load‑more‑on‑scroll). Order is the
-  shared hook‑free `orderActiveGames` (drop closed → reg before live → urgency within group).
+- **Lifecycle phases:** **Registration open → Running → Completed.** (The in‑play badge reads
+  **"Running"**, not "Live" — "Live" misread as "registration open." Single source: `gameStatus.ts`.)
+- **Relationship filter (pill):** every games list carries a **relationship pill** —
+  **Available · Playing · Hosting** (Hosting is **host/admin‑only**; players see **Available ·
+  Playing**). Default **Hosting** for hosts, **Playing** for players. It **composes** with the
+  type‑filter chips. Buckets (a partition of actionable games): **Hosting** = you run it ·
+  **Playing** = you joined it & don't run it · **Available** = joinable now (Registration open, not
+  yours, not joined). A **Running** game you neither host nor play appears **nowhere** (no "All").
+  Pure helper `relationshipOf` (hook‑free, unit‑tested) + `RelationshipPills`.
+- **Games tab** (`/games`, `GamesPage.tsx`) = the unified, cross‑club feed; active games sliced by
+  the **relationship pill** + type chips (lazy‑rendered), with a separate **Completed** section
+  whose cards are tagged **"You hosted / You played."**
+- **Host Home feed** (`HostHomePage`) = below the "FTs to host" slate, a **"Games"** section with
+  the same relationship pill + type chips, **lazy‑rendered** (`<InfiniteList/>`), ordered
+  Registration‑open → Running (closed dropped). Replaces the old 4‑item cap + two‑section split.
 - **Club = container:** a club detail page renders a **single "Games" section** driven by the same
   `useUnifiedGames` (filtered to that club) + the shared `renderUnifiedGame` — **all types in one
   place** with a per‑type filter chip row (only the types actually present) and a host‑only
