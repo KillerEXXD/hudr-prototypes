@@ -104,16 +104,18 @@ export function captureFeedback(data: FeedbackPayload): void {
 }
 
 /**
- * Frictionless quick note — just the text, sent immediately. No rating and no
- * required name/email; identity is attached only if it was captured earlier.
+ * Quick note — the reviewer's name (required at the form) plus the text, sent
+ * immediately. No rating and no email required. The passed name takes
+ * precedence; otherwise we fall back to a previously captured identity.
  */
-export function captureQuickNote(note: string): void {
+export function captureQuickNote(note: string, name?: string): void {
   const text = note.trim()
   if (!text) return
   const id = getIdentity()
+  const reviewerName = (name?.trim() || id?.name || '')
   const screen = (typeof location !== 'undefined' ? location.hash : '') || '#/'
-  posthog.capture('quick_note_submitted', { prototype: PROTOTYPE, surface: SURFACE, screen, note: text, name: id?.name, email: id?.email })
-  sendToTournamentPro('quick_note', { screen, improve: text, note: text, name: id?.name ?? '', email: id?.email ?? '' })
+  posthog.capture('quick_note_submitted', { prototype: PROTOTYPE, surface: SURFACE, screen, note: text, name: reviewerName || undefined, email: id?.email })
+  sendToTournamentPro('quick_note', { screen, improve: text, note: text, name: reviewerName, email: id?.email ?? '' })
 }
 
 // ---- Guided per-feature review (the ReviewWizard) ----
