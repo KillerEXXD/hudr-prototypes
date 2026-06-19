@@ -89,13 +89,15 @@ export interface ClubView extends Club {
 // NOTIFICATIONS
 // =====================================================================
 
-export type NotificationType = 'club_join_request' | 'club_join_approved'
+export type NotificationType = 'club_join_request' | 'club_join_approved' | 'game_join_request' | 'game_join_approved'
 
 /** An in-app notification targeted at one recipient (the header bell). */
 export interface AppNotification {
   id: string
   type: NotificationType
   clubId: string | null
+  gameType: 'll' | 'sq' | 'ft' | null
+  gameId: string | null
   actorId: string | null
   actorName: string | null
   title: string

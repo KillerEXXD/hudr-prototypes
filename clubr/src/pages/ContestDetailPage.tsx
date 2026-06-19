@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield } from 'lucide-react'
+import { GameJoinBanner } from '@/components/games/GameJoinBanner'
+import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest } from '@/hooks/ft'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
@@ -52,9 +54,10 @@ export function ContestDetailPage() {
   return (
     <div className="animate-fade-up pb-20">
       <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+      <GameJoinBanner />
 
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span>{c.clubName}<Badge tone="purple">Stack Draft</Badge></div>
-      <h1 className="mt-1 flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />{c.ftName}</h1>
+      <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />{c.ftName}</h1><ShareGameButton type="ft" gameId={c.id} /></div>
       <div className="mt-1.5 flex items-center gap-2 text-xs text-text-secondary">
         <StatusBadge phase={ftPhase(c.status)} />
         {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}

@@ -154,9 +154,10 @@ export const CLUBS: Club[] = [
 // Seeded for the host account (Harper, owns Aces High) so the demo shows a
 // couple of pending join requests + one approval the moment you sign in as host.
 export const NOTIFICATIONS: AppNotification[] = [
-  { id: 'ntf_1', type: 'club_join_request', clubId: 'c_aces', actorId: 'u_mike', actorName: 'Mike Jones', title: 'New join request', body: 'Mike Jones asked to join Aces High.', read: false, createdAt: '2026-06-18T18:40:00Z' },
-  { id: 'ntf_2', type: 'club_join_request', clubId: 'c_aces', actorId: 'u_tom', actorName: 'Tom Wilson', title: 'New join request', body: 'Tom Wilson asked to join Aces High.', read: false, createdAt: '2026-06-18T14:05:00Z' },
-  { id: 'ntf_3', type: 'club_join_approved', clubId: 'c_aces', actorId: 'u_host', actorName: 'Harper Host', title: "You're in!", body: "You're now a member of Aces High.", read: true, createdAt: '2026-06-15T09:30:00Z' },
+  { id: 'ntf_1', type: 'club_join_request', clubId: 'c_aces', gameType: null, gameId: null, actorId: 'u_mike', actorName: 'Mike Jones', title: 'New join request', body: 'Mike Jones asked to join Aces High.', read: false, createdAt: '2026-06-18T18:40:00Z' },
+  { id: 'ntf_g', type: 'game_join_request', clubId: 'c_aces', gameType: 'll', gameId: 'll_a', actorId: 'u_tom', actorName: 'Tom Wilson', title: 'New game request', body: 'Tom Wilson asked to join Friday Night Last Longer.', read: false, createdAt: '2026-06-18T16:20:00Z' },
+  { id: 'ntf_2', type: 'club_join_request', clubId: 'c_aces', gameType: null, gameId: null, actorId: 'u_tom', actorName: 'Tom Wilson', title: 'New join request', body: 'Tom Wilson asked to join Aces High.', read: false, createdAt: '2026-06-18T14:05:00Z' },
+  { id: 'ntf_3', type: 'club_join_approved', clubId: 'c_aces', gameType: null, gameId: null, actorId: 'u_host', actorName: 'Harper Host', title: "You're in!", body: "You're now a member of Aces High.", read: true, createdAt: '2026-06-15T09:30:00Z' },
 ]
 
 // Counter for generated ids (avoids relying on wall-clock for uniqueness).

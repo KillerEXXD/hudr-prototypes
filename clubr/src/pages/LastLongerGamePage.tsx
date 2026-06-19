@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, Coins, RotateCcw } from 'lucide-react'
+import { GameJoinBanner } from '@/components/games/GameJoinBanner'
+import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { CoHostSheet } from '@/components/ll/CoHostSheet'
@@ -18,6 +20,7 @@ import { useLeaderboardConfig } from '@/hooks/leaderboard'
 import { awardMap, llAward } from '@/lib/leaderboard/award'
 import { DEFAULT_LEADERBOARD } from '@/types/leaderboard'
 import { BustedRow } from '@/components/ll/BustedRow'
+import { llResult, normalizeCompleted } from '@/lib/llWinnings'
 import { useSpend } from '@/components/credits/SpendProvider'
 import type { LLParticipant } from '@/types/ll'
 import { fmtChips, digitsOnly } from '@/lib/utils/chipFormat'
@@ -62,14 +65,16 @@ export function LastLongerGamePage() {
   const out = g.participants.filter((p) => p.status === 'out').sort((a, b) => (a.finishPos ?? 99) - (b.finishPos ?? 99))
   const canChat = me?.status === 'active' || g.canManage
   // Leaderboard points earned (completed games only) — same math as the club board.
-  const lp = g.status === 'completed' ? awardMap(llAward(g, lpCfg)) : new Map<string, number>()
+  const r = llResult(g)
+  const lp = r.completed ? awardMap(llAward(normalizeCompleted(g), lpCfg)) : new Map<string, number>()
 
   return (
     <div className="animate-fade-up pb-20">
       <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+      <GameJoinBanner />
 
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
-      <h1 className="mt-1 flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}</h1>
+      <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}</h1><ShareGameButton type="ll" gameId={g.id} /></div>
       <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-secondary">
         <StatusBadge phase={g.status} />
         <span className="font-mono">{g.stake} Stakes</span>
@@ -88,9 +93,13 @@ export function LastLongerGamePage() {
         <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>
       )}
 
-      {g.status === 'completed' && (
+      {r.completed && (
         <Card className="mt-3 flex items-center gap-2 border-accent-emerald/30 bg-accent-emerald/10">
-          <Trophy className="h-5 w-5 text-accent-emerald" /><p className="text-sm font-bold text-text-primary">{g.winnerName} wins! 🎉</p>
+          {r.isChop ? (
+            <><Scissors className="h-5 w-5 shrink-0 text-accent-emerald" /><p className="text-sm font-bold text-text-primary">Chopped — {r.winnerCount} players split the pool · {r.chopShare.toLocaleString('en-US')} Stakes each 🤝</p></>
+          ) : (
+            <><Trophy className="h-5 w-5 shrink-0 text-accent-emerald" /><p className="text-sm font-bold text-text-primary">{g.winnerName} wins! 🎉</p></>
+          )}
         </Card>
       )}
 

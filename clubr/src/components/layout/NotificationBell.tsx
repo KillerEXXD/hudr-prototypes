@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bell, UserPlus, CheckCircle2 } from 'lucide-react'
+import { Bell, UserPlus, CheckCircle2, Gamepad2, PartyPopper } from 'lucide-react'
 import { Badge, Sheet, EmptyState } from '@/components/common/ui'
 import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '@/hooks'
+import { GAME_ROUTE } from '@/lib/contract/gameInvite'
 import type { AppNotification, NotificationType } from '@/types'
 
 const ICON: Record<NotificationType, typeof UserPlus> = {
   club_join_request: UserPlus,
   club_join_approved: CheckCircle2,
+  game_join_request: Gamepad2,
+  game_join_approved: PartyPopper,
 }
 
 /** Compact "2m"/"3h"/"5d" relative time; falls back to the date for older items. */
@@ -34,7 +37,8 @@ export function NotificationBell() {
   function onTap(n: AppNotification) {
     if (!n.read) markRead.mutate(n.id)
     setOpen(false)
-    if (n.clubId) navigate(`/club/${n.clubId}`)
+    if (n.gameType && n.gameId) navigate(GAME_ROUTE[n.gameType](n.gameId))
+    else if (n.clubId) navigate(`/club/${n.clubId}`)
   }
 
   return (

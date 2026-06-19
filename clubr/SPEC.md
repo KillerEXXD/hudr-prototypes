@@ -176,6 +176,25 @@ Approval is required to do anything beyond viewing:
   in‑app **notification** for every club manager (owner + hosts); admitting a member
   notifies that member. See §8b.
 
+## 8c. Game invite links (club‑gated)
+- Each game (LL / Squares / FT) has a **shareable link** `#/?game=<type>:<id>`
+  (`ll`/`sq`/`ft`) via a **Share game** button on the game page.
+- Opening it runs the **whole decision tree server‑side** (`POST /clubs/apply-game-invite`),
+  so the link "does everything." A signed‑in user is **never re‑prompted to log in**:
+  | State | Outcome |
+  |---|---|
+  | Host/co‑host, or already in the game | Open the game ("you're in"). |
+  | **Club member**, not in the game | **Request to join the game** → game host alerted → "Request sent." |
+  | **Not a club member** (public club) | **Request to join the club** first; the game is **remembered as an intent** and **auto‑requested the moment the club admits them**. Club page shows "Request sent — you'll be entered into the game automatically once admitted." |
+  | Club membership still **pending** | Club page, "awaiting approval." |
+  | **Private club** | Non‑disclosure: a generic "Request sent" (club/game not revealed). |
+  | Game missing / ended / bad link | "Game unavailable." |
+- **Club‑members‑only** is enforced at the **backend** (LL/Squares/FT reject a
+  non‑member join; hosts/co‑hosts/admins bypass) — not just in the UI.
+- A game‑join request **notifies the game host** (`game_join_request`, deep‑links to
+  the game). The deferred auto‑join is stored in `game_join_intents` and fulfilled by
+  `approveMember` on club admit.
+
 ## 8b. Notifications (in‑app)
 - A **bell** in the header shows an **unread badge**; tapping opens a sheet of
   notifications (newest first) with a per‑type icon and relative time. Tapping one

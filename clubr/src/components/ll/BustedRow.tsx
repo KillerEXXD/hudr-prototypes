@@ -4,22 +4,27 @@ import { LpBadge } from '@/components/leaderboard/LpBadge'
 import type { LLParticipant } from '@/types/ll'
 
 const ordinal = (n: number) => `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}`
+const fmtStakes = (n: number) => n.toLocaleString('en-US')
 
 // One finished player in the Last Longer standings. We do NOT strike out the name (a
 // player who finished earned their place) — the result is shown as their finish
-// position instead: "winner 🏆" for 1st, "finished 3rd" otherwise. Names/points stay at
-// readable primary/secondary brightness; the finish-place medal leads the row.
-export function BustedRow({ p, medalLabel, lpPoints, canManage, onProfile, action }: {
+// position instead: "winner 🏆"/"chop 🤝" for 1st, "finished 3rd" otherwise. On a
+// completed game we also show what they won from the pool (+N Stakes) and their LP.
+export function BustedRow({ p, medalLabel, lpPoints, amountWon, chop, canManage, onProfile, action }: {
   p: LLParticipant
   medalLabel: string
   lpPoints?: number
+  /** Stakes won from the pool (completed games). Hidden when 0. */
+  amountWon?: number
+  /** This finisher is a joint winner of a chop (shown as "chop 🤝"). */
+  chop?: boolean
   canManage: boolean
   onProfile: () => void
   /** Host-only trailing control (e.g. Reinstate). */
   action?: ReactNode
 }) {
   const label = p.finishPos === 1
-    ? 'winner 🏆'
+    ? (chop ? 'chop 🤝' : 'winner 🏆')
     : typeof p.finishPos === 'number'
       ? `finished ${ordinal(p.finishPos)}`
       : 'out'
@@ -30,8 +35,13 @@ export function BustedRow({ p, medalLabel, lpPoints, canManage, onProfile, actio
         <Avatar name={p.name} color={p.avatarColor} size={28} />
         <span className="min-w-0 flex-1 truncate text-sm font-medium text-text-primary">{p.name}</span>
       </button>
-      {lpPoints ? <LpBadge points={lpPoints} /> : null}
-      <span className="shrink-0 text-[11px] font-medium text-text-secondary">{label}</span>
+      <div className="flex shrink-0 flex-col items-end gap-0.5 leading-none">
+        {amountWon ? <span className="font-mono text-xs font-bold text-accent-emerald">+{fmtStakes(amountWon)} Stakes</span> : null}
+        <div className="flex items-center gap-1.5">
+          {lpPoints ? <LpBadge points={lpPoints} /> : null}
+          <span className="text-[11px] font-medium text-text-secondary">{label}</span>
+        </div>
+      </div>
       {action}
     </div>
   )
