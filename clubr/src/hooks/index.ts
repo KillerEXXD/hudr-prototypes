@@ -60,6 +60,27 @@ export function useJoinViaInvite() {
   return useMutation({ mutationFn: (code: string) => api.joinViaInvite(code, userId), onSuccess: invalidate })
 }
 
+// ---- Notifications (header bell) ----
+export function useNotifications() {
+  const { user } = useAuth()
+  return useQuery({ queryKey: ['notifications', user?.id], queryFn: () => api.listNotifications(), enabled: !!user })
+}
+
+function useInvalidateNotifications() {
+  const qc = useQueryClient()
+  return () => qc.invalidateQueries({ queryKey: ['notifications'] })
+}
+
+export function useMarkNotificationRead() {
+  const invalidate = useInvalidateNotifications()
+  return useMutation({ mutationFn: (id: string) => api.markNotificationRead(id), onSuccess: invalidate })
+}
+
+export function useMarkAllNotificationsRead() {
+  const invalidate = useInvalidateNotifications()
+  return useMutation({ mutationFn: () => api.markAllNotificationsRead(), onSuccess: invalidate })
+}
+
 export function useCreateClub() {
   const { userId } = useIdentity()
   const { refreshUser } = useAuth()

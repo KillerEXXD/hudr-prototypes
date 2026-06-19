@@ -7,7 +7,7 @@
 // real API calls and this file is deleted — nothing else changes.
 // =====================================================================
 
-import type { Club, User } from '@/types'
+import type { AppNotification, Club, User } from '@/types'
 
 // ---- Accounts (one per login role) + extra people who populate clubs ----
 export const USERS: Record<string, User> = {
@@ -148,6 +148,15 @@ export const CLUBS: Club[] = [
       member('u_cody', 'member', 'pending', '2026-06-15'),
     ],
   },
+]
+
+// ---- Notifications (recipient-scoped; the header bell reads these) ----
+// Seeded for the host account (Harper, owns Aces High) so the demo shows a
+// couple of pending join requests + one approval the moment you sign in as host.
+export const NOTIFICATIONS: AppNotification[] = [
+  { id: 'ntf_1', type: 'club_join_request', clubId: 'c_aces', actorId: 'u_mike', actorName: 'Mike Jones', title: 'New join request', body: 'Mike Jones asked to join Aces High.', read: false, createdAt: '2026-06-18T18:40:00Z' },
+  { id: 'ntf_2', type: 'club_join_request', clubId: 'c_aces', actorId: 'u_tom', actorName: 'Tom Wilson', title: 'New join request', body: 'Tom Wilson asked to join Aces High.', read: false, createdAt: '2026-06-18T14:05:00Z' },
+  { id: 'ntf_3', type: 'club_join_approved', clubId: 'c_aces', actorId: 'u_host', actorName: 'Harper Host', title: "You're in!", body: "You're now a member of Aces High.", read: true, createdAt: '2026-06-15T09:30:00Z' },
 ]
 
 // Counter for generated ids (avoids relying on wall-clock for uniqueness).

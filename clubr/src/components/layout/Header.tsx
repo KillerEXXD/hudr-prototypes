@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge } from '@/components/common/ui'
 import { LogoLockup } from '@/components/common/LogoMark'
+import { NotificationBell } from '@/components/layout/NotificationBell'
 import type { AccountRole } from '@/types'
 
 const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' | 'blue'; icon: typeof UserIcon }> = {
@@ -31,6 +32,7 @@ export function Header() {
             <Coins className="h-3.5 w-3.5" /><span className="font-mono">{(wallet?.balance ?? 0).toLocaleString()}</span>
           </button>
         )}
+        <NotificationBell />
         {/* The avatar is a shortcut to the account home (the "Me" tab) — not a
             second account surface. The demo account-switcher lives on /me. */}
         <button onClick={() => navigate('/me')} aria-label="Your account" title="Your account"><Avatar name={user.name} color={user.avatarColor} size={32} /></button>

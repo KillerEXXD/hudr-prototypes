@@ -156,6 +156,28 @@ Approval is required to do anything beyond viewing:
 - Each club has an **invite code** and a **shareable link** (`#/?join=CODE`). A new
   user clicks it → lands on signup with the code prefilled → **requests to join** →
   **host admits after vetting**.
+- **One front door, both audiences.** The `?join=CODE` is applied by a **single
+  applier** once signed in (`useApplyInviteOnLogin`), so the link behaves identically
+  for a **brand‑new** user (just finished phone‑OTP + onboarding) and an **existing**
+  user (already has an account). It joins, strips the param, and routes to the club.
+- **Outcome is explicit on the club page:**
+  - **Already a member** → a green *"You're already a member of &lt;club&gt;"* welcome banner.
+  - **Not a member** → a pending request is created and a green *"Request sent — pending
+    approval. The host has been notified"* banner shows (the persistent amber
+    "read‑only — awaiting approval" banner covers later visits).
+- **The host is notified.** A new join request (invite‑code **or** Discover) creates an
+  in‑app **notification** for every club manager (owner + hosts); admitting a member
+  notifies that member. See §8b.
+
+## 8b. Notifications (in‑app)
+- A **bell** in the header shows an **unread badge**; tapping opens a sheet of
+  notifications (newest first) with a per‑type icon and relative time. Tapping one
+  **deep‑links to the club** and marks it read; **Mark all read** clears the badge.
+- Types today: **`club_join_request`** (to managers) and **`club_join_approved`** (to the
+  admitted member). Recipient‑scoped — you only ever see your own.
+- Live app: a `notifications` table (recipient‑scoped RLS; rows written by the
+  service‑role edge functions) + a `/notifications` endpoint (list + unread count,
+  mark‑read, mark‑all). Prototype: a seeded mock inbox for the host account.
 
 ## 9. Information architecture (anti‑clutter)
 - **Discover** = act‑on surface: **clubs you can JOIN** (not ones you're in) +

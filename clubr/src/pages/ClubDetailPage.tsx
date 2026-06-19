@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, Filter } from 'lucide-react'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, Filter, PartyPopper } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin, useJoinViaInvite, useSetClubVisibility } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils/cn'
 export function ClubDetailPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  // Set after an invite-link join: 'already-member' (welcome) or 'pending' (request sent).
+  const justJoined = (useLocation().state as { joinResult?: 'already-member' | 'pending' } | null)?.joinResult
   const { user } = useAuth()
   const { data: club, isLoading } = useClub(id)
   const approve = useApproveMember()
@@ -89,7 +91,20 @@ export function ClubDetailPage() {
       )}
 
       {/* Access state banners */}
-      {club.myStatus === 'pending' && (
+      {/* Fresh from an invite link: welcome an existing member, or confirm a new request. */}
+      {justJoined === 'already-member' && (
+        <Card className="mt-3 flex items-start gap-2.5 border-accent-emerald/30 bg-accent-emerald/10">
+          <PartyPopper className="mt-0.5 h-4 w-4 shrink-0 text-accent-emerald" />
+          <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">You're already a member of {club.name}.</span> You're all set — jump into any game below.</p>
+        </Card>
+      )}
+      {justJoined === 'pending' && (
+        <Card className="mt-3 flex items-start gap-2.5 border-accent-emerald/30 bg-accent-emerald/10">
+          <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-emerald" />
+          <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Request sent — pending approval.</span> The host has been notified; you'll be able to enter games once they admit you.</p>
+        </Card>
+      )}
+      {club.myStatus === 'pending' && !justJoined && (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
           <Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />
           <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Read-only — awaiting approval.</span> You can look around, but you can't enter games until the host admits you.</p>

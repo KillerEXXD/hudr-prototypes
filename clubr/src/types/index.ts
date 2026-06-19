@@ -84,3 +84,22 @@ export interface ClubView extends Club {
 
 // (Discover surfaces real clubs/contests/games via the FT + LL services —
 //  no separate preview seed/types.)
+
+// =====================================================================
+// NOTIFICATIONS
+// =====================================================================
+
+export type NotificationType = 'club_join_request' | 'club_join_approved'
+
+/** An in-app notification targeted at one recipient (the header bell). */
+export interface AppNotification {
+  id: string
+  type: NotificationType
+  clubId: string | null
+  actorId: string | null
+  actorName: string | null
+  title: string
+  body: string
+  read: boolean
+  createdAt: string
+}

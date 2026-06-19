@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { ShieldCheck, Crown, User as UserIcon, Ticket, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Btn, Field } from '@/components/common/ui'
@@ -26,6 +26,7 @@ export function LoginScreen() {
   const [code, setCode] = useState('')
   const [msg, setMsg] = useState('')
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const joinCode = params.get('join')
   useEffect(() => { if (joinCode) { setJoinOpen(true); setCode(joinCode.toUpperCase()) } }, [joinCode])
 
@@ -38,7 +39,10 @@ export function LoginScreen() {
     if (!canJoin) return
     const u = signUp(name, email, phone, location)
     const club = await api.joinViaInvite(code, u.id)
-    setMsg(club ? `Requested to join ${club.name} — awaiting host approval.` : 'No club found for that code (try ACES24).')
+    // Mirror live: route to the club with the join outcome so it shows the right
+    // banner ("already a member" vs "request sent — host notified").
+    if (club) navigate(`/club/${club.id}`, { state: { joinResult: club.myStatus === 'member' ? 'already-member' : 'pending' } })
+    else setMsg('No club found for that code (try ACES24).')
   }
 
   return (

@@ -8,9 +8,9 @@
 // hook changes are needed.
 // =====================================================================
 
-import { CLUBS, USERS, nextId } from '@/data/store'
+import { CLUBS, NOTIFICATIONS, USERS, nextId } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
-import type { Club, ClubMember, ClubView, User } from '@/types'
+import type { AppNotification, Club, ClubMember, ClubView, User } from '@/types'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 const today = () => new Date().toISOString().slice(0, 10)
@@ -157,4 +157,24 @@ export async function rejectMember(clubId: string, targetUserId: string): Promis
   await delay(150)
   const c = CLUBS.find((x) => x.id === clubId)
   if (c) c.members = c.members.filter((x) => x.userId !== targetUserId)
+}
+
+// ---- Notifications (the header bell) ----
+// Mock store: the seeded rows are the host's inbox (the demo's notification
+// audience). Returns them newest-first with the unread count for the badge.
+export async function listNotifications(): Promise<{ items: AppNotification[]; unread: number }> {
+  await delay(120)
+  const items = NOTIFICATIONS.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  return { items, unread: items.filter((n) => !n.read).length }
+}
+
+export async function markNotificationRead(id: string): Promise<void> {
+  await delay(80)
+  const n = NOTIFICATIONS.find((x) => x.id === id)
+  if (n) n.read = true
+}
+
+export async function markAllNotificationsRead(): Promise<void> {
+  await delay(80)
+  for (const n of NOTIFICATIONS) n.read = true
 }
