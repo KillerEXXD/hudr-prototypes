@@ -1,42 +1,31 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Timer, CheckCircle2, Eye, Shield, Plus, Trophy, Lock, UserPlus } from 'lucide-react'
+import { Timer, Plus, Trophy, Lock } from 'lucide-react'
 import { useGames, useRequestJoinLL } from '@/hooks/ll'
 import { useMyClubs } from '@/hooks'
+import { useAuth } from '@/contexts/AuthContext'
 import { Badge, Btn, Card, Section, Spinner, EmptyState, RoleChip } from '@/components/common/ui'
 import type { MemberRole } from '@/types'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { GameRelationshipChip } from '@/components/common/GameRelationshipChip'
+import { gameRelationship, hostedByMe } from '@/lib/gameRelationship'
 import { StakePool } from '@/components/common/StakePool'
 import { PayoutBadge } from '@/components/common/GameSetup'
 import { CreateGameSheet } from '@/components/ll/CreateGameSheet'
 import type { LLGameView } from '@/types/ll'
 
-function RoleBadges({ g }: { g: LLGameView }) {
-  return (
-    <>
-      {g.canManage && <Badge tone="green"><Shield className="h-3 w-3" />Hosting</Badge>}
-      {g.me?.status === 'active' && <Badge tone="blue"><CheckCircle2 className="h-3 w-3" />In</Badge>}
-      {g.me?.status === 'pending' && <Badge tone="amber"><Eye className="h-3 w-3" />Pending</Badge>}
-      {g.me?.status === 'out' && <Badge tone="neutral">Out</Badge>}
-    </>
-  )
-}
-
-// Request-to-join straight from the list card (no need to open the game).
-function CardJoinLL({ g }: { g: LLGameView }) {
-  const req = useRequestJoinLL()
-  return (
-    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-      <Btn size="sm" variant="secondary" className="w-full" loading={req.isPending} onClick={() => req.mutate(g.id)}>
-        <UserPlus className="h-3.5 w-3.5" />Request to join
-      </Btn>
-    </div>
-  )
-}
-
 export function GameRow({ g, showType, clubRole }: { g: LLGameView; showType?: boolean; clubRole?: MemberRole }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const req = useRequestJoinLL()
+  const rel = gameRelationship({
+    hostedByMe: hostedByMe(g, user?.id ?? ''),
+    hasEntry: !!g.me,
+    entryPending: g.me?.status === 'pending',
+    isMemberOfClub: g.isMemberOfClub,
+    registrationOpen: g.status === 'registration',
+  })
   return (
     <Card onClick={() => navigate(`/lastlonger/${g.id}`)} className="p-3.5">
       {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-amber px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Timer className="h-3.5 w-3.5" />Last Longer</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
@@ -57,9 +46,11 @@ export function GameRow({ g, showType, clubRole }: { g: LLGameView; showType?: b
         )
       })()}
       <div className="mt-2"><PayoutBadge payouts={g.payouts} /></div>
-      {g.status !== 'completed' && g.isMemberOfClub && !g.canManage && !g.me && <CardJoinLL g={g} />}
-      {(g.canManage || g.me || g.visibility === 'private') && (
-        <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges g={g} />{g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
+      {(rel !== 'none' || g.visibility === 'private') && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <GameRelationshipChip rel={rel} onJoin={() => req.mutate(g.id)} joining={req.isPending} />
+          {g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}
+        </div>
       )}
       {g.status === 'completed' && g.me?.finishPos && (
         <div className="mt-1.5 flex items-center gap-1 text-[11px] font-bold text-accent-amber"><Trophy className="h-3 w-3" />{g.me.finishPos === 1 ? 'You won 🏆' : `You finished ${g.me.finishPos}${ord(g.me.finishPos)}`}</div>
@@ -71,6 +62,8 @@ export function GameRow({ g, showType, clubRole }: { g: LLGameView; showType?: b
 function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th' }
 
 export function LastLongerPage() {
+  const { user } = useAuth()
+  const me = user?.id ?? ''
   const { data, isLoading } = useGames()
   const myClubs = useMyClubs()
   const canHost = (myClubs.data ?? []).some((c) => c.canManage)
@@ -78,9 +71,9 @@ export function LastLongerPage() {
 
   const active = (data ?? []).filter((g) => g.status !== 'completed')
   // Past = completed games YOU were in (played or hosted) — not every finished one.
-  const past = (data ?? []).filter((g) => g.status === 'completed' && (g.me != null || g.canManage))
-  const hosting = active.filter((g) => g.canManage)
-  const playing = active.filter((g) => !g.canManage)
+  const past = (data ?? []).filter((g) => g.status === 'completed' && (g.me != null || hostedByMe(g, me)))
+  const hosting = active.filter((g) => hostedByMe(g, me))
+  const playing = active.filter((g) => !hostedByMe(g, me))
 
   return (
     <div className="animate-fade-up">

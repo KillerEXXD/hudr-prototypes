@@ -1,14 +1,27 @@
 import { useNavigate } from 'react-router-dom'
 import { Grid3x3, Lock, Trophy } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRequestJoinSquares } from '@/hooks/squares'
 import { Badge, Card, RoleChip } from '@/components/common/ui'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { StakePool } from '@/components/common/StakePool'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { GameRelationshipChip } from '@/components/common/GameRelationshipChip'
+import { gameRelationship, hostedByMe } from '@/lib/gameRelationship'
 import type { SquaresGameView } from '@/types/squares'
 import type { MemberRole } from '@/types'
 
 export function SquaresRow({ g, showType, clubRole }: { g: SquaresGameView; showType?: boolean; clubRole?: MemberRole }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const req = useRequestJoinSquares()
+  const rel = gameRelationship({
+    hostedByMe: hostedByMe(g, user?.id ?? ''),
+    hasEntry: !!g.me,
+    entryPending: g.me?.status === 'pending',
+    isMemberOfClub: g.isMemberOfClub,
+    registrationOpen: g.status === 'registration',
+  })
   return (
     <Card onClick={() => navigate(`/squares/${g.id}`)} className="p-3.5">
       {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-emerald px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Grid3x3 className="h-3.5 w-3.5" />Squares</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
@@ -24,7 +37,7 @@ export function SquaresRow({ g, showType, clubRole }: { g: SquaresGameView; show
       <StakePool stake={g.stake} pool={g.stake * g.claimedCount} right={g.status === 'registration' ? <Countdown deadline={regDeadline(g.id, g.registrationClosesAt)} /> : undefined}>· {g.claimedCount}/100 squares</StakePool>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         <span className="inline-flex items-center gap-1 rounded-md bg-bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-text-secondary"><Trophy className="h-3 w-3 text-accent-amber" />{g.periods.map((p) => p.label).join(' · ')}</span>
-        {g.me && <Badge tone="blue">In</Badge>}
+        <GameRelationshipChip rel={rel} onJoin={() => req.mutate(g.id)} joining={req.isPending} />
         {g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}
       </div>
     </Card>
