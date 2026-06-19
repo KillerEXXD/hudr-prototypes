@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ChevronLeft, Mail, Phone, Target, Timer, Lock, MapPin } from 'lucide-react'
 import { useMemberProfile } from '@/hooks'
 import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/components/common/ui'
@@ -6,11 +6,16 @@ import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/compon
 export function MemberPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const { data: m, isLoading, isError, refetch } = useMemberProfile(id)
 
-  // A Back button is available in EVERY state so a deep link never traps the user.
+  // Where to return to: callers pass the origin in router state so Back always goes to
+  // *where you came from* (even a private club / deep link). Falls back to history (-1).
+  // Rendered in EVERY state and prominent so it's never missed.
+  const from = (location.state as { from?: string } | null)?.from
+  const goBack = () => (from ? navigate(from) : navigate(-1))
   const back = (
-    <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+    <button onClick={goBack} className="mb-3 inline-flex items-center gap-1 rounded-lg border border-border bg-bg-surface px-2.5 py-1.5 text-sm font-semibold text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
   )
 
   if (isLoading) return <div className="animate-fade-up">{back}<Spinner label="Loading member…" /></div>
