@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, HelpCircle, Coins, RotateCcw } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, Coins, RotateCcw } from 'lucide-react'
 import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { CoHostSheet } from '@/components/ll/CoHostSheet'
@@ -10,6 +10,7 @@ import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { FloatingChat } from '@/components/common/FloatingChat'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { useEconomy } from '@/hooks/credits'
@@ -73,7 +74,7 @@ export function LastLongerGamePage() {
         <StatusBadge phase={g.status} />
         <span className="font-mono">{g.stake} Stakes</span>
         <span className="text-text-muted">· {g.activeCount} in · {out.length} out</span>
-        <button type="button" onClick={() => setHowOpen(true)} className="flex items-center gap-1 rounded-full border border-border px-2 py-0.5 font-semibold text-text-secondary hover:text-text-primary cursor-pointer"><HelpCircle className="h-3.5 w-3.5" />How it works</button>
+        <HowItWorksButton onClick={() => setHowOpen(true)} />
       </div>
       {(() => { const joined = g.participants.filter((p) => p.status !== 'pending').length; return <StakePool stake={g.stake} pool={g.stake * joined}>· {joined} joined</StakePool> })()}
       {g.status === 'registration' && <div className="mt-3"><CountdownBanner deadline={regDeadline(g.id, g.registrationClosesAt)} sub="Registration closes — join before the clock hits zero" closedLabel="Awaiting host" /></div>}
