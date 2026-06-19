@@ -13,7 +13,7 @@ import { DraftBoard } from '@/components/ft/DraftBoard'
 import { FinalTableDetails } from '@/components/ft/FinalTableDetails'
 import { SettledResult } from '@/components/ft/SettledResult'
 import { StakePool } from '@/components/common/StakePool'
-import { HowScoringPricing } from '@/components/ft/HowScoringPricing'
+import { HowItWorksFT } from '@/components/ft/HowItWorks'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
@@ -184,7 +184,7 @@ export function ContestDetailPage() {
       <FloatingChat key={c.id} messages={c.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ contestId: c.id, text })} />
 
       <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="How FT Fantasy works">
-        <HowScoringPricing players={c.players} budget={c.budget} defaultOpen />
+        <HowItWorksFT />
       </Sheet>
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={c.clubId} accessUserIds={c.accessUserIds ?? []} accent="purple" onInvite={(ids) => invite.mutate({ contestId: c.id, userIds: ids })} isPending={invite.isPending} />
