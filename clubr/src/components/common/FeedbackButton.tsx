@@ -20,15 +20,16 @@ export default function FeedbackButton() {
   const [open, setOpen] = useState(false)
   const [reviewOpen, setReviewOpen] = useState(false)
   const [sent, setSent] = useState(false)
+  const [name, setName] = useState(() => getIdentity()?.name ?? '')
   const [note, setNote] = useState('')
 
   if (GAME_DETAIL.test(location.pathname)) return null
 
-  const canSend = note.trim().length > 0
+  const canSend = name.trim().length > 0 && note.trim().length > 0
 
   function send() {
     if (!canSend) return
-    captureQuickNote(note)
+    captureQuickNote(note, name)
     setSent(true)
     setTimeout(() => { setOpen(false); setSent(false); setNote('') }, 1500)
   }
@@ -69,13 +70,26 @@ export default function FeedbackButton() {
                   <button type="button" onClick={() => setOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer" aria-label="Close"><X className="h-4 w-4" /></button>
                 </div>
 
-                {/* quick note — send immediately, no rating / name / email */}
+                {/* quick note — required name + message; no rating / email */}
+                <label htmlFor="qn-name" className="mt-3 block text-[11px] font-semibold text-text-secondary">
+                  Name <span className="text-accent-red">*</span>
+                </label>
+                <input
+                  id="qn-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoFocus={name.trim().length === 0}
+                  placeholder="Your name"
+                  aria-label="Your name (required)"
+                  className="mt-1 w-full rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue"
+                />
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') send() }}
                   rows={3}
-                  autoFocus
+                  autoFocus={name.trim().length > 0}
                   placeholder="A bug, an idea, anything that felt off…"
                   className="mt-3 w-full resize-none rounded-lg border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue"
                 />
@@ -88,7 +102,7 @@ export default function FeedbackButton() {
                 >
                   <Send className="h-4 w-4" /> Send note
                 </button>
-                <p className="mt-1.5 text-center text-[10px] text-text-muted">Sends instantly · {getIdentity() ? 'attached to your name' : 'no name or rating needed'} · ⌘/Ctrl+Enter</p>
+                <p className="mt-1.5 text-center text-[10px] text-text-muted">Sends instantly · attached to your name · ⌘/Ctrl+Enter</p>
 
                 <div className="my-3 flex items-center gap-2 text-[10px] uppercase tracking-wide text-text-muted">
                   <span className="h-px flex-1 bg-border" /> got more time? <span className="h-px flex-1 bg-border" />
