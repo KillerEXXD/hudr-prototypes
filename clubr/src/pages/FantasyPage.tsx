@@ -1,40 +1,30 @@
 import { useNavigate } from 'react-router-dom'
-import { Target, Lock, CheckCircle2, Eye, Shield, Plus, Trophy, UserPlus } from 'lucide-react'
+import { Target, Lock, Plus, Trophy } from 'lucide-react'
 import { useContests, useRequestEnter } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
+import { useAuth } from '@/contexts/AuthContext'
 import { Badge, Btn, Card, Section, Spinner, EmptyState, RoleChip } from '@/components/common/ui'
 import type { MemberRole } from '@/types'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { GameRelationshipChip } from '@/components/common/GameRelationshipChip'
+import { gameRelationship, hostedByMe } from '@/lib/gameRelationship'
 import { StakePool } from '@/components/common/StakePool'
 import { PayoutBadge } from '@/components/common/GameSetup'
 import type { FTContestView } from '@/types/ft'
 
-function RoleBadges({ c }: { c: FTContestView }) {
-  return (
-    <>
-      {c.canManage && <Badge tone="green"><Shield className="h-3 w-3" />Hosting</Badge>}
-      {c.myEntry?.status === 'approved' && <Badge tone="blue"><CheckCircle2 className="h-3 w-3" />Entered</Badge>}
-      {c.myEntry?.status === 'pending' && <Badge tone="amber"><Eye className="h-3 w-3" />Pending</Badge>}
-    </>
-  )
-}
-
-// Request-to-enter straight from the list card (no need to open the contest).
-function CardJoinFT({ c }: { c: FTContestView }) {
-  const req = useRequestEnter()
-  return (
-    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-      <Btn size="sm" variant="secondary" className="w-full" loading={req.isPending} onClick={() => req.mutate(c.id)}>
-        <UserPlus className="h-3.5 w-3.5" />Request to enter
-      </Btn>
-    </div>
-  )
-}
-
 export function ContestRow({ c, showType, clubRole }: { c: FTContestView; showType?: boolean; clubRole?: MemberRole }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const req = useRequestEnter()
+  const rel = gameRelationship({
+    hostedByMe: hostedByMe(c, user?.id ?? ''),
+    hasEntry: !!c.myEntry,
+    entryPending: c.myEntry?.status === 'pending',
+    isMemberOfClub: c.isMemberOfClub,
+    registrationOpen: c.status === 'open',
+  })
   return (
     <Card onClick={() => navigate(`/fantasy/${c.id}`)} className="p-3.5">
       {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-purple px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Target className="h-3.5 w-3.5" />FT Fantasy</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
@@ -58,9 +48,11 @@ export function ContestRow({ c, showType, clubRole }: { c: FTContestView; showTy
         )
       })()}
       <div className="mt-2"><PayoutBadge payouts={c.payouts ?? (c.format === 'winner_takes_all' ? [100] : undefined)} /></div>
-      {c.status === 'open' && c.isMemberOfClub && !c.canManage && !c.myEntry && <CardJoinFT c={c} />}
-      {(c.canManage || c.myEntry || c.visibility === 'private') && (
-        <div className="mt-2 flex flex-wrap items-center gap-1.5"><RoleBadges c={c} />{c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}</div>
+      {(rel !== 'none' || c.visibility === 'private') && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <GameRelationshipChip rel={rel} onJoin={() => req.mutate(c.id)} joining={req.isPending} />
+          {c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}
+        </div>
       )}
       {c.status === 'settled' && c.myEntry?.rank && (
         <div className={`mt-1.5 flex items-center gap-1 text-[11px] font-bold ${c.myEntry.rank === 1 ? 'text-accent-amber' : 'text-accent-purple'}`}>
@@ -78,15 +70,17 @@ function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd
 
 export function FantasyPage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const me = user?.id ?? ''
   const { data, isLoading } = useContests()
   const myClubs = useMyClubs()
   const canHost = (myClubs.data ?? []).some((c) => c.canManage)
 
   const active = (data ?? []).filter((c) => c.status !== 'settled')
   // Past = settled contests YOU were in (entered or hosted) — not every finished one.
-  const past = (data ?? []).filter((c) => c.status === 'settled' && (c.myEntry != null || c.canManage))
-  const hosting = active.filter((c) => c.canManage)
-  const playing = active.filter((c) => !c.canManage)
+  const past = (data ?? []).filter((c) => c.status === 'settled' && (c.myEntry != null || hostedByMe(c, me)))
+  const hosting = active.filter((c) => hostedByMe(c, me))
+  const playing = active.filter((c) => !hostedByMe(c, me))
 
   return (
     <div className="animate-fade-up">
