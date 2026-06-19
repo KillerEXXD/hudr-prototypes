@@ -1,4 +1,4 @@
-import { Trophy, Target } from 'lucide-react'
+import { Trophy, Target, ChevronLeft } from 'lucide-react'
 import { FINISH_POINTS } from '@/types/ft'
 import type { FTPlayer } from '@/types/ft'
 import { fmtK, fmtCash, playerShort } from '@/lib/utils/ftFormat'
@@ -14,8 +14,10 @@ const ord = (n: number) => `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'r
  *   1. Scoring — points per finish (FINISH_POINTS); score = your 4 players' sum.
  *   2. Pricing — ICM: each seat's price is its fair share of the prize pool,
  *      with a 3-seat compression illustration (chips fall faster than price).
+ * `onBack`, when provided, renders a prominent "Back to How game works" button
+ * so the user can return to the walkthrough sheet it was opened from.
  */
-export function HowScoringPricing({ players, budget }: { players: FTPlayer[]; budget: number }) {
+export function HowScoringPricing({ players, budget, onBack }: { players: FTPlayer[]; budget: number; onBack?: () => void }) {
   // Leader / mid / short by draft price — the spread that shows ICM compression.
   const byPrice = [...players].sort((a, b) => b.icmPrice - a.icmPrice)
   const leader = byPrice[0]
@@ -27,6 +29,16 @@ export function HowScoringPricing({ players, budget }: { players: FTPlayer[]; bu
 
   return (
     <div className="flex flex-col gap-3">
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex items-center gap-1.5 self-start rounded-lg border border-border bg-bg-surface/60 px-3 py-2 text-xs font-bold text-accent-blue hover:bg-bg-surface cursor-pointer"
+        >
+          <ChevronLeft className="h-4 w-4" />Back to How game works
+        </button>
+      )}
+
       {/* ---- Scoring ---- */}
       <div>
         <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-accent-emerald">
