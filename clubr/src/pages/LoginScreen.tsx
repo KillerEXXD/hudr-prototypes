@@ -4,6 +4,7 @@ import { ShieldCheck, Crown, User as UserIcon, Ticket, ArrowRight } from 'lucide
 import { useAuth } from '@/contexts/AuthContext'
 import { Btn, Field } from '@/components/common/ui'
 import { CityField } from '@/components/common/CityField'
+import { LogoMark } from '@/components/common/LogoMark'
 import * as api from '@/lib/api/services'
 import type { AccountRole } from '@/types'
 
@@ -44,8 +45,8 @@ export function LoginScreen() {
     <div className="flex min-h-screen items-center justify-center bg-bg-primary px-5">
       <div className="w-full max-w-md">
         <div className="mb-7 text-center">
-          <div className="text-4xl">🃏</div>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-text-primary">ClubR</h1>
+          <LogoMark size={60} className="mx-auto block" />
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-text-primary">Clubr<span className="text-accent-blue">GO</span></h1>
           <p className="mt-1 text-sm text-text-secondary">The transparent scorekeeper for your poker club — FT Fantasy &amp; Last Longer.</p>
         </div>
 

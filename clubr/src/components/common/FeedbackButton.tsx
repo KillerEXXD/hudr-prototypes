@@ -5,7 +5,7 @@ import { captureQuickNote, getIdentity } from '@/lib/analytics'
 import ReviewWizard from '@/components/common/ReviewWizard'
 import { useLocation } from 'react-router-dom'
 
-// Floating "Feedback" launcher for the ClubR prototype. Leads with a
+// Floating "Feedback" launcher for the ClubrGO prototype. Leads with a
 // frictionless quick note — type a line, hit send, done (no rating, no required
 // name/email). The longer guided review (which rates each feature) stays one
 // tap away. Captures the current screen + session replay via PostHog. Pinned
@@ -41,7 +41,7 @@ export default function FeedbackButton() {
           type="button"
           onClick={() => setOpen(true)}
           className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-accent-blue/30 bg-accent-blue px-3 py-2 text-xs font-bold text-white shadow-lg transition-transform hover:scale-[1.03] cursor-pointer"
-          aria-label="Give feedback on the ClubR prototype"
+          aria-label="Give feedback on the ClubrGO prototype"
         >
           <MessageSquarePlus className="h-4 w-4" /> Feedback
         </button>
@@ -57,14 +57,14 @@ export default function FeedbackButton() {
               <div className="flex flex-col items-center gap-2 py-8 text-center">
                 <CheckCircle2 className="h-9 w-9 text-accent-emerald" />
                 <p className="text-sm font-semibold text-text-primary">Note sent — thank you!</p>
-                <p className="text-xs text-text-muted">It helps us shape the ClubR build.</p>
+                <p className="text-xs text-text-muted">It helps us shape the ClubrGO build.</p>
               </div>
             ) : (
               <>
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h3 className="text-sm font-bold text-text-primary">Quick note</h3>
-                    <p className="text-[11px] text-text-muted">on the <span className="font-semibold">ClubR</span> prototype · {(window.location.hash || '#/').replace('#', '')}</p>
+                    <p className="text-[11px] text-text-muted">on the <span className="font-semibold">ClubrGO</span> prototype · {(window.location.hash || '#/').replace('#', '')}</p>
                   </div>
                   <button type="button" onClick={() => setOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-surface cursor-pointer" aria-label="Close"><X className="h-4 w-4" /></button>
                 </div>
@@ -103,7 +103,7 @@ export default function FeedbackButton() {
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-blue/20 text-accent-blue"><ClipboardList className="h-4 w-4" /></span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-bold text-accent-blue">Take the 3‑min guided review</span>
-                    <span className="block text-[11px] text-text-muted">Rate each ClubR feature — the most useful feedback</span>
+                    <span className="block text-[11px] text-text-muted">Rate each ClubrGO feature — the most useful feedback</span>
                   </span>
                   <ArrowRight className="h-4 w-4 shrink-0 text-accent-blue" />
                 </button>

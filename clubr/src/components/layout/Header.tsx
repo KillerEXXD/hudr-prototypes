@@ -3,6 +3,7 @@ import { ShieldCheck, Crown, User as UserIcon, Coins } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge } from '@/components/common/ui'
+import { LogoLockup } from '@/components/common/LogoMark'
 import type { AccountRole } from '@/types'
 
 const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' | 'blue'; icon: typeof UserIcon }> = {
@@ -21,7 +22,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-bg-secondary/95 px-4 py-3 backdrop-blur">
       <div className="flex items-center gap-2">
-        <span className="text-lg font-extrabold tracking-tight text-text-primary">🃏 ClubR</span>
+        <LogoLockup size={22} />
         <Badge tone={role.tone}><role.icon className="h-3 w-3" />{role.label}</Badge>
       </div>
       <div className="flex items-center gap-1.5">

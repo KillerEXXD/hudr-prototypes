@@ -1,8 +1,8 @@
 // =====================================================================
-// Feature sections for the guided ClubR review. Each becomes one step in
+// Feature sections for the guided ClubrGO review. Each becomes one step in
 // the ReviewWizard (score 1–5 + liked/disliked chips + free text).
 // `tryPath` is a hash route the tester can open in a new tab to try first
-// (ClubR auth persists in localStorage, so the new tab lands signed-in).
+// (ClubrGO auth persists in localStorage, so the new tab lands signed-in).
 // `likedChips` / `dislikedChips` are tappable quick-picks (can also type).
 // =====================================================================
 
@@ -26,7 +26,7 @@ export function getReviewSections(): ReviewSection[] {
   return [
     {
       key: 'first_impression', title: 'First impression',
-      blurb: 'Before going deep — what is ClubR, who’s it for, and does it look trustworthy?',
+      blurb: 'Before going deep — what is ClubrGO, who’s it for, and does it look trustworthy?',
       likedChips: ['Clear what it does', 'Looks trustworthy', 'Looks polished', 'I’d explore more'],
       dislikedChips: ['Confusing purpose', 'Looks cluttered', 'Not sure who it’s for', 'Looks unfinished'],
     },
@@ -81,7 +81,7 @@ export function getReviewSections(): ReviewSection[] {
     },
     {
       key: 'transparency', title: 'Transparent scorekeeper',
-      blurb: 'ClubR tracks the count & result but holds no money — all stakes are settled offline between players. Does that model make sense and feel trustworthy?',
+      blurb: 'ClubrGO tracks the count & result but holds no money — all stakes are settled offline between players. Does that model make sense and feel trustworthy?',
       likedChips: ['Makes sense', 'Feels trustworthy', 'Good that no cash is held'],
       dislikedChips: ['Confusing', 'Expected it to handle money', 'Unsure how settlement works'],
     },
@@ -93,7 +93,7 @@ export function getReviewSections(): ReviewSection[] {
     },
     {
       key: 'skins', title: 'Trying different skins',
-      blurb: 'In Me, ClubR ships with several appearance skins — try switching between a few. Did you find them easily? Did changing the look make it more fun, and did one stand out as your favourite?',
+      blurb: 'In Me, ClubrGO ships with several appearance skins — try switching between a few. Did you find them easily? Did changing the look make it more fun, and did one stand out as your favourite?',
       tryPath: '/me',
       likedChips: ['Love having skins', 'Easy to switch', 'Found a favourite', 'Makes it more fun', 'Fun to try them all'],
       dislikedChips: ['Couldn’t find the skins', 'Didn’t see the point', 'They all felt similar', 'Hard to switch', 'None felt right'],
@@ -106,7 +106,7 @@ export function getReviewSections(): ReviewSection[] {
     },
     {
       key: 'feature_ideas', title: 'What would make it better?',
-      blurb: 'Help shape ClubR — what other features would enrich the experience and keep you coming back? Tap any that appeal, or add your own.',
+      blurb: 'Help shape ClubrGO — what other features would enrich the experience and keep you coming back? Tap any that appeal, or add your own.',
       hideScore: true,
       likedLabel: 'Features you’d love to see',
       likedChips: ['Push notifications', 'Player stats & history', 'Leaderboards / seasons', 'Bigger group chat', 'Built-in payments', 'More game types', 'Achievements / badges', 'Calendar & reminders'],

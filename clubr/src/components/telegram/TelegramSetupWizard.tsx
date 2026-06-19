@@ -135,7 +135,7 @@ export function TelegramSetupWizard({ open, onClose, clubId, clubName }: { open:
           )}
 
           {step === 1 && (
-            <Step n={2} title="Add the ClubR bot as an admin">
+            <Step n={2} title="Add the ClubrGO bot as an admin">
               Open your new channel → <b className="text-text-primary">Administrators</b> → <b className="text-text-primary">Add Admin</b>, then search for the bot and add it. It needs admin so it can post games &amp; manage the member invite link.
               <div className="mt-2.5 flex items-center gap-2 rounded-lg border border-border bg-bg-surface px-3 py-2">
                 <span className="flex-1 font-mono text-sm font-bold text-text-primary">{TELEGRAM_BOT_HANDLE}</span>
