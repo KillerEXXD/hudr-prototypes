@@ -196,7 +196,7 @@ export function ContestDetailPage() {
       </Sheet>
 
       <Sheet open={icmOpen} onClose={() => setIcmOpen(false)} title="How ICM pricing & scoring work">
-        <HowScoringPricing players={c.players} budget={c.budget} />
+        <HowScoringPricing players={c.players} budget={c.budget} onBack={() => setIcmOpen(false)} />
       </Sheet>
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={c.clubId} accessUserIds={c.accessUserIds ?? []} accent="purple" onInvite={(ids) => invite.mutate({ contestId: c.id, userIds: ids })} isPending={invite.isPending} />
