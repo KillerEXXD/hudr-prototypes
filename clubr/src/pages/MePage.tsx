@@ -80,7 +80,7 @@ function EditProfileSheet({ open, onClose, user }: { open: boolean; onClose: () 
 }
 
 export function MePage() {
-  const { user, logout, loginAs } = useAuth()
+  const { user, realRole, actAs, logout, loginAs } = useAuth()
   const navigate = useNavigate()
   const wallet = useWallet()
   const [editOpen, setEditOpen] = useState(false)
@@ -105,6 +105,26 @@ export function MePage() {
 
       <EmailVerifyCard user={user} />
       <EditProfileSheet open={editOpen} onClose={() => setEditOpen(false)} user={user} />
+
+      {/* App Admin ONLY: view the app as any role. Gated on the REAL role so it stays
+          visible while acting as Host/Player. Changes the view, not your permissions. */}
+      {realRole === 'admin' && (
+        <Section title="Acting as" action={<span className="text-[11px] text-text-muted">App Admin only</span>}>
+          <div className="grid grid-cols-3 gap-2">
+            {(['admin', 'host', 'player'] as AccountRole[]).map((r) => {
+              const m = ROLE_META[r]
+              const active = user.role === r
+              return (
+                <button key={r} type="button" onClick={() => actAs(r)} aria-pressed={active}
+                  className={`flex flex-col items-center gap-1 rounded-xl border p-2.5 text-xs font-semibold transition-colors cursor-pointer ${active ? 'border-accent-blue bg-accent-blue/10 text-accent-blue' : 'border-border bg-bg-card text-text-secondary hover:bg-bg-surface'}`}>
+                  <m.icon className="h-4 w-4" />{m.label}
+                </button>
+              )
+            })}
+          </div>
+          <p className="mt-1.5 text-[10px] leading-snug text-text-muted">Switch your view between App Admin, Club Host and Player. Only you see this — it changes what you see, not your permissions.</p>
+        </Section>
+      )}
 
       {user.role !== 'admin' && (
         <Section title="Wallet">

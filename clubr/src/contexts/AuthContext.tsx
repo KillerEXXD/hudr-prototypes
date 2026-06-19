@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import type { AccountRole, User } from '@/types'
 import { USERS, nextId } from '@/data/store'
+import { applyActingRole, isActingRole } from '@/lib/auth/actingRole'
 
 // Mock auth. Three seeded accounts (one per role) + a "create a login" path
 // for a brand-new player joining via an invite link. Persisted to
@@ -8,10 +9,18 @@ import { USERS, nextId } from '@/data/store'
 // the rest of the app only reads `user`.
 
 const STORAGE_KEY = 'clubr-auth'
+const ACTING_KEY = 'clubr-acting-role'
 const ROLE_ACCOUNT: Record<AccountRole, string> = { admin: 'u_admin', host: 'u_host', player: 'u_player' }
+const readActing = (): AccountRole | null => {
+  try { const v = localStorage.getItem(ACTING_KEY); return isActingRole(v) ? v : null } catch { return null }
+}
 
 interface AuthCtx {
   user: User | null
+  /** The caller's REAL role. Drives whether the App Admin "acting as" switcher shows. */
+  realRole: AccountRole | null
+  /** App Admin ONLY: view the app as App Admin / Club Host / Player. No-op for non-admins. */
+  actAs: (role: AccountRole) => void
   loginAs: (role: AccountRole, userId?: string) => void
   signUp: (name: string, email: string, phone: string, location?: string) => User
   /** Update the signed-in user's name/email. Changing the email marks it unverified. */
@@ -35,6 +44,7 @@ function readStored(): User | null {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(readStored)
+  const [actingRole, setActingRole] = useState<AccountRole | null>(readActing)
 
   const persist = (u: User | null) => {
     try {
@@ -46,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginAs = useCallback((role: AccountRole, userId?: string) => {
     const u = USERS[userId ?? ROLE_ACCOUNT[role]]
     setUser(u); persist(u)
+    setActingRole(null); try { localStorage.removeItem(ACTING_KEY) } catch { /* ignore */ }
   }, [])
 
   const signUp = useCallback((name: string, email: string, phone: string, location?: string): User => {
@@ -91,9 +102,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser((prev) => (prev && USERS[prev.id] ? { ...USERS[prev.id] } : prev))
   }, [])
 
-  const logout = useCallback(() => { setUser(null); persist(null) }, [])
+  const logout = useCallback(() => {
+    setUser(null); persist(null)
+    setActingRole(null); try { localStorage.removeItem(ACTING_KEY) } catch { /* ignore */ }
+  }, [])
 
-  return <Ctx.Provider value={{ user, loginAs, signUp, updateProfile, verifyEmail, refreshUser, logout }}>{children}</Ctx.Provider>
+  // App Admin "acting as": a real admin can view the app as Host/Player. Client-side
+  // view only — gated to real admins in the UI; non-admins are unaffected.
+  const realRole = user?.role ?? null
+  const effectiveUser = applyActingRole(user, actingRole)
+  const actAs = useCallback((role: AccountRole) => {
+    setActingRole(role)
+    try { localStorage.setItem(ACTING_KEY, role) } catch { /* ignore */ }
+  }, [])
+
+  return <Ctx.Provider value={{ user: effectiveUser, realRole, actAs, loginAs, signUp, updateProfile, verifyEmail, refreshUser, logout }}>{children}</Ctx.Provider>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
