@@ -520,10 +520,19 @@ club row with pending requests shows a prominent **amber "N waiting" pill** (acc
 that **expands inline to Approve/Reject** each applicant — approvals happen straight from the list,
 no need to open the club. Both player and host club pages stay
 a clean **header → (host actions) → tabs → content**. The **Games tab's content sits in a panel that
-connects flush to the tab bar** (the bar's bottom border is the seam, corners squared to meet it), so
-the **per‑type filter chips read as belonging to Games**: a **funnel icon + `All · FTF · LL · Squares`
-row** sits at the top of the panel above a hairline divider, with the game cards in the same tray.
-Built from theme tokens (`bg-bg-card/40`, `border-border`) → subtle and correct in every skin.
+connects flush to the tab bar** (the bar's bottom border is the seam, corners squared to meet it).
+Built from theme tokens (`bg-bg-card/40`, `border-border`) → subtle and correct in every skin. The
+panel uses a **two‑level filter**:
+- **Type** is a **dropdown in the "Games" header** (`All games · FT Fantasy · Last Longer · Squares`),
+  **auto‑hidden when the club runs a single type** (nothing to choose).
+- **Status pills** below: **Available · Playing · Hosting · Completed**, default **Available**.
+  **Hosting is host/admin‑only** (`club.canManage`); players see **Available · Playing · Completed**.
+  **Available** = games you can **join now** (each card keeps its inline **Join**). **Playing** = games
+  you've joined. **Hosting** = games you run; each card shows whether you're **playing** and offers an
+  inline **"Join as player"** when you aren't (the host's own join is auto‑approved). **Completed** =
+  finished games, **infinite‑scroll, newest first by `settledAt`**, rendered as **rich winner cards**:
+  the **winner(s)**, the **prize pool** (stake × entrants) and **what each won** — FT podium/winner‑
+  takes‑all, Last Longer winner or **chop split**, Squares **period winners**.
 
 - **The formula (field‑scaled, top‑heavy):** `points = round(B × √N ÷ √rank × weight)`, where **N**
   = number of participants and **rank** = the player's finish (1 = best). `√N` makes a **bigger

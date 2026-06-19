@@ -1,17 +1,40 @@
 import { useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, Filter, PartyPopper } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, Crown, ChevronDown, PartyPopper, type LucideIcon } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin, useJoinViaInvite, useSetClubVisibility } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
+import { WinnerCard } from '@/components/games/WinnerCard'
+import { HostSelfJoinBar } from '@/components/games/HostSelfJoinBar'
+import { InfiniteList } from '@/components/common/InfiniteList'
 import { LeaderboardSection } from '@/components/leaderboard/LeaderboardSection'
 import { TelegramJoinChip, TelegramSetupCard, TelegramHostPanel } from '@/components/telegram/ClubTelegram'
-import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
+import { useUnifiedGames, matchesType, type UnifiedGame } from '@/games/useUnifiedGames'
+import { relationshipOf } from '@/games/gameRelationship'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { cn } from '@/lib/utils/cn'
+
+// Club-detail Games filter: status pills (a superset of the home/feed relationship
+// pills — it adds Completed). Hosting shows only to the club's host/admin; everyone
+// else sees Available · Playing · Completed. Default is Available.
+type ClubStatus = 'available' | 'playing' | 'hosting' | 'completed'
+
+const STATUS_META: Record<ClubStatus, { label: string; icon: LucideIcon; active: string }> = {
+  available: { label: 'Available', icon: Ticket, active: 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' },
+  playing: { label: 'Playing', icon: Gamepad2, active: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40' },
+  hosting: { label: 'Hosting', icon: Crown, active: 'border-accent-purple bg-accent-purple/20 text-accent-purple font-bold ring-1 ring-accent-purple/40' },
+  completed: { label: 'Completed', icon: Trophy, active: 'border-accent-amber bg-accent-amber/20 text-accent-amber font-bold ring-1 ring-accent-amber/40' },
+}
+
+const EMPTY: Record<ClubStatus, { title: string; sub: string }> = {
+  available: { title: 'Nothing to join right now', sub: 'When a game opens for registration, it shows here with a Join button.' },
+  playing: { title: "You're not in any games here", sub: 'Join an available game and it moves here.' },
+  hosting: { title: "You're not hosting any games here", sub: 'Games you run show here.' },
+  completed: { title: 'No completed games yet', sub: 'Finished games show here with their winners and prize pool.' },
+}
 
 export function ClubDetailPage() {
   const { id = '' } = useParams()
@@ -29,6 +52,7 @@ export function ClubDetailPage() {
   const [newOpen, setNewOpen] = useState(false)
   const [inviteOpen, setInviteOpen] = useState(false)
   const [gameFilter, setGameFilter] = useState<'all' | GameType>('all')
+  const [gameStatus, setGameStatus] = useState<ClubStatus>('available')
   const [tab, setTab] = useState<'games' | 'leaderboard' | 'members'>('games')
 
   if (isLoading) return <Spinner label="Loading club…" />
@@ -41,11 +65,27 @@ export function ClubDetailPage() {
   const members = club.members.filter((m) => m.status === 'member')
   const pending = club.members.filter((m) => m.status === 'pending')
   const isMember = club.myStatus === 'member'
-  // Every game in this club, across all types (club = container) — urgency-sorted.
-  const clubItems = allGames.items.filter((g) => g.clubId === club.id && !g.finished)
-  const shownItems = clubItems.filter((g) => matchesType(g, gameFilter))
-  const typesPresent = GAME_TYPES.filter((t) => clubItems.some((g) => g.type === t.id))
+  // Every game in this club, across all types (club = container) — incl. finished,
+  // since Completed needs them. Active list stays urgency-sorted (its source order).
+  const clubAll = allGames.items.filter((g) => g.clubId === club.id)
+  const typesPresent = GAME_TYPES.filter((t) => clubAll.some((g) => g.type === t.id))
+  const byType = (g: UnifiedGame) => gameFilter === 'all' || matchesType(g, gameFilter)
   const canHostHere = club.canManage && user?.role !== 'admin'   // app admins never host/join
+  // Status pills: Available · Playing · Hosting · Completed (Hosting host-only).
+  const statuses: ClubStatus[] = club.canManage ? ['available', 'playing', 'hosting', 'completed'] : ['available', 'playing', 'completed']
+  const active = clubAll.filter((g) => !g.finished)
+  const counts: Record<ClubStatus, number> = {
+    available: active.filter((g) => byType(g) && relationshipOf(g) === 'available').length,
+    playing: active.filter((g) => byType(g) && relationshipOf(g) === 'playing').length,
+    hosting: active.filter((g) => byType(g) && relationshipOf(g) === 'hosting').length,
+    completed: clubAll.filter((g) => byType(g) && g.finished).length,
+  }
+  // Active pill view: games whose relationship matches the selected pill.
+  const activeShown = active.filter((g) => byType(g) && relationshipOf(g) === gameStatus)
+  // Completed: newest first by settled timestamp (falls back to empty → bottom).
+  const completedItems = clubAll
+    .filter((g) => byType(g) && g.finished)
+    .sort((a, b) => (b.settledAt ?? '').localeCompare(a.settledAt ?? ''))
   // Tabs: Games + Leaderboard for everyone; Members only for the host/admin who manage the roster
   // (players don't see the member list). The header already shows "N members · hosted by X".
   const tabs: { id: 'games' | 'leaderboard' | 'members'; label: string; icon: typeof Users; badge?: number }[] = [
@@ -137,24 +177,73 @@ export function ClubDetailPage() {
           bottom border is the seam), so the filters read as "the Games tab's". */}
       {tab === 'games' && (
         <div className="rounded-b-xl border border-t-0 border-border bg-bg-card/40 p-2.5">
+          {/* Type filter lives in the header as a dropdown — hidden when there's
+              nothing to choose (a single game type in this club). */}
           {typesPresent.length > 1 && (
-            <div className="mb-2.5 flex flex-wrap items-center gap-1.5 border-b border-border/60 pb-2.5">
-              <Filter className="h-3.5 w-3.5 shrink-0 text-text-muted" />
-              <button type="button" onClick={() => setGameFilter('all')} className={cn('rounded-full border px-2.5 py-0.5 text-xs cursor-pointer transition-colors', gameFilter === 'all' ? 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' : 'border-border font-semibold text-text-secondary')}>All</button>
-              {typesPresent.map((t) => (
-                <button key={t.id} type="button" onClick={() => setGameFilter(t.id)} className={cn('flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs cursor-pointer transition-colors', gameFilter === t.id ? t.chipActive : 'border-border font-semibold text-text-secondary')}><t.icon className="h-3 w-3" />{t.short}</button>
-              ))}
+            <div className="mb-2.5 flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-text-muted">Games</span>
+              <div className="relative">
+                <select
+                  value={gameFilter}
+                  onChange={(e) => setGameFilter(e.target.value as 'all' | GameType)}
+                  aria-label="Filter games by type"
+                  className="cursor-pointer appearance-none rounded-full border border-border bg-bg-card py-1 pl-3 pr-7 text-xs font-bold text-text-secondary"
+                >
+                  <option value="all">All games</option>
+                  {typesPresent.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
+              </div>
             </div>
           )}
+
+          {/* Status pills */}
+          <div className="mb-2.5 flex gap-1.5 overflow-x-auto no-scrollbar border-b border-border/60 pb-2.5" role="tablist" aria-label="Filter games by status">
+            {statuses.map((s) => {
+              const m = STATUS_META[s]
+              const on = gameStatus === s
+              const n = counts[s]
+              return (
+                <button key={s} type="button" role="tab" aria-selected={on} onClick={() => setGameStatus(s)}
+                  className={cn('flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', on ? m.active : 'border-border font-semibold text-text-secondary')}>
+                  <m.icon className="h-3 w-3" />{m.label}{n ? ` (${n})` : ''}
+                </button>
+              )
+            })}
+          </div>
+
           {allGames.isLoading ? (
             <Spinner />
-          ) : shownItems.length > 0 ? (
-            <div className="flex flex-col gap-2">{shownItems.map((g) => renderUnifiedGame(g, gameFilter === 'all'))}</div>
+          ) : gameStatus === 'completed' ? (
+            completedItems.length > 0 ? (
+              <InfiniteList
+                items={completedItems}
+                batch={8}
+                resetKey={`${gameStatus}-${gameFilter}`}
+                className="flex flex-col gap-2"
+                renderItem={(g) => <WinnerCard key={`${g.type}_${g.id}`} g={g} />}
+              />
+            ) : (
+              <EmptyState icon={<Trophy className="h-7 w-7" />} title={EMPTY.completed.title} sub={EMPTY.completed.sub} />
+            )
+          ) : activeShown.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              {activeShown.map((g) =>
+                gameStatus === 'hosting' ? (
+                  <div key={`${g.type}_${g.id}`} className="flex flex-col gap-1.5">
+                    {renderUnifiedGame(g, gameFilter === 'all')}
+                    <HostSelfJoinBar g={g} />
+                  </div>
+                ) : (
+                  renderUnifiedGame(g, gameFilter === 'all')
+                ),
+              )}
+            </div>
           ) : (
             <EmptyState
               icon={<Gamepad2 className="h-7 w-7" />}
-              title={clubItems.length > 0 ? 'Nothing of that type' : 'No live games right now'}
-              sub={canHostHere ? 'Tap “New game” to host one — FT Fantasy, Last Longer or Squares.' : (isMember ? 'Check back when your host starts a game.' : 'Join the club to see its games.')}
+              title={EMPTY[gameStatus].title}
+              sub={gameStatus === 'hosting' && canHostHere ? 'Tap “New game” above to host one — FT Fantasy, Last Longer or Squares.' : (gameStatus === 'available' && !isMember && club.myStatus !== 'pending' ? 'Join the club to see and enter its games.' : EMPTY[gameStatus].sub)}
             />
           )}
         </div>
