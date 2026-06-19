@@ -79,6 +79,11 @@ Approval is required to do anything beyond viewing:
   reveal to everyone** in the contest. Settled contests show the leaderboard with picks.
 - **Scoring:** sum of **points‑per‑finish** across your 4 players; highest total
   takes the bucket. Top‑3 **50/30/20** (winner‑take‑all under 5 entries).
+- **Draft‑board budget UX:** a live **Spent / Available** meter with drafted‑seat **pips**
+  (not a subtle "x/4" text). If you spend down so far that the cheapest open seat is
+  unaffordable — i.e. you'd hit the 100k budget **before** filling all 4 seats — the meter
+  turns **red** and a loud **"Out of budget — N seat(s) still open"** alert names the cheapest
+  open seat and tells you to **remove a pricier pick and draft a cheaper one**. (`DraftBoard.tsx`.)
 - **Scoring schedule is visible WHILE drafting** (not only at settlement): a collapsible
   **"How scoring works — points per finish"** panel on the contest page (open by default while
   the contest is open) lists **1st 100 · 2nd 70 · 3rd 50 · 4th 35 · 5th 25 · 6th 18 · 7th 12 ·
