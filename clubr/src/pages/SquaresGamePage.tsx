@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, HelpCircle, Hand, Dice5, Coins, Stamp } from 'lucide-react'
+import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Hand, Dice5, Coins, Stamp } from 'lucide-react'
 import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares } from '@/hooks/squares'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, Processing, ProcessingOverlay } from '@/components/common/ui'
@@ -8,6 +8,7 @@ import { PaidToggle } from '@/components/common/PaidToggle'
 import { StakePool } from '@/components/common/StakePool'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { cn } from '@/lib/utils/cn'
 import { useEconomy } from '@/hooks/credits'
@@ -81,7 +82,7 @@ export function SquaresGamePage() {
       <p className="mt-0.5 text-sm text-text-secondary"><b className="text-text-primary">{g.homeTeam}</b> <span className="text-text-muted">(side)</span> vs <b className="text-text-primary">{g.awayTeam}</b> <span className="text-text-muted">(top)</span></p>
       <div className="mt-1.5 flex items-center gap-2 text-xs">
         <StatusBadge phase={g.status} />
-        <button type="button" onClick={() => setHowOpen(true)} className="flex items-center gap-1 rounded-full border border-border px-2 py-0.5 font-semibold text-text-secondary hover:text-text-primary cursor-pointer"><HelpCircle className="h-3.5 w-3.5" />How it works</button>
+        <HowItWorksButton onClick={() => setHowOpen(true)} />
       </div>
       <StakePool stake={g.stake} pool={g.stake * g.claimedCount}>· {g.claimedCount}/100 squares</StakePool>
       {g.status === 'registration' && <div className="mt-3"><CountdownBanner deadline={regDeadline(g.id, g.registrationClosesAt)} sub="Claiming closes — grab your squares before the clock hits zero" closedLabel="Awaiting host" /></div>}

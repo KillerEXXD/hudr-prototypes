@@ -4,7 +4,7 @@ import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield 
 import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest } from '@/hooks/ft'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
+import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
 import { FloatingChat } from '@/components/common/FloatingChat'
 import { DraftBoard } from '@/components/ft/DraftBoard'
@@ -15,6 +15,7 @@ import { HowScoringPricing } from '@/components/ft/HowScoringPricing'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
 import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
@@ -36,6 +37,7 @@ export function ContestDetailPage() {
   const invite = useInviteToContest()
   const [picks, setPicks] = useState<string[]>([])
   const [inviteOpen, setInviteOpen] = useState(false)
+  const [howOpen, setHowOpen] = useState(false)
 
   useEffect(() => { if (c?.myEntry) setPicks(c.myEntry.picks) }, [c?.myEntry?.picks?.join(',')]) // eslint-disable-line
 
@@ -57,6 +59,7 @@ export function ContestDetailPage() {
         <StatusBadge phase={ftPhase(c.status)} />
         {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}
         <span className="font-mono">{c.stake} Stakes</span><span className="text-text-muted">· budget {fmtK(c.budget)}</span>
+        <HowItWorksButton onClick={() => setHowOpen(true)} />
         {c.status !== 'open' && <span className="ml-auto text-text-muted">{c.locksAt}</span>}
       </div>
       {(() => { const joined = c.entries.filter((e) => e.status === 'approved').length; return <StakePool stake={c.stake} pool={c.stake * joined}>· {joined} joined</StakePool> })()}
@@ -64,8 +67,6 @@ export function ContestDetailPage() {
       {/* ===== Ticking "Closes in" countdown — draft locks at the deadline ===== */}
       {c.status === 'open' && <div className="mt-3"><CountdownBanner deadline={regDeadline(c.id, c.locksAt)} sub="Draft locks when the clock hits zero — get your picks in" /></div>}
 
-      {/* ===== How scoring & pricing work — combined explainer, at the top, by the buy-in/pool ===== */}
-      <div className="mt-3"><HowScoringPricing players={c.players} budget={c.budget} /></div>
       {c.canManage && c.visibility === 'private' && (
         <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>
       )}
@@ -178,6 +179,10 @@ export function ContestDetailPage() {
 
       {/* ===== Chat — floating bubble + slide-up sheet, scoped to this contest (key={c.id}) ===== */}
       <FloatingChat key={c.id} messages={c.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ contestId: c.id, text })} />
+
+      <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="How FT Fantasy works">
+        <HowScoringPricing players={c.players} budget={c.budget} defaultOpen />
+      </Sheet>
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={c.clubId} accessUserIds={c.accessUserIds ?? []} accent="purple" onInvite={(ids) => invite.mutate({ contestId: c.id, userIds: ids })} isPending={invite.isPending} />
     </div>

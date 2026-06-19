@@ -1,16 +1,14 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Target, Lock, CheckCircle2, Eye, Shield, Plus, Trophy, UserPlus, HelpCircle } from 'lucide-react'
+import { Target, Lock, CheckCircle2, Eye, Shield, Plus, Trophy, UserPlus } from 'lucide-react'
 import { useContests, useRequestEnter } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
-import { Badge, Btn, Card, Section, Spinner, EmptyState, Sheet, RoleChip } from '@/components/common/ui'
+import { Badge, Btn, Card, Section, Spinner, EmptyState, RoleChip } from '@/components/common/ui'
 import type { MemberRole } from '@/types'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { StakePool } from '@/components/common/StakePool'
 import { PayoutBadge } from '@/components/common/GameSetup'
-import { HowItWorksFT } from '@/components/ft/HowItWorks'
 import type { FTContestView } from '@/types/ft'
 
 function RoleBadges({ c }: { c: FTContestView }) {
@@ -80,7 +78,6 @@ function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd
 
 export function FantasyPage() {
   const navigate = useNavigate()
-  const [howOpen, setHowOpen] = useState(false)
   const { data, isLoading } = useContests()
   const myClubs = useMyClubs()
   const canHost = (myClubs.data ?? []).some((c) => c.canManage)
@@ -93,12 +90,7 @@ export function FantasyPage() {
 
   return (
     <div className="animate-fade-up">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />FT Fantasy</h1>
-        <button type="button" onClick={() => setHowOpen(true)} className="flex shrink-0 items-center gap-1 rounded-full border border-accent-purple/30 bg-accent-purple/10 px-2.5 py-1 text-xs font-semibold text-accent-purple transition-colors hover:bg-accent-purple/20 cursor-pointer">
-          <HelpCircle className="h-3.5 w-3.5" />How it works
-        </button>
-      </div>
+      <h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />FT Fantasy</h1>
       <p className="mt-1 text-sm text-text-secondary">Stack Draft — draft 4 of the 9 finalists within budget, priced by ICM. Get admitted by the host, then draft before the lock.</p>
 
       {canHost && <Btn className="mt-3 w-full" onClick={() => navigate('/host-ft')}><Plus className="h-4 w-4" />Host a contest</Btn>}
@@ -122,7 +114,6 @@ export function FantasyPage() {
         </>
       )}
 
-      <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="FT Fantasy — how it works"><HowItWorksFT /></Sheet>
     </div>
   )
 }
