@@ -192,14 +192,7 @@ export function ContestDetailPage() {
       <FloatingChat key={c.id} messages={c.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ contestId: c.id, text })} />
 
       <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="How FT Fantasy works">
-        <HowItWorksFT />
-        <button
-          type="button"
-          onClick={() => setIcmOpen(true)}
-          className="mt-3 w-full rounded-lg border border-border bg-bg-surface/60 px-3 py-2 text-left text-xs font-bold text-accent-blue hover:bg-bg-surface cursor-pointer"
-        >
-          See ICM pricing &amp; scoring details →
-        </button>
+        <HowItWorksFT onShowPricing={() => setIcmOpen(true)} />
       </Sheet>
 
       <Sheet open={icmOpen} onClose={() => setIcmOpen(false)} title="How ICM pricing & scoring work">

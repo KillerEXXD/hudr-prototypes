@@ -11,7 +11,7 @@ const STEPS = [
   { icon: Coins, title: 'Win the pool', body: 'Highest total wins. The pool is split per the host’s payout (e.g. Top 3 — 50/30/20), settled offline.' },
 ]
 
-export function HowItWorksFT() {
+export function HowItWorksFT({ onShowPricing }: { onShowPricing?: () => void } = {}) {
   return (
     <div className="flex flex-col gap-3">
       {STEPS.map((s, i) => (
@@ -23,6 +23,16 @@ export function HowItWorksFT() {
           <div className="pb-1">
             <p className="flex items-center gap-1.5 text-sm font-bold text-text-primary"><s.icon className="h-4 w-4 text-accent-purple" />{s.title}</p>
             <p className="mt-0.5 text-xs leading-snug text-text-secondary">{s.body}</p>
+            {/* ICM pricing + scoring matters most at the draft decision — surface the link right here. */}
+            {onShowPricing && s.title === 'Draft your team' && (
+              <button
+                type="button"
+                onClick={onShowPricing}
+                className="mt-1.5 rounded-lg border border-border bg-bg-surface/60 px-2.5 py-1.5 text-[11px] font-bold text-accent-blue hover:bg-bg-surface cursor-pointer"
+              >
+                See ICM pricing &amp; scoring details →
+              </button>
+            )}
           </div>
         </div>
       ))}
