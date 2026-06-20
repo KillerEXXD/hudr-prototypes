@@ -228,7 +228,15 @@ Approval is required to do anything beyond viewing:
 ## 9. Information architecture (anti‑clutter)
 - **Discover** = act‑on surface: **clubs you can JOIN** (not ones you're in) +
   **open/live** contests & games (no settled history). **Clubs in the user's city are
-  surfaced first** under a "Near you in &lt;city&gt;" section. A **location** (city, e.g.
+  surfaced first** under a "Near you in &lt;city&gt;" section.
+- **"Clubs to join" is a shared section on BOTH homes** (Player Discover **and** Club Host)
+  via `ClubsToJoinSection`: up to **3** joinable clubs (near‑you first, recently‑created
+  within), the **total count in the title** (*"Clubs to join · N"*), and a **"See all →"**
+  → the full `/discover/clubs` list (with a **Back** button) once there are more than 3.
+- **Homes hide empty sections** (`HostHomePage`): **"FTs to host"** shows only when the
+  user **manages a club** (owner/host) **and** FTs exist; the **"Games"** section is hidden
+  when there are **no active games**; the relationship pill renders **only the buckets with
+  data**, defaulting to the first non‑empty one. (Club‑detail pills are unchanged.) A **location** (city, e.g.
   "Houston, TX") is captured on the **user at signup** and on the **club at creation**,
   and shown on each club row. **Every city input uses one shared `CityField`** —
   onboarding, club create, profile edit, and the LL game location — backed by a **free

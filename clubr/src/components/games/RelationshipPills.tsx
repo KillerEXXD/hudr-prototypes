@@ -15,16 +15,20 @@ const META: Record<Relationship, { label: string; active: string }> = {
  * how many are in each bucket without switching.
  */
 export function RelationshipPills({
-  value, onChange, isHost, counts,
+  value, onChange, isHost, counts, hideEmpty,
 }: {
   value: Relationship
   onChange: (r: Relationship) => void
   isHost: boolean
   counts?: Partial<Record<Relationship, number>>
+  /** When set, render ONLY the pills that have data (count > 0). Opt-in so other
+   *  callers (e.g. club detail) keep showing every pill. */
+  hideEmpty?: boolean
 }) {
+  const pills = relationshipPills(isHost).filter((r) => !hideEmpty || (counts?.[r] ?? 0) > 0)
   return (
     <div className="flex gap-1 overflow-x-auto no-scrollbar" role="tablist" aria-label="Filter games by your relationship">
-      {relationshipPills(isHost).map((r) => {
+      {pills.map((r) => {
         const m = META[r]
         const n = counts?.[r]
         const active = value === r

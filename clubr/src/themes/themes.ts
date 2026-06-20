@@ -42,19 +42,22 @@ const F = {
 }
 
 export const THEMES: Record<ThemeName, ThemeDef> = {
+  // 'Midnight' retuned to the premium poker-luxe FELT skin (dark pine-felt +
+  // chip-gold), the default. Mirrors the live app (HudrTechLLC/Clubr #174).
   engine: {
-    name: 'engine', label: 'Midnight', tagline: 'Dark & focused',
-    flags: {},
-    swatch: { bg: '#0e0e15', accent: '#3b82f6', text: '#f2f2f7' },
+    name: 'engine', label: 'Midnight', tagline: 'Premium poker-luxe — dark felt, chip-gold',
+    flags: { goldRule: true },
+    swatch: { bg: '#0B1410', accent: '#E9C46A', text: '#F3F6F2' },
     vars: {
-      '--color-bg-primary': '#07070b', '--color-bg-secondary': '#0e0e15', '--color-bg-card': '#16161f',
-      '--color-bg-surface': '#1e1e2a', '--color-bg-elevated': '#26263420', '--color-border': '#262635', '--color-border-light': '#34344a',
-      '--color-text-primary': '#f2f2f7', '--color-text-secondary': '#a1a1b5', '--color-text-muted': '#6b6b82',
-      '--color-accent-blue': '#3b82f6', '--color-accent-blue-deep': '#1e40af', '--color-accent-amber': '#f59e0b',
-      '--color-accent-emerald': '#10b981', '--color-accent-red': '#ef4444', '--color-accent-purple': '#8b5cf6', '--color-accent-cyan': '#06b6d4',
-      '--color-tier-reliable': '#10b981', '--color-tier-tentative': '#f59e0b', '--color-tier-noise': '#6b6b82',
-      '--color-sev-critical': '#ef4444', '--color-sev-moderate': '#f59e0b', '--color-sev-minor': '#3b82f6',
-      '--font-family-sans': F.fira, '--font-family-mono': F.firaCode, '--font-family-display': F.fira,
+      '--color-bg-primary': '#0B1410', '--color-bg-secondary': '#070D0A', '--color-bg-card': '#11201A',
+      '--color-bg-surface': '#16291F', '--color-bg-elevated': '#1E3A2C', '--color-border': '#23382C', '--color-border-light': '#2C4636',
+      '--color-text-primary': '#F3F6F2', '--color-text-secondary': '#AFC4B6', '--color-text-muted': '#6E8678',
+      '--color-accent-blue': '#5AA9E6', '--color-accent-blue-deep': '#2E6FA3', '--color-accent-amber': '#E9C46A',
+      '--color-accent-emerald': '#36C98B', '--color-accent-red': '#E5604F', '--color-accent-purple': '#A98BE6', '--color-accent-cyan': '#4FB8C9',
+      '--color-accent-gold': '#E9C46A', '--color-accent-gold-deep': '#C99B3E',
+      '--color-tier-reliable': '#36C98B', '--color-tier-tentative': '#E9A23B', '--color-tier-noise': '#6E8678',
+      '--color-sev-critical': '#E5604F', '--color-sev-moderate': '#E9A23B', '--color-sev-minor': '#5AA9E6',
+      '--font-family-sans': F.inter, '--font-family-mono': F.plexMono, '--font-family-display': F.space,
     },
   },
   clarivue: {
@@ -88,7 +91,7 @@ export const THEMES: Record<ThemeName, ThemeDef> = {
     },
   },
   felt: {
-    name: 'felt', label: 'Felt', tagline: 'Premium poker, modernized',
+    name: 'felt', label: 'Midnight Light', tagline: 'Premium poker, light cream',
     flags: { serifHeadline: true, goldRule: true },
     swatch: { bg: '#F6F4EF', accent: '#1B5E47', text: '#14241C' },
     vars: {
@@ -134,5 +137,7 @@ export const THEMES: Record<ThemeName, ThemeDef> = {
   },
 }
 
-export const THEME_LIST: ThemeDef[] = Object.values(THEMES)
+// 'felt' (now "Midnight Light") retired from the picker — the felt-skinned
+// 'Midnight' (engine) replaces it. Def kept so a persisted selection resolves.
+export const THEME_LIST: ThemeDef[] = Object.values(THEMES).filter((t) => t.name !== 'felt')
 export const DEFAULT_THEME: ThemeName = 'engine'

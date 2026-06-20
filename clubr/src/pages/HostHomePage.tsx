@@ -6,9 +6,10 @@ import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { InfiniteList } from '@/components/common/InfiniteList'
+import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
 import { RelationshipPills } from '@/components/games/RelationshipPills'
 import { useUnifiedGames, matchesType, orderActiveGames } from '@/games/useUnifiedGames'
-import { relationshipOf, defaultRelationship, type Relationship } from '@/games/gameRelationship'
+import { relationshipOf, defaultRelationship, relationshipPills, type Relationship } from '@/games/gameRelationship'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { cn } from '@/lib/utils/cn'
@@ -37,11 +38,18 @@ export function HostHomePage() {
   // Role per club — chips show owner/co-host/member on each card.
   const roleByClub = new Map<string, MemberRole>()
   for (const c of myClubs.data ?? []) if (c.myStatus === 'member' && c.myRole) roleByClub.set(c.id, c.myRole)
+  // "FTs to host" only makes sense if you manage a club to host them in — hide it
+  // from users who don't own/host any club.
+  const hasManagedClub = [...roleByClub.values()].some((r) => r === 'owner' || r === 'host')
 
   const active = orderActiveGames(items) // closed dropped; reg-open before running
   const counts = { available: 0, playing: 0, hosting: 0 }
   for (const g of active) { const r = relationshipOf(g); if (r) counts[r]++ }
-  const byRel = active.filter((g) => relationshipOf(g) === rel)
+  const anyGames = active.length > 0
+  // Only buckets with data are shown; if the selected one is empty, fall back to
+  // the first non-empty pill so the visible tab always has games.
+  const effectiveRel = counts[rel] > 0 ? rel : (relationshipPills(true).find((r) => counts[r] > 0) ?? rel)
+  const byRel = active.filter((g) => relationshipOf(g) === effectiveRel)
   const typesPresent = GAME_TYPES.filter((t) => byRel.some((g) => g.type === t.id))
   const shown = byRel.filter((g) => matchesType(g, filter))
 
@@ -51,7 +59,8 @@ export function HostHomePage() {
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
       <p className="text-sm text-text-secondary">Upcoming final tables available for you to host as Fantasy games in your club.</p>
 
-      {/* ---- FTs to host (App-Admin slate) ---- */}
+      {/* ---- FTs to host — only for users who manage a club, and only when some exist ---- */}
+      {hasManagedClub && (fts.isLoading || (fts.data?.length ?? 0) > 0) && (
       <Section
         title={`FTs to host${fts.data?.length ? ` (${fts.data.length})` : ''}`}
         action={<button onClick={() => navigate('/host-ft')} className="flex items-center gap-0.5 text-xs font-semibold text-accent-purple cursor-pointer">See all <ChevronRight className="h-3.5 w-3.5" /></button>}
@@ -71,10 +80,18 @@ export function HostHomePage() {
           </div>
         )}
       </Section>
+      )}
 
-      {/* ---- Games: relationship pill (Available · Playing · Hosting) + type chips, lazy ---- */}
+      {/* ---- Clubs to join (shared, identical on the Player Discover home) ---- */}
+      <ClubsToJoinSection />
+
+      {/* ---- Games: relationship pills (only buckets with data) + type chips, lazy.
+              The whole section is hidden when there are no active games at all. ---- */}
+      {gamesLoading ? (
+      <Section title="Games"><Spinner /></Section>
+      ) : anyGames ? (
       <Section title="Games">
-        <RelationshipPills value={rel} onChange={pickRel} isHost counts={counts} />
+        <RelationshipPills value={effectiveRel} onChange={pickRel} isHost counts={counts} hideEmpty />
         {typesPresent.length > 1 && (
           <div className="mt-2 flex gap-1.5 overflow-x-auto no-scrollbar">
             <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
@@ -82,21 +99,20 @@ export function HostHomePage() {
           </div>
         )}
         <div className="mt-2">
-          {gamesLoading ? (
-            <Spinner />
-          ) : shown.length > 0 ? (
+          {shown.length > 0 ? (
             <InfiniteList
               items={shown}
               batch={8}
-              resetKey={`${rel}:${filter}`}
+              resetKey={`${effectiveRel}:${filter}`}
               className="flex flex-col gap-2"
               renderItem={(g) => renderUnifiedGame(g, true, roleByClub.get(g.clubId))}
             />
           ) : (
-            <EmptyState icon={<Gamepad2 className="h-7 w-7" />} title={rel === 'hosting' ? 'You’re not hosting any open or running games' : rel === 'playing' ? 'You’re not playing in any games yet' : 'No games available to join right now'} sub={rel === 'hosting' ? 'Host an FT above, or start a Last Longer / Squares.' : 'Check the other tabs above.'} />
+            <EmptyState icon={<Gamepad2 className="h-7 w-7" />} title="Nothing of that type right now" sub="Try another type above." />
           )}
         </div>
       </Section>
+      ) : null}
     </div>
   )
 }

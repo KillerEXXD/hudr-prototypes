@@ -1,30 +1,21 @@
 import { useState } from 'react'
-import { Sparkles, Plus, Compass, Gamepad2, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { Sparkles, Gamepad2, LayoutGrid, type LucideIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useRecentClubs, useRequestToJoin, useMyClubs } from '@/hooks'
+import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
-import { Section, Spinner, Btn, EmptyState } from '@/components/common/ui'
-import { ClubRow } from '@/components/common/cards'
+import { Section, Spinner, EmptyState } from '@/components/common/ui'
+import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
 import { useUnifiedGames } from '@/games/useUnifiedGames'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { selectOpenGames } from '@/lib/discoverGames'
 import { cn } from '@/lib/utils/cn'
-import type { ClubView, MemberRole } from '@/types'
+import type { MemberRole } from '@/types'
 
-// Both lists stay short so neither buries the other — full lists are one tap away
-// ("View all" → the join-clubs page; "See all" → the Games tab).
-const CLUBS_CAP = 3
+// The games list stays short so it doesn't bury the rest — the full list is one
+// tap away ("See all" → the Games tab). Clubs-to-join lives in the shared
+// <ClubsToJoinSection/> (identical on the Host home).
 const GAMES_CAP = 4
-
-function RequestButton({ club }: { club: ClubView }) {
-  const req = useRequestToJoin()
-  return (
-    <Btn size="sm" variant="secondary" onClick={() => req.mutate(club.id)} loading={req.isPending}>
-      <Plus className="h-3.5 w-3.5" /> Request
-    </Btn>
-  )
-}
 
 function FilterChip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
   return (
@@ -39,17 +30,9 @@ function SeeAll({ onClick, label }: { onClick: () => void; label: string }) {
 export function DiscoverPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const clubs = useRecentClubs()
   const myClubs = useMyClubs()
   const { items, isLoading: gamesLoading } = useUnifiedGames()
   const [filter, setFilter] = useState<'all' | GameType>('all')
-
-  // Clubs you can JOIN (you're not in them yet) — near-you first.
-  const joinable = (clubs.data ?? []).filter((c) => c.myStatus === 'none')
-  const city = user?.location?.trim().toLowerCase()
-  const near = city ? joinable.filter((c) => c.location?.trim().toLowerCase() === city) : []
-  const others = city ? joinable.filter((c) => c.location?.trim().toLowerCase() !== city) : joinable
-  const clubsTop = [...near, ...others].slice(0, CLUBS_CAP)
 
   // The player's role per joined club — drives the "your clubs" game filter and
   // the per-card Owner / Co-host / Member chip.
@@ -66,16 +49,8 @@ export function DiscoverPage() {
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
       <p className="text-sm text-text-secondary">New clubs to join, and what's open in clubs you're in.</p>
 
-      {/* Clubs to join — the Discover headline. Capped; full list one tap away. */}
-      {clubs.isLoading ? (
-        <Section title="Clubs to join"><Spinner /></Section>
-      ) : joinable.length === 0 ? (
-        <Section title="Clubs to join"><EmptyState icon={<Compass className="h-7 w-7" />} title="You're in every club we know" sub="Create your own from the Clubs tab." /></Section>
-      ) : (
-        <Section title="Clubs to join" action={joinable.length > CLUBS_CAP ? <SeeAll label={`View all ${joinable.length} →`} onClick={() => navigate('/discover/clubs')} /> : undefined}>
-          <div className="flex flex-col gap-2">{clubsTop.map((c) => <ClubRow key={c.id} club={c} right={<RequestButton club={c} />} />)}</div>
-        </Section>
-      )}
+      {/* Clubs to join — shared section, identical on the Host home. */}
+      <ClubsToJoinSection />
 
       {/* Open now in YOUR clubs — all game types in one list; capped. */}
       {gamesLoading ? (
