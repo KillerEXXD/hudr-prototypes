@@ -17,6 +17,7 @@ export interface LLParticipant {
   stale: boolean // chips not updated recently → pulse
   finishPos?: number // set when out (1 = winner)
   bustedAgo?: string // when they busted, e.g. '10m ago', '2h ago'
+  joinedAt?: string // ISO; when they joined — Playing/Hosting "latest joined" sort
 }
 
 export interface ChopProposal {
@@ -52,6 +53,8 @@ export interface LLGame {
   winnerName?: string
   /** Completion date 'YYYY-MM-DD' — buckets the result into a leaderboard month (completed only). */
   settledAt?: string
+  /** ISO timestamp when created — for the Available tab's "latest created first" sort. */
+  createdAt?: string
 }
 
 export interface LLGameView extends LLGame {
