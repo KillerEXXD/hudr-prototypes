@@ -51,7 +51,7 @@ export function ContestRow({ c, showType, clubRole }: { c: FTContestView; showTy
       <div className="mt-2"><PayoutBadge payouts={c.payouts ?? (c.format === 'winner_takes_all' ? [100] : undefined)} /></div>
       {(rel !== 'none' || c.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <GameRelationshipChip rel={rel} onJoin={() => req.mutate(c.id)} joining={req.isPending} />
+          <GameRelationshipChip rel={rel} alsoPlaying={!!c.myEntry && c.myEntry.status !== 'pending'} onJoin={() => req.mutate(c.id)} joining={req.isPending} />
           {c.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}
         </div>
       )}

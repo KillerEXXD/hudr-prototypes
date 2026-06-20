@@ -48,7 +48,7 @@ export function GameRow({ g, showType, clubRole }: { g: LLGameView; showType?: b
       <div className="mt-2"><PayoutBadge payouts={g.payouts} /></div>
       {(rel !== 'none' || g.visibility === 'private') && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <GameRelationshipChip rel={rel} onJoin={() => req.mutate(g.id)} joining={req.isPending} />
+          <GameRelationshipChip rel={rel} alsoPlaying={!!g.me && g.me.status !== 'pending'} onJoin={() => req.mutate(g.id)} joining={req.isPending} />
           {g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}
         </div>
       )}

@@ -37,7 +37,7 @@ export function SquaresRow({ g, showType, clubRole }: { g: SquaresGameView; show
       <StakePool stake={g.stake} pool={g.stake * g.claimedCount} right={g.status === 'registration' ? <Countdown deadline={regDeadline(g.registrationClosesAt)} /> : undefined}>· {g.claimedCount}/100 squares</StakePool>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         <span className="inline-flex items-center gap-1 rounded-md bg-bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-text-secondary"><Trophy className="h-3 w-3 text-accent-amber" />{g.periods.map((p) => p.label).join(' · ')}</span>
-        <GameRelationshipChip rel={rel} onJoin={() => req.mutate(g.id)} joining={req.isPending} />
+        <GameRelationshipChip rel={rel} alsoPlaying={!!g.me && g.me.status !== 'pending'} onJoin={() => req.mutate(g.id)} joining={req.isPending} />
         {g.visibility === 'private' && <Badge tone="neutral"><Lock className="h-3 w-3" />Private</Badge>}
       </div>
     </Card>
