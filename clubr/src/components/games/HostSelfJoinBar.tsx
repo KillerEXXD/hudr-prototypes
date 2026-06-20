@@ -1,5 +1,5 @@
 import { CheckCircle2, UserPlus } from 'lucide-react'
-import { Btn } from '@/components/common/ui'
+import { Badge, Btn } from '@/components/common/ui'
 import { useRequestEnter } from '@/hooks/ft'
 import { useRequestJoinLL } from '@/hooks/ll'
 import { useRequestJoinSquares } from '@/hooks/squares'
@@ -19,8 +19,9 @@ export function HostSelfJoinBar({ g }: { g: UnifiedGame }) {
 
   if (g.mine) {
     return (
-      <div className="flex items-center gap-1.5 px-1 text-[11px] font-semibold text-accent-emerald">
-        <CheckCircle2 className="h-3.5 w-3.5" />You're playing in this one
+      <div className="flex items-center gap-1.5 px-1">
+        <Badge tone="blue"><CheckCircle2 className="h-3 w-3" />Playing</Badge>
+        <span className="text-[11px] text-text-muted">you're in this game</span>
       </div>
     )
   }
