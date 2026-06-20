@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, Coins, RotateCcw } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, Coins, RotateCcw, X } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
 import { PrivateGameCard } from '@/components/games/PrivateGameCard'
 import { isPrivateGate } from '@/lib/api/privateGame'
-import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame, useExtendRegLL, useCloseRegLL } from '@/hooks/ll'
+import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useRejectChop, useInviteToGame, useExtendRegLL, useCloseRegLL } from '@/hooks/ll'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
 import { InviteSheet } from '@/components/common/InviteSheet'
@@ -53,7 +53,7 @@ export function LastLongerGamePage() {
   const approve = useApproveLL(); const decline = useDeclineLL()
   const togglePaid = useTogglePaidLL(); const assignCoHost = useAssignCoHostLL(); const removeCoHost = useRemoveCoHostLL()
   const updateChips = useUpdateChips(); const bust = useBust(); const reinstate = useReinstate()
-  const postChat = usePostChatLL(); const proposeChop = useProposeChop(); const agreeChop = useAgreeChop()
+  const postChat = usePostChatLL(); const proposeChop = useProposeChop(); const agreeChop = useAgreeChop(); const rejectChop = useRejectChop()
   const invite = useInviteToGame()
   const extendReg = useExtendRegLL()
   const closeReg = useCloseRegLL()
@@ -63,6 +63,8 @@ export function LastLongerGamePage() {
   const [howOpen, setHowOpen] = useState(false)
   const [coHostOpen, setCoHostOpen] = useState(false)
   const [confirmBust, setConfirmBust] = useState<{ target: string; name: string; self: boolean } | null>(null)
+  const [rejectOpen, setRejectOpen] = useState(false)
+  const [rejectReason, setRejectReason] = useState('')
 
   if (isLoading) return <Spinner label="Loading game…" />
   if (!g) return <EmptyState title="Game not found" />
@@ -136,6 +138,31 @@ export function LastLongerGamePage() {
               </div>
             ))}
           </div>
+          {/* Any remaining player (or a host) can reject — it cancels the chop for
+              everyone (wipes all agreements) and the host can propose a fresh one. The
+              reason is required and posted to chat so the others see why. */}
+          {(g.chop.agreements.some((a) => a.userId === user?.id) || g.canManage) && (
+            rejectOpen ? (
+              <div className="mt-3 border-t border-accent-amber/20 pt-3">
+                <label className="text-xs font-semibold text-text-secondary">Why are you rejecting the chop?</label>
+                <textarea
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  rows={2}
+                  maxLength={200}
+                  autoFocus
+                  placeholder="e.g. I'm chip leader and want to play it out"
+                  className="mt-1 w-full resize-none rounded-xl border border-border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-red"
+                />
+                <div className="mt-2 flex gap-2">
+                  <Btn variant="ghost" size="sm" className="flex-1" onClick={() => { setRejectOpen(false); setRejectReason('') }}>Cancel</Btn>
+                  <Btn variant="danger" size="sm" className="flex-1" disabled={!rejectReason.trim()} loading={rejectChop.isPending} onClick={() => rejectChop.mutate({ gameId: g.id, reason: rejectReason.trim() }, { onSuccess: () => { setRejectOpen(false); setRejectReason('') } })}><X className="h-3.5 w-3.5" />Reject chop</Btn>
+                </div>
+              </div>
+            ) : (
+              <Btn variant="ghost" size="sm" className="mt-3 w-full text-accent-red" onClick={() => setRejectOpen(true)}><X className="h-3.5 w-3.5" />Reject the chop</Btn>
+            )
+          )}
         </Card>
       )}
 

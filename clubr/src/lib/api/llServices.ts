@@ -190,6 +190,13 @@ export async function agreeChop(gameId: string, userId: string): Promise<void> {
     g.status = 'completed'; g.winnerName = 'Chopped'
   }
 }
+export async function rejectChop(gameId: string, userId: string, reason: string): Promise<void> {
+  await delay(120)
+  const g = LL_GAMES.find((x) => x.id === gameId); if (!g || !g.chop) return
+  const who = USERS[userId]?.name ?? g.participants.find((p) => p.userId === userId)?.name ?? 'Player'
+  g.chop = undefined // wipe every agreement — the chop is off; the host can propose a fresh one
+  g.chat.push({ id: `lm_${Date.now()}`, userId, name: who, avatarColor: '#6b7280', text: `❌ ${who} rejected the chop — ${reason.trim()}`, ts: 'now', kind: 'system' })
+}
 
 function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th' }
 
