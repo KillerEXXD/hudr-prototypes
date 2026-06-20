@@ -3,7 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, Coins, RotateCcw } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
-import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame } from '@/hooks/ll'
+import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame, useExtendRegLL, useCloseRegLL } from '@/hooks/ll'
+import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
+import { RegClosedBanner } from '@/components/games/RegClosedBanner'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { CoHostSheet } from '@/components/ll/CoHostSheet'
 import { useAuth } from '@/contexts/AuthContext'
@@ -50,6 +52,9 @@ export function LastLongerGamePage() {
   const updateChips = useUpdateChips(); const bust = useBust(); const reinstate = useReinstate()
   const postChat = usePostChatLL(); const proposeChop = useProposeChop(); const agreeChop = useAgreeChop()
   const invite = useInviteToGame()
+  const extendReg = useExtendRegLL()
+  const closeReg = useCloseRegLL()
+  const [editRegOpen, setEditRegOpen] = useState(false)
   const [chipInput, setChipInput] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
@@ -86,9 +91,14 @@ export function LastLongerGamePage() {
       {g.status === 'registration' && (
         <div className="mt-3">
           <CountdownBanner deadline={regDeadline(g.registrationClosesAt)} sub="Registration closes — join before the clock hits zero" closedLabel="Awaiting host" />
-          <CloseTimeLabel utcISO={g.registrationClosesAt} className="mt-1 block text-[11px] text-text-muted" />
+          <div className="mt-1 flex items-center justify-between gap-2">
+            <CloseTimeLabel utcISO={g.registrationClosesAt} className="text-[11px] text-text-muted" />
+            {g.canManage && <button type="button" onClick={() => setEditRegOpen(true)} className="flex items-center gap-1 text-[11px] font-semibold text-accent-blue hover:underline cursor-pointer"><Timer className="h-3 w-3" />Edit time</button>}
+          </div>
         </div>
       )}
+      {g.regClosedEarly && g.status !== 'registration' && <RegClosedBanner gameId={g.id} show />}
+      <EditRegistrationSheet open={editRegOpen} onClose={() => setEditRegOpen(false)} currentCloseISO={g.registrationClosesAt} busy={extendReg.isPending || closeReg.isPending} onExtend={(closesAt) => extendReg.mutate({ gameId: g.id, closesAt }, { onSuccess: () => setEditRegOpen(false) })} onCloseReg={() => closeReg.mutate(g.id, { onSuccess: () => setEditRegOpen(false) })} />
       {(g.location || g.mode) && (
         <p className="mt-1 flex items-center gap-1.5 text-[11px] text-text-muted">
           {g.mode === 'online' ? <Wifi className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}

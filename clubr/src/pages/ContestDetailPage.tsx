@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield, Clock } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
-import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest } from '@/hooks/ft'
+import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest, useExtendRegFT, useCloseRegFT } from '@/hooks/ft'
+import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
+import { RegClosedBanner } from '@/components/games/RegClosedBanner'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
@@ -39,6 +41,9 @@ export function ContestDetailPage() {
   const savePicks = useSavePicks()
   const postChat = usePostChat()
   const invite = useInviteToContest()
+  const extendReg = useExtendRegFT()
+  const closeReg = useCloseRegFT()
+  const [editRegOpen, setEditRegOpen] = useState(false)
   const [picks, setPicks] = useState<string[]>([])
   const [inviteOpen, setInviteOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
@@ -74,9 +79,14 @@ export function ContestDetailPage() {
       {c.status === 'open' && (
         <div className="mt-3">
           <CountdownBanner deadline={regDeadline(c.locksAtTs ?? c.locksAt)} sub="Draft locks when the clock hits zero — get your picks in" />
-          <CloseTimeLabel utcISO={c.locksAtTs} className="mt-1 block text-[11px] text-text-muted" />
+          <div className="mt-1 flex items-center justify-between gap-2">
+            <CloseTimeLabel utcISO={c.locksAtTs} className="text-[11px] text-text-muted" />
+            {c.canManage && <button type="button" onClick={() => setEditRegOpen(true)} className="flex items-center gap-1 text-[11px] font-semibold text-accent-blue hover:underline cursor-pointer"><Clock className="h-3 w-3" />Edit time</button>}
+          </div>
         </div>
       )}
+      {c.regClosedEarly && c.status !== 'open' && <RegClosedBanner gameId={c.id} show />}
+      <EditRegistrationSheet open={editRegOpen} onClose={() => setEditRegOpen(false)} currentCloseISO={c.locksAtTs} busy={extendReg.isPending || closeReg.isPending} onExtend={(closesAt) => extendReg.mutate({ contestId: c.id, closesAt }, { onSuccess: () => setEditRegOpen(false) })} onCloseReg={() => closeReg.mutate(c.id, { onSuccess: () => setEditRegOpen(false) })} />
 
       {c.canManage && c.visibility === 'private' && (
         <Btn variant="secondary" className="mt-3 w-full" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" />Invite members (private)</Btn>

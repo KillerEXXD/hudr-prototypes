@@ -29,6 +29,8 @@ export function useAssignCoHostLL() { const inv = useInvalidate(); return useMut
 export function useRemoveCoHostLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; userId: string }) => ll.removeCoHost(v.gameId, v.userId), onSuccess: inv }) }
 export function useUpdateChips() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; chips: number }) => ll.updateChips(v.gameId, userId, v.chips), onSuccess: inv }) }
 export function useBust() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; target: string }) => ll.bust(v.gameId, v.target, userId), onSuccess: inv }) }
+export function useExtendRegLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; closesAt: string }) => ll.extendRegistration(v.gameId, v.closesAt), onSuccess: inv }) }
+export function useCloseRegLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => ll.closeRegistration(gameId), onSuccess: inv }) }
 export function useReinstate() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; target: string }) => ll.reinstate(v.gameId, v.target), onSuccess: inv }) }
 export function usePostChatLL() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; text: string }) => ll.postChat(v.gameId, userId, v.text), onSuccess: inv }) }
 export function useProposeChop() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => ll.proposeChop(gameId, userId), onSuccess: inv }) }

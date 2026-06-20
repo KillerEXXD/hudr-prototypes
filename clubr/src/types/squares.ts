@@ -48,6 +48,8 @@ export interface SquaresGame {
   status: SquaresStatus
   registrationClosesAt?: string
   timezone?: string
+  /** True when a host closed registration BEFORE the scheduled deadline. */
+  regClosedEarly?: boolean
   stake: number
   hostId: string
   coHostIds: string[]

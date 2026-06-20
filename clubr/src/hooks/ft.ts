@@ -46,6 +46,8 @@ export function useSavePicks() {
   const { userId } = useIdentity(); const inv = useInvalidate()
   return useMutation({ mutationFn: (v: { contestId: string; picks: string[] }) => ft.savePicks(v.contestId, userId, v.picks), onSuccess: inv })
 }
+export function useExtendRegFT() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { contestId: string; closesAt: string }) => ft.extendRegistration(v.contestId, v.closesAt), onSuccess: inv }) }
+export function useCloseRegFT() { const inv = useInvalidate(); return useMutation({ mutationFn: (contestId: string) => ft.closeRegistration(contestId), onSuccess: inv }) }
 export function usePostChat() {
   const { userId } = useIdentity(); const inv = useInvalidate()
   return useMutation({ mutationFn: (v: { contestId: string; text: string }) => ft.postChat(v.contestId, userId, v.text), onSuccess: inv })

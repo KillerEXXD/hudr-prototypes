@@ -39,6 +39,8 @@ export interface LLGame {
   registrationClosesAt?: string
   /** Host-selected timezone label for the close time (e.g. 'ET'). */
   timezone?: string
+  /** True when a host closed registration BEFORE the scheduled deadline. */
+  regClosedEarly?: boolean
   /** Prize split percentages by place, summing to 100. Length 1 = winner-takes-all. */
   payouts?: number[]
   stake: number

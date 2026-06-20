@@ -27,6 +27,8 @@ export function useApproveSquareClaim() { const inv = useInvalidate(); return us
 export function useRejectSquareClaim() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; cellIdx: number }) => sq.rejectSquareClaim(v.gameId, v.cellIdx), onSuccess: inv }) }
 export function useApproveAllSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => sq.approveAllSquares(gameId), onSuccess: inv }) }
 export function useLockSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => sq.lockSquares(gameId), onSuccess: inv }) }
+export function useExtendRegSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; closesAt: string }) => sq.extendRegistration(v.gameId, v.closesAt), onSuccess: inv }) }
+export function useCloseRegSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => sq.closeRegistration(gameId), onSuccess: inv }) }
 export function useSetSquaresScore() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; label: string; home: number; away: number }) => sq.setSquaresScore(v.gameId, v.label, v.home, v.away), onSuccess: inv }) }
 export function useCreateSquares() {
   const { userId } = useIdentity(); const inv = useInvalidate()

@@ -117,6 +117,16 @@ export async function lockSquares(gameId: string): Promise<void> {
   g.cells.forEach((c) => { if (c.userId) c.approved = true }) // any still-pending claims are accepted at lock
   g.rowDigits = shuffleDigits(); g.colDigits = shuffleDigits(); g.status = 'live'
 }
+/** Host extends the registration deadline (absolute UTC ISO). Extend-only. */
+export async function extendRegistration(gameId: string, closesAt: string): Promise<void> {
+  await delay(120); const g = SQUARES_GAMES.find((x) => x.id === gameId); if (g) g.registrationClosesAt = closesAt
+}
+/** Host closes registration NOW (early) — digits assigned, board goes live. */
+export async function closeRegistration(gameId: string): Promise<void> {
+  await delay(200); const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
+  g.cells.forEach((c) => { if (c.userId) c.approved = true })
+  g.rowDigits = shuffleDigits(); g.colDigits = shuffleDigits(); g.status = 'live'; g.registrationClosesAt = new Date().toISOString(); g.regClosedEarly = true
+}
 /** Host enters a period's score → the winning square + winner are computed. Final score completes the game. */
 export async function setSquaresScore(gameId: string, label: string, home: number, away: number): Promise<void> {
   await delay(150)

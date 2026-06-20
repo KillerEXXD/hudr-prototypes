@@ -1,9 +1,11 @@
 import { Fragment, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Hand, Dice5, Coins, Stamp } from 'lucide-react'
+import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Hand, Dice5, Coins, Stamp, Clock } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
-import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares } from '@/hooks/squares'
+import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares, useExtendRegSquares, useCloseRegSquares } from '@/hooks/squares'
+import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
+import { RegClosedBanner } from '@/components/games/RegClosedBanner'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, Processing, ProcessingOverlay } from '@/components/common/ui'
 import { PaidToggle } from '@/components/common/PaidToggle'
@@ -11,6 +13,7 @@ import { StakePool } from '@/components/common/StakePool'
 import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { SquaresResults } from '@/components/squares/SquaresResults'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
 import { cn } from '@/lib/utils/cn'
@@ -47,6 +50,9 @@ export function SquaresGamePage() {
   const approveCell = useApproveSquareClaim(); const rejectCell = useRejectSquareClaim(); const approveAll = useApproveAllSquares()
   const lock = useLockSquares()
   const setScore = useSetSquaresScore()
+  const extendReg = useExtendRegSquares()
+  const closeReg = useCloseRegSquares()
+  const [editRegOpen, setEditRegOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
   const [hover, setHover] = useState<{ name: string; color?: string; status?: string } | null>(null)
 
@@ -92,9 +98,14 @@ export function SquaresGamePage() {
       {g.status === 'registration' && (
         <div className="mt-3">
           <CountdownBanner deadline={regDeadline(g.registrationClosesAt)} sub="Claiming closes — grab your squares before the clock hits zero" closedLabel="Awaiting host" />
-          <CloseTimeLabel utcISO={g.registrationClosesAt} className="mt-1 block text-[11px] text-text-muted" />
+          <div className="mt-1 flex items-center justify-between gap-2">
+            <CloseTimeLabel utcISO={g.registrationClosesAt} className="text-[11px] text-text-muted" />
+            {g.canManage && <button type="button" onClick={() => setEditRegOpen(true)} className="flex items-center gap-1 text-[11px] font-semibold text-accent-blue hover:underline cursor-pointer"><Clock className="h-3 w-3" />Edit time</button>}
+          </div>
         </div>
       )}
+      {g.regClosedEarly && g.status !== 'registration' && <RegClosedBanner gameId={g.id} show />}
+      <EditRegistrationSheet open={editRegOpen} onClose={() => setEditRegOpen(false)} currentCloseISO={g.registrationClosesAt} busy={extendReg.isPending || closeReg.isPending} onExtend={(closesAt) => extendReg.mutate({ gameId: g.id, closesAt }, { onSuccess: () => setEditRegOpen(false) })} onCloseReg={() => closeReg.mutate(g.id, { onSuccess: () => setEditRegOpen(false) })} />
 
       {!g.isMemberOfClub && !g.canManage ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to claim squares.</p></Card>
@@ -166,6 +177,8 @@ export function SquaresGamePage() {
         </div>
         <p className="mt-1.5 text-[10px] text-text-muted"><span className="text-accent-purple">Side digit</span> = {g.homeTeam} last digit · <span className="text-accent-blue">Top digit</span> = {g.awayTeam} last digit. {locked ? 'Digits assigned.' : 'Digits hidden until the host locks.'}</p>
       </Section>
+
+      <SquaresResults g={g} />
 
       <Section title="Periods & payouts">
         <div className="flex flex-col gap-1.5">

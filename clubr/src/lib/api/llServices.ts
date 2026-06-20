@@ -157,6 +157,15 @@ export async function postChat(gameId: string, userId: string, text: string): Pr
   if (g && text.trim()) g.chat.push({ id: `lm_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: text.trim(), ts: 'now' })
 }
 
+/** Host extends the registration deadline (absolute UTC ISO). Extend-only. */
+export async function extendRegistration(gameId: string, closesAt: string): Promise<void> {
+  await delay(120); const g = LL_GAMES.find((x) => x.id === gameId); if (g) g.registrationClosesAt = closesAt
+}
+/** Host closes registration NOW (early) — the game goes live. */
+export async function closeRegistration(gameId: string): Promise<void> {
+  await delay(120); const g = LL_GAMES.find((x) => x.id === gameId); if (g) { g.status = 'live'; g.registrationClosesAt = new Date().toISOString(); g.regClosedEarly = true }
+}
+
 export async function proposeChop(gameId: string, byUserId: string): Promise<void> {
   await delay(150)
   const g = LL_GAMES.find((x) => x.id === gameId)

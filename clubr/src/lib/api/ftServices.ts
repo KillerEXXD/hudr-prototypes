@@ -110,6 +110,17 @@ export async function postChat(contestId: string, userId: string, text: string):
   if (c && text.trim()) c.chat.push({ id: `m_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: text.trim(), ts: 'now' })
 }
 
+/** Host extends the registration deadline (absolute UTC ISO). Extend-only. */
+export async function extendRegistration(contestId: string, closesAt: string): Promise<void> {
+  await delay(120); const c = FT_CONTESTS.find((x) => x.id === contestId)
+  if (c) { c.locksAtTs = closesAt; c.locksAt = `Closes ${formatCloseInZone(closesAt, c.timezone)}` }
+}
+/** Host closes registration NOW (early) — drafts lock. */
+export async function closeRegistration(contestId: string): Promise<void> {
+  await delay(120); const c = FT_CONTESTS.find((x) => x.id === contestId)
+  if (c) { c.status = 'locked'; c.locksAtTs = new Date().toISOString(); c.regClosedEarly = true }
+}
+
 export async function listAvailableFTs(): Promise<AvailableFT[]> {
   await delay()
   return [...AVAILABLE_FTS].sort((a, b) => a.hoursLeft - b.hoursLeft)
