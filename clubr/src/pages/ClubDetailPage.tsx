@@ -17,17 +17,23 @@ import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { cn } from '@/lib/utils/cn'
 
-// Club-detail Games filter: status pills (a superset of the home/feed relationship
-// pills — it adds Completed). Hosting shows only to the club's host/admin; everyone
-// else sees Available · Playing · Completed. Default is Available.
-type ClubStatus = 'available' | 'playing' | 'hosting' | 'completed'
+// Club-detail Games filter. A club is the container for ALL its games, so a member
+// can reach every one of them across four buckets: Available · Playing · Running ·
+// Completed (Hosting is an extra, host/admin-only). `Running` is lifecycle-based —
+// it lists EVERY live game in the club regardless of relationship (so live games you
+// neither host nor play are still visible to watch), which is why it can overlap with
+// Playing/Hosting. The relationship pills (available/playing/hosting) are still
+// relationship-based. Default is Available.
+type ClubStatus = 'available' | 'playing' | 'hosting' | 'running' | 'completed'
 
 // No per-pill icons — the active color + ring already signals the category, and
-// dropping them lets all four pills (incl. Completed) fit one mobile row.
+// dropping them keeps the pills on one mobile row. Running uses the app's "live" red
+// (the pulsing live-now dot color); the row scrolls if a host's five pills overflow.
 const STATUS_META: Record<ClubStatus, { label: string; active: string }> = {
   available: { label: 'Available', active: 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' },
   playing: { label: 'Playing', active: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40' },
   hosting: { label: 'Hosting', active: 'border-accent-purple bg-accent-purple/20 text-accent-purple font-bold ring-1 ring-accent-purple/40' },
+  running: { label: 'Running', active: 'border-accent-red bg-accent-red/20 text-accent-red font-bold ring-1 ring-accent-red/40' },
   completed: { label: 'Completed', active: 'border-accent-amber bg-accent-amber/20 text-accent-amber font-bold ring-1 ring-accent-amber/40' },
 }
 
@@ -35,6 +41,7 @@ const EMPTY: Record<ClubStatus, { title: string; sub: string }> = {
   available: { title: 'Nothing to join right now', sub: 'When a game opens for registration, it shows here with a Join button.' },
   playing: { title: "You're not in any games here", sub: 'Join an available game and it moves here.' },
   hosting: { title: "You're not hosting any games here", sub: 'Games you run show here.' },
+  running: { title: 'Nothing running right now', sub: "Live games in this club show here — even ones you haven't joined." },
   completed: { title: 'No completed games yet', sub: 'Finished games show here with their winners and prize pool.' },
 }
 
@@ -73,17 +80,26 @@ export function ClubDetailPage() {
   const typesPresent = GAME_TYPES.filter((t) => clubAll.some((g) => g.type === t.id))
   const byType = (g: UnifiedGame) => gameFilter === 'all' || matchesType(g, gameFilter)
   const canHostHere = club.canManage && user?.role !== 'admin'   // app admins never host/join
-  // Status pills: Available · Playing · Hosting · Completed (Hosting host-only).
-  const statuses: ClubStatus[] = club.canManage ? ['available', 'playing', 'hosting', 'completed'] : ['available', 'playing', 'completed']
+  // Status pills: Available · Playing · Hosting · Running · Completed (Hosting host-only).
+  const statuses: ClubStatus[] = club.canManage
+    ? ['available', 'playing', 'hosting', 'running', 'completed']
+    : ['available', 'playing', 'running', 'completed']
   const active = clubAll.filter((g) => !g.finished)
   const counts: Record<ClubStatus, number> = {
     available: active.filter((g) => byType(g) && relationshipOf(g) === 'available').length,
     playing: active.filter((g) => byType(g) && relationshipOf(g) === 'playing').length,
     hosting: active.filter((g) => byType(g) && relationshipOf(g) === 'hosting').length,
+    // Running = every live game in the club (relationship-agnostic), so members can
+    // see/watch games they haven't joined. Overlaps Playing/Hosting by design.
+    running: active.filter((g) => byType(g) && g.phase === 'live').length,
     completed: clubAll.filter((g) => byType(g) && g.finished).length,
   }
-  // Active pill view: games whose relationship matches the selected pill.
-  const activeShown = active.filter((g) => byType(g) && relationshipOf(g) === gameStatus)
+  // The list for the selected non-completed pill: Running shows all live games;
+  // the relationship pills show games whose relationship matches.
+  const activeShown =
+    gameStatus === 'running'
+      ? active.filter((g) => byType(g) && g.phase === 'live')
+      : active.filter((g) => byType(g) && relationshipOf(g) === gameStatus)
   // Completed: newest first by settled timestamp (falls back to empty → bottom).
   const completedItems = clubAll
     .filter((g) => byType(g) && g.finished)

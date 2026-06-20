@@ -525,11 +525,14 @@ Built from theme tokens (`bg-bg-card/40`, `border-border`) → subtle and correc
 panel uses a **two‑level filter**:
 - **Type** is a **dropdown in the "Games" header** (`All games · FT Fantasy · Last Longer · Squares`),
   **auto‑hidden when the club runs a single type** (nothing to choose).
-- **Status pills** below: **Available · Playing · Hosting · Completed**, default **Available**.
-  **Hosting is host/admin‑only** (`club.canManage`); players see **Available · Playing · Completed**.
+- **Status pills** below: **Available · Playing · Running · Completed**, default **Available** (a
+  **Hosting** pill is inserted before Running for the **host/admin only**, `club.canManage`). The club
+  is the container for **all** its games, so these buckets together let a member reach every one.
   **Available** = games you can **join now** (each card keeps its inline **Join**). **Playing** = games
   you've joined. **Hosting** = games you run; each card shows whether you're **playing** and offers an
-  inline **"Join as player"** when you aren't (the host's own join is auto‑approved). **Completed** =
+  inline **"Join as player"** when you aren't (the host's own join is auto‑approved). **Running** =
+  **every live game in the club**, relationship‑agnostic — so a member can watch live games they neither
+  host nor play (overlaps Playing/Hosting by design; uses the "live" red accent). **Completed** =
   finished games, **infinite‑scroll, newest first by `settledAt`**, rendered as **rich winner cards**:
   the **winner(s)**, the **prize pool** (stake × entrants) and **what each won** — FT podium/winner‑
   takes‑all, Last Longer winner or **chop split**, Squares **period winners**.
