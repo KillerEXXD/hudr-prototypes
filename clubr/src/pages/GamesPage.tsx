@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Gamepad2, Plus, LayoutGrid, type LucideIcon } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
@@ -8,7 +9,7 @@ import { RelationshipPills } from '@/components/games/RelationshipPills'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { useUnifiedGames, matchesType, orderActiveGames } from '@/games/useUnifiedGames'
-import { relationshipOf, defaultRelationship, type Relationship } from '@/games/gameRelationship'
+import { relationshipOf, defaultRelationship, relationshipPills, type Relationship } from '@/games/gameRelationship'
 import { renderUnifiedGame as renderGame } from '@/games/renderGame'
 import { cn } from '@/lib/utils/cn'
 
@@ -27,9 +28,17 @@ export function GamesPage() {
   const canHost = (myClubs.data ?? []).some((c) => c.canManage)
   const isAdmin = user?.role === 'admin'
   const isHost = canHost || isAdmin
-  const [rel, setRel] = useState<Relationship>(defaultRelationship(isHost))
-  const [filter, setFilter] = useState<'all' | GameType>('all')
-  const pickRel = (r: Relationship) => { setRel(r); setFilter('all') }
+  // Keep the active filter in the URL so navigating into a game and pressing Back
+  // returns to the exact pill the user was on (component state would reset to the
+  // default). Written with `replace` so filter changes don't pile up in history.
+  const [params, setParams] = useSearchParams()
+  const allowedRels = relationshipPills(isHost) as string[]
+  const relParam = params.get('rel')
+  const rel: Relationship = relParam && allowedRels.includes(relParam) ? (relParam as Relationship) : defaultRelationship(isHost)
+  const typeParam = params.get('type')
+  const filter: 'all' | GameType = typeParam === 'all' || GAME_TYPES.some((t) => t.id === typeParam) ? (typeParam as 'all' | GameType) : 'all'
+  const setFilter = (f: 'all' | GameType) => setParams((p) => { const n = new URLSearchParams(p); n.set('type', f); return n }, { replace: true })
+  const pickRel = (r: Relationship) => setParams((p) => { const n = new URLSearchParams(p); n.set('rel', r); n.set('type', 'all'); return n }, { replace: true })
   const [newOpen, setNewOpen] = useState(false)
 
   const { isLoading, items } = useUnifiedGames()
