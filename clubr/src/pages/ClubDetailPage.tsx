@@ -129,20 +129,22 @@ export function ClubDetailPage() {
       <div className="flex items-center gap-3">
         <Avatar emoji={club.emoji} color={club.color} size={56} />
         <div className="min-w-0 flex-1">
-          {/* Name + the club's identity badge (visibility). Private gets emphasis
-              (lock + border); Public is quiet (globe, muted). Your ROLE (Owner) is a
-              different question — it stays trailing on the right. */}
+          {/* Name + the club's identity badge (visibility) — a solid, color-coded chip
+              for both states: Private = amber + lock (restricted), Public = emerald +
+              globe (open). Your ROLE (Owner) stays trailing on the right. */}
           <div className="flex items-center gap-1.5">
             <h1 className="truncate text-xl font-extrabold tracking-tight text-text-primary">{club.name}</h1>
             {isPrivate ? (
-              <span className="shrink-0 inline-flex items-center gap-1 rounded-full border border-border bg-bg-surface px-1.5 py-0.5 text-[10px] font-bold text-text-secondary"><Lock className="h-2.5 w-2.5" />Private</span>
+              <span className="shrink-0 inline-flex items-center gap-1 rounded-full border border-accent-amber/40 bg-accent-amber/15 px-2 py-0.5 text-[11px] font-bold text-accent-amber"><Lock className="h-3 w-3" />Private</span>
             ) : (
-              <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-semibold text-text-muted"><Globe className="h-2.5 w-2.5" />Public</span>
+              <span className="shrink-0 inline-flex items-center gap-1 rounded-full border border-accent-emerald/40 bg-accent-emerald/15 px-2 py-0.5 text-[11px] font-bold text-accent-emerald"><Globe className="h-3 w-3" />Public</span>
             )}
           </div>
-          {/* "hosted by" stays muted; the host NAME is emphasized + tappable (the club's
-              trust anchor). Accent rides the hover affordance, not the text fill. */}
-          <p className="text-xs text-text-muted">{members.length} members · hosted by{' '}
+          {/* Member count carries weight + a Users glyph (a legible stat); "hosted by"
+              stays muted with the host NAME emphasized + tappable (accent on hover). */}
+          <p className="text-[13px] text-text-muted">
+            <span className="inline-flex items-center gap-1 font-bold text-text-secondary"><Users className="h-3.5 w-3.5" />{members.length} {members.length === 1 ? 'member' : 'members'}</span>
+            <span className="mx-1">·</span>hosted by{' '}
             <button type="button" onClick={() => navigate(`/member/${club.ownerId}`, { state: { from: `/club/${club.id}` } })}
               className="font-semibold text-text-primary underline-offset-2 hover:text-accent-blue hover:underline cursor-pointer">{club.ownerName}</button>
           </p>

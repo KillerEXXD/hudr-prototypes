@@ -541,13 +541,14 @@ hosting**. Credits are **non‑cash, non‑refundable to money, and non‑transf
 algorithm. It lives as the **Leaderboard tab on the Club Detail page** — never a top‑level nav
 destination (reinforces club scope).
 
-**Club Detail page header:** the club **name** carries a small **visibility chip** beside it (the
-club's identity) — **Private** = lock + bordered (emphasis), **Public** = globe + muted (quiet, so the
-two don't read equal‑weight). The viewer's **role** (e.g. *Owner*) is a different question and stays
-**trailing on the right**, not in the identity cluster. **"hosted by &lt;name&gt;"** keeps a muted
-label but the **host name is emphasized and tappable** to their member page (the host is the club's
-trust anchor); the accent rides the hover affordance, not the text fill, so it reads as a person on
-every skin.
+**Club Detail page header:** the club **name** carries a **visibility chip** beside it (the club's
+identity) — a **solid, color‑coded chip for both states** so it reads at a glance: **Private** =
+amber + lock (restricted), **Public** = emerald + globe (open). The viewer's **role** (e.g. *Owner*)
+is a different question and stays **trailing on the right**, not in the identity cluster. The
+**member count** carries weight + a Users glyph (a legible stat, not muted small print). **"hosted by
+&lt;name&gt;"** keeps a muted label but the **host name is emphasized and tappable** to their member
+page (the host is the club's trust anchor); the accent rides the hover affordance, not the text fill,
+so it reads as a person on every skin.
 
 **Club Detail page IA (tabbed):** a segmented control under the club header — **Games · Leaderboard ·
 Members** — defaulting to Games. **Members is host/admin‑only** (players never see the roster; the
