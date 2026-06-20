@@ -4,6 +4,8 @@ import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
+import { PrivateGameCard } from '@/components/games/PrivateGameCard'
+import { isPrivateGate } from '@/lib/api/privateGame'
 import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame, useExtendRegLL, useCloseRegLL } from '@/hooks/ll'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
@@ -64,6 +66,7 @@ export function LastLongerGamePage() {
 
   if (isLoading) return <Spinner label="Loading game…" />
   if (!g) return <EmptyState title="Game not found" />
+  if (isPrivateGate(g)) return <PrivateGameCard info={g.private} />
 
   const me = g.me
   const isAdmin = user?.role === 'admin'

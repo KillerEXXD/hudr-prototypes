@@ -5,6 +5,7 @@ import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
 import { ECONOMY, refund } from '@/data/creditsStore'
 import { FINISH_POINTS, type AvailableFT, type ContestEntry, type FTContest, type FTContestView, type FTPlayer } from '@/types/ft'
+import { type PrivateGate, type PrivateGameInfo } from '@/lib/api/privateGame'
 import { formatCloseInZone } from '@/lib/gameSetup'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
@@ -53,10 +54,11 @@ export async function listContests(userId: string, isAdmin = false): Promise<FTC
     .sort((a, b) => Number(a.status === 'settled') - Number(b.status === 'settled'))
 }
 
-export async function getContest(id: string, userId: string, isAdmin = false): Promise<FTContestView | null> {
+export async function getContest(id: string, userId: string, isAdmin = false): Promise<FTContestView | PrivateGate | null> {
   await delay()
   const c = FT_CONTESTS.find((x) => x.id === id)
-  if (!c || !canView(c, userId, isAdmin)) return null
+  if (!c) return null
+  if (!canView(c, userId, isAdmin)) return { private: { clubId: c.clubId, clubName: c.clubName, ownerName: CLUBS.find((x) => x.id === c.clubId)?.ownerName ?? 'the club owner' } satisfies PrivateGameInfo }
   return toView(c, userId, isAdmin)
 }
 

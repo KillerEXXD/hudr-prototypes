@@ -4,6 +4,7 @@ import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
 import { ECONOMY, refund } from '@/data/creditsStore'
 import { emptyGrid, type SquaresGame, type SquaresGameView } from '@/types/squares'
+import { type PrivateGate, type PrivateGameInfo } from '@/lib/api/privateGame'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 const isMember = (clubId: string, userId: string) => !!CLUBS.find((c) => c.id === clubId)?.members.some((m) => m.userId === userId && m.status === 'member')
@@ -30,10 +31,12 @@ export async function listSquares(userId: string, isAdmin = false): Promise<Squa
   await delay()
   return SQUARES_GAMES.filter((g) => canView(g, userId, isAdmin)).map((g) => toView(g, userId, isAdmin))
 }
-export async function getSquares(id: string, userId: string, isAdmin = false): Promise<SquaresGameView | null> {
+export async function getSquares(id: string, userId: string, isAdmin = false): Promise<SquaresGameView | PrivateGate | null> {
   await delay()
   const g = SQUARES_GAMES.find((x) => x.id === id)
-  return g && canView(g, userId, isAdmin) ? toView(g, userId, isAdmin) : null
+  if (!g) return null
+  if (!canView(g, userId, isAdmin)) return { private: { clubId: g.clubId, clubName: g.clubName, ownerName: CLUBS.find((x) => x.id === g.clubId)?.ownerName ?? 'the club owner' } satisfies PrivateGameInfo }
+  return toView(g, userId, isAdmin)
 }
 
 export async function createSquares(clubId: string, hostId: string, input: { title: string; homeTeam: string; awayTeam: string; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; periodPayouts: number[] }): Promise<string> {

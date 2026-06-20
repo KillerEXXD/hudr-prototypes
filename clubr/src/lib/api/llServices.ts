@@ -5,6 +5,7 @@ import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
 import { ECONOMY, refund } from '@/data/creditsStore'
 import type { LLGame, LLGameView, LLParticipant } from '@/types/ll'
+import { type PrivateGate, type PrivateGameInfo } from '@/lib/api/privateGame'
 import { fmtChips } from '@/lib/utils/chipFormat'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
@@ -51,10 +52,11 @@ export async function listGames(userId: string, isAdmin = false): Promise<LLGame
     .sort((a, b) => Number(a.status === 'completed') - Number(b.status === 'completed'))
 }
 
-export async function getGame(id: string, userId: string, isAdmin = false): Promise<LLGameView | null> {
+export async function getGame(id: string, userId: string, isAdmin = false): Promise<LLGameView | PrivateGate | null> {
   await delay()
   const g = LL_GAMES.find((x) => x.id === id)
-  if (!g || !canView(g, userId, isAdmin)) return null
+  if (!g) return null
+  if (!canView(g, userId, isAdmin)) return { private: { clubId: g.clubId, clubName: g.clubName, ownerName: CLUBS.find((c) => c.id === g.clubId)?.ownerName ?? 'the club owner' } satisfies PrivateGameInfo }
   return toView(g, userId, isAdmin)
 }
 

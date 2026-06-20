@@ -4,6 +4,8 @@ import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
+import { PrivateGameCard } from '@/components/games/PrivateGameCard'
+import { isPrivateGate } from '@/lib/api/privateGame'
 import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares, useExtendRegSquares, useCloseRegSquares } from '@/hooks/squares'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
@@ -59,6 +61,7 @@ export function SquaresGamePage() {
 
   if (isLoading) return <Spinner label="Loading squares…" />
   if (!g) return <EmptyState title="Game not found" />
+  if (isPrivateGate(g)) return <PrivateGameCard info={g.private} />
 
   const me = g.me
   const isAdmin = user?.role === 'admin'

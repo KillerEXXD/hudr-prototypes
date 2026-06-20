@@ -4,6 +4,8 @@ import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield,
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
+import { PrivateGameCard } from '@/components/games/PrivateGameCard'
+import { isPrivateGate } from '@/lib/api/privateGame'
 import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest, useExtendRegFT, useCloseRegFT } from '@/hooks/ft'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
@@ -54,6 +56,7 @@ export function ContestDetailPage() {
 
   if (isLoading) return <Spinner label="Loading contest…" />
   if (!c) return <EmptyState title="Contest not found" />
+  if (isPrivateGate(c)) return <PrivateGameCard info={c.private} />
 
   const me = c.myEntry
   const isAdmin = user?.role === 'admin'
