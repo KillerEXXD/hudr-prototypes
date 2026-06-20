@@ -15,6 +15,12 @@ describe('relationshipOf', () => {
     expect(relationshipOf(g({ iCoHost: true, mine: true, phase: 'live' }))).toBe('playing') // co-host who also plays
     expect(relationshipOf(g({ iCoHost: true, phase: 'reg' }))).toBe('playing')              // even on a reg-open game
   })
+  it('a cancelled game is terminal — never Available/joinable (phase closed, finished)', () => {
+    // useUnifiedGames maps cancelled → finished + phase 'closed', so it cannot reach 'reg'.
+    expect(relationshipOf(g({ cancelled: true, finished: true, phase: 'closed' }))).toBeNull()
+    // ...even if it were someone else's reg-open game before cancellation, it's not Available now.
+    expect(relationshipOf(g({ cancelled: true, finished: true, phase: 'closed', mine: false }))).toBeNull()
+  })
   it('playing when you joined it and do not host it', () => {
     expect(relationshipOf(g({ mine: true }))).toBe('playing')
     expect(relationshipOf(g({ mine: true, phase: 'live' }))).toBe('playing')

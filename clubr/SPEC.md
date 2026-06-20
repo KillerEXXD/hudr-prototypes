@@ -474,6 +474,14 @@ later). Navigation is by **entity/activity, never by game type**:
   **"+ New"** that opens the same chooser pinned to that club (`fixedClubId`). No more hard‑coded
   per‑type sub‑sections — a new game type appears here automatically. The Games tab is the
   cross‑club aggregation of the same items (each carries `clubId`).
+  - **Status pills here are role‑conditional** (a partition with **no mobile overflow**, club‑detail
+    only — the cross‑page Games feed keeps Available · Playing · Hosting): **App Admin** →
+    Available · Running · Finished · **Club Host** (owner) → Playing · **Hosting** (= every active
+    game you're not playing) · Finished · **Member** → Available · Playing · **Running** (= live
+    games you're not playing) · Finished. **Finished** is terminal — settled **and cancelled** (a
+    cancelled game shows a muted "Cancelled" card; the global `useUnifiedGames` mapping treats
+    cancelled as terminal so it never reads as joinable anywhere). **Empty pills hidden**; default
+    pill **role‑tuned**, falling to the first non‑empty one.
 - **One create entry:** a single **"+ New game"** → *"What do you want to host?"* type chooser →
   the chosen type's create flow (`NewGameSheet.tsx`). Hidden for App Admin (overseer‑only).
 - Every card uses one envelope — **type badge · club · status · StakePool (buy‑in·joined·pool) ·

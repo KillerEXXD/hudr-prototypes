@@ -27,9 +27,9 @@ export type GamePhase = 'reg' | 'live' | 'closed'
 // `iHost` so an admin/club-owner who merely oversees a game they play isn't
 // mislabelled "Hosting" (the card chip already uses this real signal).
 export type UnifiedGame =
-  | { type: 'ft_fantasy'; id: string; clubId: string; canManage: boolean; iHost: boolean; iCoHost: boolean; finished: boolean; phase: GamePhase; mine: boolean; pending: boolean; sort: number; settledAt?: string; createdAt?: string; joinedAt?: string; ft: FTContestView }
-  | { type: 'last_longer'; id: string; clubId: string; canManage: boolean; iHost: boolean; iCoHost: boolean; finished: boolean; phase: GamePhase; mine: boolean; pending: boolean; sort: number; settledAt?: string; createdAt?: string; joinedAt?: string; ll: LLGameView }
-  | { type: 'football_squares'; id: string; clubId: string; canManage: boolean; iHost: boolean; iCoHost: boolean; finished: boolean; phase: GamePhase; mine: boolean; pending: boolean; sort: number; settledAt?: string; createdAt?: string; joinedAt?: string; sq: SquaresGameView }
+  | { type: 'ft_fantasy'; id: string; clubId: string; canManage: boolean; iHost: boolean; iCoHost: boolean; finished: boolean; cancelled: boolean; phase: GamePhase; mine: boolean; pending: boolean; sort: number; settledAt?: string; createdAt?: string; joinedAt?: string; ft: FTContestView }
+  | { type: 'last_longer'; id: string; clubId: string; canManage: boolean; iHost: boolean; iCoHost: boolean; finished: boolean; cancelled: boolean; phase: GamePhase; mine: boolean; pending: boolean; sort: number; settledAt?: string; createdAt?: string; joinedAt?: string; ll: LLGameView }
+  | { type: 'football_squares'; id: string; clubId: string; canManage: boolean; iHost: boolean; iCoHost: boolean; finished: boolean; cancelled: boolean; phase: GamePhase; mine: boolean; pending: boolean; sort: number; settledAt?: string; createdAt?: string; joinedAt?: string; sq: SquaresGameView }
 
 export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } {
   const contests = useContests()
@@ -40,21 +40,21 @@ export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } 
   const items: UnifiedGame[] = [
     ...(contests.data ?? []).map((c): UnifiedGame => ({
       type: 'ft_fantasy', id: c.id, clubId: c.clubId, canManage: c.canManage, iHost: isGameHost(c, me), iCoHost: isGameCoHost(c, me),
-      finished: c.status === 'settled', phase: c.status === 'settled' ? 'closed' : c.status === 'locked' ? 'live' : 'reg', mine: c.myEntry != null, pending: c.myEntry?.status === 'pending',
+      cancelled: c.status === 'cancelled', finished: c.status === 'settled' || c.status === 'cancelled', phase: c.status === 'settled' || c.status === 'cancelled' ? 'closed' : c.status === 'locked' ? 'live' : 'reg', mine: c.myEntry != null, pending: c.myEntry?.status === 'pending',
       sort: c.status === 'settled' ? Number.MAX_SAFE_INTEGER : (regDeadline(c.locksAtTs ?? c.locksAt) ?? Number.MAX_SAFE_INTEGER),
       settledAt: c.settledAt, createdAt: c.createdAt, joinedAt: c.myEntry?.joinedAt,
       ft: c,
     })),
     ...(games.data ?? []).map((g): UnifiedGame => ({
       type: 'last_longer', id: g.id, clubId: g.clubId, canManage: g.canManage, iHost: isGameHost(g, me), iCoHost: isGameCoHost(g, me),
-      finished: g.status === 'completed', phase: g.status === 'completed' ? 'closed' : g.status === 'live' ? 'live' : 'reg', mine: g.me != null, pending: g.me?.status === 'pending',
+      cancelled: g.status === 'cancelled', finished: g.status === 'completed' || g.status === 'cancelled', phase: g.status === 'completed' || g.status === 'cancelled' ? 'closed' : g.status === 'live' ? 'live' : 'reg', mine: g.me != null, pending: g.me?.status === 'pending',
       sort: g.status === 'completed' ? Number.MAX_SAFE_INTEGER : (g.status === 'live' ? 0 : (regDeadline(g.registrationClosesAt) ?? Number.MAX_SAFE_INTEGER)),
       settledAt: g.settledAt, createdAt: g.createdAt, joinedAt: g.me?.joinedAt,
       ll: g,
     })),
     ...(squares.data ?? []).map((s): UnifiedGame => ({
       type: 'football_squares', id: s.id, clubId: s.clubId, canManage: s.canManage, iHost: isGameHost(s, me), iCoHost: isGameCoHost(s, me),
-      finished: s.status === 'completed', phase: s.status === 'completed' ? 'closed' : s.status === 'live' ? 'live' : 'reg', mine: s.me != null, pending: s.me?.status === 'pending',
+      cancelled: s.status === 'cancelled', finished: s.status === 'completed' || s.status === 'cancelled', phase: s.status === 'completed' || s.status === 'cancelled' ? 'closed' : s.status === 'live' ? 'live' : 'reg', mine: s.me != null, pending: s.me?.status === 'pending',
       sort: s.status === 'completed' ? Number.MAX_SAFE_INTEGER : (s.status === 'live' ? 0 : (regDeadline(s.registrationClosesAt) ?? Number.MAX_SAFE_INTEGER)),
       settledAt: s.settledAt, createdAt: s.createdAt, joinedAt: s.me?.joinedAt,
       sq: s,

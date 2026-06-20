@@ -1,7 +1,12 @@
-import { Trophy, Coins, Scissors } from 'lucide-react'
+import { Trophy, Coins, Scissors, Ban } from 'lucide-react'
 import { Card, Badge } from '@/components/common/ui'
 import { gameTypeDef } from '@/games/types'
 import type { UnifiedGame } from '@/games/useUnifiedGames'
+
+/** Cancel reason, per game type (set when status === 'cancelled'). */
+function cancelReasonOf(g: UnifiedGame): string | undefined {
+  return g.type === 'ft_fantasy' ? g.ft.cancelReason : g.type === 'last_longer' ? g.ll.cancelReason : g.sq.cancelReason
+}
 
 /** Compact relative time for a completed game. */
 function ago(iso?: string): string {
@@ -52,11 +57,24 @@ function summarize(g: UnifiedGame): Summary {
   return { typeId: 'football_squares', title: sq.title, pool, entrants: sq.claimedCount, winners }
 }
 
-/** Rich Completed card: who won, the prize pool, and each payout. */
+/** Rich Completed card: who won, the prize pool, and each payout. A cancelled
+ *  game is terminal too (it shows in the "Finished" pill), but it has no winner —
+ *  render a distinct, muted "Cancelled" card with the host's reason instead. */
 export function WinnerCard({ g }: { g: UnifiedGame }) {
   const s = summarize(g)
-  const top = s.winners[0]
   const def = gameTypeDef(s.typeId)
+  if (g.cancelled) {
+    const reason = cancelReasonOf(g)
+    return (
+      <Card className="flex items-center gap-2 opacity-90">
+        {def && <span className={`flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold ${def.chipActive}`}><def.icon className="h-3 w-3" />{def.short}</span>}
+        <span className="min-w-0 flex-1 truncate text-sm font-bold text-text-muted line-through">{s.title}</span>
+        {reason ? <span className="hidden truncate text-[11px] text-text-muted sm:block">{reason}</span> : null}
+        <Badge tone="red"><Ban className="h-3 w-3" />Cancelled</Badge>
+      </Card>
+    )
+  }
+  const top = s.winners[0]
   return (
     <Card className="flex flex-col gap-2">
       <div className="flex items-center gap-2 text-xs text-text-muted">

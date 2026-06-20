@@ -19,6 +19,8 @@ export function relationshipOf(g: UnifiedGame): Relationship | null {
   if (g.iHost) return 'hosting' // the HOST only — co-hosts go to Playing
   // Co-hosts live under Playing (the card shows a "Co-host" badge), as do approved players.
   if (g.iCoHost || (g.mine && !g.pending)) return 'playing'
+  // A cancelled game is terminal (`finished`, phase 'closed' — see useUnifiedGames),
+  // so it never reaches 'reg' here and is correctly excluded from the active buckets.
   if (g.phase === 'reg') return 'available' // Open: not joined, OR your pending request (waiting)
   return null
 }
