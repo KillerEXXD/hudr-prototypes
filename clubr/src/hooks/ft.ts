@@ -52,6 +52,14 @@ export function usePostChat() {
   const { userId } = useIdentity(); const inv = useInvalidate()
   return useMutation({ mutationFn: (v: { contestId: string; text: string }) => ft.postChat(v.contestId, userId, v.text), onSuccess: inv })
 }
+export function useSetFinishingOrder() {
+  const inv = useInvalidate()
+  return useMutation({ mutationFn: (v: { contestId: string; order: string[] }) => ft.setFinishingOrder(v.contestId, v.order), onSuccess: inv })
+}
+export function useCancelFT() {
+  const inv = useInvalidate()
+  return useMutation({ mutationFn: (v: { contestId: string; reason: string }) => ft.cancelContest(v.contestId, v.reason), onSuccess: inv })
+}
 export function useAvailableFTs() {
   return useQuery({ queryKey: ['ft', 'available'], queryFn: () => ft.listAvailableFTs() })
 }

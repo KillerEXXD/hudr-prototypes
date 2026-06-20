@@ -200,6 +200,51 @@ export async function rejectChop(gameId: string, userId: string, reason: string)
 
 function ord(n: number) { return n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th' }
 
+/**
+ * Result of a host "Complete" attempt: `done:true` when a winner was recorded,
+ * or `done:false` + an `audit` explaining why not (mock-only — there's no
+ * contract layer in the prototype, so the type lives here).
+ */
+export interface CompleteResult {
+  done: boolean
+  audit?: { blockers: string[]; hint?: string }
+}
+
+/**
+ * Host completes the game. Requires a determined winner (1 survivor / agreed
+ * chop / everyone out); otherwise returns `{ done: false, audit }` so the UI can
+ * explain why and what to do. Mirrors the live edge `completable()` rule.
+ */
+export function mockComplete(g: LLGame): CompleteResult {
+  if (g.status === 'completed') return { done: false, audit: { blockers: ['This game is already completed.'] } }
+  if (g.status === 'cancelled') return { done: false, audit: { blockers: ['This game was cancelled.'] } }
+  const active = g.participants.filter((p) => p.status === 'active')
+  const out = g.participants.filter((p) => p.status === 'out')
+  const chopAgreed = !!g.chop && g.chop.agreements.length > 0 && g.chop.agreements.every((a) => a.agreed)
+  if (chopAgreed) { g.participants.forEach((p) => { if (p.status === 'active') { p.status = 'out'; p.finishPos = 1 } }); g.status = 'completed'; g.winnerName = 'Chopped'; return { done: true } }
+  if (active.length === 1) { active[0].status = 'out'; active[0].finishPos = 1; g.status = 'completed'; g.winnerName = active[0].name; return { done: true } }
+  if (active.length === 0) {
+    if (out.length === 0) return { done: false, audit: { blockers: ['No players have played yet — there is no winner to record.'], hint: 'Admit players and start the game first.' } }
+    g.status = 'completed'; g.winnerName = g.participants.find((p) => p.finishPos === 1)?.name ?? 'Winner'; return { done: true }
+  }
+  return { done: false, audit: { blockers: [`${active.length} players are still active — there's no single winner yet.`], hint: 'Bust players down to one survivor, or run a chop, then complete.' } }
+}
+export async function completeGame(gameId: string): Promise<CompleteResult> {
+  await delay(150)
+  const g = LL_GAMES.find((x) => x.id === gameId)
+  if (!g) return { done: false, audit: { blockers: ['Game not found.'] } }
+  return mockComplete(g)
+}
+/** Host cancels the game with a reason. Voids it (no winner). */
+export async function cancelGame(gameId: string, reason: string): Promise<void> {
+  await delay(150)
+  const g = LL_GAMES.find((x) => x.id === gameId)
+  if (!g) return
+  const r = reason.trim()
+  g.status = 'cancelled'; g.cancelReason = r || undefined; g.cancelledAt = new Date().toISOString()
+  g.chat.push({ id: `lm_${Date.now()}`, userId: '', name: 'ClubR', avatarColor: '#ef4444', text: `🚫 Game cancelled${r ? ` — ${r}` : ''}`, ts: 'now', kind: 'system' })
+}
+
 export async function createGame(clubId: string, hostId: string, input: { title: string; location: string; mode: 'in-person' | 'online'; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; payouts: number[] }): Promise<string> {
   await delay()
   const club = CLUBS.find((c) => c.id === clubId)

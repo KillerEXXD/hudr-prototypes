@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, Coins, RotateCcw, X } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, Coins, RotateCcw, X, Ban, AlertTriangle, Flag } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
 import { PrivateGameCard } from '@/components/games/PrivateGameCard'
 import { isPrivateGate } from '@/lib/api/privateGame'
-import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useRejectChop, useInviteToGame, useExtendRegLL, useCloseRegLL } from '@/hooks/ll'
+import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useRejectChop, useInviteToGame, useExtendRegLL, useCloseRegLL, useCompleteLL, useCancelLL } from '@/hooks/ll'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
+import { CancelGameSheet } from '@/components/games/CancelGameSheet'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { CoHostSheet } from '@/components/ll/CoHostSheet'
@@ -57,12 +58,15 @@ export function LastLongerGamePage() {
   const invite = useInviteToGame()
   const extendReg = useExtendRegLL()
   const closeReg = useCloseRegLL()
+  const complete = useCompleteLL(); const cancel = useCancelLL()
   const [editRegOpen, setEditRegOpen] = useState(false)
   const [chipInput, setChipInput] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
   const [coHostOpen, setCoHostOpen] = useState(false)
   const [confirmBust, setConfirmBust] = useState<{ target: string; name: string; self: boolean } | null>(null)
+  const [cancelOpen, setCancelOpen] = useState(false)
+  const [completeAudit, setCompleteAudit] = useState<{ blockers: string[]; hint?: string } | null>(null)
   const [rejectOpen, setRejectOpen] = useState(false)
   const [rejectReason, setRejectReason] = useState('')
 
@@ -126,6 +130,13 @@ export function LastLongerGamePage() {
         </Card>
       )}
 
+      {g.status === 'cancelled' && (
+        <Card className="mt-3 flex items-start gap-2 border-accent-red/30 bg-accent-red/10">
+          <Ban className="mt-0.5 h-5 w-5 shrink-0 text-accent-red" />
+          <div><p className="text-sm font-bold text-text-primary">Game cancelled by the host</p>{g.cancelReason && <p className="mt-0.5 text-xs text-text-secondary">{g.cancelReason}</p>}</div>
+        </Card>
+      )}
+
       {/* Chop proposal */}
       {g.chop && g.status !== 'completed' && (
         <Card className="mt-3 border-accent-amber/30 bg-accent-amber/10">
@@ -167,7 +178,7 @@ export function LastLongerGamePage() {
       )}
 
       {/* My status / actions (admins oversee — they don't play) */}
-      {g.status !== 'completed' && !isAdmin && (
+      {g.status !== 'completed' && g.status !== 'cancelled' && !isAdmin && (
         <Section title="You">
           {!g.isMemberOfClub && !g.canManage ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to play.</p></Card>
@@ -196,6 +207,18 @@ export function LastLongerGamePage() {
       {/* Host actions */}
       {g.canManage && g.status === 'live' && g.activeCount > 1 && !g.chop && (
         <Btn variant="secondary" className="mt-3 w-full" loading={proposeChop.isPending} onClick={() => proposeChop.mutate(g.id)}><Scissors className="h-4 w-4" />Propose a chop</Btn>
+      )}
+
+      {/* Complete / Cancel — host can end the game any time. Complete requires a
+          determined winner; otherwise it returns an audit explaining why not. */}
+      {g.canManage && (g.status === 'live' || g.status === 'registration') && (
+        <div className="mt-3 flex gap-2">
+          <Btn variant="secondary" className="flex-1" loading={complete.isPending}
+            onClick={() => complete.mutate(g.id, { onSuccess: (res) => { if (!res.done) setCompleteAudit(res.audit ?? { blockers: ['Can’t complete yet.'] }) } })}>
+            <Flag className="h-4 w-4" />Complete game
+          </Btn>
+          <Btn variant="danger" className="flex-1" onClick={() => setCancelOpen(true)}><Ban className="h-4 w-4" />Cancel game</Btn>
+        </div>
       )}
 
       {/* Standings (was "Leaderboard" — distinct from the club Leaderboard tab) */}
@@ -241,6 +264,22 @@ export function LastLongerGamePage() {
 
       {/* Per-game chat — floating bubble + slide-up sheet, scoped to this game (key={g.id}). */}
       <FloatingChat key={g.id} messages={g.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ gameId: g.id, text })} />
+
+      <CancelGameSheet key={cancelOpen ? 'cancel-open' : 'cancel-closed'} open={cancelOpen} onClose={() => setCancelOpen(false)} gameLabel="Last Longer" busy={cancel.isPending}
+        onCancel={(reason) => cancel.mutate({ gameId: g.id, reason }, { onSuccess: () => setCancelOpen(false) })} />
+
+      {/* Complete audit — why the game can't be completed yet + what to do. */}
+      <Sheet open={!!completeAudit} onClose={() => setCompleteAudit(null)} title="Can't complete yet">
+        <div className="flex flex-col gap-3">
+          <div className="rounded-xl border border-accent-amber/40 bg-accent-amber/10 p-3">
+            {completeAudit?.blockers.map((b, i) => (
+              <p key={i} className="flex items-start gap-1.5 text-sm font-semibold text-text-primary"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />{b}</p>
+            ))}
+            {completeAudit?.hint && <p className="mt-2 pl-5 text-xs text-text-secondary">{completeAudit.hint}</p>}
+          </div>
+          <Btn className="w-full" onClick={() => setCompleteAudit(null)}>Got it</Btn>
+        </div>
+      </Sheet>
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={g.clubId} accessUserIds={g.accessUserIds ?? []} accent="amber" onInvite={(ids) => invite.mutate({ gameId: g.id, userIds: ids })} isPending={invite.isPending} />
       <CoHostSheet open={coHostOpen} onClose={() => setCoHostOpen(false)} g={g} assign={assignCoHost} remove={removeCoHost} />

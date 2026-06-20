@@ -41,7 +41,7 @@ export interface ChatMsg {
   kind?: 'user' | 'system'
 }
 
-export type ContestStatusFull = 'open' | 'locked' | 'settled'
+export type ContestStatusFull = 'open' | 'locked' | 'settled' | 'cancelled'
 
 export interface FTContest {
   id: string
@@ -80,6 +80,10 @@ export interface FTContest {
   settledAt?: string
   /** ISO timestamp when created — for the Available tab's "latest created first" sort. */
   createdAt?: string
+  /** Host-supplied reason, present when status === 'cancelled'. */
+  cancelReason?: string
+  /** ISO timestamp when the host cancelled. */
+  cancelledAt?: string
   entries: ContestEntry[]
   chat: ChatMsg[]
 }

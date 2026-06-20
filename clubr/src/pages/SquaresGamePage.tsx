@@ -1,13 +1,15 @@
 import { Fragment, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Hand, Dice5, Coins, Stamp, Clock } from 'lucide-react'
+import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Hand, Dice5, Coins, Stamp, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
 import { PrivateGameCard } from '@/components/games/PrivateGameCard'
 import { isPrivateGate } from '@/lib/api/privateGame'
-import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares, useExtendRegSquares, useCloseRegSquares } from '@/hooks/squares'
+import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares, useExtendRegSquares, useCloseRegSquares, useCancelSquares } from '@/hooks/squares'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
+import { CancelGameSheet } from '@/components/games/CancelGameSheet'
+import { squaresCompleteAudit } from '@/lib/squares/completeAudit'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Spinner, EmptyState, Processing, ProcessingOverlay } from '@/components/common/ui'
@@ -55,9 +57,12 @@ export function SquaresGamePage() {
   const setScore = useSetSquaresScore()
   const extendReg = useExtendRegSquares()
   const closeReg = useCloseRegSquares()
+  const cancel = useCancelSquares()
   const [editRegOpen, setEditRegOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
   const [hover, setHover] = useState<{ name: string; color?: string; status?: string } | null>(null)
+  const [cancelOpen, setCancelOpen] = useState(false)
+  const [completeAudit, setCompleteAudit] = useState<{ blockers: string[]; hint?: string } | null>(null)
 
   if (isLoading) return <Spinner label="Loading squares…" />
   if (!g) return <EmptyState title="Game not found" />
@@ -112,7 +117,14 @@ export function SquaresGamePage() {
       {g.regClosedEarly && g.status !== 'registration' && <RegClosedBanner gameId={g.id} show />}
       <EditRegistrationSheet open={editRegOpen} onClose={() => setEditRegOpen(false)} currentCloseISO={g.registrationClosesAt} busy={extendReg.isPending || closeReg.isPending} onExtend={(closesAt) => extendReg.mutate({ gameId: g.id, closesAt }, { onSuccess: () => setEditRegOpen(false) })} onCloseReg={() => closeReg.mutate(g.id, { onSuccess: () => setEditRegOpen(false) })} />
 
-      {!g.isMemberOfClub && !g.canManage ? (
+      {g.status === 'cancelled' && (
+        <Card className="mt-3 flex items-start gap-2 border-accent-red/30 bg-accent-red/10">
+          <Ban className="mt-0.5 h-5 w-5 shrink-0 text-accent-red" />
+          <div><p className="text-sm font-bold text-text-primary">Game cancelled by the host</p>{g.cancelReason && <p className="mt-0.5 text-xs text-text-secondary">{g.cancelReason}</p>}</div>
+        </Card>
+      )}
+
+      {g.status !== 'cancelled' && (!g.isMemberOfClub && !g.canManage ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to claim squares.</p></Card>
       ) : !me && !isAdmin ? (
         <Btn className="mt-3 w-full" loading={join.isPending} onClick={async () => { if (await spend({ cost: joinCost, kind: 'join', label: `Joined ${g.title}`, title: g.canManage ? 'Join your board' : 'Join this board', verb: 'Join' })) join.mutate(g.id) }}><UserPlus className="h-4 w-4" />{g.canManage ? 'Join as a player' : 'Request to join'} · {joinCost} cr</Btn>
@@ -128,7 +140,7 @@ export function SquaresGamePage() {
           </div>
           <span className="flex shrink-0 items-center gap-1.5 text-xs text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></span>
         </div>
-      ) : null}
+      ) : null)}
 
       {canClaim && <p className="mt-2 text-[11px] text-text-secondary">Tap an empty square to claim it — your claim is <span className="text-accent-amber font-semibold">pending the host's approval</span>. Tap one of your pending (amber) squares to <b>withdraw</b>; once the host approves it, it's <b>locked in</b>. Digits stay sealed until lock.</p>}
       {hostCanApprove && <p className="mt-2 text-[11px] text-text-secondary">You're the host — <span className="text-accent-amber font-semibold">tap any amber (pending) square to approve it</span>, or use the approval queue below.</p>}
@@ -278,8 +290,34 @@ export function SquaresGamePage() {
               })}
             </div>
           )}
+
+          {(g.status === 'registration' || g.status === 'live') && (
+            <div className="mt-3 flex gap-2">
+              <Btn variant="secondary" className="flex-1"
+                onClick={() => setCompleteAudit(squaresCompleteAudit(g.status, g.periods.find((p) => p.label === 'Final')?.homeScore != null))}>
+                <Flag className="h-4 w-4" />Complete game
+              </Btn>
+              <Btn variant="danger" className="flex-1" onClick={() => setCancelOpen(true)}><Ban className="h-4 w-4" />Cancel game</Btn>
+            </div>
+          )}
         </Section>
       )}
+
+      <CancelGameSheet key={cancelOpen ? 'cancel-open' : 'cancel-closed'} open={cancelOpen} onClose={() => setCancelOpen(false)} gameLabel="Squares game" busy={cancel.isPending}
+        onCancel={(reason) => cancel.mutate({ gameId: g.id, reason }, { onSuccess: () => setCancelOpen(false) })} />
+
+      {/* Complete audit — Squares completes when the host enters the Final score. */}
+      <Sheet open={!!completeAudit} onClose={() => setCompleteAudit(null)} title="Can't complete yet">
+        <div className="flex flex-col gap-3">
+          <div className="rounded-xl border border-accent-amber/40 bg-accent-amber/10 p-3">
+            {completeAudit?.blockers.map((b, i) => (
+              <p key={i} className="flex items-start gap-1.5 text-sm font-semibold text-text-primary"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />{b}</p>
+            ))}
+            {completeAudit?.hint && <p className="mt-2 pl-5 text-xs text-text-secondary">{completeAudit.hint}</p>}
+          </div>
+          <Btn className="w-full" onClick={() => setCompleteAudit(null)}>Got it</Btn>
+        </div>
+      </Sheet>
 
       <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="Squares — how it works">
         <HowItWorks steps={SQUARES_STEPS} dotBg="bg-accent-emerald" iconColor="text-accent-emerald" />

@@ -3,7 +3,7 @@
 // =====================================================================
 import type { ChatMsg } from './ft'
 
-export type LLStatus = 'registration' | 'live' | 'completed'
+export type LLStatus = 'registration' | 'live' | 'completed' | 'cancelled'
 export type LLParticipantStatus = 'pending' | 'active' | 'out'
 
 export interface LLParticipant {
@@ -55,6 +55,10 @@ export interface LLGame {
   settledAt?: string
   /** ISO timestamp when created — for the Available tab's "latest created first" sort. */
   createdAt?: string
+  /** Host-supplied reason, present when status === 'cancelled'. */
+  cancelReason?: string
+  /** ISO timestamp when the host cancelled. */
+  cancelledAt?: string
 }
 
 export interface LLGameView extends LLGame {

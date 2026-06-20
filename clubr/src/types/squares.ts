@@ -6,7 +6,7 @@
 // =====================================================================
 import type { ChatMsg } from './ft'
 
-export type SquaresStatus = 'registration' | 'live' | 'completed'
+export type SquaresStatus = 'registration' | 'live' | 'completed' | 'cancelled'
 
 /** One of the 100 grid cells (row-major: index = row*10 + col). Empty until claimed. */
 export interface SquaresCell {
@@ -64,6 +64,10 @@ export interface SquaresGame {
   settledAt?: string
   /** ISO timestamp when created — for the Available tab's "latest created first" sort. */
   createdAt?: string
+  /** Host-supplied reason, present when status === 'cancelled'. */
+  cancelReason?: string
+  /** ISO timestamp when the host cancelled. */
+  cancelledAt?: string
 }
 
 export interface SquaresGameView extends SquaresGame {

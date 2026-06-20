@@ -110,6 +110,13 @@ Approval is required to do anything beyond viewing:
   and a **payout-aware leaderboard** (paid per the §15 split; points still rank the
   whole table). Completed contests are **listed by default** for everyone who
   entered/hosted (no collapse).
+- **Host Complete / Cancel.** The host **Completes** a contest by **entering the
+  finishing order** — a tap-to-rank sheet (`FinishingOrderSheet.tsx`): tap players
+  1st→last; submit is disabled until the **whole table is ranked** (so there's a
+  real winner), which scores every draft and settles. Complete requires the
+  contest to be **locked** first; while still open it's **blocked with an audit**
+  ("lock the drafts first"). **Cancel** voids the contest with a **reason** (preset
+  + optional note) — `cancelled` status, banner + 🚫 chat line, no winner.
 
 ## 5. Last Longer
 - The club's own live tournament (in‑person or online). Host creates it with
@@ -135,6 +142,14 @@ Approval is required to do anything beyond viewing:
   - 💥 eliminated (with finishing position) · 🚪 self‑busted · ↩️ reinstated
   - ✂️ chop proposed · 🏆 winner crowned
   The **final bust auto-completes** the game and crowns the winner.
+- **Host Complete / Cancel (any time).** Besides the auto-complete, the host can
+  **Complete** the game manually — but it needs a **determined winner** (one
+  survivor, an agreed chop, or everyone already out). With **2+ still active**
+  there's no single winner, so Complete is **blocked with an audit** ("N players
+  still active — bust down to one or run a chop"). The host can also **Cancel**
+  with a **reason** (preset + optional note) → **voids** the game (no winner,
+  nothing paid), shown to everyone via a Cancelled banner + a 🚫 chat line.
+  (`CancelGameSheet.tsx`; `cancelled` is a 4th lifecycle status with a red badge.)
 
 ## 6. Paid status (the green/grey toggle)
 - A subtle **green = paid / grey = unpaid** toggle, no heading.
@@ -300,6 +315,12 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
 - **Live:** host enters each period's score (self‑report, like Last Longer) → the app
   highlights the winning cell (home last digit × away last digit) → marks the period
   winner → settled offline.
+- **Host Complete / Cancel.** Entering the **Final** score is what completes the game
+  (winner = the square on the final digits). For parity with LL/FT there's an explicit
+  **Complete game** button that simply **guards** that: while in registration → audit
+  "lock the board first"; while live without the Final score → audit "enter the Final
+  score". **Cancel** voids the board with a **reason** (preset + optional note) →
+  `cancelled` status + banner, no winners. (`squaresCompleteAudit` + `CancelGameSheet`.)
 - **Data:** public NFL/sports scores — **no HUDR dependency.** This is an **engagement +
   acquisition** play, not a data‑moat play. Position it as the **top‑of‑funnel hook**;
   HUDR/FT Fantasy remain the **retention + moat**.

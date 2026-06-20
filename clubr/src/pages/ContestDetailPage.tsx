@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield, Clock } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
 import { PrivateGameCard } from '@/components/games/PrivateGameCard'
 import { isPrivateGate } from '@/lib/api/privateGame'
-import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest, useExtendRegFT, useCloseRegFT } from '@/hooks/ft'
+import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest, useExtendRegFT, useCloseRegFT, useSetFinishingOrder, useCancelFT } from '@/hooks/ft'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
+import { CancelGameSheet } from '@/components/games/CancelGameSheet'
+import { FinishingOrderSheet } from '@/components/ft/FinishingOrderSheet'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
 import { InviteSheet } from '@/components/common/InviteSheet'
 import { useAuth } from '@/contexts/AuthContext'
@@ -46,11 +48,15 @@ export function ContestDetailPage() {
   const invite = useInviteToContest()
   const extendReg = useExtendRegFT()
   const closeReg = useCloseRegFT()
+  const setFinishingOrder = useSetFinishingOrder(); const cancel = useCancelFT()
   const [editRegOpen, setEditRegOpen] = useState(false)
   const [picks, setPicks] = useState<string[]>([])
   const [inviteOpen, setInviteOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
   const [icmOpen, setIcmOpen] = useState(false)
+  const [finishOpen, setFinishOpen] = useState(false)
+  const [cancelOpen, setCancelOpen] = useState(false)
+  const [completeAudit, setCompleteAudit] = useState<{ blockers: string[]; hint?: string } | null>(null)
 
   useEffect(() => { if (c?.myEntry) setPicks(c.myEntry.picks) }, [c?.myEntry?.picks?.join(',')]) // eslint-disable-line
 
@@ -136,6 +142,26 @@ export function ContestDetailPage() {
       {/* ===== SETTLED: winner / podium + prizes + leaderboard ===== */}
       {c.status === 'settled' && <SettledResult c={c} meId={user?.id} />}
 
+      {c.status === 'cancelled' && (
+        <Card className="mt-3 flex items-start gap-2 border-accent-red/30 bg-accent-red/10">
+          <Ban className="mt-0.5 h-5 w-5 shrink-0 text-accent-red" />
+          <div><p className="text-sm font-bold text-text-primary">Contest cancelled by the host</p>{c.cancelReason && <p className="mt-0.5 text-xs text-text-secondary">{c.cancelReason}</p>}</div>
+        </Card>
+      )}
+
+      {/* ===== Host: Complete (enter finishing order) / Cancel ===== */}
+      {c.canManage && (c.status === 'open' || c.status === 'locked') && (
+        <div className="mt-3 flex gap-2">
+          <Btn variant="secondary" className="flex-1"
+            onClick={() => c.status === 'locked'
+              ? setFinishOpen(true)
+              : setCompleteAudit({ blockers: ['Registration is still open — players can still change their drafts.'], hint: 'Close registration (lock the drafts) first, then enter the finishing order to crown the winner.' })}>
+            <Flag className="h-4 w-4" />Complete contest
+          </Btn>
+          <Btn variant="danger" className="flex-1" onClick={() => setCancelOpen(true)}><Ban className="h-4 w-4" />Cancel contest</Btn>
+        </div>
+      )}
+
       {/* ===== LOCKED: picks revealed to everyone, scores pending ===== */}
       {c.status === 'locked' && (
         <Section title="Picks — locked in">
@@ -212,6 +238,25 @@ export function ContestDetailPage() {
 
       <Sheet open={icmOpen} onClose={() => setIcmOpen(false)} title="How ICM pricing & scoring work">
         <HowScoringPricing players={c.players} budget={c.budget} onBack={() => setIcmOpen(false)} />
+      </Sheet>
+
+      <FinishingOrderSheet key={finishOpen ? 'fo-open' : 'fo-closed'} open={finishOpen} onClose={() => setFinishOpen(false)} players={c.players} busy={setFinishingOrder.isPending}
+        onSubmit={(order) => setFinishingOrder.mutate({ contestId: c.id, order }, { onSuccess: () => setFinishOpen(false) })} />
+
+      <CancelGameSheet key={cancelOpen ? 'cancel-open' : 'cancel-closed'} open={cancelOpen} onClose={() => setCancelOpen(false)} gameLabel="contest" busy={cancel.isPending}
+        onCancel={(reason) => cancel.mutate({ contestId: c.id, reason }, { onSuccess: () => setCancelOpen(false) })} />
+
+      {/* Complete audit — why the contest can't be completed yet + what to do. */}
+      <Sheet open={!!completeAudit} onClose={() => setCompleteAudit(null)} title="Can't complete yet">
+        <div className="flex flex-col gap-3">
+          <div className="rounded-xl border border-accent-amber/40 bg-accent-amber/10 p-3">
+            {completeAudit?.blockers.map((b, i) => (
+              <p key={i} className="flex items-start gap-1.5 text-sm font-semibold text-text-primary"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />{b}</p>
+            ))}
+            {completeAudit?.hint && <p className="mt-2 pl-5 text-xs text-text-secondary">{completeAudit.hint}</p>}
+          </div>
+          <Btn className="w-full" onClick={() => setCompleteAudit(null)}>Got it</Btn>
+        </div>
       </Sheet>
 
       <InviteSheet open={inviteOpen} onClose={() => setInviteOpen(false)} clubId={c.clubId} accessUserIds={c.accessUserIds ?? []} accent="purple" onInvite={(ids) => invite.mutate({ contestId: c.id, userIds: ids })} isPending={invite.isPending} />

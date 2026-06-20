@@ -124,6 +124,25 @@ export async function closeRegistration(contestId: string): Promise<void> {
   if (c) { c.status = 'locked'; c.locksAtTs = new Date().toISOString(); c.regClosedEarly = true }
 }
 
+/**
+ * Complete the contest: enter the public 1st..9th finishing order → scores +
+ * winner. Only valid when locked (drafts final) and the order ranks all players.
+ */
+export async function setFinishingOrder(contestId: string, order: string[]): Promise<void> {
+  await delay(150)
+  const c = FT_CONTESTS.find((x) => x.id === contestId)
+  if (c && c.status === 'locked') { c.finishingOrder = order; c.status = 'settled'; c.settledAt = new Date().toISOString() }
+}
+/** Host cancels the contest with a reason. Voids it (no winner). */
+export async function cancelContest(contestId: string, reason: string): Promise<void> {
+  await delay(150)
+  const c = FT_CONTESTS.find((x) => x.id === contestId)
+  if (!c) return
+  const r = reason.trim()
+  c.status = 'cancelled'; c.cancelReason = r || undefined; c.cancelledAt = new Date().toISOString()
+  c.chat.push({ id: `m_${Date.now()}`, userId: '', name: 'ClubR', avatarColor: '#ef4444', text: `🚫 Contest cancelled${r ? ` — ${r}` : ''}`, ts: 'now', kind: 'system' })
+}
+
 export async function listAvailableFTs(): Promise<AvailableFT[]> {
   await delay()
   return [...AVAILABLE_FTS].sort((a, b) => a.hoursLeft - b.hoursLeft)

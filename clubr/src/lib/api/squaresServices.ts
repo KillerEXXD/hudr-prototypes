@@ -27,6 +27,14 @@ function toView(g: SquaresGame, userId: string, isAdmin: boolean): SquaresGameVi
   }
 }
 
+/** Host cancels the board with a reason. Voids it (no winners). */
+export async function cancelSquares(gameId: string, reason: string): Promise<void> {
+  await delay(150)
+  const g = SQUARES_GAMES.find((x) => x.id === gameId)
+  if (!g) return
+  g.status = 'cancelled'; g.cancelReason = reason.trim() || undefined; g.cancelledAt = new Date().toISOString()
+}
+
 export async function listSquares(userId: string, isAdmin = false): Promise<SquaresGameView[]> {
   await delay()
   return SQUARES_GAMES.filter((g) => canView(g, userId, isAdmin)).map((g) => toView(g, userId, isAdmin))

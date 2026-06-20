@@ -32,6 +32,8 @@ export function useBust() { const { userId } = useIdentity(); const inv = useInv
 export function useExtendRegLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; closesAt: string }) => ll.extendRegistration(v.gameId, v.closesAt), onSuccess: inv }) }
 export function useCloseRegLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => ll.closeRegistration(gameId), onSuccess: inv }) }
 export function useReinstate() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; target: string }) => ll.reinstate(v.gameId, v.target), onSuccess: inv }) }
+export function useCompleteLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => ll.completeGame(gameId), onSuccess: inv }) }
+export function useCancelLL() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; reason: string }) => ll.cancelGame(v.gameId, v.reason), onSuccess: inv }) }
 export function usePostChatLL() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; text: string }) => ll.postChat(v.gameId, userId, v.text), onSuccess: inv }) }
 export function useProposeChop() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => ll.proposeChop(gameId, userId), onSuccess: inv }) }
 export function useAgreeChop() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => ll.agreeChop(gameId, userId), onSuccess: inv }) }
