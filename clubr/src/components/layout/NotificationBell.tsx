@@ -83,7 +83,7 @@ export function NotificationBell() {
                       <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${st.bg} ${st.color}`}><Icon className="h-4 w-4" /></span>
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-2">
-                          <span className="truncate text-sm font-bold text-text-primary">{n.title}</span>
+                          <span className={`truncate text-sm font-extrabold ${st.color}`}>{n.title}</span>
                           {!n.read && <Badge tone="blue">New</Badge>}
                           <span className="ml-auto shrink-0 text-[11px] text-text-muted">{ago(n.createdAt)}</span>
                         </span>
