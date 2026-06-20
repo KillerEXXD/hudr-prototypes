@@ -1,0 +1,12 @@
+{
+  "title": "Daylight",
+  "subtitle": "Calendar-first redesign · LIGHT theme",
+  "palette": "forest-green #2F6F4F + clay #C77D3A on warm paper #F7F3EA",
+  "type": "Fraunces serif display + Inter body",
+  "best_for": "Clubs that meet on a schedule; users who want their week, not a feed — and a calm light UI",
+  "differentiator": "The only LIGHT skin. Calendar/agenda model. Same layout looks full at one club/one game and rich at ten — no empty modules, ever.",
+  "recommendation": "Pick this for the broadest audience and the strongest new-member retention; it never dumps an empty grid on anyone.",
+  "kind": "light",
+  "thumb": "thumb.png",
+  "url": "/clubr-daylight/"
+}
