@@ -1,5 +1,47 @@
 @import "tailwindcss";
 
-html, body, #root { height: 100%; }
-body { margin: 0; background: #07070b; -webkit-font-smoothing: antialiased; }
-* { -webkit-tap-highlight-color: transparent; }
+/* ClubrGo — Nocturne: a single dark, premium "poker-night" skin.
+   Tokens via Tailwind v4 @theme (same approach as the ClubR app), so utilities
+   like bg-bg-card / text-text-primary / text-accent-violet work. One skin only. */
+@theme {
+  --color-bg-primary: #07070b;
+  --color-bg-secondary: #0c0c12;
+  --color-bg-card: #14141c;
+  --color-bg-surface: #1d1d28;
+  --color-bg-elevated: #24243200;
+  --color-border: #262633;
+  --color-border-light: #343444;
+
+  --color-text-primary: #f4f4f8;
+  --color-text-secondary: #a6a6b8;
+  --color-text-muted: #6c6c80;
+
+  --color-accent-blue: #38bdf8;
+  --color-accent-violet: #8b5cf6;
+  --color-accent-emerald: #10b981;
+  --color-accent-amber: #f59e0b;
+  --color-accent-red: #f43f5e;
+
+  --font-family-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'Fira Code', ui-monospace, monospace;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font-family-sans);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  * { -webkit-tap-highlight-color: transparent; }
+  .nums { font-family: var(--font-family-mono); font-variant-numeric: tabular-nums; }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  @keyframes ng-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .animate-fade-up { animation: ng-fade-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+}
