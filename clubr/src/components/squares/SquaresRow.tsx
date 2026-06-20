@@ -7,7 +7,7 @@ import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { StakePool } from '@/components/common/StakePool'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { GameRelationshipChip } from '@/components/common/GameRelationshipChip'
-import { gameRelationship, hostedByMe } from '@/lib/gameRelationship'
+import { gameRelationship, isGameHost, isGameCoHost } from '@/lib/gameRelationship'
 import type { SquaresGameView } from '@/types/squares'
 import type { MemberRole } from '@/types'
 
@@ -16,7 +16,8 @@ export function SquaresRow({ g, showType, clubRole }: { g: SquaresGameView; show
   const { user } = useAuth()
   const req = useRequestJoinSquares()
   const rel = gameRelationship({
-    hostedByMe: hostedByMe(g, user?.id ?? ''),
+    isHost: isGameHost(g, user?.id ?? ''),
+    isCoHost: isGameCoHost(g, user?.id ?? ''),
     hasEntry: !!g.me,
     entryPending: g.me?.status === 'pending',
     isMemberOfClub: g.isMemberOfClub,

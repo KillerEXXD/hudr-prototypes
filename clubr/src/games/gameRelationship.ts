@@ -1,16 +1,24 @@
 import type { UnifiedGame } from './useUnifiedGames'
 
 // The viewer's relationship to a game — a partition of the games a user can act on:
-//   hosting   — you run it (owner/host/co-host)
-//   playing   — you've joined it and DON'T run it ("playing in other clubs")
-//   available — you can join it: registration Open, not yours, not joined
+//   hosting   — you actually run it (host/co-host)
+//   playing   — you're an APPROVED player and DON'T run it ("playing in other clubs")
+//   available — registration Open and you can still act on it: not yours, and either
+//               not joined OR your join request is still PENDING approval (you're not
+//               playing yet — it shows here with the "Waiting for approval" badge).
 // A Running game you neither host nor play returns null (can't join → shown nowhere;
 // there is no "All"). Closed games are handled separately (Completed, Games tab only).
+//
+// Hosting keys off `iHost` — the viewer's REAL HOST role (host only, NOT co-host,
+// NOT `canManage` which also includes App Admins). A co-host (`iCoHost`) helps run
+// the game but buckets into Playing with a "Co-host" badge. Mirrors the card chip
+// (`lib/gameRelationship.ts`); the two must agree.
 export type Relationship = 'available' | 'playing' | 'hosting'
 
 export function relationshipOf(g: UnifiedGame): Relationship | null {
-  if (g.iHost) return 'hosting' // REAL host/co-host — NOT canManage (which includes App Admins)
-  if (g.mine && !g.pending) return 'playing' // only an APPROVED entry is "playing"
+  if (g.iHost) return 'hosting' // the HOST only — co-hosts go to Playing
+  // Co-hosts live under Playing (the card shows a "Co-host" badge), as do approved players.
+  if (g.iCoHost || (g.mine && !g.pending)) return 'playing'
   if (g.phase === 'reg') return 'available' // Open: not joined, OR your pending request (waiting)
   return null
 }

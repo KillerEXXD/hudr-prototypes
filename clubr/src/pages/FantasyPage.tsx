@@ -10,7 +10,7 @@ import { formatCloseInZone, detectZone } from '@/lib/gameSetup'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { GameRelationshipChip } from '@/components/common/GameRelationshipChip'
-import { gameRelationship, hostedByMe } from '@/lib/gameRelationship'
+import { gameRelationship, isGameHost, isGameCoHost } from '@/lib/gameRelationship'
 import { StakePool } from '@/components/common/StakePool'
 import { PayoutBadge } from '@/components/common/GameSetup'
 import type { FTContestView } from '@/types/ft'
@@ -20,7 +20,8 @@ export function ContestRow({ c, showType, clubRole }: { c: FTContestView; showTy
   const { user } = useAuth()
   const req = useRequestEnter()
   const rel = gameRelationship({
-    hostedByMe: hostedByMe(c, user?.id ?? ''),
+    isHost: isGameHost(c, user?.id ?? ''),
+    isCoHost: isGameCoHost(c, user?.id ?? ''),
     hasEntry: !!c.myEntry,
     entryPending: c.myEntry?.status === 'pending',
     isMemberOfClub: c.isMemberOfClub,

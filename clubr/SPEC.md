@@ -435,9 +435,11 @@ later). Navigation is by **entity/activity, never by game type**:
 - **Relationship filter (pill):** every games list carries a **relationship pill** —
   **Available · Playing · Hosting** (Hosting is **host/admin‑only**; players see **Available ·
   Playing**). Default **Hosting** for hosts, **Playing** for players. It **composes** with the
-  type‑filter chips. Buckets (a partition of actionable games): **Hosting** = you run it ·
-  **Playing** = you joined it & don't run it · **Available** = joinable now (Registration open, not
-  yours, not joined). A **Running** game you neither host nor play appears **nowhere** (no "All").
+  type‑filter chips. Buckets (a partition of actionable games): **Hosting** = you **host** it (the host
+  only — **co‑hosts are NOT here**) · **Playing** = you joined it (approved entry) **OR you co‑host it**
+  (a co‑host card shows a **"Co‑host"** badge, "+ Playing" if you also joined; a pending request stays
+  Available) · **Available** = joinable now (Registration open, not yours, not joined). A **Running**
+  game you neither host, co‑host nor play appears **nowhere** (no "All").
   Pure helper `relationshipOf` (hook‑free, unit‑tested) + `RelationshipPills`.
 - **Games tab** (`/games`, `GamesPage.tsx`) = the unified, cross‑club feed; active games sliced by
   the **relationship pill** + type chips (lazy‑rendered), with a separate **Completed** section

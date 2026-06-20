@@ -9,7 +9,7 @@ import type { MemberRole } from '@/types'
 import { Countdown, regDeadline } from '@/components/common/Countdown'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { GameRelationshipChip } from '@/components/common/GameRelationshipChip'
-import { gameRelationship, hostedByMe } from '@/lib/gameRelationship'
+import { gameRelationship, isGameHost, isGameCoHost } from '@/lib/gameRelationship'
 import { StakePool } from '@/components/common/StakePool'
 import { PayoutBadge } from '@/components/common/GameSetup'
 import { CreateGameSheet } from '@/components/ll/CreateGameSheet'
@@ -20,7 +20,8 @@ export function GameRow({ g, showType, clubRole }: { g: LLGameView; showType?: b
   const { user } = useAuth()
   const req = useRequestJoinLL()
   const rel = gameRelationship({
-    hostedByMe: hostedByMe(g, user?.id ?? ''),
+    isHost: isGameHost(g, user?.id ?? ''),
+    isCoHost: isGameCoHost(g, user?.id ?? ''),
     hasEntry: !!g.me,
     entryPending: g.me?.status === 'pending',
     isMemberOfClub: g.isMemberOfClub,

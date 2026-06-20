@@ -20,4 +20,17 @@ describe('GameRelationshipChip', () => {
     expect(screen.getByText('Playing')).toBeInTheDocument()
     expect(screen.queryByText('Hosting')).toBeNull()
   })
+
+  it('shows a Co-host badge (not Hosting) for a co-host', () => {
+    render(<GameRelationshipChip rel="cohost" />)
+    expect(screen.getByText('Co-host')).toBeInTheDocument()
+    expect(screen.queryByText('Hosting')).toBeNull()
+    expect(screen.queryByText('Playing')).toBeNull()
+  })
+
+  it('shows Co-host + Playing when a co-host also plays', () => {
+    render(<GameRelationshipChip rel="cohost" alsoPlaying />)
+    expect(screen.getByText('Co-host')).toBeInTheDocument()
+    expect(screen.getByText('Playing')).toBeInTheDocument()
+  })
 })
