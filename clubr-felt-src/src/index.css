@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  /* "Felt" variant — premium poker-luxe, dark pine-felt + chip-gold (mirrors tokens.json) */
+  --color-bg-primary: #0B1410;
+  --color-bg-secondary: #070D0A;
+  --color-bg-card: #11201A;
+  --color-bg-surface: #16291F;
+  --color-bg-elevated: #1E3A2C;
+  --color-border: #23382C;
+  --color-border-light: #2C4636;
+
+  --color-text-primary: #F3F6F2;
+  --color-text-secondary: #AFC4B6;
+  --color-text-muted: #6E8678;
+
+  --color-accent-blue: #5AA9E6;
+  --color-accent-blue-deep: #2E6FA3;
+  --color-accent-amber: #E9C46A;
+  --color-accent-emerald: #36C98B;
+  --color-accent-red: #E5604F;
+  --color-accent-purple: #A98BE6;
+  --color-accent-cyan: #4FB8C9;
+  --color-accent-gold: #E9C46A;
+  --color-accent-gold-deep: #C99B3E;
+
+  /* semantic */
+  --color-tier-reliable: #36C98B;
+  --color-tier-tentative: #E9A23B;
+  --color-tier-noise: #6E8678;
+  --color-sev-critical: #E5604F;
+  --color-sev-moderate: #E9A23B;
+  --color-sev-minor: #5AA9E6;
+
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-family-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font-family-sans);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* tabular figures for stat numbers */
+  .nums { font-family: var(--font-family-mono); font-variant-numeric: tabular-nums; }
+
+  /* "Felt" personality: prominent headings carry the Space Grotesk display face.
+     The reference app titles every page with `text-xl font-extrabold`; we lift
+     those (and the larger hero scales) into the display family. */
+  h1, h2,
+  .text-xl.font-extrabold,
+  .text-2xl.font-extrabold,
+  .text-3xl.font-extrabold,
+  .text-2xl.font-bold,
+  .text-3xl.font-bold {
+    font-family: var(--font-family-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--color-border-light); border-radius: 9999px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  @keyframes se-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .animate-fade-up { animation: se-fade-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes se-pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .animate-pulse-soft { animation: se-pulse-soft 1.8s ease-in-out infinite; }
+
+  /* Gentle breathing dot for the header theme/skin chip (signals it's tappable) */
+  @keyframes se-skin-pulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  .skin-dot { animation: se-skin-pulse 2.4s ease-in-out infinite; }
+
+  /* CRUD "processing" indicator — the four card suits pop in sequence (see
+     <Processing> in ui.tsx). Staggered animation-delay travels ♠→♥→♦→♣. */
+  @keyframes clubr-suit-pop {
+    0%, 65%, 100% { opacity: 0.3; transform: translateY(0) scale(0.82); }
+    18% { opacity: 1; transform: translateY(-2px) scale(1.18); }
+  }
+  .clubr-suit { animation: clubr-suit-pop 1.15s ease-in-out infinite; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
