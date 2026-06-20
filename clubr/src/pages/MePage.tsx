@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins, Pencil } from 'lucide-react'
+import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins, Pencil, MapPin } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Field } from '@/components/common/ui'
@@ -73,6 +73,11 @@ export function MePage() {
           <Avatar name={user.name} color={user.avatarColor} size={52} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-base font-bold text-text-primary">{user.name}</p>
+            {user.location && (
+              <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-text-muted">
+                <MapPin className="h-3 w-3 shrink-0" />{user.location}
+              </p>
+            )}
           </div>
           <div className="flex flex-col items-end gap-1.5">
             <button type="button" onClick={() => setEditOpen(true)} className="flex items-center gap-1 text-xs font-semibold text-accent-blue hover:underline cursor-pointer"><Pencil className="h-3 w-3" />Edit</button>
