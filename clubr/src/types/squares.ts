@@ -33,6 +33,7 @@ export interface SquaresParticipant {
   avatarColor: string
   status: 'pending' | 'active'   // approved to claim
   paid: boolean
+  joinedAt?: string              // ISO; when they joined — Playing/Hosting "latest joined" sort
 }
 
 export interface SquaresGame {
@@ -61,6 +62,8 @@ export interface SquaresGame {
   chat: ChatMsg[]
   /** Completion date 'YYYY-MM-DD' — buckets the result into a leaderboard month (completed only). */
   settledAt?: string
+  /** ISO timestamp when created — for the Available tab's "latest created first" sort. */
+  createdAt?: string
 }
 
 export interface SquaresGameView extends SquaresGame {

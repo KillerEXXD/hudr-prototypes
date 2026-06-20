@@ -28,6 +28,7 @@ export interface ContestEntry {
   spend: number
   score?: number // present when settled
   rank?: number
+  joinedAt?: string // ISO; when this player joined — Playing/Hosting "latest joined" sort
 }
 
 export interface ChatMsg {
@@ -77,6 +78,8 @@ export interface FTContest {
   finishingOrder?: string[] // seat ids 1st..9th, present when settled
   /** Completion date 'YYYY-MM-DD' — buckets the result into a leaderboard month (settled only). */
   settledAt?: string
+  /** ISO timestamp when created — for the Available tab's "latest created first" sort. */
+  createdAt?: string
   entries: ContestEntry[]
   chat: ChatMsg[]
 }

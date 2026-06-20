@@ -8,7 +8,8 @@ import { InfiniteList } from '@/components/common/InfiniteList'
 import { RelationshipPills } from '@/components/games/RelationshipPills'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { GAME_TYPES, type GameType } from '@/games/types'
-import { useUnifiedGames, matchesType, orderActiveGames } from '@/games/useUnifiedGames'
+import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
+import { orderActiveTab, orderCompleted } from '@/games/gameOrdering'
 import { relationshipOf, defaultRelationship, relationshipPills, type Relationship } from '@/games/gameRelationship'
 import { renderUnifiedGame as renderGame } from '@/games/renderGame'
 import { cn } from '@/lib/utils/cn'
@@ -44,14 +45,15 @@ export function GamesPage() {
   const { isLoading, items } = useUnifiedGames()
   const showAll = filter === 'all'
 
-  // Active games: ordered (reg-open → running), bucketed by relationship + type.
-  const active = orderActiveGames(items)
+  // Active games (non-closed), bucketed by relationship + type, then ordered per tab:
+  // Available = latest created · Playing/Hosting = latest joined (host falls back to created).
+  const active = items.filter((g) => g.phase !== 'closed')
   const counts = { available: 0, playing: 0, hosting: 0 }
   for (const g of active) { const r = relationshipOf(g); if (r) counts[r]++ }
-  const shownActive = active.filter((g) => relationshipOf(g) === rel).filter((g) => matchesType(g, filter))
+  const shownActive = orderActiveTab(active.filter((g) => relationshipOf(g) === rel).filter((g) => matchesType(g, filter)), rel)
 
-  // Completed (history): yours/hosted, with a "Hosted / Played" tag.
-  const done = items.filter((g) => g.finished && (g.mine || g.canManage)).filter((g) => matchesType(g, filter))
+  // Completed (history): yours/hosted, latest completed first, with a "Hosted / Played" tag.
+  const done = orderCompleted(items.filter((g) => g.finished && (g.mine || g.canManage)).filter((g) => matchesType(g, filter)))
 
   return (
     <div className="animate-fade-up">
