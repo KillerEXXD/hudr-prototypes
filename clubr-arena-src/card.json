@@ -1,0 +1,12 @@
+{
+  "title": "Arena",
+  "subtitle": "Live-first redesign · dark poker-luxe",
+  "palette": "chip-gold #E9C46A on pine-felt #0B1410",
+  "type": "Space Grotesk display + Inter body + IBM Plex Mono data",
+  "best_for": "Players who open the app mid-session to see what's live and where they stand",
+  "risk": "Leads with state over catalog — empty when nothing's live, by design",
+  "recommendation": "Pick this if retention matters: the relationship ledger + live-first home are the hooks.",
+  "kind": "dark",
+  "thumb": "thumb.png",
+  "url": "/clubr-arena/"
+}

@@ -1,0 +1,315 @@
+// In-memory FT Fantasy (Stack Draft) seed data. Mutated by services.
+
+import { USERS } from './store'
+import type { AvailableFT, ContestEntry, FTContest, FTPlayer } from '@/types/ft'
+
+// 9-handed final table, ordered by chip stack (leader first). Chips are at the
+// current 100k big blind, so chips = bbStack × 100,000.
+// 9-handed final table, ordered by chip stack (leader first). Chips are at the
+// current 100k big blind, so chips = bbStack × 100,000. Prices are ICM-weighted
+// so any legal 4-seat draft fits the 100k budget, but the top-heavy combos do
+// not (e.g. A+B+C+D = 116k) — forcing real trade-offs.
+export const FT_PLAYERS: FTPlayer[] = [
+  { seat: 'A', name: 'Negreanu', first: 'Daniel', last: 'Negreanu', country: '🇨🇦', bbStack: 95, chips: 9_500_000, icmPrice: 35000, icmCash: 1_150_000 },
+  { seat: 'B', name: 'Ivey', first: 'Phil', last: 'Ivey', country: '🇺🇸', bbStack: 72, chips: 7_200_000, icmPrice: 30000, icmCash: 880_000 },
+  { seat: 'C', name: 'Hellmuth', first: 'Phil', last: 'Hellmuth', country: '🇺🇸', bbStack: 58, chips: 5_800_000, icmPrice: 27000, icmCash: 700_000 },
+  { seat: 'D', name: 'Bonomo', first: 'Justin', last: 'Bonomo', country: '🇺🇸', bbStack: 44, chips: 4_400_000, icmPrice: 24000, icmCash: 560_000 },
+  { seat: 'E', name: 'Selbst', first: 'Vanessa', last: 'Selbst', country: '🇺🇸', bbStack: 35, chips: 3_500_000, icmPrice: 22000, icmCash: 450_000 },
+  { seat: 'F', name: 'Holz', first: 'Fedor', last: 'Holz', country: '🇩🇪', bbStack: 26, chips: 2_600_000, icmPrice: 20000, icmCash: 360_000 },
+  { seat: 'G', name: 'Kenney', first: 'Bryn', last: 'Kenney', country: '🇺🇸', bbStack: 19, chips: 1_900_000, icmPrice: 18000, icmCash: 290_000 },
+  { seat: 'H', name: 'Konnikova', first: 'Maria', last: 'Konnikova', country: '🇺🇸', bbStack: 12, chips: 1_200_000, icmPrice: 16000, icmCash: 235_000 },
+  { seat: 'I', name: 'Seidel', first: 'Erik', last: 'Seidel', country: '🇺🇸', bbStack: 7, chips: 700_000, icmPrice: 13000, icmCash: 190_000 },
+]
+
+// Real final tables (TournamentPro) — same seat→price ladder as FT_PLAYERS so the
+// 100k budget math is identical; only the names change.
+const N = (seat: string, name: string, first: string, last: string, country: string) => {
+  const base = FT_PLAYERS.find((p) => p.seat === seat)!
+  return { ...base, name, first, last, country }
+}
+// Bayou City Poker Club — Summer Poker Open $1M GTD Main Event final table (9-handed).
+export const CHAMP_FT: FTPlayer[] = [
+  N('A', 'Treviño', 'Joel', 'Vázquez Treviño', '🇲🇽'),
+  N('B', 'Gillis', 'Ted', 'Gillis', '🇺🇸'),
+  N('C', 'Feng', 'Han Ming', 'Feng', '🇺🇸'),
+  N('D', 'Martinez', 'Jesus', 'Martinez', '🇺🇸'),
+  N('E', 'Eyzaguirre', 'Ricardo', 'Eyzaguirre', '🇺🇸'),
+  N('F', 'Turov', 'Danylo', 'Turov', '🇺🇦'),
+  N('G', 'Moreno', 'Andrew', 'Moreno', '🇺🇸'),
+  N('H', 'Shovkovyi', 'Vladyslav', 'Shovkovyi', '🇺🇦'),
+  N('I', 'Monaghan', 'Michael', 'Monaghan', '🇺🇸'),
+]
+// Gulf Coast Card Club — $100K Fall Harvest Headliner final table (9-handed).
+export const TCH_FT: FTPlayer[] = [
+  N('A', 'Beckenstein', 'Josh', 'Beckenstein', '🇺🇸'),
+  N('B', 'Patel', 'Harshit', 'Patel', '🇮🇳'),
+  N('C', 'Mixson', 'Cameron', 'Mixson', '🇺🇸'),
+  N('D', 'Khavboshin', 'Sergei', 'Khavboshin', '🇺🇸'),
+  N('E', 'Rathi', 'Mahesh', 'Rathi', '🇮🇳'),
+  N('F', 'Joshua', 'Josh', 'Joshua', '🇺🇸'),
+  N('G', 'Nate', 'Nate', '', '🇺🇸'),
+  N('H', 'Danny', 'Danny', '', '🇺🇸'),
+  N('I', 'Dustin', 'Dustin', '', '🇺🇸'),
+]
+// The DogHouse Poker Club, Cypress TX — $150K GTD H.W.M.S Main Event final table (9-handed).
+export const DOGHOUSE_HWMS_FT: FTPlayer[] = [
+  N('A', 'Nguyen', 'Jacob', 'Nguyen', '🇺🇸'),
+  N('B', 'Scott', 'Scott', '', '🇺🇸'),
+  N('C', 'Hammons', 'Zachary', 'Hammons', '🇺🇸'),
+  N('D', 'Thomas', 'Benjamin', 'Thomas', '🇺🇸'),
+  N('E', 'Turner', 'Roy', 'Turner', '🇺🇸'),
+  N('F', 'Fritz', 'Jeffery', 'Fritz', '🇺🇸'),
+  N('G', 'Ngo', 'Sang', 'Ngo', '🇺🇸'),
+  N('H', 'Govori', 'Genc', 'Govori', '🇺🇸'),
+  N('I', 'Corey', 'Corey', '', '🇺🇸'),
+]
+// The DogHouse Poker Club, Cypress TX — $100K GTD SFS Main Event final table (9-handed).
+export const DOGHOUSE_SFS_FT: FTPlayer[] = [
+  N('A', 'Sundara', 'Ravee', 'Sundara', '🇺🇸'),
+  N('B', 'Timmy', 'Timmy', 'T', '🇺🇸'),
+  N('C', 'Chan', 'Tony', 'Chan', '🇺🇸'),
+  N('D', 'Normand', 'Derek', 'Normand', '🇺🇸'),
+  N('E', 'Derek', 'Derek', 'L', '🇺🇸'),
+  N('F', 'Desmonde', 'Desmonde', 'T', '🇺🇸'),
+  N('G', 'Davis', 'William', 'Davis', '🇺🇸'),
+  N('H', 'David', 'David', 'M', '🇺🇸'),
+  N('I', 'Vora', 'Neil', 'Vora', '🇺🇸'),
+]
+// Texas Card House — Austin, $250K GTD Summer Series Main Event final table (9-handed).
+export const TCH_AUSTIN_SS_FT: FTPlayer[] = [
+  N('A', 'Gilliard', 'Richard', 'Gilliard', '🇺🇸'),
+  N('B', 'Shayan', 'Shayan', '', '🇺🇸'),
+  N('C', 'Esfandiary', 'Pasha', 'Esfandiary', '🇺🇸'),
+  N('D', 'Vandever', 'Maxwell', 'Vandever', '🇺🇸'),
+  N('E', 'Perelman', 'Rob', 'Perelman', '🇺🇸'),
+  N('F', 'Tanner', 'Luke', 'Tanner', '🇺🇸'),
+  N('G', 'Park', 'Joon', 'Park', '🇺🇸'),
+  N('H', 'Macey', 'Michael', 'Macey', '🇺🇸'),
+  N('I', 'Dulaney', 'Scott', 'Dulaney', '🇺🇸'),
+]
+
+const PRICE = Object.fromEntries(FT_PLAYERS.map((p) => [p.seat, p.icmPrice]))
+export function spendOf(picks: string[]): number {
+  return picks.reduce((s, seat) => s + (PRICE[seat] ?? 0), 0)
+}
+
+function entry(userId: string, status: 'pending' | 'approved', paid: boolean, picks: string[] = []): ContestEntry {
+  const u = USERS[userId]
+  return { userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status, paid, picks, spend: spendOf(picks) }
+}
+
+let _cid = 0
+const cmsg = (userId: string, text: string, ts: string, kind: 'user' | 'system' = 'user') => {
+  _cid += 1
+  const u = USERS[userId]
+  return { id: `m_${_cid}`, userId, name: u?.name ?? 'System', avatarColor: u?.avatarColor ?? '#6b7280', text, ts, kind }
+}
+
+export const FT_CONTESTS: FTContest[] = [
+  {
+    id: 'ct_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'DogHouse $150K H.W.M.S Main Event — FT',
+    status: 'open', stake: 100, budget: 100000, locksAt: 'in 1h 05m',
+    room: 'DogHouse Poker Club', prizePool: '150,000', buyIn: '380', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@DogHousePokerClub/streams', streamLive: false,
+    hostId: 'u_host', coHostIds: [],
+    players: DOGHOUSE_HWMS_FT,
+    entries: [
+      entry('u_host', 'approved', true, ['A', 'C', 'H', 'I']),
+      entry('u_mike', 'approved', true, ['B', 'D', 'F', 'G']),
+      entry('u_tom', 'approved', false),
+      entry('u_jordan', 'pending', false),
+      entry('u_dustin', 'pending', false),
+    ],
+    chat: [cmsg('u_host', 'Locks in an hour — get your drafts in 🃏', '7:42p'), cmsg('u_mike', 'Loaded up on short stacks 😅', '7:45p')],
+  },
+  {
+    id: 'ct_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'TCH Dallas — Deepstack Main FT',
+    visibility: 'private', accessUserIds: ['u_gary', 'u_lena', 'u_player'],
+    status: 'open', stake: 250, budget: 100000, locksAt: 'in 3h 40m',
+    room: 'Texas Card House', prizePool: '365,000', buyIn: '400', level: '30k / 60k · 60k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
+    hostId: 'u_gary', coHostIds: [],
+    players: FT_PLAYERS,
+    entries: [
+      entry('u_gary', 'approved', true, ['A', 'B', 'I', 'H']),
+      entry('u_lena', 'approved', true, ['C', 'D', 'E', 'G']),
+      entry('u_player', 'approved', false), // Sam — approved, hasn't drafted yet
+    ],
+    chat: [cmsg('u_gary', 'Big stake tonight — good luck all', '6:10p')],
+  },
+  {
+    id: 'ct_c', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Lone Star Poker Series — Bounty FT',
+    status: 'open', stake: 100, budget: 100000, locksAt: 'in 5h 20m',
+    room: 'Champions Club', prizePool: '500,000', buyIn: '600', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
+    hostId: 'u_gary', coHostIds: [],
+    players: FT_PLAYERS,
+    entries: [entry('u_lena', 'approved', true)],
+    chat: [],
+  },
+  {
+    id: 'ct_d', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', ftName: 'TCH Austin $250K Summer Series Main Event — FT',
+    status: 'settled', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-05-15',
+    room: 'Texas Card House', prizePool: '372,690', buyIn: '600', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
+    hostId: 'u_gary', coHostIds: [],
+    players: TCH_AUSTIN_SS_FT,
+    finishingOrder: ['C', 'F', 'A', 'H', 'B', 'E', 'I', 'D', 'G'],
+    entries: [
+      entry('u_mike', 'approved', true, ['A', 'C', 'H', 'I']),
+      entry('u_lena', 'approved', true, ['C', 'D', 'E', 'G']),
+      entry('u_player', 'approved', true, ['B', 'E', 'F', 'I']),
+      entry('u_tom', 'approved', true, ['F', 'G', 'H', 'I']),
+    ],
+    chat: [cmsg('u_gary', 'GG everyone — Mike runs it', '11:20p', 'system')],
+  },
+  {
+    id: 'ct_h', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Trailblazer Poker Tour — High Roller FT',
+    status: 'locked', stake: 100, budget: 100000, locksAt: 'locked · plays in 25m',
+    room: 'Texas Card House', prizePool: '1,000,000', buyIn: '2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: true,
+    hostId: 'u_gary', coHostIds: [],
+    players: FT_PLAYERS,
+    entries: [
+      entry('u_gary', 'approved', true, ['A', 'B', 'I', 'H']),
+      entry('u_lena', 'approved', true, ['C', 'D', 'E', 'G']),
+      entry('u_player', 'approved', false, ['A', 'C', 'H', 'I']),
+    ],
+    chat: [cmsg('u_gary', 'Locked! Cards in the air soon 🔒', '9:05p', 'system')],
+  },
+  {
+    id: 'ct_i', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Summer Poker Open — High Roller FT',
+    status: 'locked', stake: 250, budget: 100000, locksAt: 'locked · plays in 12m',
+    room: 'Champions Club', prizePool: '1,000,000', buyIn: '2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: true,
+    hostId: 'u_host', coHostIds: [],
+    players: FT_PLAYERS,
+    entries: [
+      entry('u_mike', 'approved', true, ['B', 'D', 'F', 'G']),
+      entry('u_tom', 'approved', false, ['A', 'C', 'E', 'I']),
+    ],
+    chat: [],
+  },
+  // ---- Completed (settled) — POINTS format: top 3 split the pot ----
+  {
+    id: 'ct_j', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'DogHouse $100K SFS Main Event — FT',
+    status: 'settled', format: 'points', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-06-08',
+    room: 'DogHouse Poker Club', prizePool: '100,000', buyIn: '300', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@DogHousePokerClub/streams', streamLive: false,
+    hostId: 'u_host', coHostIds: [],
+    players: DOGHOUSE_SFS_FT,
+    finishingOrder: ['A', 'C', 'B', 'F', 'D', 'I', 'E', 'G', 'H'],
+    entries: [
+      entry('u_host', 'approved', true, ['A', 'C', 'F', 'I']), // 223 pts → 1st
+      entry('u_tom', 'approved', true, ['A', 'B', 'G', 'I']), // 174 pts → 2nd
+      entry('u_player', 'approved', true, ['A', 'D', 'F', 'H']), // 163 pts → 3rd (Sam — Player demo account)
+      entry('u_dustin', 'approved', true, ['B', 'C', 'H', 'I']), // 141 pts → 4th
+      entry('u_jordan', 'approved', true, ['C', 'D', 'F', 'G']), // 136 pts → 5th
+      entry('u_mike', 'approved', true, ['B', 'D', 'E', 'H']), // 90 pts → 6th
+    ],
+    chat: [cmsg('u_host', 'GG all — Harper takes it down 🏆', '1:05a', 'system')],
+  },
+  // ---- Completed (settled) — WINNER TAKES ALL: only 1st is paid ----
+  {
+    id: 'ct_k', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Winter Poker Open — High Roller FT',
+    status: 'settled', format: 'winner_takes_all', stake: 500, budget: 100000, locksAt: 'settled', settledAt: '2026-05-18',
+    room: 'Champions Club', prizePool: '1,000,000', buyIn: '5,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
+    hostId: 'u_host', coHostIds: [],
+    players: FT_PLAYERS,
+    finishingOrder: ['B', 'A', 'H', 'C', 'I', 'D', 'E', 'F', 'G'],
+    entries: [
+      entry('u_mike', 'approved', true, ['A', 'B', 'H', 'I']), // 245 pts → WINNER, takes the pot
+      entry('u_player', 'approved', true, ['A', 'H', 'C', 'I']), // 180 pts → 2nd, no payout (WTA) — Sam, Player demo account
+      entry('u_jordan', 'approved', true, ['B', 'E', 'G', 'H']), // 165 pts
+      entry('u_host', 'approved', true, ['A', 'D', 'F', 'H']), // 144 pts
+      entry('u_tom', 'approved', true, ['C', 'D', 'E', 'F']), // 71 pts
+    ],
+    chat: [cmsg('u_host', 'Winner takes all — Mike scoops the whole pot 💰', '12:40a', 'system')],
+  },
+  // ---- Demo: Bayou City Poker Club — real Summer Poker Open $1M final table (open) ----
+  {
+    id: 'ct_champ', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆', ftName: 'Summer Poker Open — $1M GTD Main Event FT',
+    status: 'open', stake: 100, budget: 100000, locksAt: 'in 2h 30m',
+    room: 'Bayou City Poker Club', prizePool: '1,000,000', buyIn: '1,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas', streamLive: false,
+    hostId: 'u_cc_host', coHostIds: [],
+    players: CHAMP_FT,
+    entries: [
+      entry('u_cc_host', 'approved', true, ['A', 'D', 'H', 'I']),
+      entry('u_cc_p1', 'approved', true, ['B', 'C', 'F', 'G']),
+      entry('u_cc_p3', 'approved', true, ['A', 'E', 'G', 'I']),
+      entry('u_cc_p6', 'approved', true, ['C', 'D', 'G', 'I']),
+      entry('u_player', 'approved', false), // Sam — approved, hasn't drafted yet
+      entry('u_cc_p2', 'pending', false),
+    ],
+    chat: [cmsg('u_cc_host', 'Treviño came in as chip leader — draft accordingly 🏆', '6:30p'), cmsg('u_cc_p1', 'fading the leader, loading short stacks', '6:33p')],
+  },
+  // ---- Demo: Gulf Coast Card Club — real $100K Fall Harvest final table (open) ----
+  {
+    id: 'ct_tch', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏', ftName: '$100K Fall Harvest Headliner — FT',
+    status: 'open', stake: 250, budget: 100000, locksAt: 'in 4h 10m',
+    room: 'Gulf Coast Card Club', prizePool: '100,000', buyIn: '1,100', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse', streamLive: false,
+    hostId: 'u_tch_host', coHostIds: [],
+    players: TCH_FT,
+    entries: [
+      entry('u_tch_host', 'approved', true, ['A', 'C', 'H', 'I']),
+      entry('u_tch_p1', 'approved', true, ['B', 'D', 'F', 'G']),
+      entry('u_tch_p3', 'approved', true, ['A', 'E', 'G', 'I']),
+      entry('u_tch_p4', 'approved', true, ['C', 'D', 'H', 'I']),
+      entry('u_player', 'approved', false), // Sam — approved, hasn't drafted yet
+      entry('u_tch_p2', 'pending', false),
+    ],
+    chat: [cmsg('u_tch_host', 'Beckenstein came in with a monster stack — good luck all', '7:05p')],
+  },
+]
+
+// The operator's slate of upcoming, ICM-priced final tables a host can choose to host.
+// Real local Houston / Texas final tables (TournamentPro) the operator offers to host.
+// Same seat→price ladder as FT_PLAYERS; only the names change.
+// Champions Club — Winter Poker Open $1,500 Main Event final table (9-handed).
+const WINTER_FT: FTPlayer[] = [
+  N('A', 'Zhang', 'Tommy', 'Zhang', '🇺🇸'),
+  N('B', 'Diaz', 'David', 'Diaz', '🇺🇸'),
+  N('C', 'Sinn', 'Charles', 'Sinn', '🇺🇸'),
+  N('D', 'Hendrix', 'Adam', 'Hendrix', '🇺🇸'),
+  N('E', 'Trevino', 'Cedric', 'Trevino', '🇺🇸'),
+  N('F', 'Staats', 'Christopher', 'Staats', '🇺🇸'),
+  N('G', 'Lee', 'Jerry', 'Yen Lee', '🇺🇸'),
+  N('H', 'Esposito', 'Andrew', 'Esposito', '🇺🇸'),
+  N('I', 'Champlin', 'Spencer', 'Champlin', '🇺🇸'),
+]
+// Champions Club — Fall Poker Open Championship $1M GTD Main Event final table (9-handed).
+const FALL_FT: FTPlayer[] = [
+  N('A', 'Feng', 'Han Ming', 'Feng', '🇺🇸'),
+  N('B', 'Ingles', 'Jared', 'Ingles', '🇺🇸'),
+  N('C', 'Armas', 'Alejandro', 'Armas', '🇲🇽'),
+  N('D', 'Serrano', '', 'Serrano', '🇺🇸'),
+  N('E', 'Cortez', 'Mark', 'Cortez', '🇺🇸'),
+  N('F', 'Shaw', 'David', 'Shaw', '🇺🇸'),
+  N('G', 'Baba', 'Shadal', 'Baba', '🇺🇸'),
+  N('H', 'Moreno', 'Andrew', 'Moreno', '🇺🇸'),
+  N('I', 'Taherpour', 'Dara', 'Taherpour', '🇺🇸'),
+]
+// Texas Card House — $1M GTD Trailblazer Poker Tour Main Event final table (9-handed).
+const TRAIL1M_FT: FTPlayer[] = [
+  N('A', 'Klaus', 'Mallory', 'Klaus', '🇺🇸'),
+  N('B', 'Guinand', 'Sebastien', 'Guinand', '🇫🇷'),
+  N('C', 'Evan', 'Evan', '', '🇺🇸'),
+  N('D', 'Fahrenbruch', 'Michael', 'Fahrenbruch', '🇺🇸'),
+  N('E', 'Ward', 'Jared', 'Ward', '🇺🇸'),
+  N('F', 'Pengelly', 'Will', 'Pengelly', '🇺🇸'),
+  N('G', 'Baron', 'Zak', 'Baron', '🇺🇸'),
+  N('H', 'Varnell', 'Craig', 'Varnell', '🇺🇸'),
+  N('I', 'Lepovic', 'Elan', 'Lepovic', '🇺🇸'),
+]
+// Texas Card House — $500K GTD Trailblazer Multi-Flight final table (9-handed).
+const TRAIL500_FT: FTPlayer[] = [
+  N('A', 'Vieth', 'Mason', 'Vieth', '🇺🇸'),
+  N('B', 'Dzyuba', 'Sergiy', 'Dzyuba', '🇺🇦'),
+  N('C', 'Gondalia', 'Akash', 'Gondalia', '🇮🇳'),
+  N('D', 'Murphy', 'Samuel', 'Murphy', '🇺🇸'),
+  N('E', 'Difurio', 'Glenn', 'Difurio', '🇺🇸'),
+  N('F', 'Shytle', 'Christopher', 'Shytle', '🇺🇸'),
+  N('G', 'Sternberg', 'Jason', 'Sternberg', '🇺🇸'),
+  N('H', 'Guest', 'Jeremy', 'Guest', '🇺🇸'),
+  N('I', 'Amadi', 'Kelechi', 'Amadi', '🇳🇬'),
+]
+
+export const AVAILABLE_FTS: AvailableFT[] = [
+  { id: 'aft1', name: 'Winter Poker Open — $1,500 Main Event FT', room: 'Champions Club', startsIn: 'in 2h 10m', hoursLeft: 2, date: 'Today · 8:00pm CT', prizePool: '1,350,000', buyIn: '1,500', players: WINTER_FT },
+  { id: 'aft2', name: 'Trailblazer Poker Tour — $1M Main Event FT', room: 'Texas Card House', startsIn: 'in 5h', hoursLeft: 5, date: 'Today · 11:00pm CT', prizePool: '1,360,100', buyIn: '1,200', players: TRAIL1M_FT },
+  { id: 'aft3', name: 'Fall Poker Open — Championship Main Event FT', room: 'Champions Club', startsIn: 'in 21h', hoursLeft: 21, date: 'Tomorrow · 6:00pm CT', prizePool: '1,113,600', buyIn: '2,700', players: FALL_FT },
+  { id: 'aft4', name: 'Trailblazer Multi-Flight — $500K GTD FT', room: 'Texas Card House', startsIn: 'tomorrow', hoursLeft: 30, date: 'Sat · 3:00pm CT', prizePool: '500,000', buyIn: '500', players: TRAIL500_FT },
+]
