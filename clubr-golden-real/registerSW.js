@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/clubr-golden-real/sw.js', { scope: '/clubr-golden-real/' })})}
