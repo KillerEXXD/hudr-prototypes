@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield, Clock } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
+import { GameHostLine } from '@/components/games/GameHostLine'
 import { useContest, useRequestEnter, useApproveEntry, useDeclineEntry, useTogglePaid, useAssignCoHost, useSavePicks, usePostChat, useInviteToContest, useExtendRegFT, useCloseRegFT } from '@/hooks/ft'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
@@ -66,6 +67,7 @@ export function ContestDetailPage() {
 
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span>{c.clubName}<Badge tone="purple">Stack Draft</Badge></div>
       <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />{c.ftName}</h1><ShareGameButton type="ft" gameId={c.id} /></div>
+      <div className="mt-1"><GameHostLine hostId={c.hostId} knownName={c.entries.find((e) => e.userId === c.hostId)?.name} /></div>
       <div className="mt-1.5 flex items-center gap-2 text-xs text-text-secondary">
         <StatusBadge phase={ftPhase(c.status)} />
         {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}

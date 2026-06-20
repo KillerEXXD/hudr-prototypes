@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, Coins, RotateCcw } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
+import { GameHostLine } from '@/components/games/GameHostLine'
 import { useGame, useRequestJoinLL, useApproveLL, useDeclineLL, useTogglePaidLL, useAssignCoHostLL, useRemoveCoHostLL, useUpdateChips, useBust, useReinstate, usePostChatLL, useProposeChop, useAgreeChop, useInviteToGame, useExtendRegLL, useCloseRegLL } from '@/hooks/ll'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
@@ -81,6 +82,7 @@ export function LastLongerGamePage() {
 
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
       <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}</h1><ShareGameButton type="ll" gameId={g.id} /></div>
+      <div className="mt-1"><GameHostLine hostId={g.hostId} knownName={g.participants.find((p) => p.userId === g.hostId)?.name} /></div>
       <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-secondary">
         <StatusBadge phase={g.status} />
         <span className="font-mono">{g.stake} Stakes</span>

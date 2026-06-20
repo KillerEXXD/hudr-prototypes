@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Hand, Dice5, Coins, Stamp, Clock } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
+import { GameHostLine } from '@/components/games/GameHostLine'
 import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares, useExtendRegSquares, useCloseRegSquares } from '@/hooks/squares'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
 import { RegClosedBanner } from '@/components/games/RegClosedBanner'
@@ -89,6 +90,7 @@ export function SquaresGamePage() {
       <GameJoinBanner />
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}<Badge tone="green"><Grid3x3 className="h-3 w-3" />Squares</Badge></div>
       <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Grid3x3 className="h-5 w-5 text-accent-emerald" />{g.title}</h1><ShareGameButton type="sq" gameId={g.id} /></div>
+      <div className="mt-1"><GameHostLine hostId={g.hostId} knownName={g.participants.find((p) => p.userId === g.hostId)?.name} /></div>
       <p className="mt-0.5 text-sm text-text-secondary"><b className="text-text-primary">{g.homeTeam}</b> <span className="text-text-muted">(side)</span> vs <b className="text-text-primary">{g.awayTeam}</b> <span className="text-text-muted">(top)</span></p>
       <div className="mt-1.5 flex items-center gap-2 text-xs">
         <StatusBadge phase={g.status} />
