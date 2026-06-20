@@ -10,8 +10,8 @@ export type Relationship = 'available' | 'playing' | 'hosting'
 
 export function relationshipOf(g: UnifiedGame): Relationship | null {
   if (g.iHost) return 'hosting' // REAL host/co-host — NOT canManage (which includes App Admins)
-  if (g.mine) return 'playing'
-  if (g.phase === 'reg') return 'available' // Open & joinable, not yours, not joined
+  if (g.mine && !g.pending) return 'playing' // only an APPROVED entry is "playing"
+  if (g.phase === 'reg') return 'available' // Open: not joined, OR your pending request (waiting)
   return null
 }
 

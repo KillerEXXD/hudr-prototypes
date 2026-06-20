@@ -27,9 +27,9 @@ export type GamePhase = 'reg' | 'live' | 'closed'
 // `iHost` so an admin/club-owner who merely oversees a game they play isn't
 // mislabelled "Hosting" (the card chip already uses this real signal).
 export type UnifiedGame =
-  | { type: 'ft_fantasy'; id: string; clubId: string; canManage: boolean; iHost: boolean; finished: boolean; phase: GamePhase; mine: boolean; sort: number; settledAt?: string; ft: FTContestView }
-  | { type: 'last_longer'; id: string; clubId: string; canManage: boolean; iHost: boolean; finished: boolean; phase: GamePhase; mine: boolean; sort: number; settledAt?: string; ll: LLGameView }
-  | { type: 'football_squares'; id: string; clubId: string; canManage: boolean; iHost: boolean; finished: boolean; phase: GamePhase; mine: boolean; sort: number; settledAt?: string; sq: SquaresGameView }
+  | { type: 'ft_fantasy'; id: string; clubId: string; canManage: boolean; iHost: boolean; finished: boolean; phase: GamePhase; mine: boolean; pending: boolean; sort: number; settledAt?: string; ft: FTContestView }
+  | { type: 'last_longer'; id: string; clubId: string; canManage: boolean; iHost: boolean; finished: boolean; phase: GamePhase; mine: boolean; pending: boolean; sort: number; settledAt?: string; ll: LLGameView }
+  | { type: 'football_squares'; id: string; clubId: string; canManage: boolean; iHost: boolean; finished: boolean; phase: GamePhase; mine: boolean; pending: boolean; sort: number; settledAt?: string; sq: SquaresGameView }
 
 export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } {
   const contests = useContests()
@@ -40,21 +40,21 @@ export function useUnifiedGames(): { isLoading: boolean; items: UnifiedGame[] } 
   const items: UnifiedGame[] = [
     ...(contests.data ?? []).map((c): UnifiedGame => ({
       type: 'ft_fantasy', id: c.id, clubId: c.clubId, canManage: c.canManage, iHost: hostedByMe(c, me),
-      finished: c.status === 'settled', phase: c.status === 'settled' ? 'closed' : c.status === 'locked' ? 'live' : 'reg', mine: c.myEntry != null,
+      finished: c.status === 'settled', phase: c.status === 'settled' ? 'closed' : c.status === 'locked' ? 'live' : 'reg', mine: c.myEntry != null, pending: c.myEntry?.status === 'pending',
       sort: c.status === 'settled' ? Number.MAX_SAFE_INTEGER : (regDeadline(c.locksAtTs ?? c.locksAt) ?? Number.MAX_SAFE_INTEGER),
       settledAt: c.settledAt,
       ft: c,
     })),
     ...(games.data ?? []).map((g): UnifiedGame => ({
       type: 'last_longer', id: g.id, clubId: g.clubId, canManage: g.canManage, iHost: hostedByMe(g, me),
-      finished: g.status === 'completed', phase: g.status === 'completed' ? 'closed' : g.status === 'live' ? 'live' : 'reg', mine: g.me != null,
+      finished: g.status === 'completed', phase: g.status === 'completed' ? 'closed' : g.status === 'live' ? 'live' : 'reg', mine: g.me != null, pending: g.me?.status === 'pending',
       sort: g.status === 'completed' ? Number.MAX_SAFE_INTEGER : (g.status === 'live' ? 0 : (regDeadline(g.registrationClosesAt) ?? Number.MAX_SAFE_INTEGER)),
       settledAt: g.settledAt,
       ll: g,
     })),
     ...(squares.data ?? []).map((s): UnifiedGame => ({
       type: 'football_squares', id: s.id, clubId: s.clubId, canManage: s.canManage, iHost: hostedByMe(s, me),
-      finished: s.status === 'completed', phase: s.status === 'completed' ? 'closed' : s.status === 'live' ? 'live' : 'reg', mine: s.me != null,
+      finished: s.status === 'completed', phase: s.status === 'completed' ? 'closed' : s.status === 'live' ? 'live' : 'reg', mine: s.me != null, pending: s.me?.status === 'pending',
       sort: s.status === 'completed' ? Number.MAX_SAFE_INTEGER : (s.status === 'live' ? 0 : (regDeadline(s.registrationClosesAt) ?? Number.MAX_SAFE_INTEGER)),
       settledAt: s.settledAt,
       sq: s,
