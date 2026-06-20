@@ -20,7 +20,9 @@ export function AppShell() {
       <div className="flex min-h-screen w-full max-w-md flex-col border-x border-border bg-bg-primary">
         <SpendProvider>
           <Header />
-          <main className="flex-1 px-4 pb-6 pt-3">
+          {/* Generous bottom padding so the last card clears the floating
+              Feedback launcher (pinned above the bottom nav). */}
+          <main className="flex-1 px-4 pb-24 pt-3">
             <Outlet />
           </main>
           <BottomNav />
