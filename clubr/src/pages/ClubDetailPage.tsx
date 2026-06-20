@@ -223,8 +223,11 @@ export function ClubDetailPage() {
               const n = counts[s]
               return (
                 <button key={s} type="button" role="tab" aria-selected={on} onClick={() => setGameStatus(s)}
-                  className={cn('shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', on ? m.active : 'border-border font-semibold text-text-secondary')}>
-                  {m.label}{n ? ` (${n})` : ''}
+                  className={cn('flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs cursor-pointer transition-colors', on ? m.active : 'border-border font-semibold text-text-secondary')}>
+                  {m.label}
+                  {/* Count rides in a tabular-nums span (no parens) so a two-digit count
+                      stays compact and doesn't widen or jitter the pill. */}
+                  {n ? <span className="tabular-nums opacity-80">{n}</span> : null}
                 </button>
               )
             })}
