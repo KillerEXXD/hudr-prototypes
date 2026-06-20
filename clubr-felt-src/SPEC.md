@@ -1,15 +1,15 @@
-# ClubR — App Specification
+# ClubrGO — App Specification
 
-The behavioural spec for the ClubR prototype. Pairs with the product‑level
-`C:\Apps\ClubR\docs\CLUBR_PRODUCT_DEFINITION.md`. This file is the source of
+The behavioural spec for the ClubrGO prototype. Pairs with the product‑level
+`C:\Apps\ClubrGO\docs\CLUBR_PRODUCT_DEFINITION.md`. This file is the source of
 truth for *how the app behaves*; update it as decisions change.
 
-> **One line:** ClubR is the **transparent scorekeeper** for a poker club's games —
+> **One line:** ClubrGO is the **transparent scorekeeper** for a poker club's games —
 > **FT Fantasy (Stack Draft)** and **Last Longer**. The app tracks and proves the
 > count and the result; it **awards nothing, holds nothing, and never touches the
 > cash.** Clubs settle all stakes offline.
 >
-> **Platform direction:** ClubR is the **operating system for club side‑games** —
+> **Platform direction:** ClubrGO is the **operating system for club side‑games** —
 > FT Fantasy and Last Longer today, **Football Squares** next (§13) on the same rails.
 > Each new game reuses clubs, approval, visibility, the paid toggle, sealed‑until‑lock,
 > stakes buckets, chat, and offline settlement — so the marginal build cost is small and
@@ -256,7 +256,7 @@ Approval is required to do anything beyond viewing:
   labels render at every width (role chip, theme label, account switcher, etc.).
 
 ## 10. Pricing (from the product definition)
-- **To host:** a **ClubR subscription** (premium; bundles HUDR in Phase 2).
+- **To host:** a **ClubrGO subscription** (premium; bundles HUDR in Phase 2).
 - **To play:** **credits** per entry, or **free with a HUDR subscription** (Phase 2).
 - Free trial: 1000 credits / 10 free games.
 
@@ -293,7 +293,7 @@ Approval is required to do anything beyond viewing:
 ## 13. Football Squares (built — live on the rails)
 A **third club side‑game** on the same rails as FT Fantasy & Last Longer. Widely run in
 poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisition hook**
-(a reason for a club to install ClubR *that week*).
+(a reason for a club to install ClubrGO *that week*).
 
 - **Pure chance** (10×10 grid, random digit assignment). Because there's no skill element,
   the **transparent‑scorekeeper / app‑touches‑no‑cash wall matters even more here**: the
@@ -348,12 +348,12 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
 
 ## 14. Prototype feedback & analytics (testing instrumentation)
 A floating **Feedback** launcher sits on every screen (mounted in `AppShell`,
-pinned above the bottom nav), mirroring the Scout prototypes but scoped to ClubR:
+pinned above the bottom nav), mirroring the Scout prototypes but scoped to ClubrGO:
 - **Quick note (frictionless):** type a single note and **send instantly** — **no
   rating and no required name/email** (identity is attached only if already captured).
   Auto‑captures the current screen → PostHog `quick_note_submitted` (also mirrored to
   TournamentPro). The longer **guided review** stays one tap away.
-- **Guided review (`ReviewWizard`):** identity first, then **one step per ClubR
+- **Guided review (`ReviewWizard`):** identity first, then **one step per ClubrGO
   feature** — first impression, Discover, joining a club, FT Fantasy (Stack Draft),
   Last Longer, hosting, paid tracking & vetting, transparent scorekeeper,
   navigation, look & feel — each a 1–5 score + liked/disliked quick‑pick chips +
@@ -363,7 +363,7 @@ pinned above the bottom nav), mirroring the Scout prototypes but scoped to ClubR
 - Reviewer **identity is captured once and reused** across both forms, persisted
   to `localStorage` (`clubr-reviewer`).
 - Every event is tagged `prototype: 'clubr'` / `surface: 'clubr-prototype'` so
-  ClubR feedback is filterable in the shared PostHog project. **Public `phc_`
+  ClubrGO feedback is filterable in the shared PostHog project. **Public `phc_`
   key only** (never the personal `phx_` key).
 - **Mirrored to TournamentPro:** in addition to PostHog, every submission is POSTed
   (fire-and-forget) to the `submit-feedback` edge function → stored in the
@@ -442,7 +442,7 @@ when the registration deadline elapses the badge stays **Registration open** and
   in**, even across clubs they're not a member of.
 
 ## 18. Multi‑game platform IA (scales to N game types)
-ClubR is a **multi‑game platform** (FT Fantasy, Last Longer, **Football Squares** next, more
+ClubrGO is a **multi‑game platform** (FT Fantasy, Last Longer, **Football Squares** next, more
 later). Navigation is by **entity/activity, never by game type**:
 - **Bottom nav = Home · Clubs · Games · Me** (4 fixed tabs). The old per‑game tabs (Fantasy, Last
   Longer) are **replaced by a single Games tab**; adding a game type adds a **filter chip + a card
@@ -529,7 +529,7 @@ hosting**. Credits are **non‑cash, non‑refundable to money, and non‑transf
 - **Roles:** Player & Club Host have balances and spend per the table above. **App Admin has no
   balance** — they own an **"Economy" section in the Admin console** to set the three action costs
   and **CRUD the packages**.
-- **Phase 2 (noted, not built):** the **ClubR subscription** + **HUDR‑subscription fee waiver**
+- **Phase 2 (noted, not built):** the **ClubrGO subscription** + **HUDR‑subscription fee waiver**
   return as alternatives to credits once HUDR integrates (supersedes the §10 subscription wording —
   for now everything runs on credits).
 - **Prototype seed:** new accounts = 1000 cr; demo **Player (Sam) = 1000** (+ a few ledger entries),
@@ -681,22 +681,22 @@ fully hidden** — and a direct URL must never reveal whether a private club exi
 
 ## 22. Telegram channel per club (prototype: mock; real: bot + webhook)
 A club host can connect a **Telegram broadcast channel**; **approved members** join it from
-ClubR, gated on club approval. Built as a **mock** in the prototype (no real bot yet); the live
+ClubrGO, gated on club approval. Built as a **mock** in the prototype (no real bot yet); the live
 design is below.
 
 **Flow (validated):**
 - **Host connects a channel:** creates a **private broadcast channel** in Telegram with
-  **"approve new members" ON**, adds **`@ClubRBot` as admin**, and links it in ClubR (Members tab →
-  *Telegram channel*). ClubR stores the channel.
+  **"approve new members" ON**, adds **`@ClubRBot` as admin**, and links it in ClubrGO (Members tab →
+  *Telegram channel*). ClubrGO stores the channel.
 - **Member links Telegram once:** via a bot deep-link `t.me/ClubRBot?start=<nonce>` — ties their
-  `telegram_user_id` to the ClubR account. **Required** (the bot must match the joiner to a member).
+  `telegram_user_id` to the ClubrGO account. **Required** (the bot must match the joiner to a member).
 - **Join is gated on approval:** a *pending* member sees nothing. Once the **host approves** them, a
   **"Join our Telegram"** card appears: Connect Telegram (if needed) → join-request → the bot
   **approves** them because they're a **linked, approved member** of the club that owns the channel.
 - **Auto-remove:** when a member leaves / is removed from the club, the bot **kicks** them from the channel.
-- **Auto-posts:** the bot posts **new-game + results announcements + monthly leaderboard recaps**, each with a deep link back to ClubR.
+- **Auto-posts:** the bot posts **new-game + results announcements + monthly leaderboard recaps**, each with a deep link back to ClubrGO.
 - **Stray join-requests** (someone with the link who isn't a linked, approved member): the bot
-  **declines**. For a **public** club it DMs a "Join {Club} on ClubR first" link; for a **private**
+  **declines**. For a **public** club it DMs a "Join {Club} on ClubrGO first" link; for a **private**
   club it stays **generic** (no club name/link) — preserving the §21 non-disclosure.
 
 **Key constraint:** a Telegram bot **cannot silently force-add** a user to a channel — the user must

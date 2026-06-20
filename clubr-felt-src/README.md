@@ -1,6 +1,6 @@
-# Clubr · "Felt" variant
+# ClubrGO · "Felt" variant
 
-A premium **poker-luxe** design treatment of the Clubr scorekeeper. Same product,
+A premium **poker-luxe** design treatment of the ClubrGO scorekeeper. Same product,
 same routes, same data model as the reference `clubr/` app — one new, coherent
 **dark felt + chip-gold** design language applied across every route.
 
