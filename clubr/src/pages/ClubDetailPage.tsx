@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, Crown, ChevronDown, PartyPopper, type LucideIcon } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, ChevronDown, PartyPopper } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin, useJoinViaInvite, useSetClubVisibility } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
@@ -22,11 +22,13 @@ import { cn } from '@/lib/utils/cn'
 // else sees Available · Playing · Completed. Default is Available.
 type ClubStatus = 'available' | 'playing' | 'hosting' | 'completed'
 
-const STATUS_META: Record<ClubStatus, { label: string; icon: LucideIcon; active: string }> = {
-  available: { label: 'Available', icon: Ticket, active: 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' },
-  playing: { label: 'Playing', icon: Gamepad2, active: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40' },
-  hosting: { label: 'Hosting', icon: Crown, active: 'border-accent-purple bg-accent-purple/20 text-accent-purple font-bold ring-1 ring-accent-purple/40' },
-  completed: { label: 'Completed', icon: Trophy, active: 'border-accent-amber bg-accent-amber/20 text-accent-amber font-bold ring-1 ring-accent-amber/40' },
+// No per-pill icons — the active color + ring already signals the category, and
+// dropping them lets all four pills (incl. Completed) fit one mobile row.
+const STATUS_META: Record<ClubStatus, { label: string; active: string }> = {
+  available: { label: 'Available', active: 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' },
+  playing: { label: 'Playing', active: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40' },
+  hosting: { label: 'Hosting', active: 'border-accent-purple bg-accent-purple/20 text-accent-purple font-bold ring-1 ring-accent-purple/40' },
+  completed: { label: 'Completed', active: 'border-accent-amber bg-accent-amber/20 text-accent-amber font-bold ring-1 ring-accent-amber/40' },
 }
 
 const EMPTY: Record<ClubStatus, { title: string; sub: string }> = {
@@ -198,15 +200,15 @@ export function ClubDetailPage() {
           )}
 
           {/* Status pills */}
-          <div className="mb-2.5 flex gap-1.5 overflow-x-auto no-scrollbar border-b border-border/60 pb-2.5" role="tablist" aria-label="Filter games by status">
+          <div className="mb-2.5 flex gap-1 overflow-x-auto no-scrollbar border-b border-border/60 pb-2.5" role="tablist" aria-label="Filter games by status">
             {statuses.map((s) => {
               const m = STATUS_META[s]
               const on = gameStatus === s
               const n = counts[s]
               return (
                 <button key={s} type="button" role="tab" aria-selected={on} onClick={() => setGameStatus(s)}
-                  className={cn('flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', on ? m.active : 'border-border font-semibold text-text-secondary')}>
-                  <m.icon className="h-3 w-3" />{m.label}{n ? ` (${n})` : ''}
+                  className={cn('shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', on ? m.active : 'border-border font-semibold text-text-secondary')}>
+                  {m.label}{n ? ` (${n})` : ''}
                 </button>
               )
             })}
