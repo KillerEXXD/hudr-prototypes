@@ -9,7 +9,7 @@ import type { UnifiedGame } from './useUnifiedGames'
 export type Relationship = 'available' | 'playing' | 'hosting'
 
 export function relationshipOf(g: UnifiedGame): Relationship | null {
-  if (g.canManage) return 'hosting'
+  if (g.iHost) return 'hosting' // REAL host/co-host — NOT canManage (which includes App Admins)
   if (g.mine) return 'playing'
   if (g.phase === 'reg') return 'available' // Open & joinable, not yours, not joined
   return null
