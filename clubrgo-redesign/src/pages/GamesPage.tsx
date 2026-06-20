@@ -1,96 +1,108 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Gamepad2, Plus, LayoutGrid, Clock, Ticket, Trophy, Lock, type LucideIcon } from 'lucide-react'
-import { useGames } from '@/hooks'
-import { TYPE, STATUS, PrimaryBtn } from '@/components/ui'
+import { useSearchParams } from 'react-router-dom'
+import { Gamepad2, Plus, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { useMyClubs } from '@/hooks'
+import { useAuth } from '@/contexts/AuthContext'
+import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { InfiniteList } from '@/components/common/InfiniteList'
+import { RelationshipPills } from '@/components/games/RelationshipPills'
+import { NewGameSheet } from '@/components/games/NewGameSheet'
+import { GAME_TYPES, type GameType } from '@/games/types'
+import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
+import { orderActiveTab, orderCompleted } from '@/games/gameOrdering'
+import { relationshipOf, defaultRelationship, relationshipPills, type Relationship } from '@/games/gameRelationship'
+import { renderUnifiedGame as renderGame } from '@/games/renderGame'
 import { cn } from '@/lib/utils/cn'
-import type { GameType, Relationship } from '@/types'
 
-const PILLS: { key: Relationship; label: string }[] = [
-  { key: 'available', label: 'Available' },
-  { key: 'playing', label: 'Playing' },
-  { key: 'hosting', label: 'Hosting' },
-]
-const TYPES: { key: 'all' | GameType; label: string; icon: LucideIcon }[] = [
-  { key: 'all', label: 'All', icon: LayoutGrid },
-  { key: 'ft', label: 'FTF', icon: TYPE.ft.icon },
-  { key: 'll', label: 'LL', icon: TYPE.ll.icon },
-  { key: 'sq', label: 'Squares', icon: TYPE.sq.icon },
-]
+// Unified games feed across all game types. Active games are sliced by the
+// relationship pill (Available · Playing · Hosting); Completed is its own section.
+
+function FilterChip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
+  return (
+    <button type="button" onClick={onClick} className={cn('flex items-center gap-1 rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? activeClass : 'border-border font-semibold text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
+  )
+}
 
 export function GamesPage() {
-  const navigate = useNavigate()
-  const { data: games = [] } = useGames()
-  const [rel, setRel] = useState<Relationship>('playing')
-  const [type, setType] = useState<'all' | GameType>('all')
+  const { user } = useAuth()
+  const myClubs = useMyClubs()
+  const canHost = (myClubs.data ?? []).some((c) => c.canManage)
+  const isAdmin = user?.role === 'admin'
+  const isHost = canHost || isAdmin
+  // Keep the active filter in the URL so navigating into a game and pressing Back
+  // returns to the exact pill the user was on (component state would reset to the
+  // default). Written with `replace` so filter changes don't pile up in history.
+  const [params, setParams] = useSearchParams()
+  const allowedRels = relationshipPills(isHost) as string[]
+  const relParam = params.get('rel')
+  const rel: Relationship = relParam && allowedRels.includes(relParam) ? (relParam as Relationship) : defaultRelationship(isHost)
+  const typeParam = params.get('type')
+  const filter: 'all' | GameType = typeParam === 'all' || GAME_TYPES.some((t) => t.id === typeParam) ? (typeParam as 'all' | GameType) : 'all'
+  const setFilter = (f: 'all' | GameType) => setParams((p) => { const n = new URLSearchParams(p); n.set('type', f); return n }, { replace: true })
+  const pickRel = (r: Relationship) => setParams((p) => { const n = new URLSearchParams(p); n.set('rel', r); n.set('type', 'all'); return n }, { replace: true })
+  const [newOpen, setNewOpen] = useState(false)
 
-  const counts = { available: 0, playing: 0, hosting: 0 } as Record<Relationship, number>
-  for (const g of games) counts[g.relationship]++
-  const shown = games.filter((g) => g.relationship === rel).filter((g) => type === 'all' || g.type === type)
+  const { isLoading, items } = useUnifiedGames()
+  const showAll = filter === 'all'
+
+  // Active games (non-closed), bucketed by relationship + type, then ordered per tab:
+  // Available = latest created · Playing/Hosting = latest joined (host falls back to created).
+  const active = items.filter((g) => g.phase !== 'closed')
+  const counts = { available: 0, playing: 0, hosting: 0 }
+  for (const g of active) { const r = relationshipOf(g); if (r) counts[r]++ }
+  const shownActive = orderActiveTab(active.filter((g) => relationshipOf(g) === rel).filter((g) => matchesType(g, filter)), rel)
+
+  // Completed (history): yours/hosted, latest completed first, with a "Hosted / Played" tag.
+  const done = orderCompleted(items.filter((g) => g.finished && (g.mine || g.canManage)).filter((g) => matchesType(g, filter)))
 
   return (
-    <div className="px-4 pb-6 pt-4">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-black tracking-tight"><Gamepad2 className="h-6 w-6 text-accent-blue" />Games</h1>
-          <p className="mt-0.5 text-sm text-text-secondary">Everything across your clubs.</p>
-        </div>
-        <PrimaryBtn className="!px-3.5 !py-2 !text-xs"><span className="flex items-center gap-1"><Plus className="h-3.5 w-3.5" />New game</span></PrimaryBtn>
-      </div>
-
-      <div className="mt-4 flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {PILLS.map((p) => (
-          <button key={p.key} onClick={() => setRel(p.key)} className={cn('shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition', rel === p.key ? 'bg-accent-emerald/20 text-accent-emerald ring-1 ring-accent-emerald/50' : 'bg-bg-surface text-text-muted ring-1 ring-border')}>
-            {p.label} <span className={rel === p.key ? 'text-accent-emerald/80' : 'text-text-muted'}>{counts[p.key]}</span>
+    <div className="animate-fade-up">
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Gamepad2 className="h-5 w-5 text-accent-blue" />Games</h1>
+        {canHost && !isAdmin && (
+          <button type="button" onClick={() => setNewOpen(true)} className="flex shrink-0 items-center gap-1 rounded-full bg-accent-blue px-3 py-1.5 text-xs font-bold text-white transition-transform active:scale-95 cursor-pointer">
+            <Plus className="h-3.5 w-3.5" />New game
           </button>
-        ))}
+        )}
       </div>
-      <div className="mt-2 flex gap-1.5">
-        {TYPES.map((t) => (
-          <button key={t.key} onClick={() => setType(t.key)} className={cn('flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition', type === t.key ? 'bg-accent-blue/20 text-accent-blue ring-1 ring-accent-blue/40' : 'border border-border text-text-muted')}>
-            <t.icon className="h-3 w-3" />{t.label}
-          </button>
-        ))}
+      <p className="mt-1 text-sm text-text-secondary">Everything happening across your clubs — all game types in one place.</p>
+
+      {/* relationship pill + type filter */}
+      <div className="mt-3"><RelationshipPills value={rel} onChange={pickRel} isHost={isHost} counts={counts} /></div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
+        {GAME_TYPES.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
       </div>
 
-      <div className="mt-4 flex flex-col gap-2.5">
-        {shown.length === 0 ? (
-          <div className="mt-10 flex flex-col items-center gap-2 text-center">
-            <div className="grid h-16 w-16 place-items-center rounded-2xl bg-bg-surface"><Gamepad2 className="h-7 w-7 text-text-muted" /></div>
-            <p className="font-bold">No games here yet</p>
-            <p className="max-w-[15rem] text-sm text-text-muted">Nothing in this tab right now — check the others, or host one.</p>
-          </div>
-        ) : shown.map((g) => {
-          const t = TYPE[g.type], s = STATUS[g.status]
-          return (
-            <button key={g.id} onClick={() => navigate(g.type === 'ft' ? '/draft' : '/club')} className={cn('relative overflow-hidden rounded-2xl border border-border bg-bg-card p-3.5 text-left shadow-lg ring-1 transition active:scale-[.99]', t.ring)}>
-              <div className={cn('pointer-events-none absolute inset-x-0 -top-16 h-24 bg-gradient-to-b to-transparent blur-2xl', t.glow)} />
-              <div className="relative flex items-center justify-between">
-                <span className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold', t.bg, t.text)}><t.icon className="h-3.5 w-3.5" />{t.label}</span>
-                <span className={cn('rounded-full px-2.5 py-1 text-[10px] font-bold', s.cls)}>{s.label}</span>
+      {isLoading ? <Spinner /> : (
+        <>
+          <Section title="Games">
+            {shownActive.length > 0 ? (
+              <InfiniteList items={shownActive} batch={8} resetKey={`${rel}:${filter}`} className="flex flex-col gap-2" renderItem={(g) => renderGame(g, showAll)} />
+            ) : (
+              <EmptyState
+                icon={<Gamepad2 className="h-7 w-7" />}
+                title={rel === 'hosting' ? "You're not hosting any games right now" : rel === 'playing' ? "You're not playing in any games yet" : 'No games available to join right now'}
+                sub={rel === 'hosting' && canHost && !isAdmin ? 'Tap “New game” to host one.' : 'Check the other tabs above.'}
+              />
+            )}
+          </Section>
+          {done.length > 0 && (
+            <Section title={`Completed (${done.length})`}>
+              <div className="flex flex-col gap-2">
+                {done.map((g) => (
+                  <div key={g.id} className="flex flex-col gap-1">
+                    <Badge tone={g.canManage ? 'purple' : 'green'} className="self-start">{g.canManage ? 'You hosted' : 'You played'}</Badge>
+                    {renderGame(g, showAll)}
+                  </div>
+                ))}
               </div>
-              <div className="relative mt-2.5 flex items-center gap-1.5 text-xs text-text-secondary">
-                <span className="text-sm">{g.clubEmoji}</span><span className="font-medium">{g.club}</span>
-                {g.private && <span className="flex items-center gap-0.5 rounded bg-bg-surface px-1.5 py-0.5 text-[10px] text-text-muted"><Lock className="h-2.5 w-2.5" />Private</span>}
-              </div>
-              <h3 className="relative mt-0.5 text-lg font-extrabold tracking-tight">{g.title}</h3>
-              <div className="relative mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
-                <span className="flex items-center gap-1 rounded-md bg-bg-surface px-2 py-1 font-semibold text-text-primary"><Ticket className="h-3 w-3" />{g.stake}</span>
-                <span className="flex items-center gap-1 rounded-md bg-accent-emerald/10 px-2 py-1 font-semibold text-accent-emerald"><Trophy className="h-3 w-3" />{g.pool}</span>
-                <span className="text-text-muted">· {g.joined} joined</span>
-                <span className="nums ml-auto flex items-center gap-1 text-text-secondary">
-                  {g.status === 'completed' ? <span className="text-text-muted">ended</span> : <><Clock className={cn('h-3 w-3', g.status === 'running' ? 'text-accent-emerald' : 'text-accent-blue')} />{g.closesIn}</>}
-                </span>
-              </div>
-              <div className="relative mt-2 text-[11px] text-text-muted">{g.sub}</div>
-            </button>
-          )
-        })}
-      </div>
+            </Section>
+          )}
+        </>
+      )}
 
-      <p className="mt-6 rounded-xl bg-bg-card/60 p-3 text-center text-[11px] leading-snug text-text-muted">
-        ClubrGo is just the <span className="font-semibold text-text-secondary">scorekeeper</span> — it holds <span className="font-semibold text-text-secondary">no cash</span>. Stakes are settled between players offline.
-      </p>
+      <NewGameSheet open={newOpen} onClose={() => setNewOpen(false)} />
     </div>
   )
 }

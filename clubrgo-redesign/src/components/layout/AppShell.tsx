@@ -1,54 +1,40 @@
-import { NavLink, Outlet } from 'react-router-dom'
-import { Gamepad2, Layers, Users, Bell, Trophy, Coins, type LucideIcon } from 'lucide-react'
-import { cn } from '@/lib/utils/cn'
-import { useCredits, useNotifications } from '@/hooks'
-import { useAuth } from '@/contexts/AuthContext'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { CheckCircle2 } from 'lucide-react'
+import { Header } from './Header'
+import { BottomNav } from './BottomNav'
+import FeedbackButton from '@/components/common/FeedbackButton'
+import { SpendProvider } from '@/components/credits/SpendProvider'
+import { Sheet, Btn } from '@/components/common/ui'
 
-const NAV: { to: string; label: string; icon: LucideIcon; end?: boolean }[] = [
-  { to: '/', label: 'Games', icon: Gamepad2, end: true },
-  { to: '/draft', label: 'Draft', icon: Layers },
-  { to: '/club', label: 'Club', icon: Users },
-  { to: '/alerts', label: 'Alerts', icon: Bell },
-  { to: '/results', label: 'Results', icon: Trophy },
-]
-
+/** Mobile-first phone-frame shell: header on top, scrolling content, sticky bottom nav. */
 export function AppShell() {
-  const { user } = useAuth()
-  const { data: credits } = useCredits()
-  const { data: notifs } = useNotifications()
-  const unread = (notifs ?? []).filter((n) => n.unread).length
+  const location = useLocation()
+  const navigate = useNavigate()
+  // Set after a valid PRIVATE invite code: the club isn't disclosed, so we confirm
+  // the request here rather than routing into the club.
+  const inviteSent = (location.state as { inviteSent?: boolean } | null)?.inviteSent
+  const dismiss = () => navigate('/', { replace: true, state: {} })
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center bg-bg-primary py-0 sm:py-6">
-      <div className="relative flex h-[100svh] w-full max-w-[430px] flex-col overflow-hidden bg-bg-primary text-text-primary sm:h-[900px] sm:rounded-[2.2rem] sm:border sm:border-border sm:shadow-2xl">
-        {/* shared header */}
-        <header className="flex shrink-0 items-center justify-between border-b border-border/60 px-4 py-3">
-          <div className="flex items-center gap-1 text-lg font-black tracking-tight">
-            <span className="text-accent-blue">♣</span>Clubr<span className="text-accent-blue">GO</span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <span className="flex items-center gap-1 rounded-full bg-accent-amber/15 px-2.5 py-1 text-xs font-bold text-accent-amber ring-1 ring-accent-amber/30"><Coins className="h-3.5 w-3.5" />{credits ?? '—'}</span>
-            <NavLink to="/alerts" className="relative text-text-secondary">
-              <Bell className="h-5 w-5" />
-              {unread > 0 && <span className="absolute -right-1.5 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent-red px-1 text-[10px] font-bold text-white">{unread}</span>}
-            </NavLink>
-            <div className="grid h-8 w-8 place-items-center rounded-full bg-accent-blue text-xs font-bold text-white">{user?.name?.split(' ').map((x) => x[0]).join('') ?? 'GO'}</div>
-          </div>
-        </header>
-
-        {/* routed page */}
-        <main className="animate-fade-up flex-1 overflow-y-auto no-scrollbar"><Outlet /></main>
-
-        {/* bottom nav */}
-        <nav className="flex shrink-0 items-center justify-around border-t border-border bg-bg-secondary/90 px-2 pb-[max(0.4rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur">
-          {NAV.map((n) => (
-            <NavLink key={n.to} to={n.to} end={n.end}
-              className={({ isActive }) => cn('flex w-14 flex-col items-center gap-0.5 rounded-xl py-1 text-[10px] font-semibold transition', isActive ? 'text-accent-blue' : 'text-text-muted')}>
-              {({ isActive }) => (<><n.icon className={cn('h-5 w-5 transition', isActive && 'scale-110')} />{n.label}</>)}
-            </NavLink>
-          ))}
-        </nav>
+    <div className="flex min-h-screen justify-center bg-bg-primary">
+      <div className="flex min-h-screen w-full max-w-md flex-col border-x border-border bg-bg-primary">
+        <SpendProvider>
+          <Header />
+          <main className="flex-1 px-4 pb-6 pt-3">
+            <Outlet />
+          </main>
+          <BottomNav />
+        </SpendProvider>
       </div>
+      <FeedbackButton />
+
+      <Sheet open={!!inviteSent} onClose={dismiss} title="Request sent">
+        <div className="flex flex-col items-center text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-emerald/10 text-accent-emerald"><CheckCircle2 className="h-6 w-6" /></div>
+          <p className="mt-3 text-sm text-text-secondary">Your request to join the club has been sent — the <span className="font-semibold text-text-primary">host will review it</span> and admit you. You'll get a notification when you're in.</p>
+          <Btn className="mt-4 w-full" onClick={dismiss}>Back</Btn>
+        </div>
+      </Sheet>
     </div>
   )
 }
