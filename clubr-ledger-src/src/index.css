@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  /* "Ledger" — grinder stats cockpit, cool slate + electric-lime data accent */
+  --color-bg-primary: #0C0F12;
+  --color-bg-secondary: #080A0C;
+  --color-bg-card: #13181D;
+  --color-bg-surface: #1A2128;
+  --color-bg-elevated: #222B33;
+  --color-border: #222A31;
+  --color-border-light: #303A43;
+  --color-text-primary: #E9EEF2;
+  --color-text-secondary: #9DAAB5;
+  --color-text-muted: #5F6E79;
+  --color-accent-blue: #5AA9E6;
+  --color-accent-amber: #E9B44C;
+  --color-accent-emerald: #5BD08A;
+  --color-accent-red: #F0664F;
+  --color-accent-purple: #9D8BE6;
+  --color-accent-cyan: #4FD0C9;
+  --color-accent-gold: #B6F36B;
+  --color-accent-gold-deep: #8FCB48;
+  --color-tier-reliable: #5BD08A;
+  --color-tier-tentative: #E9B44C;
+  --color-tier-noise: #5F6E79;
+  --color-sev-critical: #F0664F;
+  --color-sev-moderate: #E9B44C;
+  --color-sev-minor: #5AA9E6;
+  --font-family-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-family-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-family-display: 'IBM Plex Sans', system-ui, sans-serif;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font-family-sans);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* tabular figures for stat numbers */
+  .nums { font-family: var(--font-family-mono); font-variant-numeric: tabular-nums; }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--color-border-light); border-radius: 9999px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  @keyframes se-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .animate-fade-up { animation: se-fade-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes se-pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .animate-pulse-soft { animation: se-pulse-soft 1.8s ease-in-out infinite; }
+
+  /* Gentle breathing dot for the header theme/skin chip (signals it's tappable) */
+  @keyframes se-skin-pulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  .skin-dot { animation: se-skin-pulse 2.4s ease-in-out infinite; }
+
+  /* CRUD "processing" indicator — the four card suits pop in sequence (see
+     <Processing> in ui.tsx). Staggered animation-delay travels ♠→♥→♦→♣. */
+  @keyframes clubr-suit-pop {
+    0%, 65%, 100% { opacity: 0.3; transform: translateY(0) scale(0.82); }
+    18% { opacity: 1; transform: translateY(-2px) scale(1.18); }
+  }
+  .clubr-suit { animation: clubr-suit-pop 1.15s ease-in-out infinite; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+@layer base {
+  h1, h2 { font-family: var(--font-family-display); letter-spacing: -0.01em; }
+  /* Ledger is a stats tool: tabular mono numerals everywhere by default */
+  .stat { font-family: var(--font-family-mono); font-variant-numeric: tabular-nums; }
+}
+@layer utilities {
+  @keyframes grind-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .grind-dot { animation: grind-dot 1.5s ease-in-out infinite; }
+}

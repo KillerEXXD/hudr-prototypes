@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  /* "Table" — in-session, deep felt + bright signal-green, big-touch */
+  --color-bg-primary: #06140E;
+  --color-bg-secondary: #030B07;
+  --color-bg-card: #0C2218;
+  --color-bg-surface: #123022;
+  --color-bg-elevated: #1A4030;
+  --color-border: #1B3A2A;
+  --color-border-light: #27523C;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #B7D6C6;
+  --color-text-muted: #6FA088;
+  --color-accent-blue: #54C7FF;
+  --color-accent-amber: #FFC23D;
+  --color-accent-emerald: #34E89E;
+  --color-accent-red: #FF5C6C;
+  --color-accent-purple: #B98BFF;
+  --color-accent-cyan: #34E89E;
+  --color-accent-gold: #34E89E;
+  --color-accent-gold-deep: #1FBE7E;
+  --color-tier-reliable: #34E89E;
+  --color-tier-tentative: #FFC23D;
+  --color-tier-noise: #6FA088;
+  --color-sev-critical: #FF5C6C;
+  --color-sev-moderate: #FFC23D;
+  --color-sev-minor: #54C7FF;
+  --font-family-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-family-display: 'Space Grotesk', system-ui, sans-serif;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font-family-sans);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* tabular figures for stat numbers */
+  .nums { font-family: var(--font-family-mono); font-variant-numeric: tabular-nums; }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--color-border-light); border-radius: 9999px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  @keyframes se-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .animate-fade-up { animation: se-fade-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes se-pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .animate-pulse-soft { animation: se-pulse-soft 1.8s ease-in-out infinite; }
+
+  /* Gentle breathing dot for the header theme/skin chip (signals it's tappable) */
+  @keyframes se-skin-pulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  .skin-dot { animation: se-skin-pulse 2.4s ease-in-out infinite; }
+
+  /* CRUD "processing" indicator — the four card suits pop in sequence (see
+     <Processing> in ui.tsx). Staggered animation-delay travels ♠→♥→♦→♣. */
+  @keyframes clubr-suit-pop {
+    0%, 65%, 100% { opacity: 0.3; transform: translateY(0) scale(0.82); }
+    18% { opacity: 1; transform: translateY(-2px) scale(1.18); }
+  }
+  .clubr-suit { animation: clubr-suit-pop 1.15s ease-in-out infinite; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+@layer base {
+  h1, h2 { font-family: var(--font-family-display); letter-spacing: -0.02em; }
+}
+@layer utilities {
+  @keyframes table-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(52,232,158,0)} 50%{box-shadow:0 0 0 4px rgba(52,232,158,0.22)} }
+  .table-pulse { animation: table-pulse 2s ease-in-out infinite; }
+  @keyframes table-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.65)} }
+  .table-dot { animation: table-dot 1.3s ease-in-out infinite; }
+}

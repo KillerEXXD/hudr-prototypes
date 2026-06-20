@@ -1,0 +1,12 @@
+{
+  "title": "Table",
+  "subtitle": "In-session redesign · big-touch dark",
+  "palette": "signal-green #34E89E on deep felt #06140E",
+  "type": "Space Grotesk + JetBrains Mono",
+  "best_for": "Use AT the table mid-game — one-handed, glanceable from across the felt",
+  "risk": "Optimized for the live moment; quiet-state is a calm launchpad by design",
+  "recommendation": "Pick this if players actually open the app during the game, not after.",
+  "kind": "dark",
+  "thumb": "thumb.png",
+  "url": "/clubr-table/"
+}

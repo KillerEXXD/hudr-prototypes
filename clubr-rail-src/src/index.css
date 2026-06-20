@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme {
+  /* "Rail" — social-first, warm charcoal + coral/ember */
+  --color-bg-primary: #17120F;
+  --color-bg-secondary: #0F0B09;
+  --color-bg-card: #211915;
+  --color-bg-surface: #2A201B;
+  --color-bg-elevated: #352822;
+  --color-border: #3A2C24;
+  --color-border-light: #4A382E;
+  --color-text-primary: #F6F1EC;
+  --color-text-secondary: #C9B8AC;
+  --color-text-muted: #8C7A6E;
+  --color-accent-blue: #5AA9E6;
+  --color-accent-blue-deep: #2E6FA3;
+  --color-accent-amber: #FFB155;
+  --color-accent-emerald: #4FCB8B;
+  --color-accent-red: #FF7A59;
+  --color-accent-purple: #C08BE6;
+  --color-accent-cyan: #4FB8C9;
+  --color-accent-gold: #FF7A59;
+  --color-accent-gold-deep: #E0613F;
+  --color-tier-reliable: #4FCB8B;
+  --color-tier-tentative: #FFB155;
+  --color-tier-noise: #8C7A6E;
+  --color-sev-critical: #FF6B5C;
+  --color-sev-moderate: #FFB155;
+  --color-sev-minor: #5AA9E6;
+  --font-family-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-family-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-family-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font-family-sans);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* tabular figures for stat numbers */
+  .nums { font-family: var(--font-family-mono); font-variant-numeric: tabular-nums; }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--color-border-light); border-radius: 9999px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  @keyframes se-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .animate-fade-up { animation: se-fade-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes se-pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .animate-pulse-soft { animation: se-pulse-soft 1.8s ease-in-out infinite; }
+
+  /* Gentle breathing dot for the header theme/skin chip (signals it's tappable) */
+  @keyframes se-skin-pulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  .skin-dot { animation: se-skin-pulse 2.4s ease-in-out infinite; }
+
+  /* CRUD "processing" indicator — the four card suits pop in sequence (see
+     <Processing> in ui.tsx). Staggered animation-delay travels ♠→♥→♦→♣. */
+  @keyframes clubr-suit-pop {
+    0%, 65%, 100% { opacity: 0.3; transform: translateY(0) scale(0.82); }
+    18% { opacity: 1; transform: translateY(-2px) scale(1.18); }
+  }
+  .clubr-suit { animation: clubr-suit-pop 1.15s ease-in-out infinite; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+@layer base {
+  h1, h2, .text-xl.font-extrabold, .text-2xl.font-extrabold, .text-3xl.font-extrabold, .text-2xl.font-bold {
+    font-family: var(--font-family-display); letter-spacing: -0.02em;
+  }
+}
+@layer utilities {
+  @keyframes rail-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+  .rail-dot { animation: rail-dot 1.6s ease-in-out infinite; }
+}
