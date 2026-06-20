@@ -14,6 +14,7 @@ export function Onboarding({ onEnter }: { onEnter: () => void }) {
       <div className="relative flex flex-1 flex-col justify-center px-6">
         <div className="mb-2 text-5xl">♣️</div>
         <h1 className="text-4xl font-black leading-none tracking-tight">Clubr<span className="text-sky-400">GO</span></h1>
+        <span className="mt-2 inline-flex items-center gap-1.5 self-start rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-bold text-zinc-300"><span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-violet-400 to-sky-400" />Nocturne · visual direction</span>
         <p className="mt-3 max-w-[18rem] text-base leading-snug text-zinc-300">
           Run fun side-games with your poker club — <span className="font-semibold text-white">FT Fantasy, Last Longer & Squares</span> — all in one place.
         </p>
