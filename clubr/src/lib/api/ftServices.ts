@@ -17,7 +17,8 @@ function isMember(clubId: string, userId: string): boolean {
 // list, and app admins. Public (default) is visible to all club members.
 function canView(c: FTContest, userId: string, isAdmin: boolean): boolean {
   if (c.visibility !== 'private') return true
-  return isAdmin || c.hostId === userId || c.coHostIds.includes(userId) || (c.accessUserIds ?? []).includes(userId)
+  // Entrants can always view a contest they're in (even private + off access list).
+  return isAdmin || c.hostId === userId || c.coHostIds.includes(userId) || (c.accessUserIds ?? []).includes(userId) || c.entries.some((e) => e.userId === userId)
 }
 
 /** Compute scores + ranks for a settled contest (pure; doesn't mutate). */

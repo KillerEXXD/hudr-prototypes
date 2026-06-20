@@ -9,9 +9,11 @@ const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 const isMember = (clubId: string, userId: string) => !!CLUBS.find((c) => c.id === clubId)?.members.some((m) => m.userId === userId && m.status === 'member')
 
 function canView(g: SquaresGame, viewerId: string, isAdmin: boolean) {
-  const base = isAdmin || isMember(g.clubId, viewerId) || g.hostId === viewerId || g.coHostIds.includes(viewerId)
+  // A participant (roster or claimed a square) can always view the game they're in.
+  const isParticipant = g.participants.some((p) => p.userId === viewerId) || g.cells.some((c) => c.userId === viewerId)
+  const base = isAdmin || isMember(g.clubId, viewerId) || g.hostId === viewerId || g.coHostIds.includes(viewerId) || isParticipant
   if (g.visibility !== 'private') return base
-  return isAdmin || g.hostId === viewerId || g.coHostIds.includes(viewerId) || (g.accessUserIds ?? []).includes(viewerId)
+  return isAdmin || g.hostId === viewerId || g.coHostIds.includes(viewerId) || (g.accessUserIds ?? []).includes(viewerId) || isParticipant
 }
 function toView(g: SquaresGame, userId: string, isAdmin: boolean): SquaresGameView {
   return {

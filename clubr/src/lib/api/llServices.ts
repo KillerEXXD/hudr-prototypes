@@ -29,7 +29,8 @@ function announceLeadChange(g: LLGame, prevLeaderId?: string) {
 // Private games are only visible to host, co-hosts, the chosen access list, and admins.
 function canView(g: LLGame, userId: string, isAdmin: boolean): boolean {
   if (g.visibility !== 'private') return true
-  return isAdmin || g.hostId === userId || g.coHostIds.includes(userId) || (g.accessUserIds ?? []).includes(userId)
+  // Participants can always view a game they've joined (even private + off access list).
+  return isAdmin || g.hostId === userId || g.coHostIds.includes(userId) || (g.accessUserIds ?? []).includes(userId) || g.participants.some((p) => p.userId === userId)
 }
 
 function toView(g: LLGame, userId: string, isAdmin: boolean): LLGameView {
