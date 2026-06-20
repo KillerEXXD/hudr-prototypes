@@ -1,15 +1,16 @@
-import { CheckCircle2, UserPlus } from 'lucide-react'
-import { Badge, Btn } from '@/components/common/ui'
+import { UserPlus } from 'lucide-react'
+import { Btn } from '@/components/common/ui'
 import { useRequestEnter } from '@/hooks/ft'
 import { useRequestJoinLL } from '@/hooks/ll'
 import { useRequestJoinSquares } from '@/hooks/squares'
 import type { UnifiedGame } from '@/games/useUnifiedGames'
 
 /**
- * For the host's own game (the "Hosting" filter on a club): says whether the
- * host is also PLAYING, and — when they aren't, and the game is still joinable —
- * offers an inline self-join. The backend auto-approves a host's own join, so a
- * tap puts them straight into their own game. Renders below the game card.
+ * For the host's own game (the "Hosting" filter on a club): when the host is NOT
+ * playing and the game is still joinable, offers an inline self-join. Renders below
+ * the game card. When the host IS already playing this renders nothing — the card's
+ * own relationship chip already shows "Playing" (a second badge would just duplicate
+ * it). This bar is a pure ACTION affordance, not a status echo.
  */
 export function HostSelfJoinBar({ g }: { g: UnifiedGame }) {
   // Hooks must run unconditionally; only the matching one is invoked.
@@ -17,14 +18,8 @@ export function HostSelfJoinBar({ g }: { g: UnifiedGame }) {
   const ll = useRequestJoinLL()
   const sq = useRequestJoinSquares()
 
-  if (g.mine) {
-    return (
-      <div className="flex items-center gap-1.5 px-1">
-        <Badge tone="blue"><CheckCircle2 className="h-3 w-3" />Playing</Badge>
-        <span className="text-[11px] text-text-muted">you're in this game</span>
-      </div>
-    )
-  }
+  // Already playing → nothing to offer (the card chip already says "Playing").
+  if (g.mine) return null
   // A finished game can't be joined — nothing to offer.
   if (g.finished) return null
 

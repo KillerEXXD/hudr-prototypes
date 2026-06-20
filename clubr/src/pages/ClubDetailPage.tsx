@@ -129,10 +129,24 @@ export function ClubDetailPage() {
       <div className="flex items-center gap-3">
         <Avatar emoji={club.emoji} color={club.color} size={56} />
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-xl font-extrabold tracking-tight text-text-primary">{club.name}</h1>
-          <p className="text-xs text-text-muted">{members.length} members · hosted by {club.ownerName}</p>
+          {/* Name + the club's identity badge (visibility). Private gets emphasis
+              (lock + border); Public is quiet (globe, muted). Your ROLE (Owner) is a
+              different question — it stays trailing on the right. */}
+          <div className="flex items-center gap-1.5">
+            <h1 className="truncate text-xl font-extrabold tracking-tight text-text-primary">{club.name}</h1>
+            {isPrivate ? (
+              <span className="shrink-0 inline-flex items-center gap-1 rounded-full border border-border bg-bg-surface px-1.5 py-0.5 text-[10px] font-bold text-text-secondary"><Lock className="h-2.5 w-2.5" />Private</span>
+            ) : (
+              <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-semibold text-text-muted"><Globe className="h-2.5 w-2.5" />Public</span>
+            )}
+          </div>
+          {/* "hosted by" stays muted; the host NAME is emphasized + tappable (the club's
+              trust anchor). Accent rides the hover affordance, not the text fill. */}
+          <p className="text-xs text-text-muted">{members.length} members · hosted by{' '}
+            <button type="button" onClick={() => navigate(`/member/${club.ownerId}`, { state: { from: `/club/${club.id}` } })}
+              className="font-semibold text-text-primary underline-offset-2 hover:text-accent-blue hover:underline cursor-pointer">{club.ownerName}</button>
+          </p>
           {club.location && <p className="mt-0.5 flex items-center gap-1 text-[11px] text-text-muted"><MapPin className="h-3 w-3" />{club.location}</p>}
-          {isPrivate && <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-border bg-bg-surface px-1.5 py-0.5 text-[10px] font-bold text-text-secondary"><Lock className="h-2.5 w-2.5" />Private · invite-only</span>}
         </div>
         <MembershipBadge status={club.myStatus} role={club.myRole} />
       </div>
