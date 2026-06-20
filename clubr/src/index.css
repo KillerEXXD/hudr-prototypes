@@ -21,6 +21,9 @@
   --color-accent-red: #ef4444;
   --color-accent-purple: #8b5cf6;
   --color-accent-cyan: #06b6d4;
+  /* chip-gold (Felt skin) — value overridden at runtime by ThemeContext */
+  --color-accent-gold: #E9C46A;
+  --color-accent-gold-deep: #C99B3E;
 
   /* semantic */
   --color-tier-reliable: #10b981;
@@ -32,6 +35,8 @@
 
   --font-family-sans: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-family-mono: 'Fira Code', ui-monospace, monospace;
+  /* display face — overridden per theme by ThemeContext (Felt → Space Grotesk) */
+  --font-family-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
 }
 
 @layer base {
@@ -45,6 +50,18 @@
   }
   /* tabular figures for stat numbers */
   .nums { font-family: var(--font-family-mono); font-variant-numeric: tabular-nums; }
+
+  /* "Felt" personality: prominent headings carry the display face (Space Grotesk
+     under the Felt skin). Skin-only — no markup changes. */
+  h1, h2,
+  .text-xl.font-extrabold,
+  .text-2xl.font-extrabold,
+  .text-3xl.font-extrabold,
+  .text-2xl.font-bold,
+  .text-3xl.font-bold {
+    font-family: var(--font-family-display);
+    letter-spacing: -0.02em;
+  }
 }
 
 @layer utilities {
