@@ -49,7 +49,7 @@ export function App() {
           </nav>
         )}
       </div>
-      <p className="mt-3 hidden text-xs text-zinc-600 sm:block">ClubrGo redesign prototype · mock data · tap the bottom nav to tour all screens</p>
+      <p className="mt-3 hidden text-xs text-zinc-600 sm:block">ClubrGo · <span className="text-zinc-400">Nocturne</span> — redesign prototype · mock data · tap the bottom nav to tour all screens</p>
     </div>
   )
 }
