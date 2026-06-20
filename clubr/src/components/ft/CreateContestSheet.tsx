@@ -22,6 +22,11 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
   const managed = (myClubs.data ?? []).filter((c) => c.canManage)
   const [clubId, setClubId] = useState(fixedClubId ?? '')
   const [ftId, setFtId] = useState('')
+  // Contest name — defaults to the chosen final table's event name, but the host can
+  // rename it (e.g. "Friday FT Showdown"). `nameEdited` stops the auto-prefill once
+  // they've typed, so picking a different FT never clobbers a name they set on purpose.
+  const [name, setName] = useState('')
+  const [nameEdited, setNameEdited] = useState(false)
   const [stake, setStake] = useState(250)
   const [visibility, setVisibility] = useState<'public' | 'private'>('public')
   const [access, setAccess] = useState<string[]>([])
@@ -34,15 +39,21 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
     else if (managed.length === 1) setClubId(managed[0].id)
   }, [fixedClubId, managed.length])
   useEffect(() => { if (presetFtId) setFtId(presetFtId) }, [presetFtId])
+  // Prefill the name from the chosen FT until the host edits it themselves.
+  useEffect(() => {
+    if (nameEdited) return
+    const ftName = availableFts.data?.find((f) => f.id === ftId)?.name
+    if (ftName) setName(ftName)
+  }, [ftId, availableFts.data, nameEdited])
 
   const club = managed.find((c) => c.id === clubId)
   const members = (club?.members ?? []).filter((m) => m.status === 'member')
+  const contestName = name.trim()
 
   async function submit() {
-    const ftName = availableFts.data?.find((f) => f.id === ftId)?.name ?? 'FT contest'
-    if (!(await spend({ cost: hostCost, kind: 'host_game', label: `Hosted ${ftName}`, title: 'Host this final table', verb: 'Host' }))) return
-    const newId = await create.mutateAsync({ clubId, ftId, stake, budget: 100000, visibility, accessUserIds: access, closesAt: zonedWallToUtcISO(closesAt, tz), timezone: tz, payouts })
-    onClose(); setFtId('')
+    if (!(await spend({ cost: hostCost, kind: 'host_game', label: `Hosted ${contestName}`, title: 'Host this final table', verb: 'Host' }))) return
+    const newId = await create.mutateAsync({ clubId, ftId, name: contestName, stake, budget: 100000, visibility, accessUserIds: access, closesAt: zonedWallToUtcISO(closesAt, tz), timezone: tz, payouts })
+    onClose(); setFtId(''); setName(''); setNameEdited(false)
     if (newId) navigate(`/fantasy/${newId}`)
   }
 
@@ -77,6 +88,15 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
           </div>
         </>
       )}
+      <p className="mt-3 mb-1 text-xs font-semibold text-text-secondary">Name</p>
+      <input
+        type="text" value={name} maxLength={80}
+        onChange={(e) => { setName(e.target.value); setNameEdited(true) }}
+        placeholder="Contest name"
+        className="w-full rounded-xl border border-border bg-bg-surface px-3 py-2 text-sm font-semibold text-text-primary placeholder:font-normal placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-purple"
+      />
+      <p className="mt-1 text-[11px] text-text-muted">Shown to your members — defaults to the final table's name; rename it however you like.</p>
+
       <p className="mt-3 mb-1 text-xs font-semibold text-text-secondary">Bucket (Stakes)</p>
       <div className="flex gap-2">
         {[100, 250, 500].map((s) => (
@@ -116,7 +136,7 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
         </div>
       )}
 
-      <Btn className="mt-3 w-full" disabled={!clubId || !ftId || !closesAt || !arePayoutsValid(payouts)} loading={create.isPending} onClick={submit}>Host this FT · {hostCost} cr</Btn>
+      <Btn className="mt-3 w-full" disabled={!clubId || !ftId || !contestName || !closesAt || !arePayoutsValid(payouts)} loading={create.isPending} onClick={submit}>Host this FT · {hostCost} cr</Btn>
     </Sheet>
   )
 }

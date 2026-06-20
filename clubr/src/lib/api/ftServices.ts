@@ -183,7 +183,7 @@ export async function addAvailableFT(input: {
   return id
 }
 
-export async function createContest(clubId: string, hostId: string, input: { ftId: string; stake: number; budget: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; payouts: number[] }): Promise<string | null> {
+export async function createContest(clubId: string, hostId: string, input: { ftId: string; name?: string; stake: number; budget: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; payouts: number[] }): Promise<string | null> {
   await delay()
   const ft = AVAILABLE_FTS.find((f) => f.id === input.ftId)
   const club = CLUBS.find((c) => c.id === clubId)
@@ -192,7 +192,7 @@ export async function createContest(clubId: string, hostId: string, input: { ftI
   const id = `ct_${Date.now()}`
   FT_CONTESTS.unshift({
     id, clubId, clubName: club?.name ?? 'Club', clubEmoji: club?.emoji ?? '🃏',
-    ftName: ft.name,
+    ftName: input.name?.trim() || ft.name,
     visibility: input.visibility,
     accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
     status: 'open', stake: input.stake, budget: input.budget,
