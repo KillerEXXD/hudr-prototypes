@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Target, Trophy, UserPlus, Check, Crown, Shield, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, HelpCircle, Trophy, UserPlus, Check, Crown, Shield, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
@@ -26,7 +26,6 @@ import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
-import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
 import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
@@ -67,6 +66,7 @@ export function ContestDetailPage() {
   const me = c.myEntry
   const isAdmin = user?.role === 'admin'
   const approved = me?.status === 'approved'
+  const isDrafting = c.status === 'open' && !isAdmin && approved
   const canChat = approved || c.canManage
 
   return (
@@ -74,17 +74,28 @@ export function ContestDetailPage() {
       <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
       <GameJoinBanner />
 
-      <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span>{c.clubName}<Badge tone="purple">Stack Draft</Badge></div>
-      <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Target className="h-5 w-5 text-accent-purple" />{c.ftName}</h1><ShareGameButton type="ft" gameId={c.id} /></div>
-      <div className="mt-1"><GameHostLine hostId={c.hostId} knownName={c.entries.find((e) => e.userId === c.hostId)?.name} /></div>
-      <div className="mt-1.5 flex items-center gap-2 text-xs text-text-secondary">
-        <StatusBadge phase={ftPhase(c.status)} />
+      {/* Identity — club + format badges. */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-muted">
+        <span className="text-base">{c.clubEmoji}</span>{c.clubName}
+        <Badge tone="purple">Stack Draft</Badge>
         {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}
-        <span className="font-mono">{c.stake} Stakes</span><span className="text-text-muted">· budget {fmtK(c.budget)}</span>
-        <HowItWorksButton onClick={() => setHowOpen(true)} />
-        {c.status !== 'open' && (c.locksAtTs ? <CloseTimeLabel utcISO={c.locksAtTs} prefix="Locked " className="ml-auto text-text-muted" /> : <span className="ml-auto text-text-muted">{c.locksAt}</span>)}
       </div>
-      {(() => { const joined = c.entries.filter((e) => e.status === 'approved').length; return <StakePool stake={c.stake} pool={c.stake * joined}>· {joined} joined</StakePool> })()}
+      {/* Title (host-framed name) + quiet "?" help + Share. */}
+      <div className="mt-1 flex items-start justify-between gap-2">
+        <h1 className="text-xl font-extrabold leading-tight tracking-tight text-text-primary">
+          {c.ftName}
+          <button type="button" onClick={() => setHowOpen(true)} aria-label="How this game works" title="How this game works" className="ml-1.5 inline-flex translate-y-[3px] text-text-muted hover:text-accent-purple cursor-pointer"><HelpCircle className="h-[18px] w-[18px]" /></button>
+        </h1>
+        <ShareGameButton type="ft" gameId={c.id} />
+      </div>
+      <div className="mt-1"><GameHostLine hostId={c.hostId} knownName={c.entries.find((e) => e.userId === c.hostId)?.name} /></div>
+      {/* Status + timing — the lead (no stake/budget here; buy-in shows once below). */}
+      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+        <StatusBadge phase={ftPhase(c.status)} />
+        {c.status !== 'open' && <span className="inline-flex items-center gap-1 font-semibold text-text-secondary"><Lock className="h-3.5 w-3.5 text-text-muted" />{c.locksAtTs ? <CloseTimeLabel utcISO={c.locksAtTs} prefix="Locked " /> : `Locked ${c.locksAt}`}</span>}
+      </div>
+      {/* One money strip. */}
+      <div className="mt-1.5">{(() => { const joined = c.entries.filter((e) => e.status === 'approved').length; return <StakePool stake={c.stake} pool={c.stake * joined}>· {joined} joined</StakePool> })()}</div>
 
       {/* ===== Ticking "Closes in" countdown — draft locks at the deadline ===== */}
       {c.status === 'open' && (
@@ -137,7 +148,7 @@ export function ContestDetailPage() {
       )}
 
       {/* ===== Full FT details — roster, stacks, prices, live stream (everyone) ===== */}
-      <FinalTableDetails contest={c} />
+      <FinalTableDetails contest={c} showRoster={!isDrafting} />
 
       {/* ===== SETTLED: winner / podium + prizes + leaderboard ===== */}
       {c.status === 'settled' && <SettledResult c={c} meId={user?.id} />}

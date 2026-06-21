@@ -7,7 +7,10 @@ import { fmtK, fmtChips, playerFull } from '@/lib/utils/ftFormat'
 // Read-only "everything we know about this final table" panel.
 // Shown to players AND hosts in every contest state: the live broadcast,
 // headline event facts, and the full ICM-priced player roster with stacks.
-export function FinalTableDetails({ contest: c }: { contest: FTContestView }) {
+// `showRoster` gates the per-player table: it's hidden for the person actively
+// drafting (the draft cards already show name · stack · price, so the table just
+// duplicates them) and shown to everyone else + after lock.
+export function FinalTableDetails({ contest: c, showRoster = true }: { contest: FTContestView; showRoster?: boolean }) {
   const players = [...c.players].sort((a, b) => (b.chips ?? b.bbStack) - (a.chips ?? a.bbStack))
   const leaderChips = players[0]?.chips ?? players[0]?.bbStack ?? 1
   const totalChips = players.reduce((s, p) => s + (p.chips ?? 0), 0)
@@ -63,7 +66,9 @@ export function FinalTableDetails({ contest: c }: { contest: FTContestView }) {
         <Fact icon={<Flame className="h-3.5 w-3.5 text-accent-red" />} label="Level" value={c.level ?? '—'} />
       </div>
 
-      {/* ---- Roster: stack · price · popularity ---- */}
+      {/* ---- Roster: stack · price · popularity. Hidden while you're drafting —
+              the draft cards already carry this; it's for non-drafters + after lock. ---- */}
+      {showRoster && (<>
       <div className="overflow-hidden rounded-2xl border border-border bg-bg-card">
         <div className="flex items-center gap-2 border-b border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-text-muted">
           <span className="w-4">#</span>
@@ -114,6 +119,7 @@ export function FinalTableDetails({ contest: c }: { contest: FTContestView }) {
       <p className="mt-1.5 px-0.5 text-[10px] leading-snug text-text-muted">
         Stacks &amp; chip counts are live from the broadcast. <span className="text-accent-purple">Price</span> is the ICM draft cost.
       </p>
+      </>)}
     </Section>
   )
 }
