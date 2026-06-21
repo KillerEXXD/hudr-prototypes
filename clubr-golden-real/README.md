@@ -24,7 +24,7 @@ money elsewhere renders as **Stakes**.
   with offline precache and `autoUpdate`.
 - **Maskable + standard icons** (192/512), `apple-touch-icon`, apple-mobile-web-app
   meta, `theme-color`, `viewport-fit=cover` for notch/home-bar safe areas.
-- `display: standalone`, `orientation: portrait`, scoped to `/clubr-golden-real/`.
+- `display: standalone`, `orientation: portrait`, scoped to `/clubr-felt/`.
 - Safe-area insets, hidden-scrollbar momentum strips, tap-scale feedback, no
   hover-dependent interactions.
 
@@ -34,9 +34,9 @@ installs a real standalone app.
 
 ## Run
 ```bash
-cd clubr-golden-real-src && npm install && npm run build   # → ../clubr-golden-real/
+cd clubr-felt-src && npm install && npm run build   # → ../clubr-felt/
 ```
-`base:'/clubr-golden-real/'`, `outDir:'../clubr-golden-real'`. Tailwind v4 (CSS-first).
+`base:'/clubr-felt/'`, `outDir:'../clubr-felt'`. Tailwind v4 (CSS-first).
 
 ## Structure (the correct Heavy-variant shape)
 Foundation copied verbatim (data, auth, types, hooks, lib, 15-route App, configs);

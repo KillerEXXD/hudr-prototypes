@@ -32,6 +32,11 @@ import { useSpend } from '@/components/credits/SpendProvider'
 import type { LLParticipant } from '@/types/ll'
 import { fmtChips, digitsOnly } from '@/lib/utils/chipFormat'
 
+
+// Holder for the chip leader's stack, so each leaderboard Row can size its
+// relative chip-stack bar (the JSX leaderboard signature).
+const MAX_LL_CHIPS = { value: 1 }
+
 const LL_STEPS: HowStep[] = [
   { icon: UserPlus, title: 'Join the game', body: 'Request to join your club’s live tournament — the host admits you and marks you paid.' },
   { icon: Timer, title: 'Play it out', body: 'Everyone starts together. As the night goes, the host updates chip counts and busts players as they’re eliminated.' },
@@ -77,6 +82,7 @@ export function LastLongerGamePage() {
   const me = g.me
   const isAdmin = user?.role === 'admin'
   const active = g.participants.filter((p) => p.status === 'active').sort((a, b) => b.chips - a.chips)
+  MAX_LL_CHIPS.value = Math.max(1, ...active.map((p) => p.chips))
   const waiting = g.participants.filter((p) => p.status === 'pending')
   const out = g.participants.filter((p) => p.status === 'out').sort((a, b) => (a.finishPos ?? 99) - (b.finishPos ?? 99))
   const canChat = me?.status === 'active' || g.canManage
@@ -309,17 +315,29 @@ export function LastLongerGamePage() {
 function Row({ p, rank, g, me, canManage, paidBusy, bustBusy, onPaid, onBust, onProfile }: { p: LLParticipant; rank: number; g: { hostId: string; coHostIds: string[] }; me: string; canManage: boolean; paidBusy?: boolean; bustBusy?: boolean; onPaid: () => void; onBust: () => void; onProfile?: () => void }) {
   const isHost = p.userId === g.hostId
   const isCo = g.coHostIds.includes(p.userId)
+  const leader = rank === 1
+  // Relative chip-stack bar (vs. the chip leader) — the JSX leaderboard signature.
+  const lead = Math.max(1, MAX_LL_CHIPS.value)
+  const barPct = Math.max(6, Math.min(100, Math.round((p.chips / lead) * 100)))
   return (
-    <div className="relative flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
+    <div className={cn('relative flex items-center gap-3 rounded-2xl border px-3 py-2.5',
+      leader ? 'border-accent-gold/30 bg-[linear-gradient(110deg,#1A3326,#14271C)]' : 'border-[#23382C] bg-bg-card')}>
       {bustBusy && <ProcessingOverlay label="Busting…" />}
-      <span className="w-5 text-center text-sm font-extrabold text-text-muted">{rank}</span>
-      <button onClick={onProfile} disabled={!onProfile} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
-        <Avatar name={p.name} color={p.avatarColor} size={32} />
-        <span className="flex min-w-0 items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{p.userId === me && <span className="text-[10px] text-accent-blue">(you)</span>}{isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co</Badge>}</span>
+      {/* rank medal */}
+      <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-full text-[13px] font-extrabold',
+        leader ? 'bg-accent-gold text-bg-primary' : 'bg-[#16291F] text-text-secondary')} style={{ fontFamily: 'var(--font-family-display)' }}>{rank}</span>
+      <button onClick={onProfile} disabled={!onProfile} className="flex min-w-0 flex-1 flex-col gap-1 text-left enabled:cursor-pointer">
+        <span className="flex min-w-0 items-center gap-1.5 truncate text-[14px] font-semibold text-text-primary">
+          <Avatar name={p.name} color={p.avatarColor} size={26} />
+          <span className="truncate">{p.name}</span>{p.userId === me && <span className="text-[10px] text-accent-blue">(you)</span>}{isHost && <Crown className="h-3 w-3 text-accent-gold" />}{isCo && <Badge tone="blue">Co</Badge>}
+        </span>
+        {/* chip-stack bar */}
+        <span className="h-1.5 w-full overflow-hidden rounded-full bg-[#0C1A13]">
+          <span className={cn('block h-full rounded-full', leader ? 'bg-[linear-gradient(90deg,var(--color-accent-gold-deep),var(--color-accent-gold))]' : 'bg-accent-emerald/70')} style={{ width: `${barPct}%` }} />
+        </span>
       </button>
-      {/* Prominent chip stack — headline metric, right-aligned; time as a small subline. */}
       <div className="flex shrink-0 flex-col items-end leading-none">
-        <span className="font-mono text-base font-extrabold tabular-nums text-text-primary">{fmtChips(p.chips)}</span>
+        <span className={cn('font-mono text-base font-extrabold tabular-nums', leader ? 'text-accent-gold' : 'text-text-primary')}>{fmtChips(p.chips)}</span>
         <span className="mt-1 flex items-center gap-0.5 text-[10px] font-medium text-text-muted">
           {p.stale
             ? <span className="inline-block h-1.5 w-1.5 animate-pulse-soft rounded-full bg-accent-red" title={`stale · updated ${p.chipsUpdatedAgo}`} />

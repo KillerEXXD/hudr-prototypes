@@ -1,154 +1,125 @@
 import { cn } from '@/lib/utils/cn'
-import { Tag, AlertTriangle } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { type FTPlayer } from '@/types/ft'
-import { playerFull } from '@/lib/utils/ftFormat'
 
-const fmtK = (n: number) => `${Math.round(n / 1000)}k`
+// =====================================================================
+// DraftBoard — the ClubrGo JSX "Draft Board" signature screen, faithfully:
+// gold BUDGET LEFT / PICKS header, a glowing gold meter, a picked-token row,
+// and a single-column ranked finalist list with gold-ring selected rows.
+// Bound to the app's REAL data (seats, ICM prices, stacks) and Stakes wording.
+// Props unchanged, so the FT detail page that renders it needs no edits.
+// =====================================================================
+const fmt = (n: number) => n.toLocaleString('en-US')
 
-// The 9-player ICM-priced draft board. Pick up to `max` within budget.
 export function DraftBoard({ players, budget, value, onChange, max = 4, disabled }: {
   players: FTPlayer[]; budget: number; value: string[]; onChange: (v: string[]) => void; max?: number; disabled?: boolean
 }) {
   const spend = value.reduce((s, seat) => s + (players.find((p) => p.seat === seat)?.icmPrice ?? 0), 0)
   const remaining = budget - spend
-  const spentPct = budget > 0 ? Math.min(100, Math.round((spend / budget) * 100)) : 0
-  const maxBB = Math.max(1, ...players.map((p) => p.bbStack))
-
-  // "Roster blocked": seats are still open but the budget can no longer fit the
-  // CHEAPEST way to fill them — so the entry can never reach `max` picks without
-  // a swap. We surface this loudly (the old greyed-out cards never explained the
-  // dead-end). minToComplete = sum of the cheapest `openSeats` players left.
-  const openSeats = max - value.length
-  const unpicked = players.filter((p) => !value.includes(p.seat))
-  const cheapestOpen = unpicked.reduce<FTPlayer | undefined>(
-    (min, p) => (p.icmPrice < (min?.icmPrice ?? Infinity) ? p : min), undefined)
-  const minToComplete = [...unpicked]
-    .sort((a, b) => a.icmPrice - b.icmPrice)
-    .slice(0, openSeats)
-    .reduce((s, p) => s + p.icmPrice, 0)
-  const blocked = openSeats > 0 && unpicked.length > 0 && minToComplete > remaining
-  const shortBy = Math.max(0, minToComplete - remaining)
-  const blockedMsg = !blocked || !cheapestOpen ? ''
-    : openSeats === 1
-      ? `The cheapest open seat (${playerFull(cheapestOpen)}, ${fmtK(cheapestOpen.icmPrice)}) needs ${fmtK(shortBy)} more than your ${fmtK(remaining)} left. Remove a drafted player and pick a cheaper one.`
-      : `Filling your last ${openSeats} seats needs ${fmtK(shortBy)} more than the ${fmtK(remaining)} you have left. Remove a drafted player and pick lower-priced ones.`
+  const pct = budget > 0 ? Math.min(100, (spend / budget) * 100) : 0
+  const full = value.length >= max
+  const low = remaining < budget * 0.1
 
   function toggle(p: FTPlayer) {
     if (disabled) return
     if (value.includes(p.seat)) onChange(value.filter((s) => s !== p.seat))
-    else if (value.length < max && p.icmPrice <= remaining) onChange([...value, p.seat])
+    else if (!full && p.icmPrice <= remaining) onChange([...value, p.seat])
   }
+
+  const name = (p: FTPlayer) => p.first && p.last ? `${p.first} ${p.last}` : p.name
 
   return (
     <div>
-      {/* Budget — Spent + Available shown big, with a fill bar that visibly
-          animates and numbers that pop as you draft (the change used to be too
-          subtle). Spent shares the amber of the per-player ICM-price tags.
-          When the roster is blocked, the meter flips to red. */}
-      <div className={cn('mb-2 rounded-xl border bg-bg-card p-3 transition-colors',
-        blocked ? 'border-accent-red/50' : 'border-border')}>
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-wide text-text-muted">Budget</span>
-          {/* Drafted progress as slot pips (not a subtle "3/4 drafted" text). The
-              open pip(s) pulse red when the roster is blocked. */}
-          <span className="flex items-center gap-1.5">
-            <span className="flex items-center gap-1" aria-label={`${value.length} of ${max} drafted`}>
-              {Array.from({ length: max }).map((_, i) => (
-                <span key={i} className={cn('h-2.5 w-2.5 rounded-full transition-colors',
-                  i < value.length ? 'bg-accent-emerald'
-                    : blocked ? 'bg-accent-red animate-pulse'
-                      : 'border border-border bg-bg-surface')} />
-              ))}
-            </span>
-            <span className={cn('text-[11px] font-bold tabular-nums',
-              value.length === max ? 'text-accent-emerald' : blocked ? 'text-accent-red' : 'text-text-secondary')}>
-              {value.length}/{max}
-            </span>
-          </span>
+      {/* budget meter */}
+      <div className="rounded-[18px] border border-[#23382C] bg-bg-card p-3.5">
+        <div className="mb-2.5 flex items-baseline justify-between">
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-muted">Budget left</div>
+            <div className={cn('font-bold leading-none', low ? 'text-accent-amber' : 'text-accent-gold')} style={{ fontFamily: 'var(--font-family-display)', fontSize: 26 }}>
+              {fmt(remaining)}<span className="text-[13px] font-medium text-text-muted"> / {fmt(budget)} Stakes</span>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="font-mono text-[10px] uppercase tracking-[0.06em] text-text-muted">Picks</div>
+            <div className="font-bold leading-none text-text-primary" style={{ fontFamily: 'var(--font-family-display)', fontSize: 26 }}>
+              {value.length}<span className="text-[13px] font-medium text-text-muted"> / {max}</span>
+            </div>
+          </div>
         </div>
-        <div className="mb-1.5 flex items-end justify-between">
-          <span className="flex flex-col">
-            <span className="text-[9px] font-bold uppercase tracking-wide text-text-muted">Spent</span>
-            <span key={`s${spend}`} className="text-xl font-extrabold leading-none text-accent-amber" style={{ animation: 'budgetPop 0.32s ease-out' }}>{fmtK(spend)}</span>
-          </span>
-          <span className="flex flex-col items-end">
-            <span className="text-[9px] font-bold uppercase tracking-wide text-text-muted">Available</span>
-            <span key={`a${remaining}`} className={cn('text-xl font-extrabold leading-none',
-              blocked ? 'text-accent-red' : remaining > 0 ? 'text-accent-emerald' : 'text-text-secondary')} style={{ animation: 'budgetPop 0.32s ease-out' }}>{fmtK(remaining)}</span>
-          </span>
+        {/* meter */}
+        <div className="relative h-2.5 overflow-hidden rounded-full bg-[#0C1A13]">
+          <div className="absolute inset-y-0 left-0 rounded-full bg-[linear-gradient(90deg,var(--color-accent-gold-deep),var(--color-accent-gold))] shadow-[0_0_12px_rgba(233,196,106,0.2)] transition-[width] duration-300"
+            style={{ width: `${pct}%` }} />
         </div>
-        <div className="h-2.5 w-full overflow-hidden rounded-full bg-bg-surface">
-          <div className={cn('h-full rounded-full transition-[width,background-color] duration-500 ease-out',
-            blocked ? 'bg-accent-red' : 'bg-accent-amber')} style={{ width: `${spentPct}%` }} />
-        </div>
-        <div className="mt-1 flex justify-between text-[9px] font-medium text-text-muted">
-          <span>{spentPct}% used</span>
-          <span>of {fmtK(budget)} budget</span>
+        {/* pick tokens */}
+        <div className="mt-3 flex gap-1.5">
+          {Array.from({ length: max }).map((_, i) => {
+            const seat = value[i]
+            const p = seat ? players.find((x) => x.seat === seat) : undefined
+            return (
+              <div key={i} className={cn('relative flex h-[38px] flex-1 items-center justify-center gap-1.5 overflow-hidden rounded-xl font-mono text-[12px] font-semibold',
+                p ? 'bg-[linear-gradient(135deg,#1E3A2C,#15281E)] text-accent-gold' : 'border border-dashed border-[#23382C] bg-[#0E1B14] text-text-muted')}>
+                {p ? <span>{p.country} <span className="text-text-primary">S{p.seat}</span></span> : '—'}
+                {p && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-accent-gold" />}
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* Roster-blocked alert — the loud, actionable callout. Tells the user they
-          hit budget before filling all seats and exactly what to do about it. */}
-      {blocked && (
-        <div role="alert" className="mb-2 flex items-start gap-2 rounded-xl border border-accent-red/50 bg-accent-red/10 p-2.5"
-          style={{ animation: 'blockShake 0.4s ease-in-out' }}>
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-accent-red" strokeWidth={2.5} />
-          <div className="min-w-0">
-            <p className="text-[13px] font-extrabold leading-tight text-accent-red">
-              Out of budget — {openSeats} seat{openSeats > 1 ? 's' : ''} still open
-            </p>
-            <p className="mt-0.5 text-[11px] font-medium leading-snug text-text-secondary">{blockedMsg}</p>
-          </div>
-        </div>
-      )}
+      {/* finalists list header */}
+      <div className="mb-3 mt-4 flex items-center justify-between px-0.5">
+        <span className="text-[14px] font-semibold text-text-secondary" style={{ fontFamily: 'var(--font-family-display)' }}>{players.length} finalists</span>
+        <span className="font-mono text-[11px] text-text-muted">ICM price · seat order</span>
+      </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      {/* finalists — single-column ranked list */}
+      <div className="flex flex-col gap-2">
         {players.map((p) => {
           const picked = value.includes(p.seat)
-          const affordable = picked || (value.length < max && p.icmPrice <= remaining)
-          // When blocked, spotlight the cheapest open seat as the swap target.
-          const isSwapTarget = blocked && !picked && cheapestOpen?.seat === p.seat
-          const stackPct = Math.max(8, Math.round((p.bbStack / maxBB) * 100))
+          const tooPricey = !picked && (full || p.icmPrice > remaining)
           return (
-            <button
-              key={p.seat}
-              onClick={() => toggle(p)}
-              disabled={disabled || (!picked && !affordable)}
-              className={cn('flex flex-col gap-1.5 rounded-xl border p-2 text-left transition-all cursor-pointer disabled:cursor-not-allowed',
-                picked ? 'border-accent-purple bg-accent-purple/15 ring-1 ring-accent-purple/40' : 'border-border bg-bg-card hover:bg-bg-surface',
-                isSwapTarget && 'border-accent-red/60 ring-1 ring-accent-red/40',
-                !picked && !affordable && 'opacity-40')}
-            >
-              {/* top row: seat tag + ICM price (amber price-tag pill — clearly the COST, never the stack) */}
-              <div className="flex w-full items-center justify-between gap-1">
-                <span className={cn('flex h-6 w-6 items-center justify-center rounded-md text-xs font-extrabold', picked ? 'bg-accent-purple text-white' : 'bg-bg-surface text-text-secondary')}>{p.seat}</span>
-                <span title="ICM price" className={cn('inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[12px] font-extrabold leading-none',
-                  affordable ? 'bg-accent-amber/20 text-accent-amber' : 'bg-bg-surface text-text-muted')}>
-                  <Tag className="h-3 w-3" strokeWidth={2.5} />{fmtK(p.icmPrice)}
-                </span>
+            <button key={p.seat} onClick={() => toggle(p)} disabled={disabled || tooPricey}
+              className={cn('flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-all active:scale-[0.99] disabled:cursor-not-allowed',
+                picked ? 'border-accent-gold bg-[linear-gradient(110deg,#1A3326,#14271C)] shadow-[0_6px_22px_-10px_rgba(233,196,106,0.2)]' : 'border-[#23382C] bg-bg-card',
+                tooPricey && 'opacity-45')}>
+              {/* seat avatar */}
+              <div className={cn('relative grid h-[42px] w-[42px] shrink-0 place-items-center rounded-[13px] border text-[16px] font-bold',
+                picked ? 'border-accent-gold bg-accent-gold text-bg-primary' : 'border-[#23382C] bg-[#16291F] text-text-secondary')}
+                style={{ fontFamily: 'var(--font-family-display)' }}>
+                {p.seat}
+                {p.country && <span className="absolute -bottom-1 -right-1 text-[13px]">{p.country}</span>}
               </div>
-              {/* name — the hero */}
-              <span className="flex items-center gap-1 truncate text-sm font-bold leading-tight text-text-primary">
-                <span className="shrink-0 text-base leading-none">{p.country ?? '🃏'}</span>
-                <span className="truncate">{playerFull(p)}</span>
-              </span>
-              {/* stack — BB with a relative-depth bar (distinct blue, never confused with the amber price) */}
-              <div className="w-full">
-                <div className="mb-0.5 flex items-baseline justify-between">
-                  <span className="text-[9px] font-bold uppercase tracking-wide text-text-muted">Stack</span>
-                  <span className="text-[12px] font-extrabold leading-none text-text-secondary">{p.bbStack}<span className="ml-0.5 text-[9px] font-bold text-text-muted">BB</span></span>
+              {/* name + stack */}
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[15px] font-semibold text-text-primary" style={{ fontFamily: 'var(--font-family-display)' }}>{name(p)}</div>
+                <div className="mt-0.5 flex items-center gap-2">
+                  <span className="font-mono text-[11px] text-text-muted">{p.chips ? `${fmt(p.chips)} chips` : `${p.bbStack} BB`}</span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-bg-surface">
-                  <div className={cn('h-full rounded-full', picked ? 'bg-accent-purple' : 'bg-accent-blue')} style={{ width: `${stackPct}%` }} />
-                </div>
+              </div>
+              {/* ICM price */}
+              <div className="shrink-0 text-right">
+                <div className={cn('text-[17px] font-bold', picked ? 'text-accent-gold' : 'text-text-primary')} style={{ fontFamily: 'var(--font-family-display)' }}>{fmt(p.icmPrice)}</div>
+                <div className="font-mono text-[10px] tracking-[0.04em] text-text-muted">ICM Stakes</div>
+              </div>
+              {/* check ring */}
+              <div className={cn('grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full border-2',
+                picked ? 'border-accent-gold bg-accent-gold' : 'border-[#23382C]')}>
+                {picked && <Check className="h-3.5 w-3.5 text-bg-primary" strokeWidth={3} />}
               </div>
             </button>
           )
         })}
       </div>
 
-      <style>{`@keyframes budgetPop { 0% { transform: scale(1.3); } 60% { transform: scale(0.97); } 100% { transform: scale(1); } }
-@keyframes blockShake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }`}</style>
+      {/* footer status — "Pick N more" / locked summary */}
+      <div className="sticky bottom-2 mt-4">
+        <div className={cn('rounded-2xl px-4 py-3.5 text-center text-[15px] font-bold',
+          full ? 'bg-[linear-gradient(100deg,var(--color-accent-gold),var(--color-accent-gold-deep))] text-bg-primary shadow-[0_10px_30px_-10px_rgba(233,196,106,0.3)]' : 'bg-[#16291F] text-text-muted')}
+          style={{ fontFamily: 'var(--font-family-display)' }}>
+          {full ? `Roster set · ${fmt(spend)} Stakes spent` : `Pick ${max - value.length} more finalist${max - value.length > 1 ? 's' : ''}`}
+        </div>
+      </div>
     </div>
   )
 }

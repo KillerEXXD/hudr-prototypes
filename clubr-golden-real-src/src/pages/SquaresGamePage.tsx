@@ -153,14 +153,14 @@ export function SquaresGamePage() {
         </span>
       ) : undefined}>
         <div className="overflow-x-auto">
-          <div className="grid min-w-[300px] grid-cols-11 gap-px rounded-lg bg-border p-px">
-            <div className="flex items-center justify-center bg-bg-surface text-[8px] font-bold text-text-muted">{g.awayTeam.slice(0, 3)}→</div>
+          <div className="grid min-w-[300px] grid-cols-11 gap-px rounded-xl bg-[#0C1A13] p-1.5">
+            <div className="flex items-center justify-center rounded-md bg-[#16291F] text-[8px] font-bold text-text-muted">{g.awayTeam.slice(0, 3)}→</div>
             {Array.from({ length: 10 }).map((_, c) => (
-              <div key={`c${c}`} className="flex aspect-square items-center justify-center bg-bg-surface font-mono text-[11px] font-extrabold text-accent-blue">{locked ? g.colDigits[c] : '?'}</div>
+              <div key={`c${c}`} className="flex aspect-square items-center justify-center rounded-md bg-[#16291F] font-mono text-[11px] font-extrabold text-accent-blue">{locked ? g.colDigits[c] : '?'}</div>
             ))}
             {Array.from({ length: 10 }).map((_, r) => (
               <Fragment key={`r${r}`}>
-                <div className="flex aspect-square items-center justify-center bg-bg-surface font-mono text-[11px] font-extrabold text-accent-purple">{locked ? g.rowDigits[r] : '?'}</div>
+                <div className="flex aspect-square items-center justify-center rounded-md bg-[#16291F] font-mono text-[11px] font-extrabold text-accent-gold">{locked ? g.rowDigits[r] : '?'}</div>
                 {Array.from({ length: 10 }).map((_, c) => {
                   const idx = r * 10 + c
                   const cell = g.cells[idx]
@@ -176,10 +176,10 @@ export function SquaresGamePage() {
                   return (
                     <button key={idx} type="button" aria-disabled={interactive ? undefined : 'true'} onClick={onTap}
                       onMouseEnter={show} onMouseLeave={() => setHover(null)} onFocus={show} onBlur={() => setHover(null)}
-                      className={cn('relative flex aspect-square items-center justify-center text-[9px] font-bold',
-                        win ? 'bg-accent-emerald text-white'
+                      className={cn('relative flex aspect-square items-center justify-center rounded-md text-[9px] font-bold',
+                        win ? 'bg-accent-gold text-bg-primary shadow-[0_0_10px_rgba(233,196,106,0.35)]'
                           : pend ? cn('border border-dashed border-accent-amber text-text-primary animate-pulse-soft', mine ? 'bg-accent-amber/20' : 'bg-accent-amber/5')
-                            : cell.userId ? (mine ? 'bg-accent-purple/30 text-text-primary' : 'text-text-primary') : 'bg-bg-card/40 text-text-muted',
+                            : cell.userId ? (mine ? 'bg-accent-gold/20 text-text-primary ring-1 ring-accent-gold/30' : 'text-text-primary') : 'bg-[#11201A] text-text-muted',
                         interactive && 'cursor-pointer hover:brightness-110')}
                       style={cell.userId && cell.approved && !win && !mine ? { backgroundColor: `${cell.avatarColor}33` } : undefined}
                       title={cell.userId ? `${cell.name}${pend ? ' · pending approval' : ''}${win ? ` · won ${win}` : ''}` : ''}>
@@ -192,7 +192,7 @@ export function SquaresGamePage() {
             ))}
           </div>
         </div>
-        <p className="mt-1.5 text-[10px] text-text-muted"><span className="text-accent-purple">Side digit</span> = {g.homeTeam} last digit · <span className="text-accent-blue">Top digit</span> = {g.awayTeam} last digit. {locked ? 'Digits assigned.' : 'Digits hidden until the host locks.'}</p>
+        <p className="mt-1.5 text-[10px] text-text-muted"><span className="text-accent-gold">Side digit</span> = {g.homeTeam} last digit · <span className="text-accent-blue">Top digit</span> = {g.awayTeam} last digit. {locked ? 'Digits assigned.' : 'Digits hidden until the host locks.'}</p>
       </Section>
 
       <SquaresResults g={g} />
