@@ -109,7 +109,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'DogHouse $150K H.W.M.S Main Event — FT',
     status: 'open', stake: 100, budget: 100000, locksAt: 'in 1h 05m',
-    room: 'DogHouse Poker Club', prizePool: '150,000', buyIn: '380', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@DogHousePokerClub/streams', streamLive: false,
+    room: 'DogHouse Poker Club', prizePool: '$150,000', buyIn: '$380', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@DogHousePokerClub/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
     players: DOGHOUSE_HWMS_FT,
     entries: [
@@ -125,7 +125,7 @@ export const FT_CONTESTS: FTContest[] = [
     id: 'ct_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'TCH Dallas — Deepstack Main FT',
     visibility: 'private', accessUserIds: ['u_gary', 'u_lena', 'u_player'],
     status: 'open', stake: 250, budget: 100000, locksAt: 'in 3h 40m',
-    room: 'Texas Card House', prizePool: '365,000', buyIn: '400', level: '30k / 60k · 60k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
+    room: 'Texas Card House', prizePool: '$365,000', buyIn: '$400', level: '30k / 60k · 60k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
@@ -138,7 +138,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_c', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Lone Star Poker Series — Bounty FT',
     status: 'open', stake: 100, budget: 100000, locksAt: 'in 5h 20m',
-    room: 'Champions Club', prizePool: '500,000', buyIn: '600', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
+    room: 'Champions Club', prizePool: '$500,000', buyIn: '$600', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [entry('u_lena', 'approved', true)],
@@ -147,7 +147,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_d', clubId: 'c_felt', clubName: 'Green Felt Club', clubEmoji: '🟢', ftName: 'TCH Austin $250K Summer Series Main Event — FT',
     status: 'settled', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-05-15',
-    room: 'Texas Card House', prizePool: '372,690', buyIn: '600', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
+    room: 'Texas Card House', prizePool: '$372,690', buyIn: '$600', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
     players: TCH_AUSTIN_SS_FT,
     finishingOrder: ['C', 'F', 'A', 'H', 'B', 'E', 'I', 'D', 'G'],
@@ -162,7 +162,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_h', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Trailblazer Poker Tour — High Roller FT',
     status: 'locked', stake: 100, budget: 100000, locksAt: 'locked · plays in 25m',
-    room: 'Texas Card House', prizePool: '1,000,000', buyIn: '2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: true,
+    room: 'Texas Card House', prizePool: '$1,000,000', buyIn: '$2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: true,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
@@ -175,7 +175,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_i', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Summer Poker Open — High Roller FT',
     status: 'locked', stake: 250, budget: 100000, locksAt: 'locked · plays in 12m',
-    room: 'Champions Club', prizePool: '1,000,000', buyIn: '2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: true,
+    room: 'Champions Club', prizePool: '$1,000,000', buyIn: '$2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: true,
     hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
     entries: [
@@ -188,7 +188,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_j', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'DogHouse $100K SFS Main Event — FT',
     status: 'settled', format: 'points', stake: 250, budget: 100000, locksAt: 'settled', settledAt: '2026-06-08',
-    room: 'DogHouse Poker Club', prizePool: '100,000', buyIn: '300', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@DogHousePokerClub/streams', streamLive: false,
+    room: 'DogHouse Poker Club', prizePool: '$100,000', buyIn: '$300', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@DogHousePokerClub/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
     players: DOGHOUSE_SFS_FT,
     finishingOrder: ['A', 'C', 'B', 'F', 'D', 'I', 'E', 'G', 'H'],
@@ -206,7 +206,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_k', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Winter Poker Open — High Roller FT',
     status: 'settled', format: 'winner_takes_all', stake: 500, budget: 100000, locksAt: 'settled', settledAt: '2026-05-18',
-    room: 'Champions Club', prizePool: '1,000,000', buyIn: '5,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
+    room: 'Champions Club', prizePool: '$1,000,000', buyIn: '$5,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
     finishingOrder: ['B', 'A', 'H', 'C', 'I', 'D', 'E', 'F', 'G'],
@@ -223,7 +223,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_champ', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆', ftName: 'Summer Poker Open — $1M GTD Main Event FT',
     status: 'open', stake: 100, budget: 100000, locksAt: 'in 2h 30m',
-    room: 'Bayou City Poker Club', prizePool: '1,000,000', buyIn: '1,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas', streamLive: false,
+    room: 'Bayou City Poker Club', prizePool: '$1,000,000', buyIn: '$1,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas', streamLive: false,
     hostId: 'u_cc_host', coHostIds: [],
     players: CHAMP_FT,
     entries: [
@@ -240,7 +240,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_tch', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏', ftName: '$100K Fall Harvest Headliner — FT',
     status: 'open', stake: 250, budget: 100000, locksAt: 'in 4h 10m',
-    room: 'Gulf Coast Card Club', prizePool: '100,000', buyIn: '1,100', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse', streamLive: false,
+    room: 'Gulf Coast Card Club', prizePool: '$100,000', buyIn: '$1,100', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse', streamLive: false,
     hostId: 'u_tch_host', coHostIds: [],
     players: TCH_FT,
     entries: [
@@ -308,8 +308,8 @@ const TRAIL500_FT: FTPlayer[] = [
 ]
 
 export const AVAILABLE_FTS: AvailableFT[] = [
-  { id: 'aft1', name: 'Winter Poker Open — $1,500 Main Event FT', room: 'Champions Club', startsIn: 'in 2h 10m', hoursLeft: 2, date: 'Today · 8:00pm CT', prizePool: '1,350,000', buyIn: '1,500', players: WINTER_FT },
-  { id: 'aft2', name: 'Trailblazer Poker Tour — $1M Main Event FT', room: 'Texas Card House', startsIn: 'in 5h', hoursLeft: 5, date: 'Today · 11:00pm CT', prizePool: '1,360,100', buyIn: '1,200', players: TRAIL1M_FT },
-  { id: 'aft3', name: 'Fall Poker Open — Championship Main Event FT', room: 'Champions Club', startsIn: 'in 21h', hoursLeft: 21, date: 'Tomorrow · 6:00pm CT', prizePool: '1,113,600', buyIn: '2,700', players: FALL_FT },
-  { id: 'aft4', name: 'Trailblazer Multi-Flight — $500K GTD FT', room: 'Texas Card House', startsIn: 'tomorrow', hoursLeft: 30, date: 'Sat · 3:00pm CT', prizePool: '500,000', buyIn: '500', players: TRAIL500_FT },
+  { id: 'aft1', name: 'Winter Poker Open — $1,500 Main Event FT', room: 'Champions Club', startsIn: 'in 2h 10m', hoursLeft: 2, date: 'Today · 8:00pm CT', prizePool: '$1,350,000', buyIn: '$1,500', level: '40k / 80k · 80k ante', players: WINTER_FT },
+  { id: 'aft2', name: 'Trailblazer Poker Tour — $1M Main Event FT', room: 'Texas Card House', startsIn: 'in 5h', hoursLeft: 5, date: 'Today · 11:00pm CT', prizePool: '$1,360,100', buyIn: '$1,200', level: '50k / 100k · 100k ante', players: TRAIL1M_FT },
+  { id: 'aft3', name: 'Fall Poker Open — Championship Main Event FT', room: 'Champions Club', startsIn: 'in 21h', hoursLeft: 21, date: 'Tomorrow · 6:00pm CT', prizePool: '$1,113,600', buyIn: '$2,700', level: '60k / 120k · 120k ante', players: FALL_FT },
+  { id: 'aft4', name: 'Trailblazer Multi-Flight — $500K GTD FT', room: 'Texas Card House', startsIn: 'tomorrow', hoursLeft: 30, date: 'Sat · 3:00pm CT', prizePool: '$500,000', buyIn: '$500', level: '30k / 60k · 60k ante', players: TRAIL500_FT },
 ]
