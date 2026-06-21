@@ -77,6 +77,9 @@ export function NotificationBell() {
                 {shown.map((n) => {
                   const st = STYLE[n.type] ?? FALLBACK
                   const Icon = st.icon
+                  // Names match the notification's type accent (theme-correct per skin);
+                  // the muted 'declined' types fall back to bright so names still read.
+                  const nameColor = st.color === 'text-text-secondary' ? 'text-text-primary' : st.color
                   return (
                     <button
                       key={n.id}
@@ -93,7 +96,7 @@ export function NotificationBell() {
                         <span className="mt-0.5 block text-xs leading-snug text-text-secondary">
                           {splitNotificationName(n.body, n.actorName).map((seg, i) =>
                             seg.name
-                              ? <span key={i} className="font-semibold text-text-primary">{seg.text}</span>
+                              ? <span key={i} className={`font-semibold ${nameColor}`}>{seg.text}</span>
                               : <span key={i}>{seg.text}</span>,
                           )}
                         </span>
