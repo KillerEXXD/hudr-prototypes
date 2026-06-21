@@ -90,13 +90,12 @@ export function LastLongerGamePage() {
       <GameJoinBanner />
 
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
-      <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}</h1><ShareGameButton type="ll" gameId={g.id} /></div>
+      <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}<HowItWorksButton onClick={() => setHowOpen(true)} /></h1><ShareGameButton type="ll" gameId={g.id} /></div>
       <div className="mt-1"><GameHostLine hostId={g.hostId} knownName={g.participants.find((p) => p.userId === g.hostId)?.name} /></div>
       <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-secondary">
         <StatusBadge phase={g.status} />
         <span className="font-mono">{g.stake} Stakes</span>
-        <span className="text-text-muted">· {g.activeCount} in · {out.length} out</span>
-        <HowItWorksButton onClick={() => setHowOpen(true)} />
+        <span className="text-text-muted">· {g.activeCount} in · {out.length} out</span>
       </div>
       {(() => { const joined = g.participants.filter((p) => p.status !== 'pending').length; return <StakePool stake={g.stake} pool={g.stake * joined}>· {joined} joined</StakePool> })()}
       {g.status === 'registration' && (

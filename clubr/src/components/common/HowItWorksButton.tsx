@@ -2,19 +2,22 @@ import { HelpCircle } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 /**
- * The single, consistent "How game works" pill. Lives in each game's detail-page
- * header (next to the status badge) for FT Fantasy, Last Longer & Squares, so
- * the affordance looks and sits identically everywhere. Opens that game's
- * step-by-step walkthrough sheet via `onClick`.
+ * The single, consistent "How it works" help affordance — a quiet "?" that sits
+ * by the game's title on each detail page (FT Fantasy, Last Longer & Squares), so
+ * it looks and sits identically everywhere without competing with the title. Opens
+ * that game's step-by-step walkthrough sheet via `onClick`. Pass `className` for
+ * per-title baseline alignment.
  */
 export function HowItWorksButton({ onClick, className }: { onClick: () => void; className?: string }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={cn('flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs font-semibold text-text-secondary hover:text-text-primary cursor-pointer', className)}
+      aria-label="How this game works"
+      title="How this game works"
+      className={cn('inline-flex text-text-muted hover:text-text-secondary cursor-pointer', className)}
     >
-      <HelpCircle className="h-3.5 w-3.5" />How game works
+      <HelpCircle className="h-[18px] w-[18px]" />
     </button>
   )
 }

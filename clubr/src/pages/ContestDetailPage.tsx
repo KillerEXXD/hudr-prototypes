@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, HelpCircle, Trophy, UserPlus, Check, Crown, Shield, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Trophy, UserPlus, Check, Crown, Shield, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
+import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
@@ -84,7 +85,7 @@ export function ContestDetailPage() {
       <div className="mt-1 flex items-start justify-between gap-2">
         <h1 className="text-xl font-extrabold leading-tight tracking-tight text-text-primary">
           {c.ftName}
-          <button type="button" onClick={() => setHowOpen(true)} aria-label="How this game works" title="How this game works" className="ml-1.5 inline-flex translate-y-[3px] text-text-muted hover:text-accent-purple cursor-pointer"><HelpCircle className="h-[18px] w-[18px]" /></button>
+          <HowItWorksButton onClick={() => setHowOpen(true)} className="ml-1.5 translate-y-[3px]" />
         </h1>
         <ShareGameButton type="ft" gameId={c.id} />
       </div>
