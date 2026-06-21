@@ -110,4 +110,40 @@ export interface AvailableFT {
   buyIn: string // the real event's buy-in, informational
   level?: string // the real event's current blind level, e.g. '50k / 100k · 100k ante'
   players: FTPlayer[] // ICM-priced by the operator, ready to use
+  // ClubrGo pull (Phase 2) — present on the admin slate; host slate only sees published rows
+  source?: 'manual' | 'tpro'      // 'tpro' = pulled from TournamentPro
+  sourceTournamentId?: string     // the TournamentPro tournament id (reference for hands/scouting/highlights)
+  published?: boolean             // host-visible (default true for manual; false until an admin publishes a pull)
+}
+
+// =====================
+// ClubrGo admin (App Admin pull/manage)
+// =====================
+
+/** A TournamentPro final table eligible to be pulled into ClubrGo. */
+export interface EligibleFT {
+  tournamentId: string
+  name: string
+  venue: string | null
+  finalistCount: number
+  prizePool: string
+  buyIn: string
+  level: string
+  pulled: boolean             // already in the slate
+  availableFtId: string | null
+  published: boolean
+}
+
+/** A slate FT as the admin dashboard sees it (incl. unpublished + ICM prices). */
+export interface AdminSlateFT {
+  id: string
+  name: string
+  room: string
+  prizePool: string
+  buyIn: string
+  level: string | null
+  source: 'manual' | 'tpro'
+  sourceTournamentId: string | null
+  published: boolean
+  players: { seat: string; name: string; country: string | null; chips: number; bbStack: number; icmPrice: number }[]
 }

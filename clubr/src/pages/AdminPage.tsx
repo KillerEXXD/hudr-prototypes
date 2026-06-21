@@ -8,6 +8,7 @@ import { Avatar, Badge, Btn, Card, Section, Spinner, EmptyState } from '@/compon
 import { CreateFTSheet } from '@/components/ft/CreateFTSheet'
 import { AdminEconomy } from '@/components/credits/AdminEconomy'
 import { AdminLeaderboard } from '@/components/leaderboard/AdminLeaderboard'
+import { ClubrGoAdmin } from '@/components/admin/ClubrGoAdmin'
 
 export function AdminPage() {
   const { user } = useAuth()
@@ -86,6 +87,8 @@ export function AdminPage() {
           </div>
         )}
       </Section>
+
+      <ClubrGoAdmin />
 
       <CreateFTSheet open={addOpen} onClose={() => setAddOpen(false)} />
     </div>

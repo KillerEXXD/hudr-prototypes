@@ -101,6 +101,13 @@ Approval is required to do anything beyond viewing:
 - **Operator slate is host/admin-only.** Players **never** see it; the Host page
   (`/host-ft`) is guarded — a player who lands there is redirected home. The App
   Admin curates the slate via an **"Add a final table"** form (see §17).
+- **ClubrGo pull from TournamentPro (App Admin).** Beyond manually adding tables,
+  the App Admin can **pull a final table that TournamentPro designated for ClubrGo**
+  into the slate — each pulled table keeps a **`source_tournament_id`** reference back
+  to its TournamentPro tournament (for hands / scouting / highlights). After pulling,
+  the admin **prices ICM** per seat and **publishes** it. The **host slate shows only
+  published final tables** — pulled-but-unpublished tables stay hidden from hosts until
+  the admin publishes them (`ClubrGoAdmin` dashboard in the admin console).
 - **Final Table details panel.** Each contest page shows a **live YouTube stream** card
   (per-contest, live/replay) and event facts (prize pool, buy-in, blind level, chips in play,
   avg stack) — to **everyone, every state**. The **9-player roster table** — country flag, name,

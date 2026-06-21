@@ -4,7 +4,7 @@ import { AVAILABLE_FTS, FT_CONTESTS, spendOf } from '@/data/ftStore'
 import { CLUBS, USERS } from '@/data/store'
 import { MOCK_LATENCY_MS } from '@/config/api'
 import { ECONOMY, refund } from '@/data/creditsStore'
-import { FINISH_POINTS, type AvailableFT, type ContestEntry, type FTContest, type FTContestView, type FTPlayer } from '@/types/ft'
+import { FINISH_POINTS, type AvailableFT, type ContestEntry, type FTContest, type FTContestView, type FTPlayer, type EligibleFT, type AdminSlateFT } from '@/types/ft'
 import { type PrivateGate, type PrivateGameInfo } from '@/lib/api/privateGame'
 import { formatCloseInZone } from '@/lib/gameSetup'
 
@@ -144,8 +144,9 @@ export async function cancelContest(contestId: string, reason: string): Promise<
 }
 
 export async function listAvailableFTs(): Promise<AvailableFT[]> {
+  // Host slate shows only published FTs (pulled-but-unpublished hidden).
   await delay()
-  return [...AVAILABLE_FTS].sort((a, b) => a.hoursLeft - b.hoursLeft)
+  return [...AVAILABLE_FTS].filter((f) => f.published !== false).sort((a, b) => a.hoursLeft - b.hoursLeft)
 }
 
 /** Concave (ICM-style) price from a chip stack — bigger stacks cost more, but
@@ -222,4 +223,76 @@ export async function inviteToContest(contestId: string, userIds: string[]): Pro
     const u = USERS[uid]
     c.chat.push({ id: `m_inv_${Date.now()}_${i}`, userId: uid, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `${u?.name ?? 'A member'} was invited`, ts: 'now', kind: 'system' })
   })
+}
+
+// =====================
+// ClubrGo admin — pull from TournamentPro + manage the slate (App Admin only)
+// =====================
+
+// A small fake "TournamentPro pool" for the mock so the admin dashboard is
+// exercisable without a live HUDR API.
+const MOCK_ELIGIBLE: Array<{ tournamentId: string; name: string; venue: string; prizePool: string; buyIn: string; level: string; finalists: { name: string; country: string | null; chips: number; bbStack: number }[] }> = [
+  {
+    tournamentId: 'tpro-texas-poker-open-2026', name: 'Texas Poker Open 2026 — $2.2K Main Event',
+    venue: 'Champions Club, Houston', prizePool: '$1,000,000', buyIn: '$2,200', level: '50k / 100k · 100k ante',
+    finalists: [
+      { name: 'Phu Vo', country: 'United States', chips: 7_200_000, bbStack: 72 },
+      { name: 'Bradley Rich', country: 'United States', chips: 5_800_000, bbStack: 58 },
+      { name: 'Randall Brooks', country: 'United States', chips: 4_400_000, bbStack: 44 },
+      { name: 'Adrian Curry', country: 'United States', chips: 3_500_000, bbStack: 35 },
+      { name: 'Brant Jolly', country: 'United States', chips: 3_100_000, bbStack: 31 },
+      { name: 'Vladyslav Shovkovyi', country: 'Ukraine', chips: 2_120_000, bbStack: 21 },
+    ],
+  },
+]
+
+export async function listEligibleFTs(): Promise<EligibleFT[]> {
+  await delay()
+  return MOCK_ELIGIBLE.map((e) => {
+    const existing = AVAILABLE_FTS.find((f) => f.sourceTournamentId === e.tournamentId)
+    return {
+      tournamentId: e.tournamentId, name: e.name, venue: e.venue, finalistCount: e.finalists.length,
+      prizePool: e.prizePool, buyIn: e.buyIn, level: e.level,
+      pulled: !!existing, availableFtId: existing?.id ?? null, published: existing?.published ?? false,
+    }
+  })
+}
+
+export async function listAdminSlate(): Promise<AdminSlateFT[]> {
+  await delay()
+  return AVAILABLE_FTS.map((f) => ({
+    id: f.id, name: f.name, room: f.room, prizePool: f.prizePool, buyIn: f.buyIn, level: f.level ?? null,
+    source: f.source ?? 'manual', sourceTournamentId: f.sourceTournamentId ?? null, published: f.published !== false,
+    players: f.players.map((p) => ({ seat: p.seat, name: p.name, country: p.country ?? null, chips: p.chips ?? 0, bbStack: p.bbStack, icmPrice: p.icmPrice })),
+  }))
+}
+
+export async function pullFinalTable(tournamentId: string): Promise<string> {
+  await delay()
+  const e = MOCK_ELIGIBLE.find((x) => x.tournamentId === tournamentId)
+  if (!e) throw new Error('NOT_FOUND: Not eligible')
+  const seated = [...e.finalists].sort((a, b) => b.chips - a.chips).slice(0, 9)
+  const minBB = Math.min(...seated.map((f) => f.bbStack || 1)), maxBB = Math.max(...seated.map((f) => f.bbStack || 1))
+  const players: FTPlayer[] = seated.map((f, i) => ({ seat: String.fromCharCode(65 + i), name: f.name, country: f.country ?? undefined, chips: f.chips, bbStack: f.bbStack, icmPrice: autoIcmPrice(f.bbStack || 1, minBB, maxBB) }))
+  const existing = AVAILABLE_FTS.find((f) => f.sourceTournamentId === tournamentId)
+  if (existing) { existing.players = players; existing.prizePool = e.prizePool; existing.buyIn = e.buyIn; existing.level = e.level; return existing.id }
+  const id = `aft_tpro_${Date.now()}`
+  AVAILABLE_FTS.unshift({ id, name: e.name, room: e.venue, startsIn: 'soon', hoursLeft: 0, date: 'Final table', prizePool: e.prizePool, buyIn: e.buyIn, level: e.level, players, source: 'tpro', sourceTournamentId: tournamentId, published: false })
+  return id
+}
+
+export async function setFTPublished(ftId: string, published: boolean): Promise<void> {
+  await delay(); const f = AVAILABLE_FTS.find((x) => x.id === ftId); if (f) f.published = published
+}
+
+export async function updateFTIcm(ftId: string, prices: Array<{ seat: string; icmPrice: number }>): Promise<void> {
+  await delay()
+  const f = AVAILABLE_FTS.find((x) => x.id === ftId); if (!f) return
+  for (const p of prices) { const pl = f.players.find((x) => x.seat === p.seat); if (pl && Number.isFinite(p.icmPrice)) pl.icmPrice = Math.max(0, Math.round(p.icmPrice)) }
+}
+
+export async function removeFT(ftId: string): Promise<void> {
+  await delay()
+  if (FT_CONTESTS.some((c) => c.players === AVAILABLE_FTS.find((f) => f.id === ftId)?.players)) throw new Error('CONFLICT: Cancel contests first')
+  const i = AVAILABLE_FTS.findIndex((x) => x.id === ftId); if (i >= 0) AVAILABLE_FTS.splice(i, 1)
 }

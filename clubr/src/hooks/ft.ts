@@ -75,3 +75,31 @@ export function useInviteToContest() {
   const inv = useInvalidate()
   return useMutation({ mutationFn: (v: { contestId: string; userIds: string[] }) => ft.inviteToContest(v.contestId, v.userIds), onSuccess: inv })
 }
+
+// ---- ClubrGo admin (pull from TournamentPro + manage the slate) ----
+function useInvalidateClubrgo() {
+  const qc = useQueryClient()
+  return () => { qc.invalidateQueries({ queryKey: ['ft', 'clubrgo'] }); qc.invalidateQueries({ queryKey: ['ft', 'available'] }) }
+}
+export function useEligibleFTs() {
+  return useQuery({ queryKey: ['ft', 'clubrgo', 'eligible'], queryFn: () => ft.listEligibleFTs() })
+}
+export function useAdminSlate() {
+  return useQuery({ queryKey: ['ft', 'clubrgo', 'slate'], queryFn: () => ft.listAdminSlate() })
+}
+export function usePullFinalTable() {
+  const inv = useInvalidateClubrgo()
+  return useMutation({ mutationFn: (tournamentId: string) => ft.pullFinalTable(tournamentId), onSuccess: inv })
+}
+export function useSetFTPublished() {
+  const inv = useInvalidateClubrgo()
+  return useMutation({ mutationFn: (v: { ftId: string; published: boolean }) => ft.setFTPublished(v.ftId, v.published), onSuccess: inv })
+}
+export function useUpdateFTIcm() {
+  const inv = useInvalidateClubrgo()
+  return useMutation({ mutationFn: (v: { ftId: string; prices: Array<{ seat: string; icmPrice: number }> }) => ft.updateFTIcm(v.ftId, v.prices), onSuccess: inv })
+}
+export function useRemoveFT() {
+  const inv = useInvalidateClubrgo()
+  return useMutation({ mutationFn: (ftId: string) => ft.removeFT(ftId), onSuccess: inv })
+}
