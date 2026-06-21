@@ -40,5 +40,5 @@ export default defineConfig({
     }),
   ],
   resolve: { alias: { '@': '/src' } },
-  build: { outDir: ../clubr-golden', emptyOutDir: true },
+  build: { outDir: '../clubr-golden', emptyOutDir: true },
 })

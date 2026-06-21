@@ -51,9 +51,9 @@ export interface ArenaGame {
 }
 
 const TYPE_HREF: Record<ArenaType, (id: string) => string> = {
-  ft: (id) => `/g/ft/${id}`,
-  ll: (id) => `/g/ll/${id}`,
-  squares: (id) => `/g/sq/${id}`,
+  ft: (id) => `/fantasy/${id}`,
+  ll: (id) => `/lastlonger/${id}`,
+  squares: (id) => `/squares/${id}`,
 }
 
 // ---- FT ----
