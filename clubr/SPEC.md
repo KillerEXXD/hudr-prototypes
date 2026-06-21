@@ -106,6 +106,12 @@ Approval is required to do anything beyond viewing:
   (prize pool, buy-in, blind level, chips in play, avg stack), and the **9-player
   roster** — country flag, name, relative **chip-stack bar**, chips + BB, the **ICM
   price**, and **pick popularity** (revealed once picks unlock).
+- **Real-event context is inherited from the slate FT.** The details panel's
+  **Prize pool · Buy-in · Level** (plus the broadcast **room**) are the linked
+  operator-slate final table's real values — a host-created contest carries them
+  over at creation so the panel shows the actual event facts rather than "—". The
+  admin **"Add a final table"** form captures all of them (room, prize pool,
+  buy-in, **blind level**) when seeding the slate.
 - **Picks render as player names** (first name + last initial, e.g. "Daniel N.")
   once revealed — never raw seat letters — and each entry shows its **budget spent**.
 - **Settled result.** A **prize pool** line, a **winner spotlight** (or top-3 podium),

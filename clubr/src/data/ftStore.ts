@@ -308,8 +308,8 @@ const TRAIL500_FT: FTPlayer[] = [
 ]
 
 export const AVAILABLE_FTS: AvailableFT[] = [
-  { id: 'aft1', name: 'Winter Poker Open — $1,500 Main Event FT', room: 'Champions Club', startsIn: 'in 2h 10m', hoursLeft: 2, date: 'Today · 8:00pm CT', prizePool: '$1,350,000', buyIn: '$1,500', players: WINTER_FT },
-  { id: 'aft2', name: 'Trailblazer Poker Tour — $1M Main Event FT', room: 'Texas Card House', startsIn: 'in 5h', hoursLeft: 5, date: 'Today · 11:00pm CT', prizePool: '$1,360,100', buyIn: '$1,200', players: TRAIL1M_FT },
-  { id: 'aft3', name: 'Fall Poker Open — Championship Main Event FT', room: 'Champions Club', startsIn: 'in 21h', hoursLeft: 21, date: 'Tomorrow · 6:00pm CT', prizePool: '$1,113,600', buyIn: '$2,700', players: FALL_FT },
-  { id: 'aft4', name: 'Trailblazer Multi-Flight — $500K GTD FT', room: 'Texas Card House', startsIn: 'tomorrow', hoursLeft: 30, date: 'Sat · 3:00pm CT', prizePool: '$500,000', buyIn: '$500', players: TRAIL500_FT },
+  { id: 'aft1', name: 'Winter Poker Open — $1,500 Main Event FT', room: 'Champions Club', startsIn: 'in 2h 10m', hoursLeft: 2, date: 'Today · 8:00pm CT', prizePool: '$1,350,000', buyIn: '$1,500', level: '40k / 80k · 80k ante', players: WINTER_FT },
+  { id: 'aft2', name: 'Trailblazer Poker Tour — $1M Main Event FT', room: 'Texas Card House', startsIn: 'in 5h', hoursLeft: 5, date: 'Today · 11:00pm CT', prizePool: '$1,360,100', buyIn: '$1,200', level: '50k / 100k · 100k ante', players: TRAIL1M_FT },
+  { id: 'aft3', name: 'Fall Poker Open — Championship Main Event FT', room: 'Champions Club', startsIn: 'in 21h', hoursLeft: 21, date: 'Tomorrow · 6:00pm CT', prizePool: '$1,113,600', buyIn: '$2,700', level: '60k / 120k · 120k ante', players: FALL_FT },
+  { id: 'aft4', name: 'Trailblazer Multi-Flight — $500K GTD FT', room: 'Texas Card House', startsIn: 'tomorrow', hoursLeft: 30, date: 'Sat · 3:00pm CT', prizePool: '$500,000', buyIn: '$500', level: '30k / 60k · 60k ante', players: TRAIL500_FT },
 ]

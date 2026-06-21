@@ -108,5 +108,6 @@ export interface AvailableFT {
   date: string // display, e.g. 'Today · 8:00pm ET'
   prizePool: string // the REAL event's prize pool — informational only (the contest pays its own Stakes)
   buyIn: string // the real event's buy-in, informational
+  level?: string // the real event's current blind level, e.g. '50k / 100k · 100k ante'
   players: FTPlayer[] // ICM-priced by the operator, ready to use
 }

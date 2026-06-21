@@ -10,7 +10,7 @@ import { Sheet, Btn, Field } from '@/components/common/ui'
 type Fin = { name: string; bb: string }
 const EMPTY: Fin[] = Array.from({ length: 9 }, () => ({ name: '', bb: '' }))
 
-const SAMPLE_META = { name: 'WPT World Championship — FT', room: 'WPT', date: 'Today · 9:00pm ET', startsIn: 'in 3h', hoursLeft: 3, prizePool: '$4,000,000', buyIn: '$10,400' }
+const SAMPLE_META = { name: 'WPT World Championship — FT', room: 'WPT', date: 'Today · 9:00pm ET', startsIn: 'in 3h', hoursLeft: 3, prizePool: '$4,000,000', buyIn: '$10,400', level: '50k / 100k · 100k ante' }
 const SAMPLE_FIN: Fin[] = [
   { name: 'Stephen Chidwick', bb: '88' }, { name: 'Jason Koon', bb: '70' }, { name: 'Ali Imsirovic', bb: '55' },
   { name: 'Kristen Foxen', bb: '42' }, { name: 'Dan Smith', bb: '33' }, { name: 'Sam Greenwood', bb: '25' },
@@ -19,7 +19,7 @@ const SAMPLE_FIN: Fin[] = [
 
 export function CreateFTSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const add = useAddAvailableFT()
-  const [m, setM] = useState({ name: '', room: '', date: 'Today', startsIn: 'in 2h', hoursLeft: '2', prizePool: '', buyIn: '' })
+  const [m, setM] = useState({ name: '', room: '', date: 'Today', startsIn: 'in 2h', hoursLeft: '2', prizePool: '', buyIn: '', level: '' })
   const [fin, setFin] = useState<Fin[]>(EMPTY)
 
   const filled = fin.filter((f) => f.name.trim() && Number(f.bb) > 0)
@@ -32,13 +32,13 @@ export function CreateFTSheet({ open, onClose }: { open: boolean; onClose: () =>
     setM({ ...SAMPLE_META, hoursLeft: String(SAMPLE_META.hoursLeft) })
     setFin(SAMPLE_FIN.map((f) => ({ ...f })))
   }
-  function reset() { setM({ name: '', room: '', date: 'Today', startsIn: 'in 2h', hoursLeft: '2', prizePool: '', buyIn: '' }); setFin(EMPTY) }
+  function reset() { setM({ name: '', room: '', date: 'Today', startsIn: 'in 2h', hoursLeft: '2', prizePool: '', buyIn: '', level: '' }); setFin(EMPTY) }
 
   async function submit() {
     if (!canSave) return
     await add.mutateAsync({
       name: m.name, room: m.room, date: m.date, startsIn: m.startsIn, hoursLeft: Number(m.hoursLeft) || 0,
-      prizePool: m.prizePool, buyIn: m.buyIn,
+      prizePool: m.prizePool, buyIn: m.buyIn, level: m.level,
       finalists: filled.map((f) => ({ name: f.name.trim(), bbStack: Number(f.bb) })),
     })
     reset(); onClose()
@@ -62,6 +62,7 @@ export function CreateFTSheet({ open, onClose }: { open: boolean; onClose: () =>
           <Field label="Buy-in" value={m.buyIn} onChange={(v) => setM({ ...m, buyIn: v })} placeholder="$10,000" />
         </div>
         <Field label="Prize pool" value={m.prizePool} onChange={(v) => setM({ ...m, prizePool: v })} placeholder="$5,000,000" />
+        <Field label="Level" value={m.level} onChange={(v) => setM({ ...m, level: v })} placeholder="50k / 100k · 100k ante" />
       </div>
 
       <p className="mt-4 mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-text-muted"><Trophy className="h-3.5 w-3.5 text-accent-amber" />Finalists · name &amp; chip stack (BB)</p>

@@ -160,7 +160,7 @@ function autoIcmPrice(bbStack: number, minBB: number, maxBB: number): number {
 /** App Admin adds a final table to the operator slate. Finalists are seated A..I
  *  by stack (leader first) and ICM-priced automatically from their stacks. */
 export async function addAvailableFT(input: {
-  name: string; room: string; date: string; startsIn: string; hoursLeft: number; prizePool: string; buyIn: string
+  name: string; room: string; date: string; startsIn: string; hoursLeft: number; prizePool: string; buyIn: string; level?: string
   finalists: { name: string; bbStack: number }[]
 }): Promise<string> {
   await delay()
@@ -175,10 +175,11 @@ export async function addAvailableFT(input: {
     icmPrice: autoIcmPrice(f.bbStack, minBB, maxBB),
   }))
   const id = `aft_${Date.now()}`
+  const level = input.level?.trim()
   AVAILABLE_FTS.unshift({
     id, name: input.name.trim() || 'New final table', room: input.room.trim() || 'Operator',
     startsIn: input.startsIn.trim() || 'soon', hoursLeft: input.hoursLeft, date: input.date.trim() || 'Today',
-    prizePool: input.prizePool.trim() || '—', buyIn: input.buyIn.trim() || '—', players,
+    prizePool: input.prizePool.trim() || '—', buyIn: input.buyIn.trim() || '—', ...(level ? { level } : {}), players,
   })
   return id
 }
@@ -190,12 +191,17 @@ export async function createContest(clubId: string, hostId: string, input: { ftI
   if (!ft) return null
   const u = USERS[hostId]
   const id = `ct_${Date.now()}`
+  // Carry the real-event context (room / prize pool / buy-in / level) from the
+  // slate FT onto the contest so the detail panel shows it. '—' placeholders are
+  // treated as absent so the panel falls back cleanly.
+  const real = (v: string | undefined) => (v && v !== '—' ? v : undefined)
   FT_CONTESTS.unshift({
     id, clubId, clubName: club?.name ?? 'Club', clubEmoji: club?.emoji ?? '🃏',
     ftName: input.name?.trim() || ft.name,
     visibility: input.visibility,
     accessUserIds: input.visibility === 'private' ? Array.from(new Set([hostId, ...input.accessUserIds])) : [],
     status: 'open', stake: input.stake, budget: input.budget,
+    room: real(ft.room), prizePool: real(ft.prizePool), buyIn: real(ft.buyIn), level: ft.level,
     locksAt: input.closesAt ? `Closes ${formatCloseInZone(input.closesAt, input.timezone)}` : `${ft.startsIn} · locks 10m before`,
     locksAtTs: input.closesAt || undefined, timezone: input.timezone, payouts: input.payouts,
     hostId, coHostIds: [], players: ft.players,
