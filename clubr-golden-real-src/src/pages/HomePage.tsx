@@ -1,6 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext'
-import { DiscoverPage } from '@/pages/DiscoverPage'
-import { HostHomePage } from '@/pages/HostHomePage'
+import { FeltGamesFeed } from '@/pages/FeltGamesFeed'
 import { AdminPage } from '@/pages/AdminPage'
 
 // The first tab is role-aware: App Admin → admin console, Club Host → host
@@ -8,6 +7,6 @@ import { AdminPage } from '@/pages/AdminPage'
 export function HomePage() {
   const { user } = useAuth()
   if (user?.role === 'admin') return <AdminPage />
-  if (user?.role === 'host') return <HostHomePage />
-  return <DiscoverPage />
+  // The ClubrGo JSX Games Feed is the landing for players and hosts alike.
+  return <FeltGamesFeed />
 }
