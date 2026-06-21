@@ -50,10 +50,11 @@ export interface ArenaGame {
   result?: { rank: number; field: number; won: boolean }
 }
 
+// Match the actual routes in App.tsx — AI invented a /g/ scheme that doesn't exist.
 const TYPE_HREF: Record<ArenaType, (id: string) => string> = {
-  ft: (id) => `/g/ft/${id}`,
-  ll: (id) => `/g/ll/${id}`,
-  squares: (id) => `/g/sq/${id}`,
+  ft: (id) => `/fantasy/${id}`,
+  ll: (id) => `/lastlonger/${id}`,
+  squares: (id) => `/squares/${id}`,
 }
 
 // ---- FT ----
