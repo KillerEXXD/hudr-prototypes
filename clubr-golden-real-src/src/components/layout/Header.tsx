@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { ShieldCheck, Crown, User as UserIcon, Coins } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
@@ -16,8 +16,10 @@ const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' |
 export function Header() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const { data: wallet } = useWallet()
   if (!user) return null
+  const onMe = location.pathname === '/me'
   const role = ROLE_META[user.role]
 
   return (
@@ -35,7 +37,7 @@ export function Header() {
         <NotificationBell />
         {/* The avatar is a shortcut to the account home (the "Me" tab) — not a
             second account surface. The demo account-switcher lives on /me. */}
-        <button onClick={() => navigate('/me')} aria-label="Your account" title="Your account"><Avatar name={user.name} color={user.avatarColor} size={32} /></button>
+        <button onClick={() => onMe ? navigate(-1) : navigate('/me')} aria-label={onMe ? 'Close account' : 'Your account'} title={onMe ? 'Close account' : 'Your account'} aria-pressed={onMe}><Avatar name={user.name} color={user.avatarColor} size={32} /></button>
       </div>
     </header>
   )
