@@ -52,7 +52,7 @@ export function BottomNav() {
   // A lone Home tab reads as a broken nav — hide the bar entirely until a 2nd tab unlocks.
   if (ITEMS.length < 2) return null
   return (
-    <nav className="sticky bottom-0 z-30 border-t border-border bg-bg-secondary/95 backdrop-blur">
+    <nav className="sticky bottom-0 z-30 border-t border-border bg-bg-secondary/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
       <div className="mx-auto flex max-w-md items-stretch">
         {ITEMS.map((it) => {
           const active = it.match(pathname)

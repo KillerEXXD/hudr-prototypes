@@ -95,3 +95,12 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+
+/* iOS Safari auto-zooms when a focused input's font-size is < 16px. Force form
+   controls to 16px on touch so focusing never zooms the app. Unlayered → beats
+   Tailwind's text-sm without !important; desktop keeps the denser type. */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select { font-size: 16px; }
+}

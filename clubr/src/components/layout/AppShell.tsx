@@ -16,8 +16,8 @@ export function AppShell() {
   const dismiss = () => navigate('/', { replace: true, state: {} })
 
   return (
-    <div className="flex min-h-screen justify-center bg-bg-primary">
-      <div className="flex min-h-screen w-full max-w-md flex-col border-x border-border bg-bg-primary">
+    <div className="flex min-h-dvh justify-center bg-bg-primary">
+      <div className="flex min-h-dvh w-full max-w-md flex-col border-x border-border bg-bg-primary">
         <SpendProvider>
           <Header />
           <main className="flex-1 px-4 pb-6 pt-3">

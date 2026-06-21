@@ -165,7 +165,7 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
   if (!open) return null
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/55 backdrop-blur-sm sm:items-center" onClick={onClose}>
-      <div className="animate-fade-up w-full max-w-md rounded-t-3xl border border-border bg-bg-card p-5 shadow-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+      <div className="animate-fade-up max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-border bg-bg-card p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl sm:max-h-[88dvh] sm:rounded-3xl sm:pb-5" onClick={(e) => e.stopPropagation()}>
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-base font-bold text-text-primary">{title}</h3>
           <button onClick={onClose} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-bg-surface text-text-secondary shadow-sm transition-colors hover:border-text-muted hover:bg-bg-card hover:text-text-primary cursor-pointer" aria-label="Close"><X className="h-[18px] w-[18px]" strokeWidth={2.5} /></button>

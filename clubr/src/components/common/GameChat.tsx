@@ -27,7 +27,7 @@ export function GameChat({ messages, onSend, canSend, currentUserId, bare = fals
 
   return (
     <div className={bare ? 'flex flex-1 flex-col' : 'rounded-2xl border border-border bg-bg-card p-3'}>
-      <div ref={scrollRef} className={cn('mb-2 flex flex-col gap-2 overflow-y-auto scrollbar-thin pr-1', bare ? 'max-h-[58vh] flex-1' : 'max-h-64')}>
+      <div ref={scrollRef} className={cn('mb-2 flex flex-col gap-2 overflow-y-auto scrollbar-thin pr-1', bare ? 'max-h-[58dvh] flex-1' : 'max-h-64')}>
         {messages.length === 0 && <p className="py-4 text-center text-xs text-text-muted">No messages yet. Say hi 👋</p>}
         {messages.map((m) => m.kind === 'system' ? (
           <p key={m.id} className="self-center rounded-full border border-border bg-bg-surface px-2.5 py-1 text-center text-[11px] font-medium text-text-secondary">{m.text}</p>

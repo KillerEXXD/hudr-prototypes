@@ -4,6 +4,7 @@ import { Bell, UserPlus, CheckCircle2, Gamepad2, PartyPopper, XCircle } from 'lu
 import { Badge, Sheet, EmptyState } from '@/components/common/ui'
 import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '@/hooks'
 import { GAME_ROUTE } from '@/lib/contract/gameInvite'
+import { splitNotificationName } from '@/lib/notificationNames'
 import type { AppNotification, NotificationType } from '@/types'
 
 const PAGE = 15 // show the latest 15; "More" reveals the next 15.
@@ -71,7 +72,7 @@ export function NotificationBell() {
           <EmptyState icon={<Bell className="h-7 w-7" />} title="No notifications yet" sub="Join requests and approvals will show up here." />
         ) : (
           <>
-            <div className="-mx-1 max-h-[60vh] overflow-y-auto px-1">
+            <div className="-mx-1 max-h-[60dvh] overflow-y-auto px-1">
               <div className="flex flex-col gap-1.5">
                 {shown.map((n) => {
                   const st = STYLE[n.type] ?? FALLBACK
@@ -89,7 +90,13 @@ export function NotificationBell() {
                           {!n.read && <Badge tone="blue">New</Badge>}
                           <span className="ml-auto shrink-0 text-[11px] text-text-muted">{ago(n.createdAt)}</span>
                         </span>
-                        <span className="mt-0.5 block text-xs leading-snug text-text-secondary">{n.body}</span>
+                        <span className="mt-0.5 block text-xs leading-snug text-text-secondary">
+                          {splitNotificationName(n.body, n.actorName).map((seg, i) =>
+                            seg.name
+                              ? <span key={i} className="font-semibold text-text-primary">{seg.text}</span>
+                              : <span key={i}>{seg.text}</span>,
+                          )}
+                        </span>
                       </span>
                     </button>
                   )

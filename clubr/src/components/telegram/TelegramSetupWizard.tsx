@@ -110,7 +110,7 @@ export function TelegramSetupWizard({ open, onClose, clubId, clubName }: { open:
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center">
-      <div className="animate-fade-up flex max-h-[92vh] w-full max-w-md flex-col rounded-t-2xl border border-border bg-bg-card shadow-2xl sm:max-h-[88vh] sm:rounded-2xl">
+      <div className="animate-fade-up flex max-h-[92dvh] w-full max-w-md flex-col rounded-t-2xl border border-border bg-bg-card shadow-2xl sm:max-h-[88dvh] sm:rounded-2xl">
         <div className="border-b border-border p-4">
           <div className="flex items-start justify-between gap-2">
             <div>

@@ -19,7 +19,7 @@ export function HomePage() {
   if (user?.role === 'admin') return <AdminPage />
   if (user?.role === 'host') return <HostHomePage />
   if (stage === 'fresh') {
-    if (clubs.isLoading) return <div className="flex min-h-[60vh] items-center justify-center"><Spinner /></div>
+    if (clubs.isLoading) return <div className="flex min-h-[60dvh] items-center justify-center"><Spinner /></div>
     const hasPending = (clubs.data ?? []).some((c) => c.myStatus === 'pending')
     return hasPending ? <ClubPendingSurface /> : <GetStartedHub />
   }
