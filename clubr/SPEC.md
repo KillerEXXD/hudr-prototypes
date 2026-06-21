@@ -101,11 +101,17 @@ Approval is required to do anything beyond viewing:
 - **Operator slate is host/admin-only.** Players **never** see it; the Host page
   (`/host-ft`) is guarded — a player who lands there is redirected home. The App
   Admin curates the slate via an **"Add a final table"** form (see §17).
-- **Final Table details panel (everyone, every state).** Each contest page shows the
-  full table: a **live YouTube stream** card (per-contest, live/replay), event facts
-  (prize pool, buy-in, blind level, chips in play, avg stack), and the **9-player
-  roster** — country flag, name, relative **chip-stack bar**, chips + BB, the **ICM
-  price**, and **pick popularity** (revealed once picks unlock).
+- **Final Table details panel.** Each contest page shows a **live YouTube stream** card
+  (per-contest, live/replay) and event facts (prize pool, buy-in, blind level, chips in play,
+  avg stack) — to **everyone, every state**. The **9-player roster table** — country flag, name,
+  relative **chip-stack bar**, chips + BB, the **ICM price**, and **pick popularity** (revealed
+  once picks unlock) — is shown to non-drafters and **after lock**, but **hidden while you're
+  actively drafting** (open + approved): the **draft cards already carry name · stack · price**, so
+  the table would just duplicate them (`showRoster` on `FinalTableDetails`).
+- **Contest header is tiered, not a flat chip row.** Identity (club · Stack Draft · Winner-takes-all)
+  → the **host-framed contest name** with a quiet **"?"** help affordance (not a button) → a
+  **prominent status + lock line** → **one money strip** (Buy-in · Pool · entrants, shown once).
+  The ICM **draft budget lives on the draft board**, not the header.
 - **Real-event context is inherited from the slate FT.** The details panel's
   **Prize pool · Buy-in · Level** (plus the broadcast **room**) are the linked
   operator-slate final table's real values — a host-created contest carries them
