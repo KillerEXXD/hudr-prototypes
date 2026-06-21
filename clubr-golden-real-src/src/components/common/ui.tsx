@@ -57,18 +57,20 @@ export function Avatar({ name, color, size = 36, emoji }: { name?: string; color
 }
 
 // ---- Badge / pill ----
+// Mono "Chip" — matches the ClubrGo JSX design language exactly: IBM Plex Mono,
+// 11px, rounded-full, tinted surface + tone border at ~44 alpha, 0.02em tracking.
 export function Badge({ children, tone = 'neutral', className }: { children: ReactNode; tone?: 'neutral' | 'blue' | 'green' | 'amber' | 'red' | 'purple' | 'dark' | 'gold'; className?: string }) {
   const tones: Record<string, string> = {
-    neutral: 'bg-bg-surface text-text-secondary border-border',
-    blue: 'bg-accent-blue/12 text-accent-blue border-accent-blue/30',
-    green: 'bg-accent-emerald/12 text-accent-emerald border-accent-emerald/30',
-    amber: 'bg-accent-amber/12 text-accent-amber border-accent-amber/30',
-    red: 'bg-accent-red/12 text-accent-red border-accent-red/30',
-    purple: 'bg-accent-purple/12 text-accent-purple border-accent-purple/30',
-    gold: 'bg-accent-gold/12 text-accent-gold border-accent-gold/30',
+    neutral: 'bg-[#16291F] text-text-secondary border-[#23382C]',
+    blue: 'bg-[#16314A] text-accent-blue border-accent-blue/30',
+    green: 'bg-[#0F3327] text-accent-emerald border-accent-emerald/30',
+    amber: 'bg-[#3A2C12] text-accent-amber border-accent-amber/30',
+    red: 'bg-[#3A1C18] text-accent-red border-accent-red/30',
+    purple: 'bg-[#2A2245] text-accent-purple border-accent-purple/30',
+    gold: 'bg-accent-gold/[0.13] text-accent-gold border-accent-gold/[0.27]',
     dark: 'bg-neutral-900 text-white border-neutral-700',
   }
-  return <span className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold', tones[tone], className)}>{children}</span>
+  return <span className={cn('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[11px] font-semibold tracking-[0.02em]', tones[tone], className)}>{children}</span>
 }
 
 // ---- Club-role chip ----
@@ -105,7 +107,7 @@ export function Btn({ children, onClick, variant = 'primary', size = 'md', disab
   children: ReactNode; onClick?: () => void; variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; size?: 'sm' | 'md'; disabled?: boolean; loading?: boolean; className?: string; type?: 'button' | 'submit'
 }) {
   const variants: Record<string, string> = {
-    primary: 'bg-accent-blue text-white hover:brightness-110',  // reference uses blue primary CTAs
+    primary: 'bg-accent-gold text-bg-primary hover:brightness-105 shadow-[0_8px_24px_-12px_rgba(233,196,106,0.5)]',
     secondary: 'bg-bg-surface text-text-primary border border-border hover:bg-bg-elevated',
     ghost: 'text-text-secondary hover:bg-bg-surface',
     danger: 'bg-accent-red/15 text-accent-red border border-accent-red/30 hover:bg-accent-red/25',

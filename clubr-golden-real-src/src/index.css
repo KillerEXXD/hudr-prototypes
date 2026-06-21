@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  /* "Felt" — premium poker-luxe, matching the ClubrGo reference (dark navy-felt + chip-gold) */
-  --color-bg-primary: #0B0F17;
-  --color-bg-secondary: #070A11;
-  --color-bg-card: #121826;
-  --color-bg-surface: #1A2234;
-  --color-bg-elevated: #222C42;
-  --color-border: #243049;
-  --color-border-light: #33425F;
+  /* "Golden - Real" — the ClubrGo JSX design language: pine-felt + chip-gold */
+  --color-bg-primary: #0B1410;
+  --color-bg-secondary: #070D0A;
+  --color-bg-card: #11201A;
+  --color-bg-surface: #16291F;
+  --color-bg-elevated: #1E3A2C;
+  --color-border: #23382C;
+  --color-border-light: #2C4636;
   --color-text-primary: #F3F6F2;
-  --color-text-secondary: #A9B6CC;
-  --color-text-muted: #6B7A93;
-  --color-accent-blue: #4A90E2;
+  --color-text-secondary: #AFC4B6;
+  --color-text-muted: #6E8678;
+  --color-accent-blue: #5AA9E6;
   --color-accent-blue-deep: #2E6FA3;
   --color-accent-amber: #E9C46A;
   --color-accent-emerald: #36C98B;
@@ -23,10 +23,10 @@
   --color-accent-gold-deep: #C99B3E;
   --color-tier-reliable: #36C98B;
   --color-tier-tentative: #E9A23B;
-  --color-tier-noise: #6B7A93;
+  --color-tier-noise: #6E8678;
   --color-sev-critical: #E5604F;
   --color-sev-moderate: #E9A23B;
-  --color-sev-minor: #4A90E2;
+  --color-sev-minor: #5AA9E6;
   --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-family-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --font-family-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;

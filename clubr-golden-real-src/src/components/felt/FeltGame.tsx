@@ -146,8 +146,9 @@ export function FeltGameCard({ g }: { g: ArenaGame }) {
 
   return (
     <button onClick={() => navigate(g.href)}
-      className={cn('w-full rounded-[18px] border bg-bg-card p-4 text-left shadow-[0_6px_20px_-14px_rgba(0,0,0,0.7)] transition-all active:scale-[0.99]',
-        live ? 'border-accent-emerald/30 felt-live bg-[linear-gradient(150deg,#16291E,#121826)]' : 'border-border')}>
+      className={cn('relative w-full overflow-hidden rounded-[20px] border bg-bg-card p-4 text-left shadow-[0_6px_20px_-14px_rgba(0,0,0,0.7)] transition-all active:scale-[0.99]',
+        live ? 'border-accent-gold/20 bg-[linear-gradient(150deg,#16291E,#11201A)] shadow-[0_8px_28px_-12px_rgba(233,196,106,0.2)]' : 'border-border')}>
+      {live && <span className="absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,var(--color-accent-gold),transparent)]" />}
       {/* header: type badge + status */}
       <div className="mb-2.5 flex items-center justify-between">
         <TypeBadge type={g.type} />

@@ -1,7 +1,7 @@
 {
   "title": "Golden - Real",
-  "subtitle": "The real ClubrGo \u00b7 reference-faithful \u00b7 installable PWA",
-  "palette": "chip-gold #E9C46A + blue #4A90E2 on navy-felt #0B0F17",
+  "subtitle": "The real ClubrGo design language \u2014 pine-felt & chip-gold \u00b7 installable PWA",
+  "palette": "chip-gold #E9C46A on pine-felt #0B1410 (ClubrGo JSX language)",
   "type": "Space Grotesk display + Inter body + IBM Plex Mono data",
   "best_for": "The canonical ClubrGo look \u2014 exactly matching the kit reference screenshots",
   "pwa": "Installable: web manifest + service worker + maskable icons + offline precache",
