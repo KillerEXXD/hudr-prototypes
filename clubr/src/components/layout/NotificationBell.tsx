@@ -16,6 +16,7 @@ const STYLE: Record<NotificationType, { icon: typeof UserPlus; color: string; bg
   club_join_declined: { icon: XCircle,      color: 'text-text-secondary', bg: 'bg-bg-surface' },
   game_join_request:  { icon: Gamepad2,     color: 'text-accent-purple',  bg: 'bg-accent-purple/15' },
   game_join_approved: { icon: PartyPopper,  color: 'text-accent-amber',   bg: 'bg-accent-amber/15' },
+  game_join_declined: { icon: XCircle,      color: 'text-text-secondary', bg: 'bg-bg-surface' },
 }
 const FALLBACK = { icon: Bell, color: 'text-text-secondary', bg: 'bg-bg-surface' }
 
