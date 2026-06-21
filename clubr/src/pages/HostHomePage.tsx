@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Home, Trophy, Clock, ChevronRight, Gamepad2, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { Home, Trophy, Clock, ChevronRight, Gamepad2, LayoutGrid, Plus, UserPlus, Share2, type LucideIcon } from 'lucide-react'
 import { useAvailableFTs } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
@@ -18,6 +18,20 @@ import type { MemberRole } from '@/types'
 function FilterChip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
   return (
     <button type="button" onClick={onClick} className={cn('flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? activeClass : 'border-border font-semibold text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
+  )
+}
+
+// Host first-run step (onboarding Phase 5) — a numbered row that routes into the club.
+function FirstRunStep({ n, icon: Icon, title, sub, onClick }: { n: number; icon: LucideIcon; title: string; sub: string; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick} className="flex items-center gap-3 rounded-2xl border border-border bg-bg-card p-3 text-left transition-colors hover:bg-bg-surface cursor-pointer">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-emerald/15 text-xs font-extrabold text-accent-emerald">{n}</span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-1.5 text-sm font-bold text-text-primary"><Icon className="h-3.5 w-3.5 text-text-muted" />{title}</span>
+        <span className="block text-[11px] text-text-muted">{sub}</span>
+      </span>
+      <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
+    </button>
   )
 }
 
@@ -46,6 +60,11 @@ export function HostHomePage() {
   const counts = { available: 0, playing: 0, hosting: 0 }
   for (const g of active) { const r = relationshipOf(g); if (r) counts[r]++ }
   const anyGames = active.length > 0
+  // Host first-run (Phase 5): owns/hosts a club but hasn't created a game yet → a
+  // 3-step checklist that routes into the club. Collapses once they host a game.
+  const hostedGame = items.some((g) => g.iHost)
+  const managedClub = (myClubs.data ?? []).find((c) => c.myStatus === 'member' && (c.myRole === 'owner' || c.myRole === 'host'))
+  const showFirstRun = !!managedClub && !hostedGame
   // Only buckets with data are shown; if the selected one is empty, fall back to
   // the first non-empty pill so the visible tab always has games.
   const effectiveRel = counts[rel] > 0 ? rel : (relationshipPills(true).find((r) => counts[r] > 0) ?? rel)
@@ -58,6 +77,18 @@ export function HostHomePage() {
       <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-accent-emerald"><Home className="h-3.5 w-3.5" /> Home</div>
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
       <p className="text-sm text-text-secondary">Upcoming final tables available for you to host as Fantasy games in your club.</p>
+
+      {/* ---- Host first-run checklist (Phase 5) — until the club has its first game ---- */}
+      {showFirstRun && managedClub && (
+        <Section title={`Get ${managedClub.name} going`}>
+          <p className="-mt-1 mb-2 text-xs text-text-muted">Your club's ready — three steps to your first game:</p>
+          <div className="flex flex-col gap-2">
+            <FirstRunStep n={1} icon={Plus} title="Create your first game" sub="Pick a type — FT Fantasy, Last Longer or Squares" onClick={() => navigate(`/club/${managedClub.id}`)} />
+            <FirstRunStep n={2} icon={UserPlus} title="Invite your players" sub="Share the club so people can request to join" onClick={() => navigate(`/club/${managedClub.id}`)} />
+            <FirstRunStep n={3} icon={Share2} title="Share the join link" sub="Drop it in your WhatsApp / Telegram group" onClick={() => navigate(`/club/${managedClub.id}`)} />
+          </div>
+        </Section>
+      )}
 
       {/* ---- FTs to host — only for users who manage a club, and only when some exist ---- */}
       {hasManagedClub && (fts.isLoading || (fts.data?.length ?? 0) > 0) && (

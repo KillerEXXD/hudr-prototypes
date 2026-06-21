@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Gamepad2, Send, Trophy } from 'lucide-react'
+import { ArrowRight, Clock, Gamepad2, Send, Trophy } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useUnifiedGames, type UnifiedGame } from '@/games/useUnifiedGames'
 import { useOnboardingStage } from '@/hooks/useOnboardingStage'
@@ -28,10 +28,14 @@ export function NextBestAction() {
   const myClubIds = new Set(myClubs.map((c) => c.id))
 
   const active = items.find((g) => g.mine && !g.pending && !g.finished)
+  const pendingGame = items.find((g) => g.mine && g.pending && !g.finished)
   const joinable = items.filter((g) => myClubIds.has(g.clubId) && !g.mine && !g.finished && g.phase === 'reg')
 
   let icon = Gamepad2, title: string, sub: string, cta: string, onClick: () => void
-  if (active) {
+  if (pendingGame) {
+    // Second gate (Phase 4): admitted to the club, now waiting on the game's host.
+    icon = Clock; title = `Pending — ${gameTitle(pendingGame)}`; sub = "You're in the club; the host is reviewing your game request"; cta = 'View'; onClick = () => navigate('/games')
+  } else if (active) {
     title = 'Your game is on'; sub = `Jump back into ${gameTitle(active)}`; cta = 'Open'; onClick = () => navigate('/games')
   } else if (joinable.length) {
     title = `Join a game in ${club.name}`; sub = `${joinable.length} open to enter right now`; cta = 'See games'; onClick = () => navigate('/games')

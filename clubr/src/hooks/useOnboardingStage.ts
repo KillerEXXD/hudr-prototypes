@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useMyClubs } from '@/hooks'
 import { useUnifiedGames } from '@/games/useUnifiedGames'
+import { captureOnboardingStage } from '@/lib/analytics'
 import {
   resolveOnboarding, tabsForStage, maxStage, stageRank,
   type OnboardingResult, type OnboardingStage,
@@ -45,6 +46,7 @@ export function useOnboardingStage(): OnboardingResult {
     if (stageRank(current.stage) > stageRank(persisted)) {
       window.localStorage.setItem(KEY(uid), current.stage)
       setPersisted(current.stage)
+      captureOnboardingStage(current.stage) // funnel event, once per forward step
     }
   }, [uid, current.stage, persisted])
 

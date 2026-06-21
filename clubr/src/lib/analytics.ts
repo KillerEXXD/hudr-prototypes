@@ -96,6 +96,15 @@ export interface FeedbackPayload {
   email: string
 }
 
+/**
+ * Onboarding funnel event (Phase 6) — fired once each time a user first reaches a
+ * progressive-disclosure stage (fresh → connected → settled). Lets us see where the
+ * slow-reveal ladder leaks (e.g. requested a club but never got admitted/joined a game).
+ */
+export function captureOnboardingStage(stage: string): void {
+  posthog.capture('onboarding_stage_reached', { prototype: PROTOTYPE, stage })
+}
+
 /** Structured quick-note event — links to the user's session replay in PostHog. */
 export function captureFeedback(data: FeedbackPayload): void {
   setIdentity(data.name, data.email)
