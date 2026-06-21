@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { Plus, Ticket, Users, Globe, Lock, Send } from 'lucide-react'
 import { useMyClubs, useRecentClubs, useCreateClub, useJoinViaInvite } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
@@ -21,6 +21,10 @@ export function ClubsPage() {
   const createClubCost = useEconomy().data?.costs.createClubCost ?? 200
   const [createOpen, setCreateOpen] = useState(false)
   const [joinOpen, setJoinOpen] = useState(false)
+  // The Get-Started hub routes here with { state: { create: true } } to open the
+  // create-club sheet straight away (onboarding Phase 2 host door).
+  const openCreate = (useLocation().state as { create?: boolean } | null)?.create
+  useEffect(() => { if (openCreate) setCreateOpen(true) }, [openCreate])
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('ðŸƒ')
   const [desc, setDesc] = useState('')
