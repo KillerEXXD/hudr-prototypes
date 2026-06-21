@@ -466,7 +466,13 @@ when the registration deadline elapses the badge stays **Registration open** and
 ## 18. Multi‑game platform IA (scales to N game types)
 ClubR is a **multi‑game platform** (FT Fantasy, Last Longer, **Football Squares** next, more
 later). Navigation is by **entity/activity, never by game type**:
-- **Bottom nav = Home · Clubs · Games · Me** (4 fixed tabs). The old per‑game tabs (Fantasy, Last
+- **Bottom nav = Home · Clubs · Games · Me** — **progressively revealed, not fixed.** A pure
+  resolver (`resolveOnboarding` / `useOnboardingStage`) unlocks tabs by footprint: **Home always**;
+  **Clubs + Games together** once you're a *confirmed* club member or a host (never on a pending
+  request); **Me after your first settled game** (`/me` stays reachable via the Header avatar). A
+  lone Home tab hides the bar entirely, so a brand‑new user gets **no bottom nav** (Stage 0) instead
+  of four empty tabs. Reveal is **monotonic** (persisted; never regresses). Full model:
+  `docs/ONBOARDING_PROGRESSIVE_DISCLOSURE.md`. The old per‑game tabs (Fantasy, Last
   Longer) are **replaced by a single Games tab**; adding a game type adds a **filter chip + a card
   variant**, never a nav slot.
 - **Game‑type registry:** every type is declared once in **`games/types.ts`** (`GAME_TYPES` — label,
