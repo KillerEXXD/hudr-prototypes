@@ -292,7 +292,7 @@ export function ClubDetailPage() {
       )}
 
       {/* Leaderboard tab — this club only */}
-      {tab === 'leaderboard' && <LeaderboardSection clubId={club.id} clubName={club.name} clubEmoji={club.emoji} />}
+      {tab === 'leaderboard' && <LeaderboardSection clubId={club.id} clubName={club.name} clubEmoji={club.emoji} canView={isMember || club.canManage} />}
 
       {/* Members tab — host & admin only (players never see the list). Holds the
           host-management cluster: invite link, join-request queue, and the roster. */}

@@ -27,12 +27,12 @@ const LB_STEPS: HowStep[] = [
 /** Per-CLUB standings for one month — points by finish & field size across FT,
  *  Last Longer & Squares. Lives on the Club Detail page; scoped to this club
  *  only (no app-wide board). SPEC §20. */
-export function LeaderboardSection({ clubId, clubName, clubEmoji }: { clubId: string; clubName: string; clubEmoji: string }) {
+export function LeaderboardSection({ clubId, clubName, clubEmoji, canView }: { clubId: string; clubName: string; clubEmoji: string; canView: boolean }) {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [season, setSeason] = useState<string | undefined>(undefined)
   const [howOpen, setHowOpen] = useState(false)
-  const { data, isLoading } = useClubLeaderboard(clubId, season)
+  const { data, isLoading } = useClubLeaderboard(clubId, season, { enabled: canView })
 
   return (
     <Section
@@ -63,7 +63,9 @@ export function LeaderboardSection({ clubId, clubName, clubEmoji }: { clubId: st
         Standings for <b className="text-text-secondary">{clubEmoji} {clubName}</b> — <b className="text-text-secondary">this club only</b>; every club keeps
         its own board. Points come from finishing in this club's FT Fantasy, Last Longer &amp; Squares games (Squares counts half). Resets monthly.
       </p>
-      {isLoading ? (
+      {!canView ? (
+        <EmptyState icon={<Trophy className="h-7 w-7" />} title="Join to see the leaderboard" sub={`${clubName}'s standings are for members. Request to join the club to see who's on top.`} />
+      ) : isLoading ? (
         <Spinner />
       ) : !data || data.entries.length === 0 ? (
         <EmptyState

@@ -2,11 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as lb from '@/lib/api/leaderboardServices'
 import type { LeaderboardConfig, SeasonKey } from '@/types/leaderboard'
 
-export function useClubLeaderboard(clubId: string, season?: SeasonKey) {
+export function useClubLeaderboard(clubId: string, season?: SeasonKey, opts?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['leaderboard', 'club', clubId, season ?? 'default'],
     queryFn: () => lb.getClubLeaderboard(clubId, season),
-    enabled: !!clubId,
+    enabled: !!clubId && (opts?.enabled ?? true),
   })
 }
 
