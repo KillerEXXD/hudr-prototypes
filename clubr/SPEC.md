@@ -96,6 +96,16 @@ Approval is required to do anything beyond viewing:
 - **"How it works?" walkthrough.** A **"How it works"** pill by the FT Fantasy heading opens a
   **simple numbered step‑by‑step** (find a contest → request to enter → draft 4 → picks lock →
   watch & score → win the pool), in plain English for first‑timers (`HowItWorks.tsx`).
+- **Progressive disclosure (slow‑reveal onboarding).** The UI builds up in **three monotonic
+  stages** off the user's footprint (`useOnboardingStage` → pure `resolveOnboarding`); a stage,
+  once reached, never regresses. **Stage 0 (no club):** no bottom nav — Home is the **Get‑Started
+  hub** (Join a club / Create your own), or, once a club is *requested*, the **"Waiting on [Club]"**
+  pending surface with explore cards. **Stage 1 (member/host):** **Clubs + Games** reveal together
+  (a newly‑unlocked tab **pulses once**); the player Home gets an evolving **coach card**
+  (`NextBestAction` — join a game · *pending — [Game]* second gate · no games yet), a host gets a
+  3‑step **first‑run checklist**. **Stage 2 (first game settled):** the **Me** tab reveals.
+  `onboarding_stage_reached` fires once per forward step. Full design in
+  `docs/ONBOARDING_PROGRESSIVE_DISCLOSURE.md` (live‑app repo).
 - **Prize pool shown is the REAL event's — informational only.** The contest pays
   its own **Stakes bucket**, settled **offline**. The app moves nothing.
 - **Operator slate is host/admin-only.** Players **never** see it; the Host page
