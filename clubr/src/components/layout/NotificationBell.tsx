@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bell, UserPlus, CheckCircle2, Gamepad2, PartyPopper } from 'lucide-react'
+import { Bell, UserPlus, CheckCircle2, Gamepad2, PartyPopper, XCircle } from 'lucide-react'
 import { Badge, Sheet, EmptyState } from '@/components/common/ui'
 import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from '@/hooks'
 import { GAME_ROUTE } from '@/lib/contract/gameInvite'
@@ -13,6 +13,7 @@ const PAGE = 15 // show the latest 15; "More" reveals the next 15.
 const STYLE: Record<NotificationType, { icon: typeof UserPlus; color: string; bg: string }> = {
   club_join_request:  { icon: UserPlus,     color: 'text-accent-blue',    bg: 'bg-accent-blue/15' },
   club_join_approved: { icon: CheckCircle2, color: 'text-accent-emerald', bg: 'bg-accent-emerald/15' },
+  club_join_declined: { icon: XCircle,      color: 'text-text-secondary', bg: 'bg-bg-surface' },
   game_join_request:  { icon: Gamepad2,     color: 'text-accent-purple',  bg: 'bg-accent-purple/15' },
   game_join_approved: { icon: PartyPopper,  color: 'text-accent-amber',   bg: 'bg-accent-amber/15' },
 }

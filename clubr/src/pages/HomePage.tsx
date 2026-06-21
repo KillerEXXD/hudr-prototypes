@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { useMyClubs } from '@/hooks'
 import { useOnboardingStage } from '@/hooks/useOnboardingStage'
+import { Spinner } from '@/components/common/ui'
 import { DiscoverPage } from '@/pages/DiscoverPage'
 import { GetStartedHub } from '@/pages/GetStartedHub'
 import { ClubPendingSurface } from '@/pages/ClubPendingSurface'
@@ -18,6 +19,7 @@ export function HomePage() {
   if (user?.role === 'admin') return <AdminPage />
   if (user?.role === 'host') return <HostHomePage />
   if (stage === 'fresh') {
+    if (clubs.isLoading) return <div className="flex min-h-[60vh] items-center justify-center"><Spinner /></div>
     const hasPending = (clubs.data ?? []).some((c) => c.myStatus === 'pending')
     return hasPending ? <ClubPendingSurface /> : <GetStartedHub />
   }
