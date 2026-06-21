@@ -62,7 +62,7 @@ export function BottomNav() {
             <button
               key={it.to}
               onClick={() => navigate(it.to)}
-              className={cn('flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold transition-colors cursor-pointer', active ? 'text-accent-blue' : isNew ? 'text-accent-blue animate-pulse' : 'text-text-muted hover:text-text-secondary')}
+              className={cn('flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold transition-colors cursor-pointer', active ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary', isNew && !active && 'animate-pulse')}
             >
               <Icon className="h-5 w-5" strokeWidth={active || isNew ? 2.5 : 2} />
               {it.label}
