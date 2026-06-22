@@ -13,7 +13,7 @@ export function FloatingCreateClubButton({ onClick }: { onClick: () => void }) {
       label="Create club"
       ariaLabel="Create your own club"
       onClick={onClick}
-      bottomClass="bottom-24"
+      bottomClass="bottom-36"
       pulse
     />
   )

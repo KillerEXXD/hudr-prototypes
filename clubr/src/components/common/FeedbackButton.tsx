@@ -45,7 +45,7 @@ export default function FeedbackButton() {
         label="Feedback"
         ariaLabel="Give feedback on the ClubrGO prototype"
         onClick={() => setOpen(true)}
-        bottomClass="bottom-6"
+        bottomClass="bottom-20"
       />
 
       {open && createPortal(

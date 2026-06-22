@@ -117,10 +117,13 @@ Approval is required to do anything beyond viewing:
   card and the game cards form **one accordion** — opening any one closes the others. The **single
   host door** is a **floating, gently‑pulsing Create‑a‑club puck** built on a shared `FloatingPuck`
   primitive — an icon portaled to `document.body` that **hides while the page scrolls and reappears
-  once it settles** (non‑intrusive) and **expands to its label ("Create club") on hover**. The
-  **Feedback** launcher uses the same `FloatingPuck` (icon puck → "Feedback" on hover), so the two
-  pucks **line up** bottom‑right (Create‑club stacks just above Feedback). It's the only create‑club
-  CTA (the old in‑card button was removed; the club card's "be the host" step points at the **+**).
+  once it settles** (non‑intrusive). It reveals its label ("Create club") two ways so it works on
+  every device + skin: **on hover** (desktop) **and a brief auto‑"peek" when it appears** (touch
+  screens have no hover). The **Feedback** launcher uses the same `FloatingPuck` (icon → "Feedback"),
+  and both **sit above the bottom nav** (`bottom-20`) so they never overlap the nav tabs; on the
+  nav‑less cold‑start hub the Create‑club puck stacks just above Feedback (`bottom-36`) so the two
+  **line up** bottom‑right. It's the only create‑club CTA (the old in‑card button was removed; the
+  club card's "be the host" step points at the **+**).
   The whole hub is **cold‑start only** — it renders solely for a fresh signup with **no game/invite
   link** (link arrivals are routed to their pending club instead). A header **"?"** button opens the same cards on a dedicated **`/how-games-work`**
   help page (with a back button), reachable any time. The three games' steps are **centralized in

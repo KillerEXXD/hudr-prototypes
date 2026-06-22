@@ -25,4 +25,19 @@ describe('FloatingPuck', () => {
     expect(btn.className).toContain('opacity-100')
     vi.useRealTimers()
   })
+
+  it('peeks the label on mount (so it reveals on touch, not just hover), then collapses', () => {
+    vi.useFakeTimers()
+    render(<FloatingPuck icon={Plus} label="Create club" onClick={() => {}} />)
+    const span = screen.getByText('Create club')
+    expect(span.className).not.toContain('max-w-0')   // peeking → label expanded
+    act(() => { vi.advanceTimersByTime(2700) })
+    expect(span.className).toContain('max-w-0')        // collapsed back to the icon
+    vi.useRealTimers()
+  })
+
+  it('honors the bottomClass so pucks can stack without colliding', () => {
+    render(<FloatingPuck icon={Plus} label="X" onClick={() => {}} bottomClass="bottom-20" />)
+    expect(screen.getByRole('button', { name: 'X' }).className).toContain('bottom-20')
+  })
 })
