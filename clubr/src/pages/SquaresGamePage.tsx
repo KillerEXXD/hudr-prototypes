@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Hand, Dice5, Coins, Stamp, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Stamp, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
@@ -20,7 +20,7 @@ import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SquaresResults } from '@/components/squares/SquaresResults'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
-import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
+import { HowItWorks } from '@/components/common/HowItWorks'
 import { cn } from '@/lib/utils/cn'
 import { useEconomy } from '@/hooks/credits'
 import { useLeaderboardConfig } from '@/hooks/leaderboard'
@@ -29,16 +29,9 @@ import { DEFAULT_LEADERBOARD } from '@/types/leaderboard'
 import { LpBadge } from '@/components/leaderboard/LpBadge'
 import { useSpend } from '@/components/credits/SpendProvider'
 import type { SquaresGameView } from '@/types/squares'
+import { SQUARES_STEPS } from '@/games/gameExplainers'
 
 const initials = (name?: string) => (name ? name.split(' ').map((w) => w[0]).slice(0, 2).join('') : '')
-
-const SQUARES_STEPS: HowStep[] = [
-  { icon: UserPlus, title: 'Join the board', body: 'Request to join — the host admits you, then you can grab squares.' },
-  { icon: Hand, title: 'Claim your squares', body: 'Tap any empty square on the 10×10 grid to claim it. Grab as many as you like (tap yours again to release) before claiming closes.' },
-  { icon: Dice5, title: 'Digits are drawn', body: 'When the host locks the board, each row & column gets a random 0–9 digit. They’re sealed until then — nobody can game it.' },
-  { icon: Trophy, title: 'Scores pick winners', body: 'After each period (Q1/Q2/Q3/Final), the host enters the score. The square at the home & away last digits lights up — that owner wins the period.' },
-  { icon: Coins, title: 'Split the pool', body: 'Pool = price per square × squares claimed, split by period (default 10/10/10/70). Settled offline — the app holds no cash.' },
-]
 
 export function SquaresGamePage() {
   const { id = '' } = useParams()
@@ -101,7 +94,7 @@ export function SquaresGamePage() {
       <div className="mt-1"><GameHostLine hostId={g.hostId} knownName={g.participants.find((p) => p.userId === g.hostId)?.name} /></div>
       <p className="mt-0.5 text-sm text-text-secondary"><b className="text-text-primary">{g.homeTeam}</b> <span className="text-text-muted">(side)</span> vs <b className="text-text-primary">{g.awayTeam}</b> <span className="text-text-muted">(top)</span></p>
       <div className="mt-1.5 flex items-center gap-2 text-xs">
-        <StatusBadge phase={g.status} />
+        <StatusBadge phase={g.status} />
       </div>
       <StakePool stake={g.stake} pool={g.stake * g.claimedCount}>· {g.claimedCount}/100 squares</StakePool>
       {g.status === 'registration' && (

@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Ticket, Compass, Plus, ChevronRight } from 'lucide-react'
+import { Ticket } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useJoinViaInvite } from '@/hooks'
 import { Btn, Card, Field } from '@/components/common/ui'
+import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
+import { GameHowItWorksCards } from '@/components/onboarding/GameHowItWorksCards'
 
 /**
- * Stage-0 surface (onboarding Phase 2). Shown as the player's Home while they have
- * no club yet — one focused fork instead of four empty tabs:
- *   • Join a club (primary) — paste an invite code, or browse public clubs.
- *   • Create your own club (secondary) — the host path.
- * A player can do nothing until they're in a club, so this never dead-ends: both
- * doors lead somewhere. The bottom nav is hidden at this stage (see BottomNav).
+ * Stage-0 surface (onboarding). The player's Home while they have no club yet —
+ * a guided "join, then play" instead of four empty tabs:
+ *   1. Clubs you can join (near-you list) + an invite-code door for private clubs.
+ *   2. The games — beautiful cards, tap to learn how each works (every game runs
+ *      inside a club), ending in a Create-a-club CTA (the host path).
+ * Nothing dead-ends. The bottom nav is hidden at this stage (see BottomNav).
  */
 export function GetStartedHub() {
   const { user } = useAuth()
@@ -30,39 +32,34 @@ export function GetStartedHub() {
   }
 
   return (
-    <div className="animate-fade-up flex flex-col gap-4">
+    <div className="animate-fade-up flex flex-col gap-5">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Welcome, {firstName} 👋</h1>
-        <p className="mt-1 text-sm text-text-secondary">How do you want to start?</p>
+        <p className="mt-1 text-sm text-text-secondary">Join a club to start playing — here's what's on.</p>
       </div>
 
-      {/* Join a club — the primary door (most people join before they host). */}
-      <Card className="flex flex-col gap-3 border-accent-blue/30">
+      {/* 1. Clubs you can join — the near-you list (+ "See all"). */}
+      <ClubsToJoinSection />
+
+      {/* Invite-code door — for private clubs not in the public list. */}
+      <Card className="flex flex-col gap-2.5 border-accent-blue/30">
         <div className="flex items-center gap-2">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-blue/15 text-accent-blue"><Ticket className="h-5 w-5" /></span>
           <div>
-            <p className="text-sm font-extrabold text-text-primary">Join a club</p>
-            <p className="text-[11px] text-text-muted">Got an invite code from a host? Paste it.</p>
+            <p className="text-sm font-extrabold text-text-primary">Have an invite code?</p>
+            <p className="text-[11px] text-text-muted">Paste it to request a private club.</p>
           </div>
         </div>
         <Field label="Invite code" value={code} onChange={setCode} placeholder="e.g. ACES24" mono />
         <Btn className="w-full" disabled={!code.trim()} loading={join.isPending} onClick={applyCode}>Request to join</Btn>
         {msg && <p className="text-center text-xs font-semibold text-accent-emerald">{msg}</p>}
-        <button type="button" onClick={() => navigate('/discover/clubs')} className="flex items-center justify-center gap-1 text-xs font-semibold text-accent-blue cursor-pointer">
-          <Compass className="h-3.5 w-3.5" />Browse public clubs to join<ChevronRight className="h-3.5 w-3.5" />
-        </button>
       </Card>
 
-      {/* Create a club — the host door (opens the create sheet on the Clubs screen). */}
-      <button type="button" onClick={() => navigate('/clubs', { state: { create: true } })}
-        className="flex items-center gap-3 rounded-2xl border border-border bg-bg-card p-3.5 text-left transition-colors hover:bg-bg-surface cursor-pointer">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-bg-surface text-text-secondary"><Plus className="h-5 w-5" /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-bold text-text-primary">Create your own club</span>
-          <span className="block text-[11px] text-text-muted">Host FT Fantasy, Last Longer & Squares for your crew.</span>
-        </span>
-        <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
-      </button>
+      {/* 2. The games — learn how each works (and create a club to host). */}
+      <div>
+        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-text-muted">The games</p>
+        <GameHowItWorksCards onCreateClub={() => navigate('/clubs', { state: { create: true } })} />
+      </div>
     </div>
   )
 }

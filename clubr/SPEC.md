@@ -106,6 +106,16 @@ Approval is required to do anything beyond viewing:
   3‑step **first‑run checklist**. **Stage 2 (first game settled):** the **Me** tab reveals.
   `onboarding_stage_reached` fires once per forward step. Full design in
   `docs/ONBOARDING_PROGRESSIVE_DISCLOSURE.md` (live‑app repo).
+- **Cold‑start hub (Stage 0) — clubs to join + game explainers.** The Get‑Started hub leads
+  with a **"Clubs you can join"** near‑you list and an **invite‑code** door (private clubs),
+  then a **"THE GAMES"** section of beautiful, accent‑tinted cards (`GameHowItWorksCards`) — FT
+  Fantasy (purple), Last Longer (amber), Squares (emerald). Each card carries an **"in a club"**
+  badge and **taps to expand** its inline how‑it‑works timeline, ending in a **Create‑a‑club CTA**
+  (the host door). A header **"?"** button opens the same cards on a dedicated **`/how-games-work`**
+  help page (with a back button), reachable any time. The three games' steps are **centralized in
+  one source** (`games/gameExplainers` → `FT_STEPS` / `LL_STEPS` / `SQUARES_STEPS` +
+  `GAME_EXPLAINER`), shared by the in‑game How‑it‑works sheets, the onboarding cards, and the help
+  page so the explainer never drifts.
 - **Prize pool shown is the REAL event's — informational only.** The contest pays
   its own **Stakes bucket**, settled **offline**. The app moves nothing.
 - **Operator slate is host/admin-only.** Players **never** see it; the Host page

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, Coins, RotateCcw, X, Ban, AlertTriangle, Flag } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, RotateCcw, X, Ban, AlertTriangle, Flag } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
@@ -21,7 +21,7 @@ import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { FloatingChat } from '@/components/common/FloatingChat'
-import { HowItWorks, type HowStep } from '@/components/common/HowItWorks'
+import { HowItWorks } from '@/components/common/HowItWorks'
 import { useEconomy } from '@/hooks/credits'
 import { useLeaderboardConfig } from '@/hooks/leaderboard'
 import { awardMap, llAward } from '@/lib/leaderboard/award'
@@ -31,14 +31,7 @@ import { llResult, normalizeCompleted } from '@/lib/llWinnings'
 import { useSpend } from '@/components/credits/SpendProvider'
 import type { LLParticipant } from '@/types/ll'
 import { fmtChips, digitsOnly } from '@/lib/utils/chipFormat'
-
-const LL_STEPS: HowStep[] = [
-  { icon: UserPlus, title: 'Join the game', body: 'Request to join your club’s live tournament — the host admits you and marks you paid.' },
-  { icon: Timer, title: 'Play it out', body: 'Everyone starts together. As the night goes, the host updates chip counts and busts players as they’re eliminated.' },
-  { icon: Trophy, title: 'Last one standing', body: 'The leaderboard auto-sorts by chips — active players up top, eliminated below with their finish place.' },
-  { icon: Scissors, title: 'Deal or chop', body: 'Near the end, players can propose a chop. It only goes through on a unanimous vote.' },
-  { icon: Coins, title: 'Split the pool', body: 'Pool = entry × players joined, paid by finish place per the host’s split. Settled offline — the app holds no cash.' },
-]
+import { LL_STEPS } from '@/games/gameExplainers'
 
 const medal = (n?: number) => (n === 1 ? '🥇' : n === 2 ? '🥈' : n === 3 ? '🥉' : `${n}`)
 
@@ -95,7 +88,7 @@ export function LastLongerGamePage() {
       <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-secondary">
         <StatusBadge phase={g.status} />
         <span className="font-mono">{g.stake} Stakes</span>
-        <span className="text-text-muted">· {g.activeCount} in · {out.length} out</span>
+        <span className="text-text-muted">· {g.activeCount} in · {out.length} out</span>
       </div>
       {(() => { const joined = g.participants.filter((p) => p.status !== 'pending').length; return <StakePool stake={g.stake} pool={g.stake * joined}>· {joined} joined</StakePool> })()}
       {g.status === 'registration' && (

@@ -1,15 +1,7 @@
-import { Search, UserPlus, Layers, Lock, Award, Coins } from 'lucide-react'
-
 // Plain-English "how to play FT Fantasy" — a numbered, visual walkthrough shown
-// in a sheet from the FT Fantasy page. Keep it short and friendly for first-timers.
-const STEPS = [
-  { icon: Search, title: 'Find a contest', body: 'Your club host opens an FT Fantasy contest on an upcoming streamed final table.' },
-  { icon: UserPlus, title: 'Request to enter', body: 'Tap “Request to enter” — the host admits you, then you can draft.' },
-  { icon: Layers, title: 'Draft your team', body: 'Pick 4 of the 9 finalists within your budget. Bigger chip stacks cost more (priced by ICM).' },
-  { icon: Lock, title: 'Picks lock', body: 'Your draft locks 10 minutes before the final table starts — no changes after.' },
-  { icon: Award, title: 'Watch & score', body: 'Each of your 4 players scores by where they finish — 1st 100 · 2nd 70 · 3rd 50 … 9th 3. Your score is the sum.' },
-  { icon: Coins, title: 'Win the pool', body: 'Highest total wins. The pool is split per the host’s payout (e.g. Top 3 — 50/30/20), settled offline.' },
-]
+// in a sheet from the FT Fantasy page. The steps live in games/gameExplainers
+// (shared with the onboarding cards + the /how-games-work help page).
+import { FT_STEPS as STEPS } from '@/games/gameExplainers'
 
 export function HowItWorksFT({ onShowPricing }: { onShowPricing?: () => void } = {}) {
   return (
