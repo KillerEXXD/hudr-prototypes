@@ -11,9 +11,19 @@ import { cn } from '@/lib/utils/cn'
  * carries a "plays inside a club" badge; an optional Create-a-club CTA closes
  * the set. Reused on the cold-start hub AND the /how-games-work help page.
  */
-export function GameHowItWorksCards({ onCreateClub }: { onCreateClub?: () => void } = {}) {
-  // First card open by default so first-timers immediately see what "expand" reveals.
-  const [open, setOpen] = useState<string | null>(() => GAME_TYPES[0]?.id ?? null)
+export function GameHowItWorksCards({ onCreateClub, openId, onOpen }: {
+  onCreateClub?: () => void
+  // Controlled accordion: pass openId + onOpen to coordinate with the club card
+  // (one card open at a time across the hub); omit them for standalone use.
+  openId?: string | null
+  onOpen?: (id: string | null) => void
+} = {}) {
+  // All cards collapsed by default — the user expands the one they're curious
+  // about. Reduces the cold-start scroll height and stops the first card from
+  // dominating the page.
+  const [openSelf, setOpenSelf] = useState<string | null>(null)
+  const open = onOpen ? (openId ?? null) : openSelf
+  const setOpen = onOpen ?? setOpenSelf
 
   return (
     <div className="flex flex-col gap-2.5">

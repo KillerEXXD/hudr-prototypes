@@ -136,7 +136,7 @@ export async function setFinishingOrder(contestId: string, order: string[]): Pro
     const winner = scored(c)[0]
     if (winner) {
       const wu = USERS[winner.userId]
-      c.chat.push({ id: `m_${Date.now()}`, userId: '', name: 'ClubR', avatarColor: '#ef4444', text: `🏆 ${wu?.name ?? 'Winner'} won the contest — ${winner.score ?? 0} pts`, ts: 'now', kind: 'system' })
+      c.chat.push({ id: `m_${Date.now()}`, userId: '', name: 'ClubrGO', avatarColor: '#ef4444', text: `🏆 ${wu?.name ?? 'Winner'} won the contest — ${winner.score ?? 0} pts`, ts: 'now', kind: 'system' })
     }
   }
 }
@@ -147,7 +147,7 @@ export async function cancelContest(contestId: string, reason: string): Promise<
   if (!c) return
   const r = reason.trim()
   c.status = 'cancelled'; c.cancelReason = r || undefined; c.cancelledAt = new Date().toISOString()
-  c.chat.push({ id: `m_${Date.now()}`, userId: '', name: 'ClubR', avatarColor: '#ef4444', text: `🚫 Contest cancelled${r ? ` — ${r}` : ''}`, ts: 'now', kind: 'system' })
+  c.chat.push({ id: `m_${Date.now()}`, userId: '', name: 'ClubrGO', avatarColor: '#ef4444', text: `🚫 Contest cancelled${r ? ` — ${r}` : ''}`, ts: 'now', kind: 'system' })
 }
 
 export async function listAvailableFTs(): Promise<AvailableFT[]> {

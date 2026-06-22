@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils/cn'
 const CLUB_STEPS: HowStep[] = [
   { icon: Users, title: 'A club is your crew', body: 'Every game — FT Fantasy, Last Longer, Squares — is played inside a club. No club, no games.' },
   { icon: Search, title: 'Join one', body: 'Request a club from the list above, or paste an invite code. The host reviews it and admits you.' },
-  { icon: Crown, title: 'Or be the host', body: 'Create your own club, invite your friends, and run games for your crew. Use the Create button below.' },
+  { icon: Crown, title: 'Or be the host', body: 'Create your own club, invite your friends, and run games for your crew. Tap the + button (bottom-right) to create one.' },
   { icon: Ticket, title: 'Invite link', body: 'A host can share a club link — tap it and you go straight to requesting to join that club.' },
   { icon: Link2, title: 'Game link', body: 'Shared a specific game? Tapping its link drops you right into it — and into the club too, if you’re not already in.' },
 ]
@@ -17,14 +17,19 @@ const CLUB_STEPS: HowStep[] = [
  * "How a club works" — the foundational explainer above THE GAMES on the cold-start
  * hub. Tap-to-expand (matches the game cards). No create button of its own; the
  * floating Create-a-club CTA is the single host door (see FloatingCreateClubButton).
+ *
+ * Accordion: pass `open` + `onToggle` to coordinate with the game cards (one card
+ * open at a time across the whole hub); omit them for standalone uncontrolled use.
  */
-export function ClubExplainerCard() {
-  const [open, setOpen] = useState(false)
+export function ClubExplainerCard({ open: openProp, onToggle }: { open?: boolean; onToggle?: () => void } = {}) {
+  const [openSelf, setOpenSelf] = useState(false)
+  const open = openProp ?? openSelf
+  const toggle = onToggle ?? (() => setOpenSelf((o) => !o))
   return (
     <div className="overflow-hidden rounded-2xl border border-accent-blue/30">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle}
         aria-expanded={open}
         className="flex w-full items-center gap-3 p-3.5 text-left transition-colors hover:bg-bg-surface/40 cursor-pointer"
       >

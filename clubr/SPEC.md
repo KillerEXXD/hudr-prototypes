@@ -113,12 +113,16 @@ Approval is required to do anything beyond viewing:
   → join one or be the host → **invite link** (a club link) → **game link** (jump straight into a
   shared game)*. Below it, a **"THE GAMES"** section of beautiful, accent‑tinted cards
   (`GameHowItWorksCards`) — FT Fantasy (purple), Last Longer (amber), Squares (emerald). Each card
-  carries an **"in a club"** badge and **taps to expand** its inline how‑it‑works timeline. The
-  **single host door** is a **floating, gently‑pulsing Create‑a‑club puck** (`FloatingCreateClubButton`)
-  built like the table‑chat puck — an icon portaled to `document.body` that **hides while the page
-  scrolls and reappears once it settles** (non‑intrusive). It's the only create‑club CTA (the old
-  in‑card button was removed). The whole hub is **cold‑start only** — it renders solely for a fresh
-  signup with **no game/invite link** (link arrivals are routed to their pending club instead). A header **"?"** button opens the same cards on a dedicated **`/how-games-work`**
+  carries an **"in a club"** badge and **taps to expand** its inline how‑it‑works timeline. The club
+  card and the game cards form **one accordion** — opening any one closes the others. The **single
+  host door** is a **floating, gently‑pulsing Create‑a‑club puck** built on a shared `FloatingPuck`
+  primitive — an icon portaled to `document.body` that **hides while the page scrolls and reappears
+  once it settles** (non‑intrusive) and **expands to its label ("Create club") on hover**. The
+  **Feedback** launcher uses the same `FloatingPuck` (icon puck → "Feedback" on hover), so the two
+  pucks **line up** bottom‑right (Create‑club stacks just above Feedback). It's the only create‑club
+  CTA (the old in‑card button was removed; the club card's "be the host" step points at the **+**).
+  The whole hub is **cold‑start only** — it renders solely for a fresh signup with **no game/invite
+  link** (link arrivals are routed to their pending club instead). A header **"?"** button opens the same cards on a dedicated **`/how-games-work`**
   help page (with a back button), reachable any time. The three games' steps are **centralized in
   one source** (`games/gameExplainers` → `FT_STEPS` / `LL_STEPS` / `SQUARES_STEPS` +
   `GAME_EXPLAINER`), shared by the in‑game How‑it‑works sheets, the onboarding cards, and the help

@@ -246,7 +246,7 @@ export async function cancelGame(gameId: string, reason: string): Promise<void> 
   if (!g) return
   const r = reason.trim()
   g.status = 'cancelled'; g.cancelReason = r || undefined; g.cancelledAt = new Date().toISOString()
-  g.chat.push({ id: `lm_${Date.now()}`, userId: '', name: 'ClubR', avatarColor: '#ef4444', text: `🚫 Game cancelled${r ? ` — ${r}` : ''}`, ts: 'now', kind: 'system' })
+  g.chat.push({ id: `lm_${Date.now()}`, userId: '', name: 'ClubrGO', avatarColor: '#ef4444', text: `🚫 Game cancelled${r ? ` — ${r}` : ''}`, ts: 'now', kind: 'system' })
 }
 
 export async function createGame(clubId: string, hostId: string, input: { title: string; location: string; mode: 'in-person' | 'online'; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; payouts: number[] }): Promise<string> {

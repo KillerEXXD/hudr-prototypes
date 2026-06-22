@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { MessageSquarePlus, X, Send, CheckCircle2, ClipboardList, ArrowRight } from 'lucide-react'
 import { captureQuickNote, getIdentity } from '@/lib/analytics'
+import { FloatingPuck } from '@/components/common/FloatingPuck'
 import ReviewWizard from '@/components/common/ReviewWizard'
 import { useLocation } from 'react-router-dom'
 
@@ -36,17 +37,16 @@ export default function FeedbackButton() {
 
   return (
     <>
-      {/* launcher — pinned to the right edge of the centered app frame, above the nav */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-20 z-40 mx-auto flex max-w-md justify-end px-3">
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-accent-blue/30 bg-accent-blue px-3 py-2 text-xs font-bold text-white shadow-lg transition-transform hover:scale-[1.03] cursor-pointer"
-          aria-label="Give feedback on the ClubrGO prototype"
-        >
-          <MessageSquarePlus className="h-4 w-4" /> Feedback
-        </button>
-      </div>
+      {/* launcher — an icon puck matching the other floating pucks: hides while the
+          page scrolls, expands to "Feedback" on hover. Sits at the standard low-right
+          FAB spot (the Create-club puck stacks above it on the cold-start hub). */}
+      <FloatingPuck
+        icon={MessageSquarePlus}
+        label="Feedback"
+        ariaLabel="Give feedback on the ClubrGO prototype"
+        onClick={() => setOpen(true)}
+        bottomClass="bottom-6"
+      />
 
       {open && createPortal(
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center" onClick={() => setOpen(false)}>

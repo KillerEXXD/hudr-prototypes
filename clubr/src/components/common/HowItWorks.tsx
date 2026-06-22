@@ -21,7 +21,7 @@ export function HowItWorks({ steps, dotBg, iconColor }: { steps: HowStep[]; dotB
         </div>
       ))}
       <p className="mt-1 rounded-lg bg-bg-surface/60 p-2 text-[11px] leading-snug text-text-muted">
-        ClubR is just the <strong className="text-text-secondary">scorekeeper</strong> — it tracks everything transparently and <strong className="text-text-secondary">holds no cash</strong>. All stakes are settled between players offline.
+        ClubrGO is just the <strong className="text-text-secondary">scorekeeper</strong> — it tracks everything transparently and <strong className="text-text-secondary">holds no cash</strong>. All stakes are settled between players offline.
       </p>
     </div>
   )

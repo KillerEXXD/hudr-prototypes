@@ -23,6 +23,9 @@ export function GetStartedHub() {
   const join = useJoinViaInvite()
   const [code, setCode] = useState('')
   const [msg, setMsg] = useState('')
+  // One accordion across the club card + the game cards: opening any one closes
+  // the rest. null = all collapsed; 'club' | a game id = that card is open.
+  const [openId, setOpenId] = useState<string | null>(null)
   const firstName = user?.name?.split(' ')[0] ?? 'there'
 
   async function applyCode() {
@@ -59,12 +62,12 @@ export function GetStartedHub() {
       </Card>
 
       {/* 2. How a club works — the foundational explainer, first card above the games. */}
-      <ClubExplainerCard />
+      <ClubExplainerCard open={openId === 'club'} onToggle={() => setOpenId(openId === 'club' ? null : 'club')} />
 
       {/* 3. The games — learn how each works. The host door is the floating CTA below. */}
       <div>
         <p className="mb-2 text-xs font-bold uppercase tracking-wide text-text-muted">The games</p>
-        <GameHowItWorksCards />
+        <GameHowItWorksCards openId={openId} onOpen={setOpenId} />
       </div>
     </div>
 
