@@ -131,7 +131,14 @@ export async function closeRegistration(contestId: string): Promise<void> {
 export async function setFinishingOrder(contestId: string, order: string[]): Promise<void> {
   await delay(150)
   const c = FT_CONTESTS.find((x) => x.id === contestId)
-  if (c && c.status === 'locked') { c.finishingOrder = order; c.status = 'settled'; c.settledAt = new Date().toISOString() }
+  if (c && c.status === 'locked') {
+    c.finishingOrder = order; c.status = 'settled'; c.settledAt = new Date().toISOString()
+    const winner = scored(c)[0]
+    if (winner) {
+      const wu = USERS[winner.userId]
+      c.chat.push({ id: `m_${Date.now()}`, userId: '', name: 'ClubR', avatarColor: '#ef4444', text: `🏆 ${wu?.name ?? 'Winner'} won the contest — ${winner.score ?? 0} pts`, ts: 'now', kind: 'system' })
+    }
+  }
 }
 /** Host cancels the contest with a reason. Voids it (no winner). */
 export async function cancelContest(contestId: string, reason: string): Promise<void> {

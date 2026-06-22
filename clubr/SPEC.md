@@ -150,7 +150,8 @@ Approval is required to do anything beyond viewing:
 - **Settled result.** A **prize pool** line, a **winner spotlight** (or top-3 podium),
   and a **payout-aware leaderboard** (paid per the §15 split; points still rank the
   whole table). Completed contests are **listed by default** for everyone who
-  entered/hosted (no collapse).
+  entered/hosted (no collapse). Settling also posts a **`🏆 <winner> won the contest — <score> pts`**
+  system line to the **table chat** (mirrors Last Longer's result line).
 - **Host Complete / Cancel.** The host **Completes** a contest by **entering the
   finishing order** — a tap-to-rank sheet (`FinishingOrderSheet.tsx`): tap players
   1st→last; submit is disabled until the **whole table is ranked** (so there's a
