@@ -24,7 +24,7 @@ import { FloatingChat } from '@/components/common/FloatingChat'
 import { HowItWorks } from '@/components/common/HowItWorks'
 import { useEconomy } from '@/hooks/credits'
 import { useLeaderboardConfig } from '@/hooks/leaderboard'
-import { awardMap, llAward } from '@/lib/leaderboard/award'
+import { awardMap, llAward, lpZeroReason } from '@/lib/leaderboard/award'
 import { DEFAULT_LEADERBOARD } from '@/types/leaderboard'
 import { BustedRow } from '@/components/ll/BustedRow'
 import { llResult, normalizeCompleted } from '@/lib/llWinnings'
@@ -76,6 +76,8 @@ export function LastLongerGamePage() {
   // Leaderboard points earned (completed games only) — same math as the club board.
   const r = llResult(g)
   const lp = r.completed ? awardMap(llAward(normalizeCompleted(g), lpCfg)) : new Map<string, number>()
+  // When the field was too small (e.g. heads-up), LP is 0 for everyone — explain it.
+  const lpReason = r.completed ? lpZeroReason(g.participants.filter((p) => p.status !== 'pending').length, lpCfg) : undefined
 
   return (
     <div className="animate-fade-up pb-20">
@@ -219,7 +221,7 @@ export function LastLongerGamePage() {
         <div className="flex flex-col gap-1.5">
           {r.completed ? (
             r.finishers.map((p) => (
-              <BustedRow key={p.userId} p={p} medalLabel={medal(p.finishPos)} lpPoints={lp.get(p.userId)} amountWon={r.amountWon(p)} chop={r.isChop && p.finishPos === 1} canManage={false}
+              <BustedRow key={p.userId} p={p} medalLabel={medal(p.finishPos)} lpPoints={lp.get(p.userId)} lpReason={lpReason} amountWon={r.amountWon(p)} chop={r.isChop && p.finishPos === 1} canManage={false}
                 onProfile={() => navigate(`/member/${p.userId}`, { state: { from: `/lastlonger/${g.id}` } })} />
             ))
           ) : (

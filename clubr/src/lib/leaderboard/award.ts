@@ -55,3 +55,13 @@ export function awardMap(a: GameAward): Map<string, number> {
   for (const r of a.results) if (r.points > 0) m.set(r.userId, r.points)
   return m
 }
+
+/**
+ * Why a finished game awarded 0 LP to *everyone* because the field was too small
+ * (e.g. heads-up). Returns the explanation to surface behind a "?" next to "0 LP",
+ * or undefined when the field met the threshold (normal scoring applies).
+ */
+export function lpZeroReason(fieldSize: number, cfg: LeaderboardConfig): string | undefined {
+  if (fieldSize >= cfg.minField) return undefined
+  return `Heads-up games don't earn leaderboard points — a game needs at least ${cfg.minField} players to count toward the club board.`
+}

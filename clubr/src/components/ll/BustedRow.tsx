@@ -10,10 +10,12 @@ const fmtStakes = (n: number) => n.toLocaleString('en-US')
 // player who finished earned their place) — the result is shown as their finish
 // position instead: "winner 🏆"/"chop 🤝" for 1st, "finished 3rd" otherwise. On a
 // completed game we also show what they won from the pool (+N Stakes) and their LP.
-export function BustedRow({ p, medalLabel, lpPoints, amountWon, chop, canManage, onProfile, action }: {
+export function BustedRow({ p, medalLabel, lpPoints, lpReason, amountWon, chop, canManage, onProfile, action }: {
   p: LLParticipant
   medalLabel: string
   lpPoints?: number
+  /** When LP is 0 because the field was too small, the explanation behind a pulsing "?". */
+  lpReason?: string
   /** Stakes won from the pool (completed games). Hidden when 0. */
   amountWon?: number
   /** This finisher is a joint winner of a chop (shown as "chop 🤝"). */
@@ -38,7 +40,7 @@ export function BustedRow({ p, medalLabel, lpPoints, amountWon, chop, canManage,
       <div className="flex shrink-0 flex-col items-end gap-0.5 leading-none">
         {amountWon ? <span className="font-mono text-xs font-bold text-accent-emerald">+{fmtStakes(amountWon)} Stakes</span> : null}
         <div className="flex items-center gap-1.5">
-          {lpPoints ? <LpBadge points={lpPoints} /> : null}
+          <LpBadge points={lpPoints} reason={lpReason} />
           <span className="text-[11px] font-medium text-text-secondary">{label}</span>
         </div>
       </div>

@@ -251,7 +251,8 @@ Approval is required to do anything beyond viewing:
   | **Not a club member** (public club) | **Request to join the club** first; the game is **remembered as an intent** and **auto‑requested the moment the club admits them**. Club page shows "Request sent — you'll be entered into the game automatically once admitted." |
   | Club membership still **pending** | Club page, "awaiting approval." |
   | **Private club** | Non‑disclosure: a generic "Request sent" (club/game not revealed). |
-  | Game missing / ended / bad link | "Game unavailable." |
+  | **Game already finished** (completed / settled / cancelled) | Open it **read‑only** with a neutral *"This game has ended."* banner — **no** join request is filed and the host is **not** notified. |
+  | Game missing / bad link | "Game unavailable." |
 - **Club‑members‑only** is enforced at the **backend** (LL/Squares/FT reject a
   non‑member join; hosts/co‑hosts/admins bypass) — not just in the UI.
 - A game‑join request **notifies the game host** (`game_join_request`, deep‑links to
@@ -656,6 +657,11 @@ panel uses a **two‑level filter**:
   board is **this club only**.
 - **App‑Admin‑configurable (global):** one `LeaderboardConfig` — `base`, `minField`, `depthDivisor`,
   `ftWeight`, `llWeight`, `squaresWeight` — tuned in the Admin console (mirrors the §19 Economy card).
+  **`minField` default = 3** (small in‑person games count; **heads‑up / 2‑player games score 0 LP**).
+- **0‑LP explainer:** when a game's field is below `minField` (e.g. heads‑up), it awards 0 LP to
+  *everyone*. The result card + final standings then show a muted **"0 LP"** with a **pulsing "?"** that
+  taps open a short reason (instead of silently hiding it). Driven by `lpZeroReason(fieldSize, cfg)` →
+  surfaced via `LpBadge`; same in both skins.
 - **Prototype seed:** settled/completed games carry a `settledAt` date spread across recent months so
   the season selector has content (e.g. Aces High: June = a settled FT + a Last Longer, May = a WTA FT).
 
@@ -668,7 +674,7 @@ panel uses a **two‑level filter**:
   ranked (by summed period `pct`); everyone else scores 0 but still counts toward "games played."
 - A member appears on the board once they've **played ≥ 1 counted game** that season (points may be 0).
 
-### 20.2 Worked example (defaults B=10, top‑third, min 4)
+### 20.2 Worked example (defaults B=10, top‑third, min 3)
 - FT, N=6 → scoring depth `ceil(6/3)=2`: 1st **24**, 2nd **17**, 3rd+ **0**.
 - LL, N=5 → depth 2: 1st **22**, 2nd **16**, 3rd+ **0**.
 - Squares, N=5, ×0.5: top winner **11**, 2nd winner **8**.
