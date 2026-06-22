@@ -106,12 +106,19 @@ Approval is required to do anything beyond viewing:
   3‑step **first‑run checklist**. **Stage 2 (first game settled):** the **Me** tab reveals.
   `onboarding_stage_reached` fires once per forward step. Full design in
   `docs/ONBOARDING_PROGRESSIVE_DISCLOSURE.md` (live‑app repo).
-- **Cold‑start hub (Stage 0) — clubs to join + game explainers.** The Get‑Started hub leads
-  with a **"Clubs you can join"** near‑you list and an **invite‑code** door (private clubs),
-  then a **"THE GAMES"** section of beautiful, accent‑tinted cards (`GameHowItWorksCards`) — FT
-  Fantasy (purple), Last Longer (amber), Squares (emerald). Each card carries an **"in a club"**
-  badge and **taps to expand** its inline how‑it‑works timeline, ending in a **Create‑a‑club CTA**
-  (the host door). A header **"?"** button opens the same cards on a dedicated **`/how-games-work`**
+- **Cold‑start hub (Stage 0) — clubs to join + how a club works + game explainers.** The
+  Get‑Started hub leads with a **"Clubs you can join"** near‑you list and an **invite‑code** door
+  (private clubs), then a tap‑to‑expand **"How a club works"** card (`ClubExplainerCard`) — the
+  foundational explainer directly above the games: *a club is your crew → games only run inside one
+  → join one or be the host → **invite link** (a club link) → **game link** (jump straight into a
+  shared game)*. Below it, a **"THE GAMES"** section of beautiful, accent‑tinted cards
+  (`GameHowItWorksCards`) — FT Fantasy (purple), Last Longer (amber), Squares (emerald). Each card
+  carries an **"in a club"** badge and **taps to expand** its inline how‑it‑works timeline. The
+  **single host door** is a **floating, gently‑pulsing Create‑a‑club puck** (`FloatingCreateClubButton`)
+  built like the table‑chat puck — an icon portaled to `document.body` that **hides while the page
+  scrolls and reappears once it settles** (non‑intrusive). It's the only create‑club CTA (the old
+  in‑card button was removed). The whole hub is **cold‑start only** — it renders solely for a fresh
+  signup with **no game/invite link** (link arrivals are routed to their pending club instead). A header **"?"** button opens the same cards on a dedicated **`/how-games-work`**
   help page (with a back button), reachable any time. The three games' steps are **centralized in
   one source** (`games/gameExplainers` → `FT_STEPS` / `LL_STEPS` / `SQUARES_STEPS` +
   `GAME_EXPLAINER`), shared by the in‑game How‑it‑works sheets, the onboarding cards, and the help

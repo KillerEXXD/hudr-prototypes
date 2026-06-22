@@ -5,7 +5,9 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useJoinViaInvite } from '@/hooks'
 import { Btn, Card, Field } from '@/components/common/ui'
 import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
+import { ClubExplainerCard } from '@/components/onboarding/ClubExplainerCard'
 import { GameHowItWorksCards } from '@/components/onboarding/GameHowItWorksCards'
+import { FloatingCreateClubButton } from '@/components/onboarding/FloatingCreateClubButton'
 
 /**
  * Stage-0 surface (onboarding). The player's Home while they have no club yet —
@@ -32,7 +34,8 @@ export function GetStartedHub() {
   }
 
   return (
-    <div className="animate-fade-up flex flex-col gap-5">
+    <>
+    <div className="animate-fade-up flex flex-col gap-5 pb-20">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Welcome, {firstName} 👋</h1>
         <p className="mt-1 text-sm text-text-secondary">Join a club to start playing — here's what's on.</p>
@@ -55,11 +58,19 @@ export function GetStartedHub() {
         {msg && <p className="text-center text-xs font-semibold text-accent-emerald">{msg}</p>}
       </Card>
 
-      {/* 2. The games — learn how each works (and create a club to host). */}
+      {/* 2. How a club works — the foundational explainer, first card above the games. */}
+      <ClubExplainerCard />
+
+      {/* 3. The games — learn how each works. The host door is the floating CTA below. */}
       <div>
         <p className="mb-2 text-xs font-bold uppercase tracking-wide text-text-muted">The games</p>
-        <GameHowItWorksCards onCreateClub={() => navigate('/clubs', { state: { create: true } })} />
+        <GameHowItWorksCards />
       </div>
     </div>
+
+    {/* The single host door — a floating, pulsing puck that hides while you scroll
+        and reappears when it settles (chat-puck pattern). Cold-start only. */}
+    <FloatingCreateClubButton onClick={() => navigate('/clubs', { state: { create: true } })} />
+    </>
   )
 }
