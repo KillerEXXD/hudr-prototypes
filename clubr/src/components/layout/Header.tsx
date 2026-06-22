@@ -34,7 +34,7 @@ export function Header() {
             <Coins className="h-3.5 w-3.5" /><span className="font-mono">{(wallet?.balance ?? 0).toLocaleString()}</span>
           </button>
         )}
-        <button onClick={() => navigate('/how-games-work')} aria-label="How the games work" title="How the games work" className="rounded-full p-1.5 text-text-secondary hover:bg-bg-surface cursor-pointer">
+        <button onClick={() => navigate('/how-games-work')} aria-label="Help" title="How the games work" className="rounded-full p-1.5 text-text-secondary hover:bg-bg-surface cursor-pointer">
           <HelpCircle className="h-5 w-5" />
         </button>
         <NotificationBell />
