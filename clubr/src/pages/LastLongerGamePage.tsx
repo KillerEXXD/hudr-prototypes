@@ -196,8 +196,8 @@ export function LastLongerGamePage() {
         </Section>
       )}
 
-      {/* Host actions */}
-      {g.canManage && g.status === 'live' && g.activeCount > 1 && !g.chop && (
+      {/* Propose a chop — any remaining active (non-busted) player, or a host/co-host. */}
+      {(g.canManage || g.me?.status === 'active') && g.status === 'live' && g.activeCount > 1 && !g.chop && (
         <Btn variant="secondary" className="mt-3 w-full" loading={proposeChop.isPending} onClick={() => proposeChop.mutate(g.id)}><Scissors className="h-4 w-4" />Propose a chop</Btn>
       )}
 

@@ -173,7 +173,11 @@ export async function proposeChop(gameId: string, byUserId: string): Promise<voi
   await delay(150)
   const g = LL_GAMES.find((x) => x.id === gameId)
   if (!g) return
+  if (g.status !== 'live' || g.chop) return
   const active = g.participants.filter((p) => p.status === 'active')
+  // A host/co-host OR a remaining ACTIVE (non-busted) player may propose; others can't.
+  const isManager = g.hostId === byUserId || g.coHostIds.includes(byUserId)
+  if (!isManager && !active.some((p) => p.userId === byUserId)) return
   g.chop = { proposedByName: USERS[byUserId]?.name ?? 'Host', agreements: active.map((p) => ({ userId: p.userId, name: p.name, agreed: p.userId === byUserId })) }
   g.chat.push({ id: `lm_${Date.now()}`, userId: byUserId, name: USERS[byUserId]?.name ?? '', avatarColor: '#6b7280', text: `✂️ ${USERS[byUserId]?.name ?? 'Host'} proposed a chop`, ts: 'now', kind: 'system' })
 }

@@ -172,7 +172,8 @@ Approval is required to do anything beyond viewing:
   the host/co‑host gets a **Reinstate** button on each eliminated row — the player
   returns to active (finish place + bust time cleared; they re‑enter chips); if the
   bust had auto‑completed the game, reinstate **reopens it** and reactivates the winner.
-- **Chop:** host proposes → players agree → game settles.
+- **Chop:** any remaining **active (non‑busted) player**, or the host/co‑host, proposes → all
+  remaining players agree → game settles. Busted players and spectators can't propose.
 - **Per‑game chat** among the players.
 - **Auto-updates in chat.** The app posts **system chat lines** automatically for the
   whole lifecycle, each prefixed with a **distinct icon** so the table can scan the
