@@ -98,7 +98,11 @@ Approval is required to do anything beyond viewing:
   watch & score → win the pool), in plain English for first‑timers (`HowItWorks.tsx`).
 - **Progressive disclosure (slow‑reveal onboarding).** The UI builds up in **three monotonic
   stages** off the user's footprint (`useOnboardingStage` → pure `resolveOnboarding`); a stage,
-  once reached, never regresses. **Stage 0 (no club):** no bottom nav — Home is the **Get‑Started
+  once reached, never regresses — **except a fully‑loaded, truly‑empty footprint** (no club
+  records of any status, not a host, no games) **resets to Stage 0** (the persisted max is reset),
+  so a member who leaves their last club returns to the cold‑start hub with the nav hidden; a
+  *partial* shrink keeps the higher stage. (Gated on loaded data so it never flickers mid‑fetch.)
+  **Stage 0 (no club):** no bottom nav — Home is the **Get‑Started
   hub** (Join a club / Create your own), or, once a club is *requested*, the **"Waiting on [Club]"**
   pending surface with explore cards. **Stage 1 (member/host):** **Clubs + Games** reveal together
   (a newly‑unlocked tab **pulses once**); the player Home gets an evolving **coach card**
@@ -145,6 +149,18 @@ Approval is required to do anything beyond viewing:
   **`ClubrGoAdmin`** panel is now a **read-only mirror** of the published tables; the
   **host slate shows only published** ones. To add, re-price, publish or unpublish,
   the admin uses TournamentPro. (Design: TournamentPro `docs/CLUBRGO_FT_CONTROL.md`.)
+- **ClubrGo FT control — Published → Playing (edit-lock flow, in TournamentPro).** After a
+  table is published, TournamentPro splits it across two admin tabs, **derived from whether
+  any player has drafted it** (saved picks):
+  - **Published** (`drafted = 0`) — *Open · editable*: re-open the inline editor, change
+    details / blinds / ICM, **re-publish**.
+  - **Playing** (`drafted ≥ 1`) — *Playing · locked*: the editor opens **read-only** so chip
+    stacks / BB / ICM can't change (that would unfairly alter drafts already made). Only
+    **Unpublish** stays live.
+  - **Unpublish** (either tab) hides the table from **new** contests only — clubs already
+    playing keep running on their snapshot. Rows show usage (**# distinct clubs · # drafted
+    players**). The lock is automatic — a table flips Published → Playing the instant someone
+    drafts it. ClubrGo just mirrors the published set; none of this is controllable in ClubrGo.
 - **Final Table details panel.** Each contest page shows a **live YouTube stream** card
   (per-contest, live/replay) and event facts (prize pool, buy-in, blind level, chips in play,
   avg stack) — to **everyone, every state**. The **9-player roster table** — country flag, name,
@@ -518,7 +534,8 @@ later). Navigation is by **entity/activity, never by game type**:
   **Clubs + Games together** once you're a *confirmed* club member or a host (never on a pending
   request); **Me after your first settled game** (`/me` stays reachable via the Header avatar). A
   lone Home tab hides the bar entirely, so a brand‑new user gets **no bottom nav** (Stage 0) instead
-  of four empty tabs. Reveal is **monotonic** (persisted; never regresses). Full model:
+  of four empty tabs. Reveal is **monotonic** (persisted; never regresses) — except a truly‑empty
+  loaded footprint resets to Stage 0 (back to the cold‑start hub, nav hidden). Full model:
   `docs/ONBOARDING_PROGRESSIVE_DISCLOSURE.md`. The old per‑game tabs (Fantasy, Last
   Longer) are **replaced by a single Games tab**; adding a game type adds a **filter chip + a card
   variant**, never a nav slot.
