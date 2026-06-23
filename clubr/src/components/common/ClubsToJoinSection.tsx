@@ -1,8 +1,8 @@
-import { Compass, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useRecentClubs, useMyClubs, useRequestToJoin } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
-import { Section, Spinner, Btn, EmptyState } from '@/components/common/ui'
+import { Section, Spinner, Btn } from '@/components/common/ui'
 import { ClubRow, WaitingBadge } from '@/components/common/cards'
 import type { ClubView } from '@/types'
 
@@ -50,13 +50,10 @@ export function ClubsToJoinSection() {
         </Section>
       )}
 
-      {/* Clubs you can still join. */}
-      {joinable.length === 0 ? (
-        // Don't show the "you're in every club" dead-end while requests are pending.
-        pending.length === 0 && (
-          <Section title="Clubs to join"><EmptyState icon={<Compass className="h-7 w-7" />} title="You're in every club we know" sub="Create your own from the Clubs tab." /></Section>
-        )
-      ) : (
+      {/* Clubs you can still join. When there are NONE we render nothing at all —
+          no bland "no clubs" empty state. The cold-start hub shows a warm welcome
+          in its place (HubWelcome); other surfaces simply omit the section. */}
+      {joinable.length > 0 && (
         <Section
           title={`Clubs to join · ${joinable.length}`}
           action={joinable.length > CLUBS_CAP

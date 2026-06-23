@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Ticket } from 'lucide-react'
+import { Ticket, Plus } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useJoinViaInvite } from '@/hooks'
+import { useJoinViaInvite, useRecentClubs } from '@/hooks'
 import { Btn, Card, Field } from '@/components/common/ui'
 import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
 import { ClubExplainerCard } from '@/components/onboarding/ClubExplainerCard'
@@ -33,6 +33,10 @@ export function GetStartedHub() {
   // the rest. null = all collapsed; 'club' | a game id = that card is open.
   const [openId, setOpenId] = useState<string | null>(null)
   const firstName = user?.name?.split(' ')[0] ?? 'there'
+  // No clubs to join anywhere → skip the "Clubs to join" list (it self-hides) and
+  // show a warm welcome instead, encouraging them to explore + start their own.
+  const recent = useRecentClubs()
+  const noJoinable = !recent.isLoading && !(recent.data ?? []).some((c) => c.myStatus === 'none')
 
   async function applyCode() {
     const c = await join.mutateAsync(code.trim())
@@ -53,8 +57,31 @@ export function GetStartedHub() {
         <p className="mt-1 text-sm text-text-secondary">Join a club to start playing — here's what's on.</p>
       </div>
 
-      {/* 1. Your pending requests + clubs you can join (near-you list, "See all"). */}
+      {/* 1. Your pending requests + clubs you can join (near-you list, "See all").
+             When there are none to join, this self-hides and the welcome below shows. */}
       <ClubsToJoinSection />
+
+      {/* No clubs to join yet → a warm, hopeful welcome instead of an empty list:
+          tell them what ClubrGO is and nudge them to explore + be the first to host. */}
+      {noJoinable && (
+        <div className="overflow-hidden rounded-3xl border border-accent-amber/30 bg-gradient-to-br from-accent-amber/15 via-bg-card to-accent-emerald/10 p-5 text-center shadow-lg">
+          <div className="text-[2.6rem] leading-none">🃏✨</div>
+          <h2 className="mt-1.5 bg-gradient-to-r from-accent-amber to-accent-emerald bg-clip-text text-[1.55rem] font-extrabold leading-tight tracking-tight text-transparent">
+            You're early — be the one who starts it!
+          </h2>
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-text-secondary">
+            ClubrGO is where your crew keeps the <strong className="text-text-primary">poker side-games</strong> honest — <strong className="text-text-primary">FT Fantasy</strong>, <strong className="text-text-primary">Last Longer</strong> &amp; <strong className="text-text-primary">Squares</strong>. No clubs near you <em>yet</em>, so make the first move: peek at how it all works just below&nbsp;👇, then spin up your own club and drop your first game.&nbsp;🎉
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate('/clubs', { state: { create: true } })}
+            className="mx-auto mt-4 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent-amber to-amber-500 px-5 py-2.5 text-sm font-extrabold text-bg-primary shadow-md transition-transform hover:scale-[1.02] active:scale-95 cursor-pointer"
+          >
+            <Plus className="h-4 w-4" /> Start your club
+          </button>
+          <p className="mt-2.5 text-[11px] text-text-muted">Got an invite code from a friend? Drop it in below&nbsp;👇</p>
+        </div>
+      )}
 
       {/* Invite-code door — for private clubs not in the public list. */}
       <Card className="flex flex-col gap-2.5 border-accent-blue/30">
