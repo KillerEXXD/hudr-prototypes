@@ -9,6 +9,15 @@ import { type PrivateGate, type PrivateGameInfo } from '@/lib/api/privateGame'
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 const isMember = (clubId: string, userId: string) => !!CLUBS.find((c) => c.id === clubId)?.members.some((m) => m.userId === userId && m.status === 'member')
 
+// Activity feed — system chat posted on lifecycle events (mirrors the live ClubrGO
+// `squares` edge function). Board-level lines use a neutral "ClubR" author (userId '').
+function disp(userId: string) { const u = USERS[userId]; return { name: u?.name ?? 'Guest', color: u?.avatarColor ?? '#6b7280' } }
+function sysMsgSq(g: SquaresGame, userId: string, name: string, avatarColor: string, text: string) {
+  g.chat.push({ id: `sm_${Date.now()}_${g.chat.length}`, userId, name, avatarColor, text, ts: 'now', kind: 'system' })
+}
+const SQ_SYS = { id: '', name: 'ClubR', color: '#10b981' }
+const DIGITS_DRAWN_MSG = '🎲 Registration closed — the numbers are drawn. The board is live!'
+
 function canView(g: SquaresGame, viewerId: string, isAdmin: boolean) {
   // A participant (roster or claimed a square) can always view the game they're in.
   const isParticipant = g.participants.some((p) => p.userId === viewerId) || g.cells.some((c) => c.userId === viewerId)
@@ -33,6 +42,8 @@ export async function cancelSquares(gameId: string, reason: string): Promise<voi
   const g = SQUARES_GAMES.find((x) => x.id === gameId)
   if (!g) return
   g.status = 'cancelled'; g.cancelReason = reason.trim() || undefined; g.cancelledAt = new Date().toISOString()
+  const r = reason.trim(); const host = disp(g.hostId)
+  sysMsgSq(g, g.hostId, host.name, host.color, `🚫 ${host.name} cancelled the game${r ? ` — ${r}` : ''}`)
 }
 
 export async function listSquares(userId: string, isAdmin = false): Promise<SquaresGameView[]> {
@@ -71,9 +82,11 @@ export async function requestJoinSquares(gameId: string, userId: string): Promis
   const u = USERS[userId]
   const auto = g.hostId === userId || g.coHostIds.includes(userId)
   g.participants.push({ userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status: auto ? 'active' : 'pending', paid: false })
+  const d = disp(userId); sysMsgSq(g, userId, d.name, d.color, auto ? `🪑 ${d.name} joined` : `🙋 ${d.name} requested to join`)
 }
 export async function approveSquares(gameId: string, userId: string): Promise<void> {
-  await delay(150); const p = SQUARES_GAMES.find((x) => x.id === gameId)?.participants.find((x) => x.userId === userId); if (p) p.status = 'active'
+  await delay(150); const g = SQUARES_GAMES.find((x) => x.id === gameId); const p = g?.participants.find((x) => x.userId === userId)
+  if (g && p) { p.status = 'active'; const d = disp(userId); sysMsgSq(g, userId, d.name, d.color, `✅ ${d.name} was admitted`) }
 }
 export async function declineSquares(gameId: string, userId: string): Promise<void> {
   await delay(150)
@@ -100,7 +113,12 @@ export async function claimSquare(gameId: string, userId: string, cellIdx: numbe
   const me = g.participants.find((p) => p.userId === userId); if (!me || me.status !== 'active') return
   const cell = g.cells[cellIdx]
   if (cell.userId === userId) { if (!cell.approved) g.cells[cellIdx] = {} } // withdraw only while pending
-  else if (!cell.userId) { const u = USERS[userId]; g.cells[cellIdx] = { userId, name: u?.name, avatarColor: u?.avatarColor, approved: false } }
+  else if (!cell.userId) {
+    const u = USERS[userId]; g.cells[cellIdx] = { userId, name: u?.name, avatarColor: u?.avatarColor, approved: false }
+    const d = disp(userId); sysMsgSq(g, userId, d.name, d.color, `🎯 ${d.name} grabbed a square`)
+    const n = g.cells.filter((c) => c.userId).length
+    if (n === 25 || n === 50 || n === 75 || n === 100) sysMsgSq(g, SQ_SYS.id, SQ_SYS.name, SQ_SYS.color, n === 100 ? `🔥 The board's full — all 100 squares are gone!` : `🔥 ${n}% of the board's gone — ${n} squares filled`)
+  }
 }
 
 /** Host approves a single pending square → locks it in (player can no longer withdraw). */
@@ -133,16 +151,24 @@ export async function lockSquares(gameId: string): Promise<void> {
   const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
   g.cells.forEach((c) => { if (c.userId) c.approved = true }) // any still-pending claims are accepted at lock
   g.rowDigits = shuffleDigits(); g.colDigits = shuffleDigits(); g.status = 'live'
+  const host = disp(g.hostId)
+  sysMsgSq(g, g.hostId, host.name, host.color, `🔒 ${host.name} locked the board`)
+  sysMsgSq(g, SQ_SYS.id, SQ_SYS.name, SQ_SYS.color, DIGITS_DRAWN_MSG)
 }
 /** Host extends the registration deadline (absolute UTC ISO). Extend-only. */
 export async function extendRegistration(gameId: string, closesAt: string): Promise<void> {
-  await delay(120); const g = SQUARES_GAMES.find((x) => x.id === gameId); if (g) g.registrationClosesAt = closesAt
+  await delay(120); const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g) return
+  g.registrationClosesAt = closesAt
+  const host = disp(g.hostId); sysMsgSq(g, g.hostId, host.name, host.color, `⏱️ ${host.name} extended registration`)
 }
 /** Host closes registration NOW (early) — digits assigned, board goes live. */
 export async function closeRegistration(gameId: string): Promise<void> {
   await delay(200); const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
   g.cells.forEach((c) => { if (c.userId) c.approved = true })
   g.rowDigits = shuffleDigits(); g.colDigits = shuffleDigits(); g.status = 'live'; g.registrationClosesAt = new Date().toISOString(); g.regClosedEarly = true
+  const host = disp(g.hostId)
+  sysMsgSq(g, g.hostId, host.name, host.color, `🔒 ${host.name} closed registration early`)
+  sysMsgSq(g, SQ_SYS.id, SQ_SYS.name, SQ_SYS.color, DIGITS_DRAWN_MSG)
 }
 /** Host enters a period's score → the winning square + winner are computed. Final score completes the game. */
 export async function setSquaresScore(gameId: string, label: string, home: number, away: number): Promise<void> {
@@ -151,6 +177,16 @@ export async function setSquaresScore(gameId: string, label: string, home: numbe
   const period = g.periods.find((p) => p.label === label); if (!period) return
   period.homeScore = home; period.awayScore = away
   const r = g.rowDigits.indexOf(home % 10), c = g.colDigits.indexOf(away % 10)
-  if (r >= 0 && c >= 0) { period.winnerCell = r * 10 + c; period.winnerUserId = g.cells[r * 10 + c].userId }
-  if (label === 'Final') g.status = 'completed'
+  let winnerUserId: string | undefined
+  if (r >= 0 && c >= 0) { period.winnerCell = r * 10 + c; winnerUserId = g.cells[r * 10 + c].userId; period.winnerUserId = winnerUserId }
+  const sc = `${home}–${away}`
+  if (label === 'Final') {
+    g.status = 'completed'
+    if (winnerUserId) { const d = disp(winnerUserId); sysMsgSq(g, winnerUserId, d.name, d.color, `🏆 Final ${sc} — ${d.name} takes it! 🎉`) }
+    else sysMsgSq(g, SQ_SYS.id, SQ_SYS.name, SQ_SYS.color, `🏁 Final ${sc} — no winner on the board`)
+  } else if (winnerUserId) {
+    const d = disp(winnerUserId); sysMsgSq(g, winnerUserId, d.name, d.color, `🏈 ${label} ${sc} — 👑 ${d.name} wins the square!`)
+  } else {
+    sysMsgSq(g, SQ_SYS.id, SQ_SYS.name, SQ_SYS.color, `🏈 ${label} ${sc} — no winner this quarter`)
+  }
 }

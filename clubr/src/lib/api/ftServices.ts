@@ -70,13 +70,13 @@ export async function requestEnter(contestId: string, userId: string): Promise<v
   // A host/co-host joining their own contest is auto-approved (no self-approval dance).
   const isHost = c.hostId === userId || c.coHostIds.includes(userId)
   c.entries.push({ userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status: isHost ? 'approved' : 'pending', paid: false, picks: [], spend: 0 })
-  c.chat.push({ id: `m_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: isHost ? `${u?.name ?? 'The host'} joined as a player` : `${u?.name ?? 'A player'} requested to enter`, ts: 'now', kind: 'system' })
+  c.chat.push({ id: `m_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: isHost ? `🪑 ${u?.name ?? 'The host'} entered` : `🙋 ${u?.name ?? 'A player'} requested to enter`, ts: 'now', kind: 'system' })
 }
 
 export async function approveEntry(contestId: string, targetUserId: string): Promise<void> {
   await delay(150)
-  const e = FT_CONTESTS.find((x) => x.id === contestId)?.entries.find((x) => x.userId === targetUserId)
-  if (e) e.status = 'approved'
+  const c = FT_CONTESTS.find((x) => x.id === contestId); const e = c?.entries.find((x) => x.userId === targetUserId)
+  if (c && e) { e.status = 'approved'; const u = USERS[targetUserId]; c.chat.push({ id: `m_${Date.now()}`, userId: targetUserId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `✅ ${u?.name ?? 'A player'} was admitted`, ts: 'now', kind: 'system' }) }
 }
 
 export async function declineEntry(contestId: string, targetUserId: string): Promise<void> {
@@ -97,13 +97,18 @@ export async function togglePaid(contestId: string, targetUserId: string): Promi
 export async function assignCoHost(contestId: string, targetUserId: string): Promise<void> {
   await delay(150)
   const c = FT_CONTESTS.find((x) => x.id === contestId)
-  if (c && !c.coHostIds.includes(targetUserId)) c.coHostIds.push(targetUserId)
+  if (c && !c.coHostIds.includes(targetUserId)) { c.coHostIds.push(targetUserId); const u = USERS[targetUserId]; c.chat.push({ id: `m_${Date.now()}`, userId: targetUserId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: `🛡️ ${u?.name ?? 'A player'} is now a co-host`, ts: 'now', kind: 'system' }) }
 }
 
 export async function savePicks(contestId: string, userId: string, picks: string[]): Promise<void> {
   await delay()
-  const e = FT_CONTESTS.find((x) => x.id === contestId)?.entries.find((x) => x.userId === userId)
-  if (e && e.status === 'approved') { e.picks = picks; e.spend = spendOf(picks) }
+  const c = FT_CONTESTS.find((x) => x.id === contestId); const e = c?.entries.find((x) => x.userId === userId)
+  if (c && e && e.status === 'approved') {
+    const hadPicks = e.picks.length > 0
+    e.picks = picks; e.spend = spendOf(picks)
+    const u = USERS[userId]
+    c.chat.push({ id: `m_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: hadPicks ? `🔄 ${u?.name ?? 'A player'} changed their lineup` : `📝 ${u?.name ?? 'A player'} locked in their lineup`, ts: 'now', kind: 'system' })
+  }
 }
 
 export async function postChat(contestId: string, userId: string, text: string): Promise<void> {
@@ -121,7 +126,11 @@ export async function extendRegistration(contestId: string, closesAt: string): P
 /** Host closes registration NOW (early) — drafts lock. */
 export async function closeRegistration(contestId: string): Promise<void> {
   await delay(120); const c = FT_CONTESTS.find((x) => x.id === contestId)
-  if (c) { c.status = 'locked'; c.locksAtTs = new Date().toISOString(); c.regClosedEarly = true }
+  if (c) {
+    c.status = 'locked'; c.locksAtTs = new Date().toISOString(); c.regClosedEarly = true
+    const host = USERS[c.hostId]; const n = c.entries.filter((e) => e.picks.length > 0).length
+    c.chat.push({ id: `m_${Date.now()}`, userId: c.hostId, name: host?.name ?? '', avatarColor: host?.avatarColor ?? '#6b7280', text: `🔒 ${host?.name ?? 'The host'} closed registration — drafts locked (${n} lineup${n === 1 ? '' : 's'} in)`, ts: 'now', kind: 'system' })
+  }
 }
 
 /**
@@ -133,10 +142,12 @@ export async function setFinishingOrder(contestId: string, order: string[]): Pro
   const c = FT_CONTESTS.find((x) => x.id === contestId)
   if (c && c.status === 'locked') {
     c.finishingOrder = order; c.status = 'settled'; c.settledAt = new Date().toISOString()
-    const winner = scored(c)[0]
-    if (winner) {
-      const wu = USERS[winner.userId]
-      c.chat.push({ id: `m_${Date.now()}`, userId: '', name: 'ClubrGO', avatarColor: '#ef4444', text: `🏆 ${wu?.name ?? 'Winner'} won the contest — ${winner.score ?? 0} pts`, ts: 'now', kind: 'system' })
+    const ranked = scored(c)
+    if (ranked[0]) {
+      const medals = ['🥇', '🥈', '🥉']
+      const standings = ranked.slice(0, 3).map((e, i) => `${medals[i]} ${USERS[e.userId]?.name ?? 'Player'} (${e.score ?? 0} pts)`).join(' · ')
+      const champ = USERS[ranked[0].userId]
+      c.chat.push({ id: `m_${Date.now()}`, userId: ranked[0].userId, name: champ?.name ?? '', avatarColor: champ?.avatarColor ?? '#6b7280', text: `🏁 Results in — ${standings}`, ts: 'now', kind: 'system' })
     }
   }
 }
