@@ -96,18 +96,23 @@ Approval is required to do anything beyond viewing:
 - **"How it works?" walkthrough.** A **"How it works"** pill by the FT Fantasy heading opens a
   **simple numbered step‑by‑step** (find a contest → request to enter → draft 4 → picks lock →
   watch & score → win the pool), in plain English for first‑timers (`HowItWorks.tsx`).
-- **Progressive disclosure (slow‑reveal onboarding).** The UI builds up in **three monotonic
-  stages** off the user's footprint (`useOnboardingStage` → pure `resolveOnboarding`); a stage,
-  once reached, never regresses — **except a fully‑loaded, truly‑empty footprint** (no club
-  records of any status, not a host, no games) **resets to Stage 0** (the persisted max is reset),
-  so a member who leaves their last club returns to the cold‑start hub with the nav hidden; a
-  *partial* shrink keeps the higher stage. (Gated on loaded data so it never flickers mid‑fetch.)
-  **Stage 0 (no club):** no bottom nav — Home is the **Get‑Started
-  hub** (Join a club / Create your own), or, once a club is *requested*, the **"Waiting on [Club]"**
-  pending surface with explore cards. **Stage 1 (member/host):** **Clubs + Games** reveal together
-  (a newly‑unlocked tab **pulses once**); the player Home gets an evolving **coach card**
-  (`NextBestAction` — join a game · *pending — [Game]* second gate · no games yet), a host gets a
-  3‑step **first‑run checklist**. **Stage 2 (first game settled):** the **Me** tab reveals.
+- **Progressive disclosure (slow‑reveal onboarding).** The nav **reveals one tab at a time** off
+  the user's footprint (`useOnboardingStage` → pure `resolveOnboarding`): **fresh** (no club) → no
+  nav · **connected** (confirmed member or host) → **+ Clubs** · **playing** (an approved, live
+  game) → **+ Games** · **settled** → steady state. **There is no "Me" tab** — profile/settings/
+  logout live on the **top‑right avatar** from minute one (only App Admins get a Me/console tab).
+  The reveal is monotonic — once a tab shows it stays — **except a fully‑loaded, truly‑empty
+  footprint** (no club records of any status, not a host, no games) **resets to fresh** (the
+  persisted max is reset), so a member who leaves their last club returns to the cold‑start hub
+  with the nav hidden; a *partial* shrink keeps the higher stage. (Gated on loaded data so it never
+  flickers mid‑fetch.) **Fresh (no club):** no nav — Home is the **Get‑Started hub**; once a club
+  is *requested* the **same hub stays** with a **"Waiting on [Club]"** banner pinned on top (still
+  no nav). **Connected — member:** Home is **Discover**, led by the **open games in your clubs** +
+  more clubs to join, the how‑it‑works collapsed into a small *"New here?"* disclosure, plus a
+  coach card; **Clubs** = your clubs **+ suggested clubs to join**. **Connected — host:** Home is
+  labelled **Home** — a 3‑step **first‑run checklist** + your club's games + a short *"how hosting
+  works"* note (no how‑club‑works card / invite panel). **Playing:** the **Games** tab unlocks + a
+  **"Your game is on → Open"** card pins to Discover (a *pending* game request does NOT reveal it).
   `onboarding_stage_reached` fires once per forward step. Full design in
   `docs/ONBOARDING_PROGRESSIVE_DISCLOSURE.md` (live‑app repo).
 - **Cold‑start hub (Stage 0) — clubs to join + how a club works + game explainers.** The

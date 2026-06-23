@@ -65,11 +65,12 @@ export function GameHowItWorksCards({ onCreateClub, openId, onOpen }: {
         )
       })}
 
-      {/* Always-visible reminder that games live in a club + an optional host door. */}
+      {/* Always-visible reminder of the flow: club first → host opens a game → share /
+          discover → play. Plus an optional host door. */}
       <div className="mt-0.5 rounded-2xl border border-border bg-bg-surface/50 p-3.5">
         <p className="flex items-start gap-2 text-xs leading-snug text-text-secondary">
           <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-text-muted" />
-          <span>Every game is played <strong className="text-text-primary">inside a club</strong> — join one above, or start your own to host.</span>
+          <span>Every game lives <strong className="text-text-primary">inside a club</strong>. First <strong className="text-text-primary">create or join a club</strong> — then the <strong className="text-text-primary">host opens a game and shares its link</strong> with members (or they find it on the <strong className="text-text-primary">club's page</strong>). From there, each game plays out as above.</span>
         </p>
         {onCreateClub && (
           <button

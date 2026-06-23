@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { Sparkles, Gamepad2, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { Sparkles, Gamepad2, LayoutGrid, Info, ChevronDown, type LucideIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Section, Spinner, EmptyState } from '@/components/common/ui'
 import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
+import { ClubExplainerCard } from '@/components/onboarding/ClubExplainerCard'
+import { GameHowItWorksCards } from '@/components/onboarding/GameHowItWorksCards'
 import { NextBestAction } from '@/components/onboarding/NextBestAction'
 import { useUnifiedGames } from '@/games/useUnifiedGames'
 import { renderUnifiedGame } from '@/games/renderGame'
@@ -34,6 +36,10 @@ export function DiscoverPage() {
   const myClubs = useMyClubs()
   const { items, isLoading: gamesLoading } = useUnifiedGames()
   const [filter, setFilter] = useState<'all' | GameType>('all')
+  // The full how-it-works education collapses into one small disclosure here (a member
+  // has already joined a club) — open it only if you want a refresher.
+  const [showHow, setShowHow] = useState(false)
+  const [howOpenId, setHowOpenId] = useState<string | null>(null)
 
   // The player's role per joined club — drives the "your clubs" game filter and
   // the per-card Owner / Co-host / Member chip.
@@ -50,12 +56,9 @@ export function DiscoverPage() {
       <NextBestAction />
       <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-accent-blue"><Sparkles className="h-3.5 w-3.5" /> Discover</div>
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
-      <p className="text-sm text-text-secondary">New clubs to join, and what's open in clubs you're in.</p>
+      <p className="text-sm text-text-secondary">What's open in your clubs, and new clubs to join.</p>
 
-      {/* Clubs to join — shared section, identical on the Host home. */}
-      <ClubsToJoinSection />
-
-      {/* Open now in YOUR clubs — all game types in one list; capped. */}
+      {/* Open now in YOUR clubs — leads the member view (real games, all types, capped). */}
       {gamesLoading ? (
         <Section title="Open now in your clubs"><Spinner /></Section>
       ) : openInMyClubs.length > 0 && (
@@ -73,6 +76,27 @@ export function DiscoverPage() {
           )}
         </Section>
       )}
+
+      {/* Clubs to join — shared section, identical on the Host home. */}
+      <ClubsToJoinSection />
+
+      {/* Lightweight education — a member already knows the basics, so the full
+          how-it-works cards collapse into one small "New here?" disclosure. */}
+      <div className="mt-5">
+        <button type="button" onClick={() => setShowHow((v) => !v)} className="flex w-full items-center justify-between rounded-2xl border border-border bg-bg-card/50 px-4 py-2.5 text-left cursor-pointer transition-colors hover:bg-bg-surface" aria-expanded={showHow}>
+          <span className="flex items-center gap-2 text-sm font-bold text-text-secondary"><Info className="h-4 w-4 text-text-muted" />New here? How it works</span>
+          <ChevronDown className={cn('h-4 w-4 text-text-muted transition-transform', showHow && 'rotate-180')} />
+        </button>
+        {showHow && (
+          <div className="mt-3 flex flex-col gap-4">
+            <ClubExplainerCard open={howOpenId === 'club'} onToggle={() => setHowOpenId(howOpenId === 'club' ? null : 'club')} />
+            <div>
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-text-muted">The games</p>
+              <GameHowItWorksCards openId={howOpenId} onOpen={setHowOpenId} />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

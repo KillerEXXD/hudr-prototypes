@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Home, Trophy, Clock, ChevronRight, Gamepad2, LayoutGrid, Plus, UserPlus, Share2, type LucideIcon } from 'lucide-react'
+import { Home, Trophy, Clock, ChevronRight, ChevronDown, Info, Gamepad2, LayoutGrid, Plus, UserPlus, Share2, type LucideIcon } from 'lucide-react'
 import { useAvailableFTs } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { InfiniteList } from '@/components/common/InfiniteList'
 import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
+import { GameHowItWorksCards } from '@/components/onboarding/GameHowItWorksCards'
 import { RelationshipPills } from '@/components/games/RelationshipPills'
 import { useUnifiedGames, matchesType, orderActiveGames } from '@/games/useUnifiedGames'
 import { relationshipOf, defaultRelationship, relationshipPills, type Relationship } from '@/games/gameRelationship'
@@ -48,6 +49,10 @@ export function HostHomePage() {
   const [rel, setRel] = useState<Relationship>(defaultRelationship(true)) // host home → 'hosting'
   const [filter, setFilter] = useState<'all' | GameType>('all')
   const pickRel = (r: Relationship) => { setRel(r); setFilter('all') } // type chips reset per bucket
+  // "How hosting works" — a collapsed refresher (game cards). No how-club-works card
+  // and no invite-code panel: a host already knows how to get into a club.
+  const [showHow, setShowHow] = useState(false)
+  const [howOpenId, setHowOpenId] = useState<string | null>(null)
 
   // Role per club — chips show owner/co-host/member on each card.
   const roleByClub = new Map<string, MemberRole>()
@@ -89,6 +94,20 @@ export function HostHomePage() {
           </div>
         </Section>
       )}
+
+      {/* ---- How hosting works — a collapsed refresher (game cards only; no
+              how-club-works card / invite panel — a host knows that already) ---- */}
+      <div className="mt-4">
+        <button type="button" onClick={() => setShowHow((v) => !v)} className="flex w-full items-center justify-between rounded-2xl border border-border bg-bg-card/50 px-4 py-2.5 text-left cursor-pointer transition-colors hover:bg-bg-surface" aria-expanded={showHow}>
+          <span className="flex items-center gap-2 text-sm font-bold text-text-secondary"><Info className="h-4 w-4 text-text-muted" />How hosting works</span>
+          <ChevronDown className={cn('h-4 w-4 text-text-muted transition-transform', showHow && 'rotate-180')} />
+        </button>
+        {showHow && (
+          <div className="mt-3">
+            <GameHowItWorksCards openId={howOpenId} onOpen={setHowOpenId} />
+          </div>
+        )}
+      </div>
 
       {/* ---- FTs to host — only for users who manage a club, and only when some exist ---- */}
       {hasManagedClub && (fts.isLoading || (fts.data?.length ?? 0) > 0) && (

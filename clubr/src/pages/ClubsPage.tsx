@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Plus, Ticket, Users, Globe, Lock, Send } from 'lucide-react'
 import { useMyClubs, useRecentClubs, useCreateClub, useJoinViaInvite } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
@@ -7,10 +8,12 @@ import { useSpend } from '@/components/credits/SpendProvider'
 import { Section, Spinner, Btn, Sheet, Field, EmptyState } from '@/components/common/ui'
 import { CityField } from '@/components/common/CityField'
 import { ClubRow } from '@/components/common/cards'
+import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
 import { hostsClub } from '@/lib/clubRole'
 import { cn } from '@/lib/utils/cn'
 
 export function ClubsPage() {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
   const clubs = useMyClubs()
@@ -21,12 +24,16 @@ export function ClubsPage() {
   const createClubCost = useEconomy().data?.costs.createClubCost ?? 200
   const [createOpen, setCreateOpen] = useState(false)
   const [joinOpen, setJoinOpen] = useState(false)
-  // The Get-Started hub routes here with { state: { create: true } } to open the
-  // create-club sheet straight away (onboarding Phase 2 host door).
-  const openCreate = (useLocation().state as { create?: boolean } | null)?.create
+  // Callers route here with { state: { create: true } } to open the create-club
+  // sheet straight away (onboarding Phase 2 host door). An optional returnTo says
+  // where to send the user if they CANCEL the sheet — e.g. "Clubs to join" launches
+  // create here but expects cancel to bring them back there, not strand them on My Clubs.
+  const navState = useLocation().state as { create?: boolean; returnTo?: string } | null
+  const openCreate = navState?.create
+  const returnTo = navState?.returnTo
   useEffect(() => { if (openCreate) setCreateOpen(true) }, [openCreate])
   const [name, setName] = useState('')
-  const [emoji, setEmoji] = useState('ðŸƒ')
+  const [emoji, setEmoji] = useState('🃏')
   const [desc, setDesc] = useState('')
   const [loc, setLoc] = useState('')
   const [visibility, setVisibility] = useState<'public' | 'private'>('public')
@@ -82,7 +89,11 @@ export function ClubsPage() {
         </>
       )}
 
-      <Sheet open={createOpen} onClose={() => setCreateOpen(false)} title="Create a club">
+      {/* Suggested clubs to join — keep growing your crew right from the Clubs tab.
+          (Shared near-you list; hidden for admins, who already see every club above.) */}
+      {!isAdmin && <ClubsToJoinSection />}
+
+      <Sheet open={createOpen} onClose={() => { setCreateOpen(false); if (returnTo) navigate(returnTo) }} title="Create a club">
         <div className="flex flex-col gap-3">
           <div className="flex gap-2">
             <div className="w-20"><Field label="Emoji" value={emoji} onChange={setEmoji} /></div>
@@ -111,11 +122,11 @@ export function ClubsPage() {
               <span className="flex items-center gap-1.5 text-sm font-bold text-text-primary">Telegram channel for members
                 <span className={cn('ml-auto flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors', telegram ? 'justify-end bg-accent-blue' : 'justify-start bg-border')}><span className="h-3 w-3 rounded-full bg-white" /></span>
               </span>
-              <span className="mt-0.5 block text-[11px] leading-snug text-text-muted">Members get instant alerts for <b className="text-text-secondary">new games, results & monthly leaderboard recaps</b> — and one-tap join, auto-managed. You'll connect it in ~30 seconds after creating the club.</span>
+              <span className="mt-0.5 block text-[11px] leading-snug text-text-muted">Members get instant alerts for <b className="text-text-secondary">new games, results &amp; monthly leaderboard recaps</b> — and one-tap join. You'll connect it in ~30 seconds after creating the club.</span>
             </span>
           </button>
-          <Btn className="w-full" disabled={!name.trim() || !loc.trim()} loading={create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; await create.mutateAsync({ name, emoji, description: desc, location: loc, visibility, telegram }); setCreateOpen(false); setName(''); setDesc(''); setLoc(''); setVisibility('public'); setTelegram(false) }}>
-            Create club â€” you're the host Â· {createClubCost} cr
+          <Btn className="w-full" disabled={!name.trim() || !loc.trim()} loading={create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; const club = await create.mutateAsync({ name, emoji, description: desc, location: loc, visibility, telegram }); setCreateOpen(false); setName(''); setDesc(''); setLoc(''); setVisibility('public'); setTelegram(false); navigate(`/club/${club.id}`) }}>
+            Create club — you're the host · {createClubCost} cr
           </Btn>
           <p className="text-center text-[11px] text-text-muted">You'll own it, get an invite code, and approve who joins.</p>
         </div>
@@ -124,7 +135,7 @@ export function ClubsPage() {
       <Sheet open={joinOpen} onClose={() => setJoinOpen(false)} title="Join with an invite code">
         <div className="flex flex-col gap-3">
           <Field label="Invite code" value={code} onChange={setCode} placeholder="e.g. ACES24" mono />
-          <Btn className="w-full" disabled={!code.trim()} loading={join.isPending} onClick={async () => { const c = await join.mutateAsync(code); setJoinMsg(c ? `Requested to join ${c.name} â€” awaiting approval.` : 'If a club matches that code, your request was sent â€” you\'ll get access once the host admits you.'); setCode('') }}>
+          <Btn className="w-full" disabled={!code.trim()} loading={join.isPending} onClick={async () => { const c = await join.mutateAsync(code); setJoinMsg(c ? `Requested to join ${c.name} — awaiting approval.` : 'If a club matches that code, your request was sent — you\'ll get access once the host admits you.'); setCode('') }}>
             Request to join
           </Btn>
           {joinMsg && <p className="text-center text-xs font-semibold text-accent-emerald">{joinMsg}</p>}
