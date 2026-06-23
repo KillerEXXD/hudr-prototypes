@@ -8,6 +8,7 @@ import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { InfiniteList } from '@/components/common/InfiniteList'
 import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
 import { GameHowItWorksCards } from '@/components/onboarding/GameHowItWorksCards'
+import { ApprovedBanner } from '@/components/onboarding/ApprovedBanner'
 import { RelationshipPills } from '@/components/games/RelationshipPills'
 import { useUnifiedGames, matchesType, orderActiveGames } from '@/games/useUnifiedGames'
 import { relationshipOf, defaultRelationship, relationshipPills, type Relationship } from '@/games/gameRelationship'
@@ -79,6 +80,8 @@ export function HostHomePage() {
 
   return (
     <div className="animate-fade-up">
+      {/* Transient "you've been approved to a club/game" nudge (self-hides; shown once). */}
+      <ApprovedBanner />
       <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-accent-emerald"><Home className="h-3.5 w-3.5" /> Home</div>
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
       <p className="text-sm text-text-secondary">Upcoming final tables available for you to host as Fantasy games in your club.</p>

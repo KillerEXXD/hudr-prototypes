@@ -8,6 +8,7 @@ import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
 import { ClubExplainerCard } from '@/components/onboarding/ClubExplainerCard'
 import { GameHowItWorksCards } from '@/components/onboarding/GameHowItWorksCards'
 import { FloatingCreateClubButton } from '@/components/onboarding/FloatingCreateClubButton'
+import { ApprovedBanner } from '@/components/onboarding/ApprovedBanner'
 
 /**
  * Stage-0 surface (onboarding). The player's Home while they have no club yet —
@@ -44,6 +45,9 @@ export function GetStartedHub() {
   return (
     <>
     <div className="animate-fade-up flex flex-col gap-5 pb-20">
+      {/* Seeds the approval-snapshot empty while you're still pre-club, so your FIRST
+          admit registers as new (and renders nothing here — you have no club yet). */}
+      <ApprovedBanner />
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Welcome, {firstName} 👋</h1>
         <p className="mt-1 text-sm text-text-secondary">Join a club to start playing — here's what's on.</p>

@@ -8,6 +8,7 @@ import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
 import { ClubExplainerCard } from '@/components/onboarding/ClubExplainerCard'
 import { GameHowItWorksCards } from '@/components/onboarding/GameHowItWorksCards'
 import { NextBestAction } from '@/components/onboarding/NextBestAction'
+import { ApprovedBanner } from '@/components/onboarding/ApprovedBanner'
 import { useUnifiedGames } from '@/games/useUnifiedGames'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
@@ -52,6 +53,8 @@ export function DiscoverPage() {
 
   return (
     <div className="animate-fade-up">
+      {/* Transient "you've been approved to a club/game" nudge (self-hides; shown once). */}
+      <ApprovedBanner />
       {/* Onboarding coach — the evolving "what now?" hero (self-hides when there's no step). */}
       <NextBestAction />
       <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-accent-blue"><Sparkles className="h-3.5 w-3.5" /> Discover</div>

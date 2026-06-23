@@ -114,6 +114,11 @@ Approval is required to do anything beyond viewing:
   labelled **Home** — a 3‑step **first‑run checklist** + your club's games + a short *"how hosting
   works"* note (no how‑club‑works card / invite panel). **Playing:** the **Games** tab unlocks + a
   **"Your game is on → Open"** card pins to Discover (a *pending* game request does NOT reveal it).
+  **Approval nudge (`ApprovedBanner`):** when the host admits you to a club/game, a transient
+  **"You're in! → Open"** banner shows atop Discover/Home — detected by a per‑user localStorage
+  **snapshot** of clubs/games you've already been in (fires only for a **new** one, then advances
+  the snapshot → shown **once**, gone next load; first run seeds silently so existing members /
+  cache‑clears never false‑fire). Clears on Open or ×. Client‑side, no backend.
   `onboarding_stage_reached` fires once per forward step. Full design in
   `docs/ONBOARDING_PROGRESSIVE_DISCLOSURE.md` (live‑app repo).
 - **Cold‑start hub (Stage 0) — clubs to join + how a club works + game explainers.** The
