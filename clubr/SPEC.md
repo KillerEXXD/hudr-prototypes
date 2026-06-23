@@ -106,8 +106,9 @@ Approval is required to do anything beyond viewing:
   persisted max is reset), so a member who leaves their last club returns to the cold‑start hub
   with the nav hidden; a *partial* shrink keeps the higher stage. (Gated on loaded data so it never
   flickers mid‑fetch.) **Fresh (no club):** no nav — Home is the **Get‑Started hub**; once a club
-  is *requested* the **same hub stays** with a **"Waiting on [Club]"** banner pinned on top (still
-  no nav). **Connected — member:** Home is **Discover**, led by the **open games in your clubs** +
+  is *requested* the **same hub stays** and each requested club moves into a **"Pending approval"**
+  group atop the clubs list with a **"Waiting for approval"** pill (every request visible, still no
+  nav). **Connected — member:** Home is **Discover**, led by the **open games in your clubs** +
   more clubs to join, the how‑it‑works collapsed into a small *"New here?"* disclosure, plus a
   coach card; **Clubs** = your clubs **+ suggested clubs to join**. **Connected — host:** Home is
   labelled **Home** — a 3‑step **first‑run checklist** + your club's games + a short *"how hosting

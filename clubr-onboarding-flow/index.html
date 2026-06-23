@@ -191,10 +191,11 @@
     <div class="phone">
       <div class="top"><span class="brand">Club<b>rGO</b></span><span class="av">SK</span></div>
       <div class="scr">
-        <div class="ban" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:var(--pending)">⏳ Waiting on 🃏 Aces High — the host will admit you</div>
-        <div class="ccard">📍 More clubs to join</div>
+        <div class="lab" style="color:var(--pending)">Pending approval · 1</div>
+        <div class="ccard" style="border-color:rgba(251,191,36,.3)">🃏 Aces High&nbsp;&nbsp;<span style="color:var(--pending);font-weight:700">⏳ Waiting for approval</span></div>
+        <div class="lab">Clubs to join · 3</div>
+        <div class="ccard">📍 Green Felt&nbsp;&nbsp;＋ Request</div>
         <div class="ccard">🎟️ Invite code</div>
-        <div class="ccard">🛡️ How a club works ⌄</div>
       </div>
       <div class="navnone" style="margin:9px 0 0;justify-content:center;width:100%">⛔ No bottom nav</div>
     </div>
@@ -270,7 +271,7 @@
     <thead><tr><th>Stage</th><th>Footprint trigger</th><th>Bottom nav</th><th>Home surface</th><th>Me</th></tr></thead>
     <tbody>
       <tr><td class="stg" style="color:var(--fresh)">Fresh</td><td>No club, no request</td><td><span class="no">hidden</span></td><td>Welcome / Get-Started hub</td><td>avatar</td></tr>
-      <tr><td class="stg" style="color:var(--pending)">Pending</td><td>A pending club request</td><td><span class="no">hidden</span></td><td>Hub + "Waiting on [club]" banner</td><td>avatar</td></tr>
+      <tr><td class="stg" style="color:var(--pending)">Pending</td><td>A pending club request</td><td><span class="no">hidden</span></td><td>Hub + "Pending approval" group (Waiting for approval)</td><td>avatar</td></tr>
       <tr><td class="stg" style="color:var(--member)">Member</td><td>Admitted to a club</td><td>Discover · Clubs</td><td>Discover (games-led)</td><td>avatar</td></tr>
       <tr><td class="stg" style="color:var(--host)">Host</td><td>Created / manages a club</td><td>Home · Clubs</td><td>Host home + checklist</td><td>avatar</td></tr>
       <tr><td class="stg" style="color:var(--playing)">Playing</td><td>Approved into a live game</td><td>Discover · Clubs · <b style="color:var(--playing)">Games</b></td><td>Discover + "game is on" card</td><td>avatar</td></tr>
@@ -284,11 +285,11 @@
 <!-- PENDING -->
 <section id="pending">
   <div class="h2"><span class="num">5.</span><h2>Pending — you don't leave the welcome</h2></div>
-  <p class="lead">When you request a club, you <strong>stay on the same hub</strong>. A "Waiting on [club]" banner pins to the top; everything else (more clubs to join, invite code, how-it-works) stays right where it was — so you can keep exploring while the host reviews. <strong>Still no bottom nav</strong> — you're not in yet.</p>
+  <p class="lead">When you request a club, you <strong>stay on the same hub</strong>. Each club you've requested moves into a <strong>"Pending approval"</strong> group at the top of the clubs list, marked <strong>"Waiting for approval"</strong> — so every request stays visible (not just one). Everything else (more clubs to join, invite code, how-it-works) stays right where it was. <strong>Still no bottom nav</strong> — you're not in yet.</p>
   <div class="grid g3">
     <div class="card" style="--c:var(--pending)"><span class="ic">🙋</span><h4>Request a club</h4><p>Tap "Request" on a club, or paste an invite code.</p></div>
-    <div class="card" style="--c:var(--pending)"><span class="ic">⏳</span><h4>Banner pins on top</h4><p>"Waiting on 🃏 Aces High — the host will admit you." The hub stays below it.</p></div>
-    <div class="card" style="--c:var(--member)"><span class="ic">✅</span><h4>Admitted → Member</h4><p>The banner clears, nav reveals <strong>Discover + Clubs</strong>.</p></div>
+    <div class="card" style="--c:var(--pending)"><span class="ic">⏳</span><h4>'Pending approval' group</h4><p>The club moves up to a Pending group with a "Waiting for approval" pill. Request two, both show.</p></div>
+    <div class="card" style="--c:var(--member)"><span class="ic">✅</span><h4>Admitted → Member</h4><p>It clears from Pending, nav reveals <strong>Discover + Clubs</strong>.</p></div>
   </div>
   <p class="lead" style="margin-top:14px">Tapping <strong>"Clubs to join → See all"</strong> opens the full list, which also has a <strong>"Create a club"</strong> button; <strong>Back</strong> returns you here — no nav commitment yet.</p>
 </section>

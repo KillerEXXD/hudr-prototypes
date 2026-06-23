@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Clock, CheckCircle2, Users, Crown, Shield, MapPin, Lock, UserCheck, X, ChevronDown } from 'lucide-react'
-import { Avatar, Badge, Btn, Card, Processing } from './ui'
+import { Avatar, Badge, Btn, Card, ProcessingOverlay } from './ui'
 import { useApproveMember, useRejectMember } from '@/hooks'
 import type { ClubView } from '@/types'
 
@@ -13,12 +13,19 @@ export function MembershipBadge({ status, role }: { status: ClubView['myStatus']
   return null
 }
 
+// A clearer, full-text version of the pending badge for the "Pending approval" group
+// in the clubs-to-join lists — tells a requester their request is in-flight (vs the
+// terse "Pending" chip used elsewhere).
+export function WaitingBadge() {
+  return <Badge tone="amber"><Clock className="h-3 w-3" />Waiting for approval</Badge>
+}
+
 export function ClubRow({ club, right }: { club: ClubView; right?: React.ReactNode }) {
   const navigate = useNavigate()
   const approve = useApproveMember()
   const reject = useRejectMember()
   const [open, setOpen] = useState(false)
-  const memberCount = club.members.filter((m) => m.status === 'member').length
+  const memberCount = club.memberCount
   const pending = club.members.filter((m) => m.status === 'pending')
   // Hosts/admins get an inline "N waiting" affordance to approve from the list.
   const showWaiting = club.canManage && pending.length > 0
@@ -58,11 +65,12 @@ export function ClubRow({ club, right }: { club: ClubView; right?: React.ReactNo
         <div className="mt-1 flex flex-col gap-1.5 rounded-xl border border-accent-amber/30 bg-accent-amber/5 p-2">
           <p className="px-1 text-[10px] font-bold uppercase tracking-wide text-accent-amber">Waiting to be approved</p>
           {pending.map((m) => (
-            <div key={m.userId} className="flex items-center gap-2 rounded-lg bg-bg-card px-2 py-1.5">
+            <div key={m.userId} className="relative flex items-center gap-2 rounded-lg bg-bg-card px-2 py-1.5">
               <Avatar name={m.name} color={m.avatarColor} size={26} />
               <span className="min-w-0 flex-1 truncate text-sm font-semibold text-text-primary">{m.name}</span>
               <Btn size="sm" loading={approve.isPending && approve.variables?.userId === m.userId} onClick={() => approve.mutate({ clubId: club.id, userId: m.userId })}><UserCheck className="h-3.5 w-3.5" />Approve</Btn>
-              <button type="button" disabled={reject.isPending && reject.variables?.userId === m.userId} onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-accent-red/10 hover:text-accent-red cursor-pointer" aria-label={`Reject ${m.name}`}>{reject.isPending && reject.variables?.userId === m.userId ? <Processing size={13} /> : <X className="h-3.5 w-3.5" />}</button>
+              <button type="button" onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-accent-red/10 hover:text-accent-red cursor-pointer" aria-label={`Reject ${m.name}`}><X className="h-3.5 w-3.5" /></button>
+              {reject.isPending && reject.variables?.userId === m.userId && <ProcessingOverlay label="Removing…" className="rounded-lg" />}
             </div>
           ))}
         </div>
