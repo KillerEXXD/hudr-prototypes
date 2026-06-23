@@ -272,6 +272,7 @@ export function SquaresGamePage() {
                   <div key={p.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-1.5">
                     <Avatar name={p.name} color={p.avatarColor} size={26} />
                     <button onClick={() => navigate(`/member/${p.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{p.name}{p.userId === g.hostId && <Crown className="ml-1 inline h-3 w-3 text-accent-emerald" />}</button>
+                    {g.coHostIds.includes(p.userId) && p.userId !== g.hostId && <Badge tone="blue">Co-host</Badge>}
                     <div className="shrink-0 text-right leading-tight">
                       <div className="font-mono text-[10px] text-text-muted">{n} sq{pend ? <span className="text-accent-amber"> · {pend} pend</span> : ''}</div>
                       <div className="font-mono text-[10px] font-bold text-accent-emerald">{(n * g.stake).toLocaleString()}</div>

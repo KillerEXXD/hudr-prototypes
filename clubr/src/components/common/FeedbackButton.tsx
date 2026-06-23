@@ -14,7 +14,8 @@ import { useLocation } from 'react-router-dom'
 // Hidden on a game-detail page, where it collided with row actions and the
 // per-game chat bubble owns the bottom-right corner.
 
-const GAME_DETAIL = /^\/(lastlonger|fantasy|squares)\/[^/]+$/
+// Home / Discover / landing ('/') and Profile ('/me') only.
+const FEEDBACK_ROUTES = new Set(['/', '/me'])
 
 export default function FeedbackButton() {
   const location = useLocation()
@@ -24,7 +25,7 @@ export default function FeedbackButton() {
   const [name, setName] = useState(() => getIdentity()?.name ?? '')
   const [note, setNote] = useState('')
 
-  if (GAME_DETAIL.test(location.pathname)) return null
+  if (!FEEDBACK_ROUTES.has(location.pathname)) return null
 
   const canSend = name.trim().length > 0 && note.trim().length > 0
 
