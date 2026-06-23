@@ -105,6 +105,12 @@ export function captureOnboardingStage(stage: string): void {
   posthog.capture('onboarding_stage_reached', { prototype: PROTOTYPE, stage })
 }
 
+/** Viewport-misbehaviour event (see lib/viewportSentinel) — zoom / overflow / layout
+ *  shift on an activity, on a real device. PostHog auto-tags device + links a replay. */
+export function captureViewportIssue(issue: { kind: string; screen: string; activity?: string; scale?: number; overflowPx?: number; shiftValue?: number; element?: string }): void {
+  posthog.capture('viewport_issue', { prototype: PROTOTYPE, surface: SURFACE, ...issue })
+}
+
 /** Structured quick-note event — links to the user's session replay in PostHog. */
 export function captureFeedback(data: FeedbackPayload): void {
   setIdentity(data.name, data.email)

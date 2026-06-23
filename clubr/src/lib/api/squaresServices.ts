@@ -86,6 +86,10 @@ export async function declineSquares(gameId: string, userId: string): Promise<vo
 export async function toggleSquaresPaid(gameId: string, userId: string): Promise<void> {
   await delay(120); const p = SQUARES_GAMES.find((x) => x.id === gameId)?.participants.find((x) => x.userId === userId); if (p) p.paid = !p.paid
 }
+export async function postChatSquares(gameId: string, userId: string, text: string): Promise<void> {
+  await delay(80); const g = SQUARES_GAMES.find((x) => x.id === gameId); const u = USERS[userId]
+  if (g && text.trim()) g.chat.push({ id: `sm_${Date.now()}`, userId, name: u?.name ?? '', avatarColor: u?.avatarColor ?? '#6b7280', text: text.trim(), ts: 'now' })
+}
 
 /** Toggle a square: claim an empty one (→ PENDING host approval), or withdraw one you own
  *  while it's still pending. Registration only, active players only. An APPROVED square is

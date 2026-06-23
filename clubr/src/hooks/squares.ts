@@ -31,6 +31,7 @@ export function useExtendRegSquares() { const inv = useInvalidate(); return useM
 export function useCloseRegSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => sq.closeRegistration(gameId), onSuccess: inv }) }
 export function useSetSquaresScore() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; label: string; home: number; away: number }) => sq.setSquaresScore(v.gameId, v.label, v.home, v.away), onSuccess: inv }) }
 export function useCancelSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; reason: string }) => sq.cancelSquares(v.gameId, v.reason), onSuccess: inv }) }
+export function usePostChatSquares() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; text: string }) => sq.postChatSquares(v.gameId, userId, v.text), onSuccess: inv }) }
 export function useCreateSquares() {
   const { userId } = useIdentity(); const inv = useInvalidate()
   return useMutation({ mutationFn: (v: { clubId: string; title: string; homeTeam: string; awayTeam: string; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; periodPayouts: number[] }) => sq.createSquares(v.clubId, userId, { title: v.title, homeTeam: v.homeTeam, awayTeam: v.awayTeam, stake: v.stake, visibility: v.visibility, accessUserIds: v.accessUserIds, closesAt: v.closesAt, timezone: v.timezone, periodPayouts: v.periodPayouts }), onSuccess: inv })

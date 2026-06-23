@@ -6,7 +6,8 @@ import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
 import { PrivateGameCard } from '@/components/games/PrivateGameCard'
 import { isPrivateGate } from '@/lib/api/privateGame'
-import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares, useExtendRegSquares, useCloseRegSquares, useCancelSquares } from '@/hooks/squares'
+import { useSquaresGame, useRequestJoinSquares, useApproveSquares, useDeclineSquares, useToggleSquaresPaid, useClaimSquare, useLockSquares, useSetSquaresScore, useApproveSquareClaim, useRejectSquareClaim, useApproveAllSquares, useExtendRegSquares, useCloseRegSquares, useCancelSquares, usePostChatSquares } from '@/hooks/squares'
+import { FloatingChat } from '@/components/common/FloatingChat'
 import { EditRegistrationSheet } from '@/components/games/EditRegistrationSheet'
 import { CancelGameSheet } from '@/components/games/CancelGameSheet'
 import { squaresCompleteAudit } from '@/lib/squares/completeAudit'
@@ -44,6 +45,7 @@ export function SquaresGamePage() {
   const lpCfg = useLeaderboardConfig().data ?? DEFAULT_LEADERBOARD
   const approve = useApproveSquares(); const decline = useDeclineSquares()
   const togglePaid = useToggleSquaresPaid()
+  const postChat = usePostChatSquares()
   const claim = useClaimSquare()
   const approveCell = useApproveSquareClaim(); const rejectCell = useRejectSquareClaim(); const approveAll = useApproveAllSquares()
   const lock = useLockSquares()
@@ -62,6 +64,8 @@ export function SquaresGamePage() {
   if (isPrivateGate(g)) return <PrivateGameCard info={g.private} />
 
   const me = g.me
+  // Chat parity with FT/Last Longer: an approved player (or the host/co-host) can post.
+  const canChat = me?.status === 'active' || g.canManage
   const isAdmin = user?.role === 'admin'
   const locked = g.status !== 'registration'
   const canClaim = g.status === 'registration' && me?.status === 'active' && !isAdmin
@@ -315,6 +319,9 @@ export function SquaresGamePage() {
       <Sheet open={howOpen} onClose={() => setHowOpen(false)} title="Squares — how it works">
         <HowItWorks steps={SQUARES_STEPS} dotBg="bg-accent-emerald" iconColor="text-accent-emerald" />
       </Sheet>
+
+      {/* Chat — floating bubble + slide-up sheet, scoped to this board (key={g.id}). */}
+      <FloatingChat key={g.id} messages={g.chat} currentUserId={user?.id ?? ''} canSend={canChat} onSend={(text) => postChat.mutate({ gameId: g.id, text })} />
     </div>
   )
 }

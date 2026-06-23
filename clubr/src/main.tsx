@@ -6,9 +6,11 @@ import App from './App'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { initAnalytics } from './lib/analytics'
+import { initViewportSentinel } from './lib/viewportSentinel'
 import './index.css'
 
 initAnalytics()
+initViewportSentinel()
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30 * 1000, refetchOnWindowFocus: false } },
