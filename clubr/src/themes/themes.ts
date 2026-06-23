@@ -140,4 +140,5 @@ export const THEMES: Record<ThemeName, ThemeDef> = {
 // 'felt' (now "Midnight Light") retired from the picker — the felt-skinned
 // 'Midnight' (engine) replaces it. Def kept so a persisted selection resolves.
 export const THEME_LIST: ThemeDef[] = Object.values(THEMES).filter((t) => t.name !== 'felt')
-export const DEFAULT_THEME: ThemeName = 'engine'
+// Default skin for any user without an explicit choice: Golden (goldenSurfaces routing).
+export const DEFAULT_THEME: ThemeName = 'golden'
