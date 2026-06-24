@@ -172,7 +172,7 @@
       font-size: 13px;
     }
     /* Show the Scout prototypes (Engine + Crisp + Stats + Sharp) + the ClubrGO flow + the ClubrGO app + the ClubrGO Nocturne redesign + the ClubrGO Felt / Arena / Ledger / Rail / Table / Daylight / Golden variants; hide the rest of the gallery. */
-    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]):not([href^="scout-stats-demo"]):not([href^="scout-sharp-demo"]):not([href^="clubr-flow"]):not([href^="clubr-demo"]):not([href^="clubrgo-redesign-demo"]):not([href^="clubr-felt"]):not([href^="clubr-arena"]):not([href^="clubr-ledger"]):not([href^="clubr-rail"]):not([href^="clubr-table"]):not([href^="clubr-daylight"]):not([href^="clubr-golden"]):not([href^="clubr-golden-real"]):not([href^="clubr-qa-guide"]) {
+    .card:not([href^="scout-engine-demo"]):not([href^="scout-crisp-demo"]):not([href^="scout-stats-demo"]):not([href^="scout-sharp-demo"]):not([href^="clubr-flow"]):not([href^="clubr-demo"]):not([href^="clubrgo-redesign-demo"]):not([href^="clubr-felt"]):not([href^="clubr-arena"]):not([href^="clubr-ledger"]):not([href^="clubr-rail"]):not([href^="clubr-table"]):not([href^="clubr-daylight"]):not([href^="clubr-golden"]):not([href^="clubr-golden-real"]):not([href^="clubr-apps"]):not([href^="clubr-qa-guide"]) {
       display: none !important;
     }
   </style>
@@ -862,6 +862,21 @@
           <span class="tag">A/B with Golden</span>
         </div>
         <span class="cta" style="background: linear-gradient(135deg, #E9C46A, #C99B3E); color: #0B1410;">Open the real one →</span>
+      </a>
+
+      <a href="clubr-apps/index.html" class="card">
+        <div class="card-gradient" style="background: linear-gradient(90deg, #a855f7, #f59e0b, #10b981)"></div>
+        <div class="card-letter" style="background: rgba(168,85,247,0.15); color: #c084fc;">AP</div>
+        <h2>ClubrGO — Apps</h2>
+        <div class="subtitle">Each game is its own glassy app · Home / Clubs / + / Board / Me dock</div>
+        <p><strong>Apps</strong> rethinks the home screen as an OS-style app grid — Fantasy 🟣, Last Longer 🟠, Squares 🟢 each get their own glassy squircle icon with live + unread pips. Tap one and you enter that game's dedicated app (Open / Live / Finished / How tabs). Built on the same Golden Real architecture and mock-data infrastructure — single registry (<code>appRegistry.ts</code>) drives every surface so adding a 4th game = one entry. Bottom dock has a raised center [+] FAB that opens a Create-game sheet, and a Leaderboard tab that combines LP across every app using the real award math.</p>
+        <div class="tags">
+          <span class="tag">Apps-grid home</span>
+          <span class="tag">Per-game app shells</span>
+          <span class="tag">Live mock-data</span>
+          <span class="tag">Scales to N games</span>
+        </div>
+        <span class="cta" style="background: linear-gradient(135deg, #a855f7, #f59e0b 50%, #10b981); color: #050810;">Open the Apps shell →</span>
       </a>
 
       <a href="clubr-qa-guide/index.html" class="card">

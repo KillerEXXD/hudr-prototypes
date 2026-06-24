@@ -1,0 +1,10 @@
+{
+  "title": "Apps",
+  "subtitle": "Each game is its own glassy app · Home / Clubs / + / Board / Me dock",
+  "palette": "Aurora glass on midnight (#050810); per-game gradient identities (purple Fantasy · amber Last Longer · emerald Squares)",
+  "type": "Space Grotesk display + Inter body — glassy backdrop-blur cards",
+  "best_for": "Treating each game as a distinct mini-app — scales to 4+ games by adding one icon",
+  "kind": "dark",
+  "thumb": "thumb.png",
+  "url": "/clubr-apps/"
+}
