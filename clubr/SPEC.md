@@ -557,8 +557,11 @@ later). Navigation is by **entity/activity, never by game type**:
 - **Lifecycle phases:** **Registration open → Running → Completed.** (The in‑play badge reads
   **"Running"**, not "Live" — "Live" misread as "registration open." Single source: `gameStatus.ts`.)
 - **Relationship filter (pill):** every games list carries a **relationship pill** —
-  **Available · Playing · Hosting** (Hosting is **host/admin‑only**; players see **Available ·
-  Playing**). Default **Hosting** for hosts, **Playing** for players. It **composes** with the
+  **New · Playing · Hosting · Finished** (Hosting is **host/admin‑only**; players see **New · Playing ·
+  Finished**). **New** (formerly "Available") is the actionable pill: bold‑italic with its count as a
+  **red attention badge**. **Finished** (completed/settled **+** cancelled, each keeping its own badge)
+  is **hidden until there's history** and replaces the old standalone "Completed" section. Default
+  **Hosting** for hosts, **Playing** for players. It **composes** with the
   type‑filter chips. Buckets (a partition of actionable games): **Hosting** = you **host** it (the host
   only — **co‑hosts are NOT here**) · **Playing** = you joined it (approved entry) **OR you co‑host it**
   (a co‑host card shows a **"Co‑host"** badge, "+ Playing" if you also joined; a pending request stays
@@ -668,7 +671,7 @@ Built from theme tokens (`bg-bg-card/40`, `border-border`) → subtle and correc
 panel uses a **two‑level filter**:
 - **Type** is a **dropdown in the "Games" header** (`All games · FT Fantasy · Last Longer · Squares`),
   **auto‑hidden when the club runs a single type** (nothing to choose).
-- **Status pills** below: **Available · Playing · Running · Completed**, default **Available** (a
+- **Status pills** below: **New · Playing · Running · Finished**, default **New** (a
   **Hosting** pill is inserted before Running for the **host/admin only**, `club.canManage`). The club
   is the container for **all** its games, so these buckets together let a member reach every one.
   **Available** = games you can **join now** (each card keeps its inline **Join**). **Playing** = games

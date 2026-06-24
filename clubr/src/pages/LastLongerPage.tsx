@@ -95,7 +95,7 @@ export function LastLongerPage() {
             <Section title="Games"><EmptyState icon={<Timer className="h-7 w-7" />} title="Nothing live right now" sub={canHost ? 'Create one above to get your club playing.' : 'Join a club and check back when your host starts one.'} /></Section>
           )}
           {past.length > 0 && (
-            <Section title={`Completed (${past.length})`}>
+            <Section title={`Finished (${past.length})`}>
               <div className="flex flex-col gap-2">{past.map((g) => <GameRow key={g.id} g={g} />)}</div>
             </Section>
           )}

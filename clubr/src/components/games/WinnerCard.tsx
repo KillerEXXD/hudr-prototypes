@@ -99,7 +99,7 @@ export function WinnerCard({ g }: { g: UnifiedGame }) {
           </div>
         </div>
       ) : (
-        <div className="text-xs text-text-muted">Completed · {s.pool.toLocaleString()} Stakes pool</div>
+        <div className="text-xs text-text-muted">Finished · {s.pool.toLocaleString()} Stakes pool</div>
       )}
 
       {!s.chopped && s.winners.length > 1 && (

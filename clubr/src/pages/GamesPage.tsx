@@ -48,12 +48,14 @@ export function GamesPage() {
   // Active games (non-closed), bucketed by relationship + type, then ordered per tab:
   // Available = latest created · Playing/Hosting = latest joined (host falls back to created).
   const active = items.filter((g) => g.phase !== 'closed')
-  const counts = { available: 0, playing: 0, hosting: 0 }
+  // Finished (history): your/hosted TERMINAL games — completed/settled AND cancelled —
+  // latest finished first, each keeping its "You hosted / You played" tag. Folded into
+  // the 'finished' pill instead of an always-on "Completed" section.
+  const done = orderCompleted(items.filter((g) => g.finished && (g.mine || g.canManage)).filter((g) => matchesType(g, filter)))
+  const counts = { available: 0, playing: 0, hosting: 0, finished: done.length }
   for (const g of active) { const r = relationshipOf(g); if (r) counts[r]++ }
   const shownActive = orderActiveTab(active.filter((g) => relationshipOf(g) === rel).filter((g) => matchesType(g, filter)), rel)
-
-  // Completed (history): yours/hosted, latest completed first, with a "Hosted / Played" tag.
-  const done = orderCompleted(items.filter((g) => g.finished && (g.mine || g.canManage)).filter((g) => matchesType(g, filter)))
+  const showFinished = rel === 'finished'
 
   return (
     <div className="animate-fade-up">
@@ -75,31 +77,30 @@ export function GamesPage() {
       </div>
 
       {isLoading ? <Spinner /> : (
-        <>
-          <Section title="Games">
-            {shownActive.length > 0 ? (
+        <Section title={showFinished ? 'Finished' : 'Games'}>
+          {showFinished ? (
+            done.length > 0 ? (
+              <InfiniteList items={done} batch={8} resetKey={`finished:${filter}`} className="flex flex-col gap-2" renderItem={(g) => (
+                <div key={g.id} className="flex flex-col gap-1">
+                  <Badge tone={g.canManage ? 'purple' : 'green'} className="self-start">{g.canManage ? 'You hosted' : 'You played'}</Badge>
+                  {renderGame(g, showAll)}
+                </div>
+              )} />
+            ) : (
+              <EmptyState icon={<Gamepad2 className="h-7 w-7" />} title="No finished games yet" sub="Your completed and cancelled games show here." />
+            )
+          ) : (
+            shownActive.length > 0 ? (
               <InfiniteList items={shownActive} batch={8} resetKey={`${rel}:${filter}`} className="flex flex-col gap-2" renderItem={(g) => renderGame(g, showAll)} />
             ) : (
               <EmptyState
                 icon={<Gamepad2 className="h-7 w-7" />}
-                title={rel === 'hosting' ? "You're not hosting any games right now" : rel === 'playing' ? "You're not playing in any games yet" : 'No games available to join right now'}
+                title={rel === 'hosting' ? "You're not hosting any games right now" : rel === 'playing' ? "You're not playing in any games yet" : 'No new games to join right now'}
                 sub={rel === 'hosting' && canHost && !isAdmin ? 'Tap “New game” to host one.' : 'Check the other tabs above.'}
               />
-            )}
-          </Section>
-          {done.length > 0 && (
-            <Section title={`Completed (${done.length})`}>
-              <div className="flex flex-col gap-2">
-                {done.map((g) => (
-                  <div key={g.id} className="flex flex-col gap-1">
-                    <Badge tone={g.canManage ? 'purple' : 'green'} className="self-start">{g.canManage ? 'You hosted' : 'You played'}</Badge>
-                    {renderGame(g, showAll)}
-                  </div>
-                ))}
-              </div>
-            </Section>
+            )
           )}
-        </>
+        </Section>
       )}
 
       <NewGameSheet open={newOpen} onClose={() => setNewOpen(false)} />

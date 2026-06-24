@@ -29,7 +29,7 @@ export interface LifecycleBadge {
 const LIFECYCLE_BADGES: Record<GamePhase, LifecycleBadge> = {
   registration: { tone: 'blue', label: 'Registration open', live: false },
   live: { tone: 'green', label: 'Running', live: true },
-  completed: { tone: 'dark', label: 'Completed', live: false },
+  completed: { tone: 'dark', label: 'Finished', live: false },
   cancelled: { tone: 'red', label: 'Cancelled', live: false },
 }
 

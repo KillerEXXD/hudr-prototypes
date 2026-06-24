@@ -103,7 +103,7 @@ export function FantasyPage() {
             <Section title="Contests"><EmptyState icon={<Target className="h-7 w-7" />} title="Nothing open right now" sub={canHost ? 'Host one above, or check back when a final table is coming up.' : 'Join a club and check back when your host opens one.'} /></Section>
           )}
           {past.length > 0 && (
-            <Section title={`Completed (${past.length})`}>
+            <Section title={`Finished (${past.length})`}>
               <div className="flex flex-col gap-2">{past.map((c) => <ContestRow key={c.id} c={c} />)}</div>
             </Section>
           )}
