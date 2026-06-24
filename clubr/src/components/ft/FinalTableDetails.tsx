@@ -1,4 +1,5 @@
 import { Radio, Play, Trophy, Users, Coins, Layers, Flame, ChevronRight } from 'lucide-react'
+import { countryFlag } from '@/lib/countries'
 import type { FTContestView } from '@/types/ft'
 import { Badge, Section } from '@/components/common/ui'
 import { cn } from '@/lib/utils/cn'
@@ -93,7 +94,7 @@ export function FinalTableDetails({ contest: c, showRoster = true }: { contest: 
               <span className="w-4 text-center text-xs font-extrabold text-text-muted">{i + 1}</span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm leading-none">{p.country ?? '🃏'}</span>
+                  <span className="text-sm leading-none">{countryFlag(p.country) || '🃏'}</span>
                   <span className="truncate text-sm font-bold text-text-primary">{playerFull(p)}</span>
                   {mine && <Badge tone="purple">Yours</Badge>}
                   {hot && <Badge tone="amber"><Flame className="h-2.5 w-2.5" />Hot</Badge>}

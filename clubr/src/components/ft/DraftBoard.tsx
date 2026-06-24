@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils/cn'
+import { countryFlag } from '@/lib/countries'
 import { Tag, AlertTriangle } from 'lucide-react'
 import { type FTPlayer } from '@/types/ft'
 import { playerFull } from '@/lib/utils/ftFormat'
@@ -129,7 +130,7 @@ export function DraftBoard({ players, budget, value, onChange, max = 4, disabled
               </div>
               {/* name — the hero */}
               <span className="flex items-center gap-1 truncate text-sm font-bold leading-tight text-text-primary">
-                <span className="shrink-0 text-base leading-none">{p.country ?? '🃏'}</span>
+                <span className="shrink-0 text-base leading-none">{countryFlag(p.country) || '🃏'}</span>
                 <span className="truncate">{playerFull(p)}</span>
               </span>
               {/* stack — BB with a relative-depth bar (distinct blue, never confused with the amber price) */}

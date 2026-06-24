@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { countryFlag } from '@/lib/countries'
 import { Trophy, X, RotateCcw, Flag } from 'lucide-react'
 import { Sheet, Btn } from '@/components/common/ui'
 import { cn } from '@/lib/utils/cn'
@@ -42,7 +43,7 @@ export function FinishingOrderSheet({ open, onClose, players, busy, onSubmit }: 
                   <span className={cn('flex w-9 shrink-0 items-center text-[12px] font-extrabold', i === 0 ? 'text-accent-amber' : 'text-text-muted')}>
                     {i === 0 ? <Trophy className="h-4 w-4" /> : ord(i + 1)}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-text-primary"><span className="mr-1">{p?.country ?? '🃏'}</span>{playerFull(p)}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-text-primary"><span className="mr-1">{countryFlag(p?.country) || '🃏'}</span>{playerFull(p)}</span>
                   <button type="button" aria-label="Remove" onClick={() => setOrder(order.filter((s) => s !== seat))} className="text-text-muted hover:text-accent-red cursor-pointer"><X className="h-4 w-4" /></button>
                 </div>
               )
@@ -57,7 +58,7 @@ export function FinishingOrderSheet({ open, onClose, players, busy, onSubmit }: 
               {remaining.map((p) => (
                 <button key={p.seat} type="button" onClick={() => setOrder([...order, p.seat])}
                   className="rounded-full border border-border bg-bg-surface px-3 py-1.5 text-[12px] font-semibold text-text-primary hover:bg-bg-card cursor-pointer">
-                  <span className="mr-1">{p.country ?? '🃏'}</span>{playerFull(p)}
+                  <span className="mr-1">{countryFlag(p.country) || '🃏'}</span>{playerFull(p)}
                 </button>
               ))}
             </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { countryFlag } from '@/lib/countries'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Trophy, Users, UserRound, UserPlus, Check, Crown, Shield, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
@@ -191,7 +192,7 @@ export function ContestDetailPage() {
                     const p = c.players.find((x) => x.seat === seat)
                     return (
                       <span key={seat} className="inline-flex items-center gap-1 rounded-lg bg-bg-surface px-1.5 py-0.5 text-[11px] text-text-secondary">
-                        <span className="leading-none">{p?.country ?? '🃏'}</span>{playerFull(p)}
+                        <span className="leading-none">{countryFlag(p?.country) || '🃏'}</span>{playerFull(p)}
                       </span>
                     )
                   })}
