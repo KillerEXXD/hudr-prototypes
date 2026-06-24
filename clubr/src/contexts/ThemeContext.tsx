@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
 import { THEMES, THEME_LIST, DEFAULT_THEME, type ThemeName, type ThemeFlags, type ThemeDef } from '@/themes/themes'
 
 // Runtime skin system. The selected skin overrides the CSS-variable tokens on
@@ -46,6 +46,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     try { localStorage.setItem(STORAGE_KEY, t) } catch { /* ignore */ }
     setThemeState(t)
   }, [])
+  // The skin lives in localStorage, which outlives a server-side DB reset — so a
+  // fresh account in the same browser would inherit the last-used skin. AuthContext
+  // dispatches 'clubr:skin-reset' on logout / new account; drop back to default.
+  useEffect(() => {
+    const reset = () => setTheme(DEFAULT_THEME)
+    window.addEventListener('clubr:skin-reset', reset)
+    return () => window.removeEventListener('clubr:skin-reset', reset)
+  }, [setTheme])
   const def = THEMES[theme]
   return (
     <Ctx.Provider value={{ theme, setTheme, label: def.label, tagline: def.tagline, flags: def.flags, themes: THEME_LIST }}>

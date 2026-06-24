@@ -10,6 +10,11 @@ import { applyActingRole, isActingRole } from '@/lib/auth/actingRole'
 
 const STORAGE_KEY = 'clubr-auth'
 const ACTING_KEY = 'clubr-acting-role'
+
+// Ask ThemeContext to drop the skin back to the default (Golden). The skin lives in
+// localStorage and survives a DB reset, so a fresh account in the same browser would
+// otherwise keep the last-used skin. Fired on logout + new account.
+const resetSkin = () => { try { window.dispatchEvent(new Event('clubr:skin-reset')) } catch { /* ignore */ } }
 const ROLE_ACCOUNT: Record<AccountRole, string> = { admin: 'u_admin', host: 'u_host', player: 'u_player' }
 const readActing = (): AccountRole | null => {
   try { const v = localStorage.getItem(ACTING_KEY); return isActingRole(v) ? v : null } catch { return null }
@@ -68,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     USERS[id] = u
     setUser(u); persist(u)
+    resetSkin() // brand-new account -> default skin (not whatever lingered in localStorage)
     return u
   }, [])
 
@@ -105,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     setUser(null); persist(null)
     setActingRole(null); try { localStorage.removeItem(ACTING_KEY) } catch { /* ignore */ }
+    resetSkin() // clean slate for the next account
   }, [])
 
   // App Admin "acting as": a real admin can view the app as Host/Player. Client-side
