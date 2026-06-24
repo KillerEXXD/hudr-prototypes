@@ -28,7 +28,7 @@ import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { ftPhase } from '@/lib/gameStatus'
 import { StatusBadge } from '@/components/common/StatusBadge'
-import { fmtK, picksToNames, playerFull } from '@/lib/utils/ftFormat'
+import { fmtK, playerFull } from '@/lib/utils/ftFormat'
 import { useEconomy } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
 
@@ -220,7 +220,22 @@ export function ContestDetailPage() {
                       <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{e.name}
                         {isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co-host</Badge>}
                       </p>
-                      <p className="truncate text-[11px] text-text-muted">{c.status === 'open' ? (e.picks.length === 4 ? 'drafted ✓ · sealed until lock' : e.picks.length ? `drafting ${e.picks.length}/4` : 'not drafted') : (e.picks.length ? `${picksToNames(e.picks, c.players)} · ${fmtK(e.spend)} spent` : 'no picks')}</p>
+                      {c.status === 'open' ? (
+                        <p className="truncate text-[11px] text-text-muted">{e.picks.length === 4 ? 'drafted ✓ · sealed until lock' : e.picks.length ? `drafting ${e.picks.length}/4` : 'not drafted'}</p>
+                      ) : e.picks.length ? (
+                        <>
+                          {/* Picks revealed — 2 per row, 2 rows, so all 4 stay visible (no truncated line). */}
+                          <div className="mt-1 grid grid-cols-2 gap-1">
+                            {e.picks.map((seat) => {
+                              const pl = c.players.find((p) => p.seat === seat)
+                              return <span key={seat} className="truncate rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-text-secondary">{pl ? (pl.first && pl.last ? `${pl.first} ${pl.last}` : pl.name) : seat}</span>
+                            })}
+                          </div>
+                          <p className="mt-0.5 text-[10px] text-text-muted">{fmtK(e.spend)} spent</p>
+                        </>
+                      ) : (
+                        <p className="text-[11px] text-text-muted">no picks</p>
+                      )}
                     </div>
                   </button>
                   {e.status === 'pending' ? (
