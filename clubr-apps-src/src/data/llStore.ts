@@ -3,6 +3,11 @@
 import { USERS } from './store'
 import type { LLGame, LLParticipant } from '@/types/ll'
 
+// Relative-to-now timestamps so 'New' (created in last 24h) buckets stay
+// populated whenever the prototype is loaded, regardless of the day.
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString()
+const daysAgo = (d: number) => new Date(Date.now() - d * 86_400_000).toISOString()
+
 function p(userId: string, status: LLParticipant['status'], paid: boolean, chips: number, ago: string, stale = false, finishPos?: number, bustedAgo?: string): LLParticipant {
   const u = USERS[userId]
   return { userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status, paid, chips, chipsUpdatedAgo: ago, stale, finishPos, bustedAgo }
@@ -18,7 +23,7 @@ const cmsg = (userId: string, text: string, ts: string, kind: 'user' | 'system' 
 export const LL_GAMES: LLGame[] = [
   {
     id: 'll_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', title: 'Friday Night Last Longer',
-    status: 'live', stake: 100, hostId: 'u_host', coHostIds: [],
+    status: 'live', createdAt: hoursAgo(6), stake: 100, hostId: 'u_host', coHostIds: [],
     participants: [
       p('u_host', 'active', true, 285000, 'now'),
       p('u_mike', 'active', true, 245000, '3m'),
@@ -33,7 +38,7 @@ export const LL_GAMES: LLGame[] = [
   {
     id: 'll_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', title: 'Midweek Grind',
     visibility: 'private', accessUserIds: ['u_gary', 'u_lena', 'u_player'],
-    status: 'live', stake: 250, hostId: 'u_gary', coHostIds: [],
+    status: 'live', createdAt: hoursAgo(12), stake: 250, hostId: 'u_gary', coHostIds: [],
     participants: [
       p('u_gary', 'active', true, 410000, 'now'),
       p('u_lena', 'active', true, 260000, '6m'),
@@ -43,7 +48,7 @@ export const LL_GAMES: LLGame[] = [
   },
   {
     id: 'll_c', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', title: 'Sunday Sweat',
-    status: 'registration', registrationClosesAt: 'in 2h 15m', stake: 100, hostId: 'u_gary', coHostIds: [],
+    status: 'registration', createdAt: hoursAgo(3), registrationClosesAt: 'in 2h 15m', stake: 100, hostId: 'u_gary', coHostIds: [],
     participants: [p('u_gary', 'active', true, 0, 'now'), p('u_lena', 'active', true, 0, 'now')],
     chat: [],
   },
@@ -72,7 +77,7 @@ export const LL_GAMES: LLGame[] = [
   // ---- Aces High (Club Host) — REGISTERING ----
   {
     id: 'll_f', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', title: 'Saturday Deep Stack Last Longer',
-    status: 'registration', registrationClosesAt: 'in 45m', stake: 100, hostId: 'u_host', coHostIds: [],
+    status: 'registration', createdAt: hoursAgo(0.5), registrationClosesAt: 'in 45m', stake: 100, hostId: 'u_host', coHostIds: [],
     location: 'Aces High Card Room', mode: 'in-person',
     participants: [
       p('u_host', 'active', true, 0, 'now'),
@@ -130,7 +135,7 @@ export const LL_GAMES: LLGame[] = [
   },
   {
     id: 'll_champ_reg', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆', title: 'Saturday Night Last Longer',
-    status: 'registration', registrationClosesAt: 'in 3h 30m', stake: 100, hostId: 'u_cc_host', coHostIds: [],
+    status: 'registration', createdAt: hoursAgo(2), registrationClosesAt: 'in 3h 30m', stake: 100, hostId: 'u_cc_host', coHostIds: [],
     location: 'Bayou City Poker Club', mode: 'in-person',
     participants: [
       p('u_cc_host', 'active', true, 0, 'now'),
@@ -182,5 +187,55 @@ export const LL_GAMES: LLGame[] = [
       p('u_tch_p6', 'active', false, 0, 'now'),
     ],
     chat: [cmsg('u_tch_host', 'Deep stacks tonight — register now 🃏', '5:40p', 'system')],
+  },
+  // ---- River Rats (Sam's 4th club) — gives c_river its leaderboard data ----
+  {
+    id: 'll_river_done', clubId: 'c_river', clubName: 'River Rats', clubEmoji: '🌊', title: 'River Rats Sunday Sweat',
+    status: 'completed', createdAt: daysAgo(9), stake: 100, hostId: 'u_rae', coHostIds: [], winnerName: 'Sam Rivers', settledAt: '2026-06-15',
+    location: 'River Rats Card Room', mode: 'in-person',
+    participants: [
+      p('u_player', 'out', true, 0, '—', false, 1),
+      p('u_rae', 'out', true, 0, '—', false, 2, '22m ago'),
+      p('u_cody', 'out', true, 0, '—', false, 3, '50m ago'),
+    ],
+    chat: [cmsg('u_rae', 'Sam takes down the River 🌊🏆', '11:30p', 'system')],
+  },
+  {
+    id: 'll_river_live', clubId: 'c_river', clubName: 'River Rats', clubEmoji: '🌊', title: 'River Rats Live Tonight',
+    status: 'live', createdAt: hoursAgo(4), stake: 100, hostId: 'u_rae', coHostIds: [],
+    participants: [
+      p('u_rae', 'active', true, 320000, 'now'),
+      p('u_cody', 'active', true, 220000, '7m'),
+      p('u_player', 'active', true, 180000, '12m'),
+    ],
+    chat: [cmsg('u_rae', 'Down to 3 — Sam still in 🤝', '9:40p', 'system')],
+  },
+  {
+    id: 'll_river_reg', clubId: 'c_river', clubName: 'River Rats', clubEmoji: '🌊', title: 'River Rats Mid-Week Last Longer',
+    status: 'registration', createdAt: hoursAgo(1.5), registrationClosesAt: 'in 5h 10m', stake: 50, hostId: 'u_rae', coHostIds: [],
+    participants: [
+      p('u_rae', 'active', true, 0, 'now'),
+      p('u_cody', 'active', true, 0, 'now'),
+    ],
+    chat: [cmsg('u_rae', 'Casual stakes, no egos — come hang 🌊', '5:10p')],
+  },
+  // ---- Brand-new (just-created) Aces High game — drives the red 'New' badge ----
+  {
+    id: 'll_aces_brand_new', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', title: 'Sunday Big Stack Last Longer',
+    status: 'registration', createdAt: hoursAgo(0.25), registrationClosesAt: 'in 7h', stake: 200, hostId: 'u_host', coHostIds: [],
+    location: 'Aces High Card Room', mode: 'in-person',
+    participants: [p('u_host', 'active', true, 0, 'now'), p('u_mike', 'active', true, 0, 'now')],
+    chat: [cmsg('u_host', 'Just opened — Sunday will be wild 🃏', 'now', 'system')],
+  },
+  // ---- Additional Grinders completed — adds depth to leaderboard ----
+  {
+    id: 'll_grinders_done2', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', title: 'Grinders Wednesday Mash',
+    status: 'completed', createdAt: daysAgo(12), stake: 100, hostId: 'u_gary', coHostIds: [], winnerName: 'Lena Park', settledAt: '2026-06-12',
+    participants: [
+      p('u_lena', 'out', true, 0, '—', false, 1),
+      p('u_gary', 'out', true, 0, '—', false, 2, '18m ago'),
+      p('u_player', 'out', true, 0, '—', false, 3, '42m ago'),
+    ],
+    chat: [cmsg('u_gary', 'Lena denies the chip leader — well played', '11:05p', 'system')],
   },
 ]

@@ -2,6 +2,9 @@ import type { SquaresGame, SquaresCell, SquaresParticipant } from '@/types/squar
 import { emptyGrid } from '@/types/squares'
 import { USERS } from '@/data/store'
 
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString()
+const daysAgo = (d: number) => new Date(Date.now() - d * 86_400_000).toISOString()
+
 const u = USERS
 const part = (id: string, status: SquaresParticipant['status'], paid: boolean): SquaresParticipant =>
   ({ userId: id, name: u[id].name, avatarColor: u[id].avatarColor, status, paid })
@@ -50,7 +53,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_c', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡',
     title: 'Sunday Night Squares', homeTeam: 'Ravens', awayTeam: 'Bills',
-    visibility: 'public', status: 'registration', registrationClosesAt: 'in 1h 20m', timezone: 'CT',
+    visibility: 'public', status: 'registration', createdAt: hoursAgo(4), registrationClosesAt: 'in 1h 20m', timezone: 'CT',
     stake: 50, hostId: 'u_host', coHostIds: [],
     cells: apprCells, rowDigits: [], colDigits: [],
     periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
@@ -60,7 +63,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡',
     title: 'Sunday Squares', homeTeam: 'Chiefs', awayTeam: 'Eagles',
-    visibility: 'public', status: 'registration', registrationClosesAt: 'in 2h 40m', timezone: 'CT',
+    visibility: 'public', status: 'registration', createdAt: hoursAgo(8), registrationClosesAt: 'in 2h 40m', timezone: 'CT',
     stake: 100, hostId: 'u_host', coHostIds: [],
     cells: regCells, rowDigits: [], colDigits: [],
     periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
@@ -70,7 +73,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️',
     title: 'Cowboys @ Niners Squares', homeTeam: 'Niners', awayTeam: 'Cowboys',
-    visibility: 'public', status: 'completed', timezone: 'PT', settledAt: '2026-06-09',
+    visibility: 'public', status: 'completed', createdAt: daysAgo(15), timezone: 'PT', settledAt: '2026-06-09',
     stake: 250, hostId: 'u_gary', coHostIds: [],
     cells: doneCells, rowDigits, colDigits,
     periods: [
@@ -86,7 +89,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_champ_done', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆',
     title: 'Texans @ Cowboys Squares', homeTeam: 'Texans', awayTeam: 'Cowboys',
-    visibility: 'public', status: 'completed', timezone: 'CT', settledAt: '2026-06-08',
+    visibility: 'public', status: 'completed', createdAt: daysAgo(16), timezone: 'CT', settledAt: '2026-06-08',
     stake: 50, hostId: 'u_cc_host', coHostIds: [],
     cells: champDone, rowDigits, colDigits,
     periods: [
@@ -101,7 +104,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_champ_reg', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆',
     title: 'Sunday Squares — Texans @ Colts', homeTeam: 'Texans', awayTeam: 'Colts',
-    visibility: 'public', status: 'registration', registrationClosesAt: 'in 35m', timezone: 'CT',
+    visibility: 'public', status: 'registration', createdAt: hoursAgo(1), registrationClosesAt: 'in 35m', timezone: 'CT',
     stake: 50, hostId: 'u_cc_host', coHostIds: [],
     cells: champReg, rowDigits: [], colDigits: [],
     periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
@@ -112,7 +115,7 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_tch_done', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏',
     title: 'Cowboys @ Eagles Squares', homeTeam: 'Eagles', awayTeam: 'Cowboys',
-    visibility: 'public', status: 'completed', timezone: 'CT', settledAt: '2026-06-04',
+    visibility: 'public', status: 'completed', createdAt: daysAgo(20), timezone: 'CT', settledAt: '2026-06-04',
     stake: 100, hostId: 'u_tch_host', coHostIds: [],
     cells: tchDone, rowDigits, colDigits,
     periods: [
@@ -127,11 +130,79 @@ export const SQUARES_GAMES: SquaresGame[] = [
   {
     id: 'sq_tch_reg', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏',
     title: 'Game Day Squares — Cowboys @ Giants', homeTeam: 'Cowboys', awayTeam: 'Giants',
-    visibility: 'public', status: 'registration', registrationClosesAt: 'in 4h 10m', timezone: 'CT',
+    visibility: 'public', status: 'registration', createdAt: hoursAgo(6), registrationClosesAt: 'in 4h 10m', timezone: 'CT',
     stake: 100, hostId: 'u_tch_host', coHostIds: [],
     cells: tchReg, rowDigits: [], colDigits: [],
     periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
     participants: [part('u_tch_host', 'active', true), part('u_tch_p2', 'active', true), part('u_tch_p3', 'active', true), part('u_tch_p6', 'active', true)],
     chat: [],
   },
+  // ---- River Rats (Sam's 4th club) completed squares — seeds c_river leaderboard ----
+  ((): SquaresGame => {
+    const grid = emptyGrid()
+    for (let i = 0; i < 100; i++) claim(grid, i, ['u_player', 'u_rae', 'u_cody'][i % 3])
+    const rd = [4, 9, 1, 6, 0, 8, 3, 7, 2, 5]
+    const cd = [2, 7, 0, 5, 9, 1, 6, 4, 8, 3]
+    const win = (h: number, a: number) => {
+      const idx = rd.indexOf(h % 10) * 10 + cd.indexOf(a % 10)
+      return { winnerCell: idx, winnerUserId: grid[idx].userId }
+    }
+    return {
+      id: 'sq_river_done', clubId: 'c_river', clubName: 'River Rats', clubEmoji: '🌊',
+      title: 'River Rats Game-Day Squares', homeTeam: 'Texans', awayTeam: 'Eagles',
+      visibility: 'public', status: 'completed', createdAt: daysAgo(11), timezone: 'CT', settledAt: '2026-06-14',
+      stake: 50, hostId: 'u_rae', coHostIds: [],
+      cells: grid, rowDigits: rd, colDigits: cd,
+      periods: [
+        { label: 'Q1', pct: 10, homeScore: 7, awayScore: 0, ...win(7, 0) },
+        { label: 'Q2', pct: 10, homeScore: 10, awayScore: 7, ...win(10, 7) },
+        { label: 'Q3', pct: 10, homeScore: 17, awayScore: 14, ...win(17, 14) },
+        { label: 'Final', pct: 70, homeScore: 24, awayScore: 21, ...win(24, 21) },
+      ],
+      participants: [part('u_rae', 'active', true), part('u_player', 'active', true), part('u_cody', 'active', true)],
+      chat: [],
+    }
+  })(),
+  // ---- Brand-new River Rats registration board (drives 'New' badge for Squares) ----
+  ((): SquaresGame => {
+    const grid = emptyGrid()
+    ;([[5, 'u_rae'], [18, 'u_cody'], [27, 'u_player'], [39, 'u_rae'], [44, 'u_cody']] as [number, string][])
+      .forEach(([i, id]) => claim(grid, i, id))
+    return {
+      id: 'sq_river_reg', clubId: 'c_river', clubName: 'River Rats', clubEmoji: '🌊',
+      title: 'River Rats Sunday Squares', homeTeam: 'Cowboys', awayTeam: 'Giants',
+      visibility: 'public', status: 'registration', createdAt: hoursAgo(0.75), registrationClosesAt: 'in 6h',
+      timezone: 'CT', stake: 50, hostId: 'u_rae', coHostIds: [],
+      cells: grid, rowDigits: [], colDigits: [],
+      periods: [{ label: 'Q1', pct: 10 }, { label: 'Q2', pct: 10 }, { label: 'Q3', pct: 10 }, { label: 'Final', pct: 70 }],
+      participants: [part('u_rae', 'active', true), part('u_cody', 'active', true), part('u_player', 'active', true)],
+      chat: [],
+    }
+  })(),
+  // ---- Brand-new Bayou City squares (live) ----
+  ((): SquaresGame => {
+    const grid = emptyGrid()
+    for (let i = 0; i < 100; i++) claim(grid, i, ['u_player', 'u_cc_p1', 'u_cc_p3', 'u_cc_p6'][i % 4])
+    const rd = [2, 6, 9, 1, 5, 7, 0, 4, 8, 3]
+    const cd = [5, 0, 8, 3, 7, 1, 6, 9, 2, 4]
+    const win = (h: number, a: number) => {
+      const idx = rd.indexOf(h % 10) * 10 + cd.indexOf(a % 10)
+      return { winnerCell: idx, winnerUserId: grid[idx].userId }
+    }
+    return {
+      id: 'sq_champ_live', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆',
+      title: 'Bayou Live Squares — Texans @ Bills', homeTeam: 'Texans', awayTeam: 'Bills',
+      visibility: 'public', status: 'live', createdAt: hoursAgo(20), timezone: 'CT',
+      stake: 100, hostId: 'u_cc_host', coHostIds: [],
+      cells: grid, rowDigits: rd, colDigits: cd,
+      periods: [
+        { label: 'Q1', pct: 10, homeScore: 7, awayScore: 3, ...win(7, 3) },
+        { label: 'Q2', pct: 10, homeScore: 14, awayScore: 10, ...win(14, 10) },
+        { label: 'Q3', pct: 10 }, // not yet scored
+        { label: 'Final', pct: 70 },
+      ],
+      participants: [part('u_cc_host', 'active', true), part('u_player', 'active', true), part('u_cc_p1', 'active', true), part('u_cc_p3', 'active', true), part('u_cc_p6', 'active', true)],
+      chat: [],
+    }
+  })(),
 ]

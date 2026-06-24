@@ -3,6 +3,9 @@
 import { USERS } from './store'
 import type { AvailableFT, ContestEntry, FTContest, FTPlayer } from '@/types/ft'
 
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString()
+const daysAgo = (d: number) => new Date(Date.now() - d * 86_400_000).toISOString()
+
 // 9-handed final table, ordered by chip stack (leader first). Chips are at the
 // current 100k big blind, so chips = bbStack × 100,000.
 // 9-handed final table, ordered by chip stack (leader first). Chips are at the
@@ -108,7 +111,7 @@ const cmsg = (userId: string, text: string, ts: string, kind: 'user' | 'system' 
 export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_a', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'DogHouse $150K H.W.M.S Main Event — FT',
-    status: 'open', stake: 100, budget: 100000, locksAt: 'in 1h 05m',
+    status: 'open', createdAt: hoursAgo(5), stake: 100, budget: 100000, locksAt: 'in 1h 05m',
     room: 'DogHouse Poker Club', prizePool: '150,000', buyIn: '380', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@DogHousePokerClub/streams', streamLive: false,
     hostId: 'u_host', coHostIds: [],
     players: DOGHOUSE_HWMS_FT,
@@ -124,7 +127,7 @@ export const FT_CONTESTS: FTContest[] = [
   {
     id: 'ct_b', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'TCH Dallas — Deepstack Main FT',
     visibility: 'private', accessUserIds: ['u_gary', 'u_lena', 'u_player'],
-    status: 'open', stake: 250, budget: 100000, locksAt: 'in 3h 40m',
+    status: 'open', createdAt: hoursAgo(10), stake: 250, budget: 100000, locksAt: 'in 3h 40m',
     room: 'Texas Card House', prizePool: '365,000', buyIn: '400', level: '30k / 60k · 60k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
@@ -137,7 +140,7 @@ export const FT_CONTESTS: FTContest[] = [
   },
   {
     id: 'ct_c', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Lone Star Poker Series — Bounty FT',
-    status: 'open', stake: 100, budget: 100000, locksAt: 'in 5h 20m',
+    status: 'open', createdAt: hoursAgo(2), stake: 100, budget: 100000, locksAt: 'in 5h 20m',
     room: 'Champions Club', prizePool: '500,000', buyIn: '600', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
@@ -161,7 +164,7 @@ export const FT_CONTESTS: FTContest[] = [
   },
   {
     id: 'ct_h', clubId: 'c_grinders', clubName: 'The Grinders', clubEmoji: '♠️', ftName: 'Trailblazer Poker Tour — High Roller FT',
-    status: 'locked', stake: 100, budget: 100000, locksAt: 'locked · plays in 25m',
+    status: 'locked', createdAt: hoursAgo(18), stake: 100, budget: 100000, locksAt: 'locked · plays in 25m',
     room: 'Texas Card House', prizePool: '1,000,000', buyIn: '2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: true,
     hostId: 'u_gary', coHostIds: [],
     players: FT_PLAYERS,
@@ -174,7 +177,7 @@ export const FT_CONTESTS: FTContest[] = [
   },
   {
     id: 'ct_i', clubId: 'c_aces', clubName: 'Aces High', clubEmoji: '🂡', ftName: 'Summer Poker Open — High Roller FT',
-    status: 'locked', stake: 250, budget: 100000, locksAt: 'locked · plays in 12m',
+    status: 'locked', createdAt: hoursAgo(14), stake: 250, budget: 100000, locksAt: 'locked · plays in 12m',
     room: 'Champions Club', prizePool: '1,000,000', buyIn: '2,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: true,
     hostId: 'u_host', coHostIds: [],
     players: FT_PLAYERS,
@@ -222,7 +225,7 @@ export const FT_CONTESTS: FTContest[] = [
   // ---- Demo: Bayou City Poker Club — real Summer Poker Open $1M final table (open) ----
   {
     id: 'ct_champ', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆', ftName: 'Summer Poker Open — $1M GTD Main Event FT',
-    status: 'open', stake: 100, budget: 100000, locksAt: 'in 2h 30m',
+    status: 'open', createdAt: hoursAgo(7), stake: 100, budget: 100000, locksAt: 'in 2h 30m',
     room: 'Bayou City Poker Club', prizePool: '1,000,000', buyIn: '1,500', level: '50k / 100k · 100k ante', streamUrl: 'https://www.youtube.com/@championsclubtexas', streamLive: false,
     hostId: 'u_cc_host', coHostIds: [],
     players: CHAMP_FT,
@@ -239,7 +242,7 @@ export const FT_CONTESTS: FTContest[] = [
   // ---- Demo: Gulf Coast Card Club — real $100K Fall Harvest final table (open) ----
   {
     id: 'ct_tch', clubId: 'c_tch', clubName: 'Gulf Coast Card Club', clubEmoji: '🃏', ftName: '$100K Fall Harvest Headliner — FT',
-    status: 'open', stake: 250, budget: 100000, locksAt: 'in 4h 10m',
+    status: 'open', createdAt: hoursAgo(11), stake: 250, budget: 100000, locksAt: 'in 4h 10m',
     room: 'Gulf Coast Card Club', prizePool: '100,000', buyIn: '1,100', level: '40k / 80k · 80k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse', streamLive: false,
     hostId: 'u_tch_host', coHostIds: [],
     players: TCH_FT,
@@ -252,6 +255,50 @@ export const FT_CONTESTS: FTContest[] = [
       entry('u_tch_p2', 'pending', false),
     ],
     chat: [cmsg('u_tch_host', 'Beckenstein came in with a monster stack — good luck all', '7:05p')],
+  },
+  // ---- River Rats (Sam's 4th club) — seeds c_river FT leaderboard data ----
+  {
+    id: 'ct_river_done', clubId: 'c_river', clubName: 'River Rats', clubEmoji: '🌊', ftName: 'River Rats — Bayou Bounty FT',
+    status: 'settled', format: 'points', createdAt: daysAgo(8), stake: 100, budget: 100000, locksAt: 'settled', settledAt: '2026-06-16',
+    room: 'River Rats Card Room', prizePool: '120,000', buyIn: '400', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
+    hostId: 'u_rae', coHostIds: [],
+    players: FT_PLAYERS,
+    finishingOrder: ['B', 'C', 'A', 'F', 'D', 'H', 'I', 'E', 'G'],
+    entries: [
+      entry('u_player', 'approved', true, ['A', 'B', 'C', 'F']),  // Sam — 1st
+      entry('u_rae', 'approved', true, ['B', 'D', 'F', 'I']),     // 2nd
+      entry('u_cody', 'approved', true, ['C', 'H', 'I', 'E']),    // 3rd
+    ],
+    chat: [cmsg('u_rae', 'Sam takes the River 🌊🏆', '11:45p', 'system')],
+  },
+  {
+    id: 'ct_river_open', clubId: 'c_river', clubName: 'River Rats', clubEmoji: '🌊', ftName: 'River Rats — Sunday Stack Draft FT',
+    status: 'open', createdAt: hoursAgo(0.5), stake: 50, budget: 100000, locksAt: 'in 4h 20m',
+    room: 'Texas Card House', prizePool: '180,000', buyIn: '500', level: '30k / 60k · 60k ante', streamUrl: 'https://www.youtube.com/@TexasCardHouse/streams', streamLive: false,
+    hostId: 'u_rae', coHostIds: [],
+    players: FT_PLAYERS,
+    entries: [
+      entry('u_rae', 'approved', true),
+      entry('u_cody', 'approved', false),
+      entry('u_player', 'pending', false),
+    ],
+    chat: [cmsg('u_rae', 'Just opened — chill stake, easy draft 🌊', 'now', 'system')],
+  },
+  // ---- Bayou City completed FT (gives c_champions more leaderboard depth) ----
+  {
+    id: 'ct_champ_done', clubId: 'c_champions', clubName: 'Bayou City Poker Club', clubEmoji: '🏆', ftName: 'Bayou Bounty — Mid-Season FT',
+    status: 'settled', format: 'points', createdAt: daysAgo(7), stake: 150, budget: 100000, locksAt: 'settled', settledAt: '2026-06-17',
+    room: 'Bayou City Poker Club', prizePool: '450,000', buyIn: '1,000', level: 'Final · table done', streamUrl: 'https://www.youtube.com/@championsclubtexas/streams', streamLive: false,
+    hostId: 'u_cc_host', coHostIds: [],
+    players: FT_PLAYERS,
+    finishingOrder: ['A', 'D', 'F', 'B', 'C', 'I', 'E', 'H', 'G'],
+    entries: [
+      entry('u_cc_p3', 'approved', true, ['A', 'D', 'F', 'I']), // 1st
+      entry('u_player', 'approved', true, ['A', 'C', 'F', 'B']), // 2nd
+      entry('u_cc_p1', 'approved', true, ['D', 'F', 'H', 'I']), // 3rd
+      entry('u_cc_host', 'approved', true, ['B', 'C', 'G', 'I']),
+    ],
+    chat: [cmsg('u_cc_host', 'Kevin runs deep again — Sam closes 2nd', '12:30a', 'system')],
   },
 ]
 
