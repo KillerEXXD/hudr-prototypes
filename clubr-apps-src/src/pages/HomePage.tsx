@@ -145,7 +145,8 @@ function AppCard({ app, c, onOpen }: {
         <p className="mt-0.5 text-[11px] font-semibold text-text-muted">{app.sub}</p>
       </div>
 
-      <div className="flex shrink-0 items-end gap-4">
+      <div className="flex shrink-0 items-end gap-3">
+        <Stat n={c.fresh} label="New" tone="red" />
         <Stat n={c.running} label="Running" tone="emerald" />
         <Stat n={c.completed} label="Completed" tone="gold" />
       </div>
@@ -155,8 +156,10 @@ function AppCard({ app, c, onOpen }: {
   )
 }
 
-function Stat({ n, label, tone }: { n: number; label: string; tone: 'emerald' | 'gold' }) {
-  const numColor = tone === 'emerald' ? 'text-accent-emerald' : 'text-accent-gold'
+function Stat({ n, label, tone }: { n: number; label: string; tone: 'emerald' | 'gold' | 'red' }) {
+  const numColor = tone === 'emerald' ? 'text-accent-emerald'
+    : tone === 'gold' ? 'text-accent-gold'
+    : 'text-accent-red'
   return (
     <div className="text-right leading-none">
       <p className={`font-mono text-2xl font-extrabold tabular-nums ${numColor}`}>{n}</p>

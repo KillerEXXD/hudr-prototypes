@@ -4,7 +4,7 @@ import { relationshipPills, type Relationship } from '@/games/gameRelationship'
 // No per-pill icons — the active color + ring conveys the category and keeps the
 // row compact (matches the club-detail status pills).
 const META: Record<Relationship, { label: string; active: string }> = {
-  available: { label: 'Available', active: 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' },
+  available: { label: 'New', active: 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' },
   playing: { label: 'Playing', active: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40' },
   hosting: { label: 'Hosting', active: 'border-accent-purple bg-accent-purple/20 text-accent-purple font-bold ring-1 ring-accent-purple/40' },
 }
