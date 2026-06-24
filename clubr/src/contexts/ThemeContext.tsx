@@ -9,6 +9,20 @@ import { THEMES, THEME_LIST, DEFAULT_THEME, type ThemeName, type ThemeFlags, typ
 // others (they share the same origin).
 
 const STORAGE_KEY = `clubr-skin:${import.meta.env.BASE_URL}`
+const EPOCH_KEY = `clubr-skin-epoch:${import.meta.env.BASE_URL}`
+
+// Force-reset lever. Bump this (or set VITE_SKIN_EPOCH) whenever the DB is wiped to
+// push EVERY browser back to the default skin on its next load, independent of auth.
+const SKIN_EPOCH = import.meta.env.VITE_SKIN_EPOCH || '2026-06-24'
+
+function enforceSkinEpoch() {
+  try {
+    if (localStorage.getItem(EPOCH_KEY) !== SKIN_EPOCH) {
+      localStorage.removeItem(STORAGE_KEY)
+      localStorage.setItem(EPOCH_KEY, SKIN_EPOCH)
+    }
+  } catch { /* SSR / disabled storage */ }
+}
 
 function readStored(): ThemeName {
   try {
@@ -25,7 +39,8 @@ function applyTheme(name: ThemeName) {
   root.setAttribute('data-theme', name)
 }
 
-// Apply persisted skin immediately on import (before React mounts).
+// Force-reset stale skins (DB wipe) first, then apply the persisted skin on import.
+enforceSkinEpoch()
 applyTheme(readStored())
 
 interface ThemeCtx {
