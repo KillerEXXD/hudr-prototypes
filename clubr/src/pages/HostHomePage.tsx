@@ -86,6 +86,31 @@ export function HostHomePage() {
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
       <p className="text-sm text-text-secondary">Upcoming final tables available for you to host as Fantasy games in your club.</p>
 
+      {/* ---- FTs to host — directly under the intro line it belongs to, so the slate the
+              subtitle promises is the first thing a host sees (not buried below the
+              checklist). Only for club managers, and only when some exist. ---- */}
+      {hasManagedClub && (fts.isLoading || (fts.data?.length ?? 0) > 0) && (
+      <Section
+        title={`FTs to host${fts.data?.length ? ` (${fts.data.length})` : ''}`}
+        action={<button onClick={() => navigate('/host-ft')} className="flex items-center gap-0.5 text-xs font-semibold text-accent-purple cursor-pointer">See all <ChevronRight className="h-3.5 w-3.5" /></button>}
+      >
+        {fts.isLoading ? <Spinner /> : (
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+            {(fts.data ?? []).slice(0, 6).map((f) => (
+              <button key={f.id} onClick={() => navigate(`/host-ft?ft=${f.id}`)} className="flex w-44 shrink-0 flex-col rounded-2xl border border-border bg-bg-card p-3 text-left transition-colors hover:bg-bg-surface active:scale-[0.99] cursor-pointer">
+                <Badge tone="purple" className="self-start">{f.room}</Badge>
+                <p className="mt-1.5 line-clamp-2 text-sm font-bold leading-snug text-text-primary">{f.name}</p>
+                <div className="mt-auto pt-2">
+                  <div className="flex items-center gap-1 text-[11px] text-text-muted"><Trophy className="h-3 w-3 text-accent-amber" />{f.prizePool}</div>
+                  <div className="mt-0.5 flex items-center gap-1 text-[11px] text-text-muted"><Clock className="h-3 w-3" />{f.startsIn} · ICM ✓</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </Section>
+      )}
+
       {/* ---- Host first-run checklist (Phase 5) — until the club has its first game ---- */}
       {showFirstRun && managedClub && (
         <Section title={`Get ${managedClub.name} going`}>
@@ -111,29 +136,6 @@ export function HostHomePage() {
           </div>
         )}
       </div>
-
-      {/* ---- FTs to host — only for users who manage a club, and only when some exist ---- */}
-      {hasManagedClub && (fts.isLoading || (fts.data?.length ?? 0) > 0) && (
-      <Section
-        title={`FTs to host${fts.data?.length ? ` (${fts.data.length})` : ''}`}
-        action={<button onClick={() => navigate('/host-ft')} className="flex items-center gap-0.5 text-xs font-semibold text-accent-purple cursor-pointer">See all <ChevronRight className="h-3.5 w-3.5" /></button>}
-      >
-        {fts.isLoading ? <Spinner /> : (
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            {(fts.data ?? []).slice(0, 6).map((f) => (
-              <button key={f.id} onClick={() => navigate(`/host-ft?ft=${f.id}`)} className="flex w-44 shrink-0 flex-col rounded-2xl border border-border bg-bg-card p-3 text-left transition-colors hover:bg-bg-surface active:scale-[0.99] cursor-pointer">
-                <Badge tone="purple" className="self-start">{f.room}</Badge>
-                <p className="mt-1.5 line-clamp-2 text-sm font-bold leading-snug text-text-primary">{f.name}</p>
-                <div className="mt-auto pt-2">
-                  <div className="flex items-center gap-1 text-[11px] text-text-muted"><Trophy className="h-3 w-3 text-accent-amber" />{f.prizePool}</div>
-                  <div className="mt-0.5 flex items-center gap-1 text-[11px] text-text-muted"><Clock className="h-3 w-3" />{f.startsIn} · ICM ✓</div>
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </Section>
-      )}
 
       {/* ---- Clubs to join (shared, identical on the Player Discover home) ---- */}
       <ClubsToJoinSection />
