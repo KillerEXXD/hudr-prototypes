@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Stamp, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Medal, Stamp, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
@@ -141,7 +141,7 @@ export function SquaresGamePage() {
       {canClaim && <p className="mt-2 text-[11px] text-text-secondary">Tap an empty square to claim it — your claim is <span className="text-accent-amber font-semibold">pending the host's approval</span>. Tap one of your pending (amber) squares to <b>withdraw</b>; once the host approves it, it's <b>locked in</b>. Digits stay sealed until lock.</p>}
       {hostCanApprove && <p className="mt-2 text-[11px] text-text-secondary">You're the host — <span className="text-accent-amber font-semibold">tap any amber (pending) square to approve it</span>, or use the approval queue below.</p>}
 
-      <Section title={locked ? 'The board' : 'Claim your squares'} action={hover ? (
+      <Section icon={Grid3x3} tone="emerald" title={locked ? 'The board' : 'Claim your squares'} action={hover ? (
         <span className="flex items-center gap-1.5 text-xs font-bold text-text-primary">
           <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: hover.color }} />
           <span className="truncate">{hover.name}</span>
@@ -193,7 +193,7 @@ export function SquaresGamePage() {
 
       <SquaresResults g={g} />
 
-      <Section title="Periods & payouts">
+      <Section icon={Trophy} tone="amber" title="Periods & payouts">
         <div className="flex flex-col gap-1.5">
           {g.periods.map((p) => {
             const winnerName = p.winnerUserId ? (g.cells.find((c) => c.userId === p.winnerUserId)?.name ?? g.participants.find((x) => x.userId === p.winnerUserId)?.name) : undefined
@@ -211,7 +211,7 @@ export function SquaresGamePage() {
       </Section>
 
       {lpRows.length > 0 && (
-        <Section title="Leaderboard points" action={<Trophy className="h-4 w-4 text-accent-amber" />}>
+        <Section icon={Medal} tone="purple" title="Leaderboard points" action={<Trophy className="h-4 w-4 text-accent-amber" />}>
           <p className="mb-2 text-[11px] text-text-muted">Earned toward <b className="text-text-secondary">{g.clubName}</b>'s monthly leaderboard — Squares counts half (it's mostly luck).</p>
           <div className="flex flex-col gap-1.5">
             {lpRows.map((r) => (
@@ -226,7 +226,7 @@ export function SquaresGamePage() {
       )}
 
       {g.canManage && (
-        <Section title="Host" action={<Badge tone="green"><Shield className="h-3 w-3" />You manage</Badge>}>
+        <Section icon={Shield} tone="blue" title="Host" action={<Badge tone="green"><Shield className="h-3 w-3" />You manage</Badge>}>
           {pendingClaims.length > 0 && (
             <div className="mb-3 rounded-xl border border-accent-amber/40 bg-accent-amber/5 p-2.5">
               <div className="mb-1.5 flex items-center justify-between gap-2">

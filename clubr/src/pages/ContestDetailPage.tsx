@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Trophy, UserPlus, Check, Crown, Shield, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Trophy, Users, UserRound, UserPlus, Check, Crown, Shield, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
@@ -117,7 +117,7 @@ export function ContestDetailPage() {
 
       {/* ===== OPEN: entry CTA up top — request to enter, then draft (admins don't play) ===== */}
       {c.status === 'open' && !isAdmin && (
-        <Section title="Your entry">
+        <Section icon={UserRound} tone="blue" title="Your entry">
           {!c.isMemberOfClub && !c.canManage ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10">
               <Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" />
@@ -176,7 +176,7 @@ export function ContestDetailPage() {
 
       {/* ===== LOCKED: picks revealed to everyone, scores pending ===== */}
       {c.status === 'locked' && (
-        <Section title="Picks — locked in">
+        <Section icon={Lock} tone="purple" title="Picks — locked in">
           <p className="mb-2 text-[11px] text-text-muted">The lock has passed, so picks are revealed to everyone. Scores post when the FT finishes.</p>
           <div className="flex flex-col gap-1.5">
             {c.entries.filter((e) => e.status === 'approved').map((e) => (
@@ -204,7 +204,7 @@ export function ContestDetailPage() {
 
       {/* ===== HOST/CO-HOST controls ===== */}
       {c.canManage && (
-        <Section title={`Entrants · ${c.entries.length}`} action={<Badge tone="green"><Shield className="h-3 w-3" />You manage</Badge>}>
+        <Section icon={Users} tone="emerald" title={`Entrants · ${c.entries.length}`} action={<Badge tone="green"><Shield className="h-3 w-3" />You manage</Badge>}>
           <p className="mb-2 text-[11px] text-text-muted">Admit players · toggle the green dot when they've paid · tap a name to make a co-host.</p>
           {c.status === 'open' && <p className="mb-2 flex items-center gap-1 text-[11px] text-accent-amber"><Lock className="h-3 w-3" />Picks are sealed until the 10‑min lock — for everyone, including the host &amp; admin. They reveal after lock.</p>}
           <div className="flex flex-col gap-2">

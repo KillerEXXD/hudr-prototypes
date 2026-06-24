@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, RotateCcw, X, Ban, AlertTriangle, Flag } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Users, UserRound, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, RotateCcw, X, Ban, AlertTriangle, Flag } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
@@ -173,7 +173,7 @@ export function LastLongerGamePage() {
 
       {/* My status / actions (admins oversee — they don't play) */}
       {g.status !== 'completed' && g.status !== 'cancelled' && !isAdmin && (
-        <Section title="You">
+        <Section icon={UserRound} tone="blue" title="You">
           {!g.isMemberOfClub && !g.canManage ? (
             <Card className="flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to play.</p></Card>
           ) : !me ? (
@@ -216,7 +216,7 @@ export function LastLongerGamePage() {
       )}
 
       {/* Standings (was "Leaderboard" — distinct from the club Leaderboard tab) */}
-      <Section title={r.completed ? `Final standings · ${r.finishers.length}` : `Standings · ${active.length} in · ${out.length} out`} action={!r.completed && g.canManage ? <button type="button" onClick={() => setCoHostOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue/15 px-2.5 py-1 text-[11px] font-bold text-accent-blue ring-1 ring-accent-blue/30 hover:bg-accent-blue/25 cursor-pointer"><Shield className="h-3 w-3" />Add co-host</button> : undefined}>
+      <Section icon={Users} tone="emerald" title={r.completed ? `Final standings · ${r.finishers.length}` : `Standings · ${active.length} in · ${out.length} out`} action={!r.completed && g.canManage ? <button type="button" onClick={() => setCoHostOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue/15 px-2.5 py-1 text-[11px] font-bold text-accent-blue ring-1 ring-accent-blue/30 hover:bg-accent-blue/25 cursor-pointer"><Shield className="h-3 w-3" />Add co-host</button> : undefined}>
         {!r.completed && g.canManage && <p className="mb-2 text-[11px] text-text-muted">Admit players · green dot = paid · "Bust" to eliminate. Co-hosts are set with “Add co-host”.</p>}
         <div className="flex flex-col gap-1.5">
           {r.completed ? (
