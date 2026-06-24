@@ -88,6 +88,7 @@ export const CLUBS: Club[] = [
     members: [
       member('u_rae', 'owner', 'member', '2026-06-08'),
       member('u_cody', 'member', 'member', '2026-06-09'),
+      member('u_player', 'member', 'member', '2026-06-22'),
     ],
   },
   {
