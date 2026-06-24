@@ -29,7 +29,7 @@ export function JoinClubsPage() {
 
   return (
     <div className="animate-fade-up">
-      <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+      <button onClick={() => navigate('/')} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Clubs to join</h1>
       <p className="text-sm text-text-secondary">Request to join — the host vets &amp; admits you.</p>
 

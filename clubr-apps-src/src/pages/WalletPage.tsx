@@ -34,7 +34,7 @@ export function WalletPage() {
 
   return (
     <div className="animate-fade-up">
-      <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+      <button onClick={() => navigate('/')} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
       <h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Coins className="h-5 w-5 text-accent-amber" />Wallet</h1>
 
       {/* balance */}

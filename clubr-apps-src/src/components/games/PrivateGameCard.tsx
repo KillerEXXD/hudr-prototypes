@@ -13,7 +13,7 @@ export function PrivateGameCard({ info }: { info: PrivateGameInfo }) {
   const navigate = useNavigate()
   return (
     <div className="animate-fade-up">
-      <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+      <button onClick={() => navigate('/')} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
       <Card className="mt-2 flex flex-col items-center gap-3 py-8 text-center">
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-surface text-text-muted"><Lock className="h-6 w-6" /></div>
         <h1 className="text-xl font-extrabold tracking-tight text-text-primary">This is a private game</h1>

@@ -13,7 +13,7 @@ export function MemberPage() {
   // *where you came from* (even a private club / deep link). Falls back to history (-1).
   // Rendered in EVERY state and prominent so it's never missed.
   const from = (location.state as { from?: string } | null)?.from
-  const goBack = () => (from ? navigate(from) : navigate(-1))
+  const goBack = () => (from ? navigate(from) : navigate('/'))
   const back = (
     <button onClick={goBack} className="mb-3 inline-flex items-center gap-1 rounded-lg border border-border bg-bg-surface px-2.5 py-1.5 text-sm font-semibold text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
   )

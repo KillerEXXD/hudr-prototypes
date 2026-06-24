@@ -44,7 +44,7 @@ export function LedgerPage() {
 
   return (
     <div className="animate-fade-up">
-      <button onClick={() => navigate(-1)} className="mb-2 inline-flex items-center gap-1 text-[13px] font-semibold text-text-secondary hover:text-text-primary">
+      <button onClick={() => navigate('/')} className="mb-2 inline-flex items-center gap-1 text-[13px] font-semibold text-text-secondary hover:text-text-primary">
         <ChevronLeft className="h-4 w-4" /> Back
       </button>
       <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Your ledger</h1>

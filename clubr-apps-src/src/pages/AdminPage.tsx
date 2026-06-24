@@ -25,7 +25,7 @@ export function AdminPage() {
 
   return (
     <div className="animate-fade-up">
-      {!isHome && <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>}
+      {!isHome && <button onClick={() => navigate('/')} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>}
       <h1 className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-text-primary"><ShieldCheck className="h-5 w-5 text-accent-purple" />Admin console</h1>
       <p className="text-sm text-text-secondary">Everything on the platform — all clubs and all users.</p>
 
