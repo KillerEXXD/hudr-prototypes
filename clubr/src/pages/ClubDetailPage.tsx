@@ -175,7 +175,8 @@ export function ClubDetailPage() {
           <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">You're already a member of {club.name}.</span> You're all set — jump into any game below.</p>
         </Card>
       )}
-      {justJoined === 'pending' && (
+      {/* Hide once the host admits them (myStatus 'member') — the nav-state is stale. */}
+      {justJoined === 'pending' && !isMember && (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-emerald/30 bg-accent-emerald/10">
           <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-emerald" />
           <p className="text-xs leading-snug text-text-secondary"><span className="font-bold text-text-primary">Request sent — pending approval.</span> The host has been notified; you'll be able to enter games once they admit you.</p>
