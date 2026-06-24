@@ -169,7 +169,8 @@ function ClubsStrip() {
 
 function NotificationsStrip() {
   const notifs = useNotifications()
-  const recent = (notifs.data ?? []).slice(0, 3)
+  // listNotifications() returns { items, unread } — NOT an array. Read .items.
+  const recent = (notifs.data?.items ?? []).slice(0, 3)
   if (recent.length === 0) return null
   return (
     <div className="rounded-2xl border border-border bg-bg-card/60 p-4 backdrop-blur">
