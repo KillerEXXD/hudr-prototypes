@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom'
 import { type ReactNode } from 'react'
-import { X, Loader2, Crown, Shield, Spade, Heart, Diamond, Club } from 'lucide-react'
+import { X, Loader2, Crown, Shield, Spade, Heart, Diamond, Club, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 // ---- Processing (CRUD activity indicator) ----
@@ -128,14 +128,58 @@ export function Btn({ children, onClick, variant = 'primary', size = 'md', disab
 }
 
 // ---- Section header ----
-export function Section({ title, action, children, className }: { title: string; action?: ReactNode; children: ReactNode; className?: string }) {
+// ONE prominent heading style for the whole app — bold, primary-coloured, readable
+// (replaces the old tiny uppercase muted label). Optional icon-in-tinted-badge +
+// subtitle + count chip for richer list sections (Hosting, Member, Pending approval,
+// Clubs to join…). Semantic theme tokens only → identical in every skin.
+const HEADER_TONES = {
+  blue: 'bg-accent-blue/15 text-accent-blue',
+  amber: 'bg-accent-amber/15 text-accent-amber',
+  emerald: 'bg-accent-emerald/15 text-accent-emerald',
+  purple: 'bg-accent-purple/15 text-accent-purple',
+} as const
+export type SectionTone = keyof typeof HEADER_TONES
+
+export function SectionHeader({ icon: Icon, tone = 'blue', title, sub, count, action, className }: {
+  icon?: LucideIcon
+  tone?: SectionTone
+  title: string
+  sub?: string
+  count?: number
+  action?: ReactNode
+  className?: string
+}) {
+  const tint = HEADER_TONES[tone]
+  return (
+    <div className={cn('mb-3 flex items-center gap-3 px-0.5', className)}>
+      {Icon && <span className={cn('flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl', tint)}><Icon className="h-5 w-5" /></span>}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <h2 className="truncate text-lg font-extrabold leading-tight tracking-tight text-text-primary">{title}</h2>
+          {count != null && <span className={cn('shrink-0 rounded-full px-2 py-0.5 text-xs font-bold tabular-nums', tint)}>{count}</span>}
+        </div>
+        {sub && <p className="truncate text-xs text-text-muted">{sub}</p>}
+      </div>
+      {action}
+    </div>
+  )
+}
+
+export function Section({ title, action, children, className, icon, tone, sub, count, indent }: {
+  title: string
+  action?: ReactNode
+  children: ReactNode
+  className?: string
+  icon?: LucideIcon
+  tone?: SectionTone
+  sub?: string
+  count?: number
+  indent?: boolean
+}) {
   return (
     <section className={cn('mt-5', className)}>
-      <div className="mb-2 flex items-center justify-between px-0.5">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-text-muted">{title}</h2>
-        {action}
-      </div>
-      {children}
+      <SectionHeader icon={icon} tone={tone} title={title} sub={sub} count={count} action={action} />
+      {indent ? <div className="ml-[1.4rem] border-l border-border/50 pl-3">{children}</div> : children}
     </section>
   )
 }

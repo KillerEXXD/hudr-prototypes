@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Plus, Ticket, Users, Globe, Lock, Send } from 'lucide-react'
+import { Plus, Ticket, Users, Globe, Lock, Send, Crown } from 'lucide-react'
 import { useMyClubs, useRecentClubs, useCreateClub, useJoinViaInvite } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { useEconomy } from '@/hooks/credits'
@@ -61,7 +61,7 @@ export function ClubsPage() {
       </div>
 
       {isAdmin ? (
-        <Section title="All clubs" action={<span className="text-xs text-text-muted">you oversee every club</span>}>
+        <Section icon={Users} tone="blue" title="All clubs" sub="you oversee every club" count={allClubs.data?.length}>
           {allClubs.isLoading ? <Spinner /> : allClubs.data && allClubs.data.length > 0 ? (
             <div className="flex flex-col gap-2">{allClubs.data.map((c) => <ClubRow key={c.id} club={c} />)}</div>
           ) : (
@@ -69,20 +69,20 @@ export function ClubsPage() {
           )}
         </Section>
       ) : clubs.isLoading ? (
-        <Section title="Clubs you're in"><Spinner /></Section>
+        <Section icon={Users} tone="blue" title="Clubs you're in"><Spinner /></Section>
       ) : mine.length === 0 ? (
-        <Section title="Clubs you're in">
+        <Section icon={Users} tone="blue" title="Clubs you're in">
           <EmptyState icon={<Users className="h-7 w-7" />} title="No clubs yet" sub="Discover a club and request to join, create your own, or join with an invite code." />
         </Section>
       ) : (
         <>
           {hosting.length > 0 && (
-            <Section title="Hosting" action={<span className="text-xs text-text-muted">you manage {hosting.length === 1 ? 'this club' : `these ${hosting.length}`}</span>}>
+            <Section icon={Crown} tone="purple" title="Hosting" sub={`you manage ${hosting.length === 1 ? 'this club' : `these ${hosting.length}`}`} count={hosting.length} indent>
               <div className="flex flex-col gap-2">{hosting.map((c) => <ClubRow key={c.id} club={c} />)}</div>
             </Section>
           )}
           {member.length > 0 && (
-            <Section title={hosting.length > 0 ? 'Member' : "Clubs you're in"}>
+            <Section icon={Users} tone="emerald" title={hosting.length > 0 ? 'Member' : "Clubs you're in"} sub={hosting.length > 0 ? "clubs you've joined" : undefined} count={member.length} indent>
               <div className="flex flex-col gap-2">{member.map((c) => <ClubRow key={c.id} club={c} />)}</div>
             </Section>
           )}
