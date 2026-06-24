@@ -85,12 +85,12 @@ export function RoleChip({ role, className }: { role: 'owner' | 'host' | 'member
 }
 
 // ---- Card ----
-export function Card({ children, className, onClick, id }: { children: ReactNode; className?: string; onClick?: () => void; id?: string }) {
+export function Card({ children, className, onClick, id, lift }: { children: ReactNode; className?: string; onClick?: () => void; id?: string; lift?: 'blue' | 'cyan' | 'purple' | 'amber' | 'emerald' | 'slate' }) {
   return (
     <div
       id={id}
       onClick={onClick}
-      className={cn('card-gold rounded-2xl border border-border bg-bg-card p-4', onClick && 'cursor-pointer transition-colors hover:bg-bg-surface active:scale-[0.995]', className)}
+      className={cn('rounded-2xl p-4', lift ? `card-lift lift-${lift}` : 'card-gold border border-border bg-bg-card', onClick && 'cursor-pointer transition-colors hover:bg-bg-surface active:scale-[0.995]', className)}
     >
       {children}
     </div>

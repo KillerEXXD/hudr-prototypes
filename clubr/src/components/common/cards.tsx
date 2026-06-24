@@ -32,7 +32,7 @@ export function ClubRow({ club, right }: { club: ClubView; right?: React.ReactNo
 
   return (
     <div>
-      <Card onClick={() => navigate(`/club/${club.id}`)} className="flex items-center gap-3 p-3">
+      <Card lift="blue" onClick={() => navigate(`/club/${club.id}`)} className="flex items-center gap-3 p-3">
         <Avatar emoji={club.emoji} color={club.color} size={44} />
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 text-sm font-bold text-text-primary">
