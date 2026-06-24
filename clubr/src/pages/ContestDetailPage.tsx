@@ -73,7 +73,7 @@ export function ContestDetailPage() {
   return (
     <div className="animate-fade-up pb-20">
       <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
-      <GameJoinBanner />
+      <GameJoinBanner admitted={c.isMemberOfClub || c.canManage} />
 
       {/* Identity — club + format badges. */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-muted">

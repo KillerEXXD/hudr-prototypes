@@ -6,8 +6,11 @@ import { Card } from '@/components/common/ui'
  *  (state.gameJoin set by useApplyInviteOnLogin): confirms the request, welcomes
  *  someone already in, or notes the game is over. Transient — clears on the next
  *  navigation. */
-export function GameJoinBanner() {
+export function GameJoinBanner({ admitted = false }: { admitted?: boolean } = {}) {
   const gameJoin = (useLocation().state as { gameJoin?: 'game-open' | 'game-requested' | 'game-over' } | null)?.gameJoin
+  // Once the viewer is admitted (a club member, or the host) the transient
+  // "Request sent" nav state is stale — drop it so it doesn't linger after admit.
+  if (gameJoin === 'game-requested' && admitted) return null
   if (gameJoin === 'game-over') {
     return (
       <Card className="mb-3 flex items-start gap-2.5 border-border bg-bg-surface">

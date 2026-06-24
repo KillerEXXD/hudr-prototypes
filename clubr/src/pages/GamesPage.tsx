@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Gamepad2, Plus, LayoutGrid, type LucideIcon } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { InfiniteList } from '@/components/common/InfiniteList'
 import { RelationshipPills } from '@/components/games/RelationshipPills'
@@ -25,6 +26,7 @@ function FilterChip({ active, onClick, label, icon: Icon, activeClass = 'border-
 
 export function GamesPage() {
   const { user } = useAuth()
+  const { theme } = useTheme()
   const myClubs = useMyClubs()
   const canHost = (myClubs.data ?? []).some((c) => c.canManage)
   const isAdmin = user?.role === 'admin'
@@ -70,7 +72,7 @@ export function GamesPage() {
       <p className="mt-1 text-sm text-text-secondary">Everything happening across your clubs — all game types in one place.</p>
 
       {/* relationship pill + type filter */}
-      <div className="mt-3"><RelationshipPills value={rel} onChange={pickRel} isHost={isHost} counts={counts} /></div>
+      <div className="mt-3"><RelationshipPills value={rel} onChange={pickRel} isHost={isHost} counts={counts} golden={theme === 'golden'} /></div>
       <div className="mt-2 flex flex-wrap gap-1.5">
         <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
         {GAME_TYPES.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
