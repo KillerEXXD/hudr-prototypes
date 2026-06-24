@@ -90,7 +90,7 @@ export function Card({ children, className, onClick, id }: { children: ReactNode
     <div
       id={id}
       onClick={onClick}
-      className={cn('rounded-2xl border border-border bg-bg-card p-4', onClick && 'cursor-pointer transition-colors hover:bg-bg-surface active:scale-[0.995]', className)}
+      className={cn('card-gold rounded-2xl border border-border bg-bg-card p-4', onClick && 'cursor-pointer transition-colors hover:bg-bg-surface active:scale-[0.995]', className)}
     >
       {children}
     </div>

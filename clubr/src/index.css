@@ -104,3 +104,21 @@
   textarea,
   select { font-size: 16px; }
 }
+
+/* ── Golden skin: prominent gold, slightly-raised card edge ───────────────────
+   The default border token is near-invisible on the pine-felt background, so cards
+   read flat. Under the Golden skin ONLY, give cards a defined chip-gold border + a
+   soft bevel (top highlight, lower contact shadow + depth) for a subtle 3-D lift.
+   Scoped to [data-theme="golden"]; applied via the `card-gold` marker on <Card>. */
+[data-theme="golden"] .card-gold {
+  border-color: var(--color-accent-gold-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(233, 196, 106, 0.32),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+    0 1px 1px rgba(0, 0, 0, 0.55),
+    0 8px 18px -10px rgba(233, 196, 106, 0.28);
+}
+[data-theme="golden"] .card-gold:hover { border-color: var(--color-accent-gold); }
+[data-theme="golden"] .card-gold:active {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 6px -4px rgba(0, 0, 0, 0.6);
+}
