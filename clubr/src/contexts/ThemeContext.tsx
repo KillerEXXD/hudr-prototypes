@@ -16,6 +16,8 @@ const EPOCH_KEY = `clubr-skin-epoch:${import.meta.env.BASE_URL}`
 const SKIN_EPOCH = import.meta.env.VITE_SKIN_EPOCH || '2026-06-24'
 
 function enforceSkinEpoch() {
+  // Skip under e2e builds, which pin their own skin (parity with the live app).
+  if (import.meta.env.VITE_E2E === '1') return
   try {
     if (localStorage.getItem(EPOCH_KEY) !== SKIN_EPOCH) {
       localStorage.removeItem(STORAGE_KEY)
