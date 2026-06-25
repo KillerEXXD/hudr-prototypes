@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins, Pencil, MapPin } from 'lucide-react'
+import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins, Pencil, MapPin, GalleryHorizontalEnd } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Field } from '@/components/common/ui'
@@ -118,6 +118,14 @@ export function MePage() {
           </Card>
         </Section>
       )}
+
+      <Section title="Prototype">
+        <Card onClick={() => navigate('/carousel-lab')} className="flex items-center gap-3">
+          <GalleryHorizontalEnd className="h-5 w-5 text-accent-blue" />
+          <div className="flex-1"><p className="text-sm font-bold text-text-primary">Carousel Lab</p><p className="text-xs text-text-muted">Compare carousel styles · pick the one you like</p></div>
+          <ChevronRight className="h-4 w-4 text-text-muted" />
+        </Card>
+      </Section>
 
       {user.role === 'admin' && (
         <Section title="App administration">
