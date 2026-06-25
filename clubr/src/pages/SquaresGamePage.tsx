@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Medal, Stamp, Flag, Ban, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Medal, Stamp, Flag, Ban, AlertTriangle, Users } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
@@ -192,6 +192,32 @@ export function SquaresGamePage() {
       </Section>
 
       <SquaresResults g={g} />
+
+      {/* ===== Entrants — PUBLIC at any stage so everyone sees who's in + the
+              count. Read-only: rows are clickable to member details ONLY for the
+              owner/co-host (canManage). ===== */}
+      {g.participants.length > 0 && (
+        <Section icon={Users} tone="emerald" title={`Entrants · ${g.participants.length}`}>
+          <div className="flex flex-col gap-1.5">
+            {g.participants.map((p) => {
+              const isHost = p.userId === g.hostId
+              const isCo = g.coHostIds.includes(p.userId) && !isHost
+              const row = (
+                <>
+                  <Avatar name={p.name} color={p.avatarColor} size={28} />
+                  <span className="flex min-w-0 flex-1 items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co-host</Badge>}</span>
+                  {p.status === 'pending' ? <Badge tone="amber">Pending</Badge> : <span className="flex items-center gap-1 text-[11px] text-accent-emerald"><Check className="h-3.5 w-3.5" />In</span>}
+                </>
+              )
+              return g.canManage ? (
+                <button key={p.userId} type="button" onClick={() => navigate(`/member/${p.userId}`)} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2 text-left hover:bg-bg-surface cursor-pointer">{row}</button>
+              ) : (
+                <div key={p.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">{row}</div>
+              )
+            })}
+          </div>
+        </Section>
+      )}
 
       <Section icon={Trophy} tone="amber" title="Periods & payouts">
         <div className="flex flex-col gap-1.5">
