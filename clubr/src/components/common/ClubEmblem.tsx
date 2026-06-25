@@ -29,10 +29,15 @@ function hashStr(s: string): number {
   return h >>> 0
 }
 
-export function ClubEmblem({ id, glyph, gradient, size = 44, className }: {
-  id: string; glyph?: string; gradient?: string; size?: number; className?: string
+export function ClubEmblem({ id, glyph, gradient, logoUrl, size = 44, className }: {
+  id: string; glyph?: string; gradient?: string; logoUrl?: string; size?: number; className?: string
 }) {
   const radius = Math.round(size * 0.3)
+  // Uploaded / AI-pack image (e.g. a Midjourney mascot) — render it instead of the
+  // procedural glass.
+  if (logoUrl) {
+    return <img src={logoUrl} alt="" aria-hidden="true" className={cn('shrink-0 object-cover ring-1 ring-border shadow-lg shadow-black/30', className)} style={{ width: size, height: size, borderRadius: radius }} />
+  }
   const h = hashStr(id || 'club')
   const gKey = (glyph && GLYPHS[glyph]) ? glyph : GLYPH_KEYS[(h >>> 5) % GLYPH_KEYS.length]
   const grKey = (gradient && EMBLEM_GRADIENTS[gradient]) ? gradient : GRADIENT_KEYS[h % GRADIENT_KEYS.length]

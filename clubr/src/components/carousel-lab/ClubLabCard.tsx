@@ -12,14 +12,18 @@ export interface LabClub {
   role: 'owner' | 'member' | 'waiting'
   memberCount: number
   memberColors: string[]
+  logoUrl?: string
 }
 
+// Midjourney mascot emblems live in public/emblems and are served under the build base.
+const mascot = (file: string) => `${import.meta.env.BASE_URL}emblems/${file}.webp`
+
 export const LAB_CLUBS: LabClub[] = [
-  { id: 'c_aces', name: 'Aces High', location: 'Houston, TX', role: 'owner', memberCount: 8, memberColors: ['#ef4444', '#3b82f6', '#10b981'] },
-  { id: 'c_grinders', name: 'The Grinders', location: 'Dallas, TX', role: 'member', memberCount: 14, memberColors: ['#f59e0b', '#8b5cf6', '#06b6d4'] },
-  { id: 'c_river', name: 'River Rats', location: 'Austin, TX', role: 'member', memberCount: 5, memberColors: ['#06b6d4', '#ec4899'] },
-  { id: 'c_high', name: 'High Rollers', location: 'Las Vegas, NV', role: 'waiting', memberCount: 21, memberColors: ['#a855f7', '#22c55e', '#eab308'] },
-  { id: 'c_bayou', name: 'Bayou City Poker Club', location: 'Houston, TX', role: 'owner', memberCount: 33, memberColors: ['#a855f7', '#ef4444', '#14b8a6'] },
+  { id: 'c_aces', name: 'Aces High', location: 'Houston, TX', role: 'owner', memberCount: 8, memberColors: ['#ef4444', '#3b82f6', '#10b981'], logoUrl: mascot('gladiator') },
+  { id: 'c_grinders', name: 'The Grinders', location: 'Dallas, TX', role: 'member', memberCount: 14, memberColors: ['#f59e0b', '#8b5cf6', '#06b6d4'], logoUrl: mascot('wolf') },
+  { id: 'c_river', name: 'River Rats', location: 'Austin, TX', role: 'member', memberCount: 5, memberColors: ['#06b6d4', '#ec4899'], logoUrl: mascot('shark') },
+  { id: 'c_high', name: 'High Rollers', location: 'Las Vegas, NV', role: 'waiting', memberCount: 21, memberColors: ['#a855f7', '#22c55e', '#eab308'], logoUrl: mascot('tiger') },
+  { id: 'c_bayou', name: 'Bayou City Poker Club', location: 'Houston, TX', role: 'owner', memberCount: 33, memberColors: ['#a855f7', '#ef4444', '#14b8a6'], logoUrl: mascot('bear') },
   { id: 'c_gulf', name: 'Gulf Coast Card Club', location: 'Galveston, TX', role: 'member', memberCount: 9, memberColors: ['#dc2626', '#2563eb', '#16a34a'] },
 ]
 
@@ -60,7 +64,7 @@ function MemberCluster({ colors, count }: { colors: string[]; count: number }) {
 export function ClubLabCard({ club }: { club: LabClub }) {
   return (
     <div className="flex w-full flex-col items-center gap-1.5 rounded-t-3xl rounded-b-2xl border border-border bg-bg-card p-5 text-center shadow-lg shadow-black/25">
-      <ClubEmblem id={club.id} size={72} />
+      <ClubEmblem id={club.id} logoUrl={club.logoUrl} size={72} />
       <span className="mt-1 w-full truncate text-base font-extrabold tracking-tight text-text-primary">{club.name}</span>
       <RolePill role={club.role} />
       <span className="flex items-center gap-1 text-[11px] text-text-muted"><MapPin className="h-3 w-3 shrink-0" /><span className="truncate">{club.location}</span></span>
