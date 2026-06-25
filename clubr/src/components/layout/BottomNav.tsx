@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Home, Radio, Plus } from 'lucide-react'
+import { Home, Plus } from 'lucide-react'
 import { useOnboardingStage } from '@/hooks/useOnboardingStage'
 import { useUnifiedGames } from '@/games/useUnifiedGames'
-import { isLiveForMe, isFinishedForMe } from '@/games/liveBuckets'
+import { isLiveForMe, isFinishedForMe, isInProgressForMe } from '@/games/liveBuckets'
+import { LiveDot } from '@/components/common/LiveDot'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { cn } from '@/lib/utils/cn'
 
@@ -30,6 +31,8 @@ export function BottomNav() {
   const { items } = useUnifiedGames()
   const liveCount = items.filter(isLiveForMe).length
   const finishedCount = items.filter(isFinishedForMe).length
+  // Pulse the red dot only when a game is actually rolling (phase 'live'); else grey.
+  const inProgress = items.some(isInProgressForMe)
 
   const [createOpen, setCreateOpen] = useState(false)
   const [noLive, setNoLive] = useState(false)
@@ -70,7 +73,20 @@ export function BottomNav() {
           </div>
           {/* Right: Live — smart tap (opens Live/Finished, or a popup when you have no games). */}
           <div className="relative flex flex-1 items-stretch">
-            {showLive && <NavBtn active={liveActive} onClick={onLive} icon={Radio} label="Live" />}
+            {showLive && (
+              <button
+                type="button"
+                onClick={onLive}
+                className={cn('flex flex-1 flex-col items-center justify-center py-2.5 text-[10px] font-semibold transition-colors cursor-pointer', liveActive ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary')}
+              >
+                {/* The word "Live" with a pulsing-red dot at its top-right (grey when
+                    nothing's in progress). No broadcast icon — the dot IS the cue. */}
+                <span className="relative text-xs font-bold leading-none tracking-wide">
+                  Live
+                  <LiveDot live={inProgress} className="absolute -right-2.5 -top-1" />
+                </span>
+              </button>
+            )}
             {noLive && (
               <div className="pointer-events-none absolute -top-11 right-1 z-10 whitespace-nowrap rounded-lg bg-bg-card px-3 py-1.5 text-xs font-semibold text-text-primary shadow-lg ring-1 ring-border animate-fade-up">
                 No live games right now

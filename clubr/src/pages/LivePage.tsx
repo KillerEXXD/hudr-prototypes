@@ -8,7 +8,8 @@ import { GAME_TYPES, type GameType } from '@/games/types'
 import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
 import { orderActiveTab, orderCompleted } from '@/games/gameOrdering'
 import { renderUnifiedGame } from '@/games/renderGame'
-import { isLiveForMe, isFinishedForMe } from '@/games/liveBuckets'
+import { isLiveForMe, isFinishedForMe, isInProgressForMe } from '@/games/liveBuckets'
+import { LiveDot } from '@/components/common/LiveDot'
 import { cn } from '@/lib/utils/cn'
 
 // "Live" is the player/host home for games: every game you're IN that hasn't ended
@@ -21,6 +22,18 @@ type View = 'live' | 'finished'
 function Chip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
   return (
     <button type="button" onClick={onClick} className={cn('flex items-center gap-1 rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? activeClass : 'border-transparent font-semibold text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
+  )
+}
+
+// The Live / Finished status pills: just the word + a top-right corner dot — red
+// (pulsing) on Live when a game is in progress, calm elephant-grey otherwise (and
+// always grey on Finished). No leading icon — the dot is the cue.
+function StatusPill({ active, onClick, label, live }: { active: boolean; onClick: () => void; label: string; live: boolean }) {
+  return (
+    <button type="button" onClick={onClick} className={cn('relative flex items-center rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' : 'border-transparent font-semibold text-text-secondary')}>
+      {label}
+      <LiveDot live={live} className="absolute -right-1 -top-1" />
+    </button>
   )
 }
 
@@ -48,16 +61,20 @@ export function LivePage() {
   const finished = orderCompleted(items.filter(isFinishedForMe).filter((g) => matchesType(g, filter)))
   const liveTotal = items.filter(isLiveForMe).length
   const finishedTotal = items.filter(isFinishedForMe).length
+  // Red pulse only when a game is actually rolling (phase 'live'); else the dot rests grey.
+  const inProgress = items.some(isInProgressForMe)
 
   return (
     <div className="animate-fade-up">
-      <h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Radio className="h-5 w-5 text-accent-blue" />Live</h1>
+      <h1 className="text-xl font-extrabold tracking-tight text-text-primary">
+        <span className="relative inline-block">Live<LiveDot live={inProgress} className="absolute -right-3 -top-0.5" /></span>
+      </h1>
       <p className="mt-1 text-sm text-text-secondary">Every game you're in or hosting — and how your finished ones went.</p>
 
-      {/* Live / Finished + type filter */}
+      {/* Live / Finished status pills (word + top-right dot) + type filter */}
       <div className="mt-3 flex gap-1.5">
-        <Chip active={view === 'live'} onClick={() => setView('live')} label={liveTotal ? `Live · ${liveTotal}` : 'Live'} icon={Radio} />
-        <Chip active={view === 'finished'} onClick={() => setView('finished')} label={finishedTotal ? `Finished · ${finishedTotal}` : 'Finished'} icon={Flag} />
+        <StatusPill active={view === 'live'} onClick={() => setView('live')} label={liveTotal ? `Live · ${liveTotal}` : 'Live'} live={inProgress} />
+        <StatusPill active={view === 'finished'} onClick={() => setView('finished')} label={finishedTotal ? `Finished · ${finishedTotal}` : 'Finished'} live={false} />
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5">
         <Chip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />

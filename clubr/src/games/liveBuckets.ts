@@ -18,3 +18,12 @@ export function isLiveForMe(g: UnifiedGame): boolean {
 export function isFinishedForMe(g: UnifiedGame): boolean {
   return g.finished && (g.mine || g.canManage)
 }
+
+/**
+ * In progress for you RIGHT NOW — a game you're in/hosting whose phase is 'live'
+ * (the puck is rolling). Drives the pulsing-red "Live" dot on the nav + page; when
+ * nothing matches, the dot rests grey.
+ */
+export function isInProgressForMe(g: UnifiedGame): boolean {
+  return g.phase === 'live' && (g.iHost || g.iCoHost || g.mine)
+}

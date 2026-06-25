@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isLiveForMe, isFinishedForMe } from './liveBuckets'
+import { isLiveForMe, isFinishedForMe, isInProgressForMe } from './liveBuckets'
 import type { UnifiedGame } from '@/games/useUnifiedGames'
 
 // A game's two dimensions that decide its Live/Finished bucket. (ll payload is
@@ -29,5 +29,13 @@ describe('Live page buckets', () => {
     expect(isFinishedForMe(g({ finished: true, cancelled: true, mine: true }))).toBe(true)
     expect(isFinishedForMe(g({ finished: false, mine: true }))).toBe(false)          // still live
     expect(isFinishedForMe(g({ finished: true, mine: false, canManage: false }))).toBe(false) // not yours
+  })
+
+  it('In progress = phase "live" AND you are involved (drives the pulsing-red dot)', () => {
+    expect(isInProgressForMe(g({ mine: true, phase: 'live' }))).toBe(true)           // playing a rolling game
+    expect(isInProgressForMe(g({ iHost: true, phase: 'live' }))).toBe(true)          // hosting a rolling game
+    expect(isInProgressForMe(g({ mine: true, phase: 'reg' }))).toBe(false)           // registration, not rolling yet
+    expect(isInProgressForMe(g({ mine: true, phase: 'closed', finished: true }))).toBe(false) // ended
+    expect(isInProgressForMe(g({ mine: false, phase: 'live' }))).toBe(false)         // live, but not yours
   })
 })
