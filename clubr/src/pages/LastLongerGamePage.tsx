@@ -85,7 +85,7 @@ export function LastLongerGamePage() {
       <GameJoinBanner admitted={g.isMemberOfClub || g.canManage} />
 
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
-      <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}<HowItWorksButton onClick={() => setHowOpen(true)} /></h1><ShareGameButton type="ll" gameId={g.id} /></div>
+      <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex min-w-0 flex-wrap items-center gap-1.5 text-lg font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}<HowItWorksButton onClick={() => setHowOpen(true)} /></h1><ShareGameButton type="ll" gameId={g.id} className="shrink-0 whitespace-nowrap" /></div>
       <div className="mt-1"><GameHostLine hostId={g.hostId} knownName={g.participants.find((p) => p.userId === g.hostId)?.name} /></div>
       <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-secondary">
         <StatusBadge phase={g.status} />
@@ -95,10 +95,10 @@ export function LastLongerGamePage() {
       {(() => { const joined = g.participants.filter((p) => p.status !== 'pending').length; return <StakePool stake={g.stake} pool={g.stake * joined}>· {joined} joined</StakePool> })()}
       {g.status === 'registration' && (
         <div className="mt-3">
-          <CountdownBanner deadline={regDeadline(g.registrationClosesAt)} sub="Registration closes — join before the clock hits zero" closedLabel="Awaiting host" />
+          <CountdownBanner deadline={regDeadline(g.registrationClosesAt)} sub="Registration closes — join before the clock hits zero" closedLabel="Awaiting host" onEdit={g.canManage ? () => setEditRegOpen(true) : undefined} />
           <div className="mt-1 flex items-center justify-between gap-2">
             <CloseTimeLabel utcISO={g.registrationClosesAt} className="text-[11px] text-text-muted" />
-            {g.canManage && <button type="button" onClick={() => setEditRegOpen(true)} className="flex items-center gap-1 text-[11px] font-semibold text-accent-blue hover:underline cursor-pointer"><Timer className="h-3 w-3" />Edit time</button>}
+            
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Clock } from 'lucide-react'
+import { Clock, Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 // Prototype note: the live app drives the countdown off SERVER time (see
@@ -91,7 +91,7 @@ export function Countdown({ deadline, prefix = 'Closes in' }: { deadline: number
  * HH:MM:SS clock so the closing deadline is impossible to miss:
  *   emerald (plenty of time) → amber (< 30m) → red (< 10m) → pulses (< 2m).
  */
-export function CountdownBanner({ deadline, label = 'Closes in', closedLabel = 'Closed', sub, className }: { deadline: number | null; label?: string; closedLabel?: string; sub?: string; className?: string }) {
+export function CountdownBanner({ deadline, label = 'Closes in', closedLabel = 'Closed', sub, onEdit, className }: { deadline: number | null; label?: string; closedLabel?: string; sub?: string; onEdit?: () => void; className?: string }) {
   useTicker()
   const ms = deadline == null ? null : deadline - Date.now()
   const pending = ms == null
@@ -105,13 +105,19 @@ export function CountdownBanner({ deadline, label = 'Closes in', closedLabel = '
         : 'border-accent-emerald/40 bg-accent-emerald/10 text-accent-emerald'
 
   return (
-    <div className={cn('flex items-center gap-3 rounded-xl border px-3.5 py-2.5', tone, !pending && !closed && ms < 2 * 60_000 && 'animate-pulse', className)}>
+    <div className={cn('relative flex items-center gap-3 rounded-xl border px-3.5 py-2.5', tone, !pending && !closed && ms < 2 * 60_000 && 'animate-pulse', className)}>
       <Clock className="h-5 w-5 shrink-0" />
       <div className="min-w-0 flex-1">
         <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">{closed ? closedLabel : label}</p>
         {sub && !closed && <p className="truncate text-[11px] leading-tight text-text-muted">{sub}</p>}
       </div>
       <span className="font-mono text-2xl font-extrabold tabular-nums tracking-tight leading-none">{pending ? '—:—' : closed ? '00:00' : fmtClock(ms)}</span>
+      {onEdit && (
+        <button type="button" onClick={(e) => { e.stopPropagation(); onEdit() }} aria-label="Edit time" title="Edit time"
+          className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-md opacity-60 hover:bg-black/10 hover:opacity-100 cursor-pointer">
+          <Pencil className="h-3.5 w-3.5" />
+        </button>
+      )}
     </div>
   )
 }

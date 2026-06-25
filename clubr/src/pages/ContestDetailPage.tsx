@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { countryFlag } from '@/lib/countries'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Lock, Eye, Trophy, Users, UserRound, UserPlus, Check, Crown, Shield, Clock, Flag, Ban, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, Lock, Eye, Trophy, Users, UserRound, UserPlus, Check, Crown, Shield, Flag, Ban, AlertTriangle } from 'lucide-react'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
@@ -79,16 +79,16 @@ export function ContestDetailPage() {
       {/* Identity — club + format badges. */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-muted">
         <span className="text-base">{c.clubEmoji}</span>{c.clubName}
-        <Badge tone="purple">Stack Draft</Badge>
+        <Badge tone="purple">FT Fantasy</Badge>
         {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}
       </div>
       {/* Title (host-framed name) + quiet "?" help + Share. */}
       <div className="mt-1 flex items-start justify-between gap-2">
-        <h1 className="text-xl font-extrabold leading-tight tracking-tight text-text-primary">
+        <h1 className="min-w-0 break-words text-lg font-extrabold leading-tight tracking-tight text-text-primary">
           {c.ftName}
           <HowItWorksButton onClick={() => setHowOpen(true)} className="ml-1.5 translate-y-[3px]" />
         </h1>
-        <ShareGameButton type="ft" gameId={c.id} />
+        <ShareGameButton type="ft" gameId={c.id} className="shrink-0 whitespace-nowrap" />
       </div>
       <div className="mt-1"><GameHostLine hostId={c.hostId} knownName={c.entries.find((e) => e.userId === c.hostId)?.name} /></div>
       {/* Status + timing — the lead (no stake/budget here; buy-in shows once below). */}
@@ -102,10 +102,10 @@ export function ContestDetailPage() {
       {/* ===== Ticking "Closes in" countdown — draft locks at the deadline ===== */}
       {c.status === 'open' && (
         <div className="mt-3">
-          <CountdownBanner deadline={regDeadline(c.locksAtTs ?? c.locksAt)} sub="Draft locks when the clock hits zero — get your picks in" />
+          <CountdownBanner deadline={regDeadline(c.locksAtTs ?? c.locksAt)} sub="Draft locks when the clock hits zero — get your picks in" onEdit={c.canManage ? () => setEditRegOpen(true) : undefined} />
           <div className="mt-1 flex items-center justify-between gap-2">
             <CloseTimeLabel utcISO={c.locksAtTs} className="text-[11px] text-text-muted" />
-            {c.canManage && <button type="button" onClick={() => setEditRegOpen(true)} className="flex items-center gap-1 text-[11px] font-semibold text-accent-blue hover:underline cursor-pointer"><Clock className="h-3 w-3" />Edit time</button>}
+            
           </div>
         </div>
       )}
