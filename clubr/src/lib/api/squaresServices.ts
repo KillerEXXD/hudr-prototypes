@@ -128,7 +128,7 @@ export async function approveSquareClaim(gameId: string, cellIdx: number): Promi
   const cell = g.cells[cellIdx]; if (cell.userId) cell.approved = true
 }
 /** Host rejects a pending square → frees it back to empty. */
-export async function rejectSquareClaim(gameId: string, cellIdx: number): Promise<void> {
+export async function rejectSquareClaim(gameId: string, cellIdx: number, _reason: string): Promise<void> {
   await delay(100)
   const g = SQUARES_GAMES.find((x) => x.id === gameId); if (!g || g.status !== 'registration') return
   const cell = g.cells[cellIdx]; if (cell.userId && !cell.approved) g.cells[cellIdx] = {}

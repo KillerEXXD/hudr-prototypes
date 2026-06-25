@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins, Pencil, MapPin, GalleryHorizontalEnd } from 'lucide-react'
+import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins, Pencil, MapPin, GalleryHorizontalEnd, Camera, Check, Ban } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Field } from '@/components/common/ui'
 import { CityField } from '@/components/common/CityField'
 import { SkinPicker } from '@/components/common/SkinPicker'
+import { demoAvatarUrl } from '@/data/store'
 import type { AccountRole, User } from '@/types'
 import { EmailVerifyRow } from '@/components/me/EmailVerifyRow'
 
@@ -56,11 +57,44 @@ function EditProfileSheet({ open, onClose, user }: { open: boolean; onClose: () 
   )
 }
 
+/** Pick a profile picture from a fun set — or choose "No photo" to keep initials. */
+function AvatarPickerSheet({ open, onClose, user }: { open: boolean; onClose: () => void; user: User }) {
+  const { setAvatar } = useAuth()
+  // Ten fun variations seeded by the user's handle, plus the "none" (initials) option.
+  const options = Array.from({ length: 10 }, (_, i) => demoAvatarUrl(user.handle || user.id, i))
+  const choose = (url: string | null) => { setAvatar(url); onClose() }
+  return (
+    <Sheet open={open} onClose={onClose} title="Profile picture">
+      <p className="mb-3 text-xs text-text-muted">Pick a picture, or choose <b className="text-text-primary">No photo</b> to show your initials.</p>
+      <div className="grid grid-cols-4 gap-3">
+        {/* No photo → initials */}
+        <button type="button" onClick={() => choose(null)}
+          className={`relative flex flex-col items-center gap-1 rounded-xl p-0.5 cursor-pointer ${!user.avatarUrl ? 'ring-2 ring-accent-blue' : 'ring-1 ring-transparent'}`}>
+          <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-bg-surface text-text-muted"><Ban className="h-5 w-5" /></span>
+          <span className="text-[10px] text-text-muted">None</span>
+          {!user.avatarUrl && <Check className="absolute right-0 top-0 h-4 w-4 rounded-full bg-accent-blue p-0.5 text-white" />}
+        </button>
+        {options.map((url) => {
+          const on = user.avatarUrl === url
+          return (
+            <button key={url} type="button" onClick={() => choose(url)}
+              className={`relative rounded-xl p-0.5 cursor-pointer ${on ? 'ring-2 ring-accent-blue' : 'ring-1 ring-transparent'}`}>
+              <Avatar name={user.name} pic={url} size={56} />
+              {on && <Check className="absolute right-0 top-0 h-4 w-4 rounded-full bg-accent-blue p-0.5 text-white" />}
+            </button>
+          )
+        })}
+      </div>
+    </Sheet>
+  )
+}
+
 export function MePage() {
   const { user, realRole, actAs, logout, loginAs } = useAuth()
   const navigate = useNavigate()
   const wallet = useWallet()
   const [editOpen, setEditOpen] = useState(false)
+  const [photoOpen, setPhotoOpen] = useState(false)
   if (!user) return null
   const role = ROLE_META[user.role]
 
@@ -70,7 +104,10 @@ export function MePage() {
 
       <Card className="mt-3">
         <div className="flex items-center gap-3">
-          <Avatar name={user.name} color={user.avatarColor} size={52} />
+          <button type="button" onClick={() => setPhotoOpen(true)} className="relative shrink-0 cursor-pointer" aria-label="Change profile picture">
+            <Avatar name={user.name} color={user.avatarColor} pic={user.avatarUrl} size={52} />
+            <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent-blue text-white ring-2 ring-bg-card"><Camera className="h-3 w-3" /></span>
+          </button>
           <div className="min-w-0 flex-1">
             <p className="truncate text-base font-bold text-text-primary">{user.name}</p>
             {user.location && (
@@ -87,6 +124,7 @@ export function MePage() {
         <EmailVerifyRow user={user} />
       </Card>
       <EditProfileSheet open={editOpen} onClose={() => setEditOpen(false)} user={user} />
+      <AvatarPickerSheet open={photoOpen} onClose={() => setPhotoOpen(false)} user={user} />
 
       {/* App Admin ONLY: view the app as any role. Gated on the REAL role so it stays
           visible while acting as Host/Player. Changes the view, not your permissions. */}

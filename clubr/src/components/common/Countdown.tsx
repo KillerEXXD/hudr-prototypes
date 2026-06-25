@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Clock, Pencil } from 'lucide-react'
+import { Clock, SquarePen } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 // Prototype note: the live app drives the countdown off SERVER time (see
@@ -114,8 +114,8 @@ export function CountdownBanner({ deadline, label = 'Closes in', closedLabel = '
       <span className="font-mono text-2xl font-extrabold tabular-nums tracking-tight leading-none">{pending ? '—:—' : closed ? '00:00' : fmtClock(ms)}</span>
       {onEdit && (
         <button type="button" onClick={(e) => { e.stopPropagation(); onEdit() }} aria-label="Edit time" title="Edit time"
-          className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-md opacity-60 hover:bg-black/10 hover:opacity-100 cursor-pointer">
-          <Pencil className="h-3.5 w-3.5" />
+          className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-lg border border-current/40 bg-bg-card shadow-sm hover:bg-black/10 cursor-pointer">
+          <SquarePen className="h-4 w-4" />
         </button>
       )}
     </div>

@@ -18,13 +18,16 @@ export interface LabClub {
 // Midjourney mascot emblems live in public/emblems and are served under the build base.
 const mascot = (file: string) => `${import.meta.env.BASE_URL}emblems/${file}.webp`
 
+// Only bright, friendly (not scary) mascots — gladiator, lion, eagle, dragon, bull, ram.
+// The darker / snarling ones (bear, tiger, shark, wolf, gorilla, cobra) are kept in the
+// pack but not used here.
 export const LAB_CLUBS: LabClub[] = [
   { id: 'c_aces', name: 'Aces High', location: 'Houston, TX', role: 'owner', memberCount: 8, memberColors: ['#ef4444', '#3b82f6', '#10b981'], logoUrl: mascot('gladiator') },
-  { id: 'c_grinders', name: 'The Grinders', location: 'Dallas, TX', role: 'member', memberCount: 14, memberColors: ['#f59e0b', '#8b5cf6', '#06b6d4'], logoUrl: mascot('wolf') },
-  { id: 'c_river', name: 'River Rats', location: 'Austin, TX', role: 'member', memberCount: 5, memberColors: ['#06b6d4', '#ec4899'], logoUrl: mascot('shark') },
-  { id: 'c_high', name: 'High Rollers', location: 'Las Vegas, NV', role: 'waiting', memberCount: 21, memberColors: ['#a855f7', '#22c55e', '#eab308'], logoUrl: mascot('tiger') },
-  { id: 'c_bayou', name: 'Bayou City Poker Club', location: 'Houston, TX', role: 'owner', memberCount: 33, memberColors: ['#a855f7', '#ef4444', '#14b8a6'], logoUrl: mascot('bear') },
-  { id: 'c_gulf', name: 'Gulf Coast Card Club', location: 'Galveston, TX', role: 'member', memberCount: 9, memberColors: ['#dc2626', '#2563eb', '#16a34a'] },
+  { id: 'c_grinders', name: 'The Grinders', location: 'Dallas, TX', role: 'member', memberCount: 14, memberColors: ['#f59e0b', '#8b5cf6', '#06b6d4'], logoUrl: mascot('lion') },
+  { id: 'c_river', name: 'River Rats', location: 'Austin, TX', role: 'member', memberCount: 5, memberColors: ['#06b6d4', '#ec4899'], logoUrl: mascot('eagle') },
+  { id: 'c_high', name: 'High Rollers', location: 'Las Vegas, NV', role: 'waiting', memberCount: 21, memberColors: ['#a855f7', '#22c55e', '#eab308'], logoUrl: mascot('dragon') },
+  { id: 'c_bayou', name: 'Bayou City Poker Club', location: 'Houston, TX', role: 'owner', memberCount: 33, memberColors: ['#a855f7', '#ef4444', '#14b8a6'], logoUrl: mascot('bull') },
+  { id: 'c_gulf', name: 'Gulf Coast Card Club', location: 'Galveston, TX', role: 'member', memberCount: 9, memberColors: ['#dc2626', '#2563eb', '#16a34a'], logoUrl: mascot('ram') },
 ]
 
 function Pawn({ className }: { className?: string }) {
@@ -47,28 +50,24 @@ function RolePill({ role }: { role: LabClub['role'] }) {
   return <span className={cn('inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-extrabold', cls)}><Icon className="h-3.5 w-3.5" />{label}</span>
 }
 
-function MemberCluster({ colors, count }: { colors: string[]; count: number }) {
-  const slots = Math.min(3, Math.max(1, count))
+// Members are shown as a COUNT only — no avatars/names. A single pawn + the number
+// in a subtle pill keeps it clean and never implies we know who the members are.
+function MemberCluster({ count }: { count: number }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <div className="flex -space-x-2">
-        {Array.from({ length: slots }).map((_, i) => (
-          <span key={i} className="h-5 w-5 rounded-full ring-2 ring-bg-card" style={{ background: colors[i] ?? 'var(--color-bg-surface, #2a2a2a)' }} />
-        ))}
-      </div>
-      <span className="inline-flex items-center gap-0.5 text-xs font-semibold text-text-secondary"><Pawn className="h-3.5 w-3.5 text-text-muted" />{count}</span>
-    </div>
+    <span className="inline-flex items-center gap-1 rounded-full bg-bg-surface/60 px-2.5 py-1 text-xs font-semibold text-text-secondary">
+      <Pawn className="h-3.5 w-3.5 text-text-muted" />{count} {count === 1 ? 'member' : 'members'}
+    </span>
   )
 }
 
 export function ClubLabCard({ club }: { club: LabClub }) {
   return (
     <div className="flex w-full flex-col items-center gap-1.5 rounded-t-3xl rounded-b-2xl border border-border bg-bg-card p-5 text-center shadow-lg shadow-black/25">
-      <ClubEmblem id={club.id} logoUrl={club.logoUrl} size={72} />
+      <ClubEmblem id={club.id} logoUrl={club.logoUrl} size={140} />
       <span className="mt-1 w-full truncate text-base font-extrabold tracking-tight text-text-primary">{club.name}</span>
       <RolePill role={club.role} />
       <span className="flex items-center gap-1 text-[11px] text-text-muted"><MapPin className="h-3 w-3 shrink-0" /><span className="truncate">{club.location}</span></span>
-      <MemberCluster colors={club.memberColors} count={club.memberCount} />
+      <MemberCluster count={club.memberCount} />
     </div>
   )
 }

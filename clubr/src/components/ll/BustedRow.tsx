@@ -34,7 +34,7 @@ export function BustedRow({ p, medalLabel, lpPoints, lpReason, amountWon, chop, 
     <div className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
       <span className="w-6 text-center text-sm font-bold text-text-secondary">{medalLabel}</span>
       <button type="button" onClick={onProfile} disabled={!canManage} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
-        <Avatar name={p.name} color={p.avatarColor} size={28} />
+        <Avatar name={p.name} color={p.avatarColor} pic={p.avatarUrl} size={28} />
         <span className="min-w-0 flex-1 truncate text-sm font-medium text-text-primary">{p.name}</span>
       </button>
       <div className="flex shrink-0 flex-col items-end gap-0.5 leading-none">

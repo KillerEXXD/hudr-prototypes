@@ -309,7 +309,7 @@ export function ClubDetailPage() {
                     {approve.isPending && approve.variables?.userId === m.userId && <ProcessingOverlay label="Admitting…" />}
                     {reject.isPending && reject.variables?.userId === m.userId && <ProcessingOverlay label="Removing…" />}
                     <button onClick={() => navigate(`/member/${m.userId}`, { state: { from: `/club/${club.id}` } })} className="flex min-w-0 flex-1 items-center gap-3 text-left cursor-pointer">
-                      <Avatar name={m.name} color={m.avatarColor} size={36} />
+                      <Avatar name={m.name} color={m.avatarColor} pic={m.avatarUrl} size={36} />
                       <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-text-primary">{m.name}</p><p className="text-xs text-text-muted">{m.handle ? <>@{m.handle} · </> : null}tap to vet →</p></div>
                     </button>
                     <Btn size="sm" loading={approve.isPending && approve.variables?.userId === m.userId} onClick={() => approve.mutate({ clubId: club.id, userId: m.userId })}><UserCheck className="h-3.5 w-3.5" />Admit</Btn>
@@ -327,7 +327,7 @@ export function ClubDetailPage() {
                 <div key={m.userId} className="relative flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
                   {reject.isPending && reject.variables?.userId === m.userId && <ProcessingOverlay label="Removing…" />}
                   <button onClick={() => navigate(`/member/${m.userId}`, { state: { from: `/club/${club.id}` } })} className="flex min-w-0 flex-1 items-center gap-2.5 text-left cursor-pointer">
-                    <Avatar name={m.name} color={m.avatarColor} size={30} />
+                    <Avatar name={m.name} color={m.avatarColor} pic={m.avatarUrl} size={30} />
                     <span className="truncate text-sm text-text-primary">{m.name}</span>
                     <ChevronRight className="h-3.5 w-3.5 shrink-0 text-text-muted" />
                   </button>

@@ -408,6 +408,11 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
   plus **Approve all**) and can also **tap any amber (pending) square on the grid to approve it**.
   Pending squares **pulse amber**; approved go solid. **At lock, any still‑pending squares are
   auto‑approved.** The host's players list shows each player's **squares chosen + owed**.
+- **Reject needs a reason (BUG‑912).** Rejecting a square frees it back to empty **and** the host
+  must type a short **reason**. The rejected player sees it as an **on‑page banner** on the board
+  ("Your square R3·C7 wasn't approved — {reason}") **and** a bell notification — **never in chat**
+  (a reject stays private to that player). Driven by an unread `square_rejected` notification;
+  **Dismiss** marks it read. They can then claim another empty square.
 - **Live:** host enters each period's score (self‑report, like Last Longer) → the app
   highlights the winning cell (home last digit × away last digit) → marks the period
   winner → settled offline.

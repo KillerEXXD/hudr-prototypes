@@ -20,6 +20,8 @@ import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SquaresResults } from '@/components/squares/SquaresResults'
+import { SquaresRejectionBanner } from '@/components/squares/SquaresRejectionBanner'
+import { useNotifications, useMarkNotificationRead } from '@/hooks'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { HowItWorks } from '@/components/common/HowItWorks'
 import { cn } from '@/lib/utils/cn'
@@ -53,10 +55,17 @@ export function SquaresGamePage() {
   const extendReg = useExtendRegSquares()
   const closeReg = useCloseRegSquares()
   const cancel = useCancelSquares()
+  // Member "your square was rejected" banner is driven by unread square_rejected
+  // notifications for this game (the bell shares the source); Dismiss marks read.
+  const { data: notifData } = useNotifications()
+  const markNotifRead = useMarkNotificationRead()
   const [editRegOpen, setEditRegOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
   const [hover, setHover] = useState<{ name: string; color?: string; status?: string } | null>(null)
   const [cancelOpen, setCancelOpen] = useState(false)
+  // Host reject-with-reason: which pending square (cellIdx) is being rejected + its reason.
+  const [rejectingIdx, setRejectingIdx] = useState<number | null>(null)
+  const [rejectReason, setRejectReason] = useState('')
   const [completeAudit, setCompleteAudit] = useState<{ blockers: string[]; hint?: string } | null>(null)
 
   if (isLoading) return <Spinner label="Loading squares…" />
@@ -78,6 +87,8 @@ export function SquaresGamePage() {
   // squares awaiting host approval (registration only) — drives the host queue + grid pulse
   const hostCanApprove = g.canManage && g.status === 'registration'
   const pendingClaims = g.status === 'registration' ? g.cells.map((c, i) => ({ c, i })).filter((x) => x.c.userId && !x.c.approved) : []
+  // Unread "your square was rejected" notices for THIS board → member banner.
+  const myRejections = (notifData?.items ?? []).filter((n) => n.type === 'square_rejected' && n.gameId === g.id && !n.read)
 
   const winners = new Map<number, string>()
   g.periods.forEach((p) => { if (p.winnerCell != null) winners.set(p.winnerCell, p.label) })
@@ -119,6 +130,10 @@ export function SquaresGamePage() {
           <div><p className="text-sm font-bold text-text-primary">Game cancelled by the host</p>{g.cancelReason && <p className="mt-0.5 text-xs text-text-secondary">{g.cancelReason}</p>}</div>
         </Card>
       )}
+
+      {/* Member banner — the host rejected one or more of your pending squares, with
+          their reason. Driven by unread square_rejected notifications (never chat). */}
+      {!isAdmin && <SquaresRejectionBanner rejections={myRejections} onDismiss={(nid) => markNotifRead.mutate(nid)} canClaimMore={g.status === 'registration'} />}
 
       {g.status !== 'cancelled' && (!g.isMemberOfClub && !g.canManage ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to claim squares.</p></Card>
@@ -204,7 +219,7 @@ export function SquaresGamePage() {
               const isCo = g.coHostIds.includes(p.userId) && !isHost
               const row = (
                 <>
-                  <Avatar name={p.name} color={p.avatarColor} size={28} />
+                  <Avatar name={p.name} color={p.avatarColor} pic={p.avatarUrl} size={28} />
                   <span className="flex min-w-0 flex-1 items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co-host</Badge>}</span>
                   {p.status === 'pending' ? <Badge tone="amber">Pending</Badge> : <span className="flex items-center gap-1 text-[11px] text-accent-emerald"><Check className="h-3.5 w-3.5" />In</span>}
                 </>
@@ -261,13 +276,30 @@ export function SquaresGamePage() {
               </div>
               <div className="flex max-h-56 flex-col gap-1.5 overflow-y-auto scrollbar-thin">
                 {pendingClaims.map(({ c, i }) => (
-                  <div key={i} className="relative flex items-center gap-2 rounded-lg border border-border bg-bg-card px-2.5 py-1.5">
-                    {((approveCell.isPending && approveCell.variables?.cellIdx === i) || (rejectCell.isPending && rejectCell.variables?.cellIdx === i)) && <ProcessingOverlay className="rounded-lg" />}
-                    <Avatar name={c.name} color={c.avatarColor} size={24} />
-                    <button onClick={() => navigate(`/member/${c.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{c.name}</button>
-                    <span className="font-mono text-[10px] text-text-muted">R{Math.floor(i / 10) + 1}·C{(i % 10) + 1}</span>
-                    <button onClick={() => approveCell.mutate({ gameId: g.id, cellIdx: i })} title="Approve square" className="flex h-7 w-7 items-center justify-center rounded-lg border border-accent-emerald/30 bg-accent-emerald/10 text-accent-emerald hover:bg-accent-emerald/20 cursor-pointer"><Check className="h-3.5 w-3.5" /></button>
-                    <button onClick={() => rejectCell.mutate({ gameId: g.id, cellIdx: i })} title="Reject (frees the square)" className="flex h-7 w-7 items-center justify-center rounded-lg border border-accent-red/30 bg-accent-red/10 text-accent-red hover:bg-accent-red/20 cursor-pointer"><X className="h-3.5 w-3.5" /></button>
+                  <div key={i} className="flex flex-col gap-1.5">
+                    <div className="relative flex items-center gap-2 rounded-lg border border-border bg-bg-card px-2.5 py-1.5">
+                      {((approveCell.isPending && approveCell.variables?.cellIdx === i) || (rejectCell.isPending && rejectCell.variables?.cellIdx === i)) && <ProcessingOverlay className="rounded-lg" />}
+                      <Avatar name={c.name} color={c.avatarColor} size={24} />
+                      <button type="button" onClick={() => navigate(`/member/${c.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{c.name}</button>
+                      <span className="font-mono text-[10px] text-text-muted">R{Math.floor(i / 10) + 1}·C{(i % 10) + 1}</span>
+                      <button type="button" onClick={() => approveCell.mutate({ gameId: g.id, cellIdx: i })} title="Approve square" className="flex h-7 w-7 items-center justify-center rounded-lg border border-accent-emerald/30 bg-accent-emerald/10 text-accent-emerald hover:bg-accent-emerald/20 cursor-pointer"><Check className="h-3.5 w-3.5" /></button>
+                      <button type="button" onClick={() => { setRejectingIdx(rejectingIdx === i ? null : i); setRejectReason('') }} title="Reject (frees the square)" className={cn('flex h-7 w-7 items-center justify-center rounded-lg border text-accent-red cursor-pointer', rejectingIdx === i ? 'border-accent-red bg-accent-red/20' : 'border-accent-red/30 bg-accent-red/10 hover:bg-accent-red/20')}><X className="h-3.5 w-3.5" /></button>
+                    </div>
+                    {rejectingIdx === i && (
+                      <div className="rounded-lg border border-accent-red/30 bg-accent-red/5 p-2">
+                        <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} maxLength={200} rows={2} autoFocus
+                          placeholder={`Why isn’t ${c.name}’s square approved? They'll see this.`}
+                          className="w-full resize-none rounded-md border border-border bg-bg-card px-2 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:border-accent-red focus:outline-none" />
+                        <div className="mt-1.5 flex items-center justify-end gap-3">
+                          <button type="button" onClick={() => { setRejectingIdx(null); setRejectReason('') }} className="text-[11px] font-semibold text-text-muted hover:text-text-primary cursor-pointer">Cancel</button>
+                          <button type="button" disabled={!rejectReason.trim() || (rejectCell.isPending && rejectCell.variables?.cellIdx === i)}
+                            onClick={() => rejectCell.mutate({ gameId: g.id, cellIdx: i, reason: rejectReason.trim() }, { onSuccess: () => { setRejectingIdx(null); setRejectReason('') } })}
+                            className="flex items-center gap-1 rounded-lg bg-accent-red px-3 py-1.5 text-xs font-bold text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
+                            {rejectCell.isPending && rejectCell.variables?.cellIdx === i ? <Processing size={12} count={1} /> : <X className="h-3.5 w-3.5" />}Reject square
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -279,7 +311,7 @@ export function SquaresGamePage() {
               {pending.map((p) => (
                 <div key={p.userId} className="relative flex items-center gap-2.5 rounded-xl border border-dashed border-accent-amber/40 bg-accent-amber/5 px-3 py-2">
                   {decline.isPending && decline.variables?.userId === p.userId && <ProcessingOverlay label="Declining…" className="rounded-xl" />}
-                  <Avatar name={p.name} color={p.avatarColor} size={28} />
+                  <Avatar name={p.name} color={p.avatarColor} pic={p.avatarUrl} size={28} />
                   <button onClick={() => navigate(`/member/${p.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{p.name}</button>
                   <Btn size="sm" loading={approve.isPending && approve.variables?.userId === p.userId} onClick={() => approve.mutate({ gameId: g.id, userId: p.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn>
                   <button onClick={() => decline.mutate({ gameId: g.id, userId: p.userId })} className="text-[11px] text-text-muted hover:text-accent-red cursor-pointer">✕</button>
@@ -300,7 +332,7 @@ export function SquaresGamePage() {
                 const pend = owned.filter((c) => !c.approved).length
                 return (
                   <div key={p.userId} className="flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-1.5">
-                    <Avatar name={p.name} color={p.avatarColor} size={26} />
+                    <Avatar name={p.name} color={p.avatarColor} pic={p.avatarUrl} size={26} />
                     <button onClick={() => navigate(`/member/${p.userId}`)} className="min-w-0 flex-1 truncate text-left text-sm text-text-primary cursor-pointer">{p.name}{p.userId === g.hostId && <Crown className="ml-1 inline h-3 w-3 text-accent-emerald" />}</button>
                     {g.coHostIds.includes(p.userId) && p.userId !== g.hostId && <Badge tone="blue">Co-host</Badge>}
                     <div className="shrink-0 text-right leading-tight">

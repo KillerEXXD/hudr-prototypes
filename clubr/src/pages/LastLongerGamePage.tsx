@@ -238,7 +238,7 @@ export function LastLongerGamePage() {
                 <div key={p.userId} className="relative flex items-center gap-2.5 rounded-xl border border-dashed border-accent-amber/40 bg-accent-amber/5 px-3 py-2">
                   {decline.isPending && decline.variables?.userId === p.userId && <ProcessingOverlay label="Declining…" />}
                   <button onClick={() => navigate(`/member/${p.userId}`)} disabled={!g.canManage} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
-                    <Avatar name={p.name} color={p.avatarColor} size={30} />
+                    <Avatar name={p.name} color={p.avatarColor} pic={p.avatarUrl} size={30} />
                     <span className="min-w-0 flex-1 truncate text-sm text-text-primary">{p.name} <Badge tone="amber">Waiting</Badge></span>
                   </button>
                   {g.canManage && <><Btn size="sm" loading={approve.isPending && approve.variables?.userId === p.userId} onClick={() => approve.mutate({ gameId: g.id, userId: p.userId })}><Check className="h-3.5 w-3.5" />Admit</Btn><button onClick={() => decline.mutate({ gameId: g.id, userId: p.userId })} className="text-[11px] text-text-muted hover:text-accent-red cursor-pointer">✕</button></>}
@@ -308,7 +308,7 @@ function Row({ p, rank, g, me, canManage, paidBusy, bustBusy, onPaid, onBust, on
       {bustBusy && <ProcessingOverlay label="Busting…" />}
       <span className="w-5 text-center text-sm font-extrabold text-text-muted">{rank}</span>
       <button onClick={onProfile} disabled={!onProfile} className="flex min-w-0 flex-1 items-center gap-2.5 text-left enabled:cursor-pointer">
-        <Avatar name={p.name} color={p.avatarColor} size={32} />
+        <Avatar name={p.name} color={p.avatarColor} pic={p.avatarUrl} size={32} />
         <span className="flex min-w-0 items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{p.userId === me && <span className="text-[10px] text-accent-blue">(you)</span>}{isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co</Badge>}</span>
       </button>
       {/* Prominent chip stack — headline metric, right-aligned; time as a small subline. */}

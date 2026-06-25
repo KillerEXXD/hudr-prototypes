@@ -25,6 +25,8 @@ interface AuthCtx {
   signUp: (name: string, email: string, phone: string, location?: string) => User
   /** Update the signed-in user's name/email. Changing the email marks it unverified. */
   updateProfile: (patch: { name: string; email: string; city?: string }) => void
+  /** Set (or clear, with null) the signed-in user's profile picture. Clearing falls back to initials. */
+  setAvatar: (avatarUrl: string | null) => void
   /** Mock email verification (the real app confirms via a magic link). */
   verifyEmail: () => void
   /** Re-read the signed-in user from the store (e.g. after creating a club promotes the role). */
@@ -91,6 +93,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const setAvatar = useCallback((avatarUrl: string | null) => {
+    setUser((prev) => {
+      if (!prev) return prev
+      const u: User = { ...prev, avatarUrl }
+      // Mutate the store too so entrants / member lists (which read USERS) update.
+      USERS[u.id] = u; persist(u)
+      return u
+    })
+  }, [])
+
   const verifyEmail = useCallback(() => {
     setUser((prev) => {
       if (!prev) return prev
@@ -119,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try { localStorage.setItem(ACTING_KEY, role) } catch { /* ignore */ }
   }, [])
 
-  return <Ctx.Provider value={{ user: effectiveUser, realRole, actAs, loginAs, signUp, updateProfile, verifyEmail, refreshUser, logout }}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={{ user: effectiveUser, realRole, actAs, loginAs, signUp, updateProfile, setAvatar, verifyEmail, refreshUser, logout }}>{children}</Ctx.Provider>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

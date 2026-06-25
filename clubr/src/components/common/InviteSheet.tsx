@@ -25,7 +25,7 @@ export function InviteSheet({ open, onClose, clubId, accessUserIds, accent = 'pu
             const on = sel.includes(m.userId)
             return (
               <button key={m.userId} onClick={() => setSel((s) => on ? s.filter((x) => x !== m.userId) : [...s, m.userId])} className={cn('flex items-center gap-2.5 rounded-xl border p-2 text-left cursor-pointer', on ? onCls : 'border-border hover:bg-bg-surface')}>
-                <Avatar name={m.name} color={m.avatarColor} size={30} />
+                <Avatar name={m.name} color={m.avatarColor} pic={m.avatarUrl} size={30} />
                 <span className="flex-1 truncate text-sm text-text-primary">{m.name}</span>
                 <input type="checkbox" readOnly checked={on} className="pointer-events-none" />
               </button>

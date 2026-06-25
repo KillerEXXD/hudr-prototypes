@@ -65,7 +65,7 @@ export function ClubRow({ club, right }: { club: ClubView; right?: React.ReactNo
           <p className="px-1 text-[10px] font-bold uppercase tracking-wide text-accent-amber">Waiting to be approved</p>
           {pending.map((m) => (
             <div key={m.userId} className="relative flex items-center gap-2 rounded-lg bg-bg-card px-2 py-1.5">
-              <Avatar name={m.name} color={m.avatarColor} size={26} />
+              <Avatar name={m.name} color={m.avatarColor} pic={m.avatarUrl} size={26} />
               <span className="min-w-0 flex-1 truncate text-sm font-semibold text-text-primary">{m.name}</span>
               <Btn size="sm" loading={approve.isPending && approve.variables?.userId === m.userId} onClick={() => approve.mutate({ clubId: club.id, userId: m.userId })}><UserCheck className="h-3.5 w-3.5" />Approve</Btn>
               <button type="button" onClick={() => reject.mutate({ clubId: club.id, userId: m.userId })} className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-accent-red/10 hover:text-accent-red cursor-pointer" aria-label={`Reject ${m.name}`}><X className="h-3.5 w-3.5" /></button>

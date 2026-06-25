@@ -34,7 +34,7 @@ export function CoHostSheet({ open, onClose, g, assign, remove }: {
             return (
               <div key={p.userId} className="relative flex items-center gap-2.5 rounded-xl border border-border bg-bg-card px-3 py-2">
                 {(adding || removing) && <ProcessingOverlay />}
-                <Avatar name={p.name} color={p.avatarColor} size={32} />
+                <Avatar name={p.name} color={p.avatarColor} pic={p.avatarUrl} size={32} />
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{p.name}{isCo && <Badge tone="blue"><Shield className="h-2.5 w-2.5" />Co-host</Badge>}</p>
                   <p className="font-mono text-[11px] text-text-muted">{fmtChips(p.chips)} · <span className={p.status === 'active' ? 'font-semibold text-accent-emerald' : 'text-text-muted'}>{p.status === 'active' ? 'In' : 'Out'}</span></p>

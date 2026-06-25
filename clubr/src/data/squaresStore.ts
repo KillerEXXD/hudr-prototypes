@@ -4,7 +4,7 @@ import { USERS } from '@/data/store'
 
 const u = USERS
 const part = (id: string, status: SquaresParticipant['status'], paid: boolean): SquaresParticipant =>
-  ({ userId: id, name: u[id].name, avatarColor: u[id].avatarColor, status, paid })
+  ({ userId: id, name: u[id].name, avatarColor: u[id].avatarColor, avatarUrl: u[id].avatarUrl, status, paid })
 const claim = (cells: SquaresCell[], idx: number, id: string, approved = true) => { cells[idx] = { userId: id, name: u[id].name, avatarColor: u[id].avatarColor, approved } }
 
 // ---- registration board: claims open, digits still sealed (all host-approved already) ----

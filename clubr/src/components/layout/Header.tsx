@@ -40,7 +40,7 @@ export function Header() {
         <NotificationBell />
         {/* The avatar is a shortcut to the account home (the "Me" tab) — not a
             second account surface. The demo account-switcher lives on /me. */}
-        <button onClick={() => onMe ? navigate(-1) : navigate('/me')} aria-label={onMe ? 'Close account' : 'Your account'} title={onMe ? 'Close account' : 'Your account'} aria-pressed={onMe}><Avatar name={user.name} color={user.avatarColor} size={32} /></button>
+        <button onClick={() => onMe ? navigate(-1) : navigate('/me')} aria-label={onMe ? 'Close account' : 'Your account'} title={onMe ? 'Close account' : 'Your account'} aria-pressed={onMe}><Avatar name={user.name} color={user.avatarColor} pic={user.avatarUrl} size={32} /></button>
       </div>
     </header>
   )

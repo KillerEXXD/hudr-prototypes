@@ -47,9 +47,27 @@ export const USERS: Record<string, User> = {
   u_tch_p9: { id: 'u_tch_p9', name: 'Andrew Todhunter', handle: 'andrewt', email: 'andrew@example', location: 'Dallas, TX', role: 'member', avatarColor: '#ec4899' },
 }
 
+// ---- Profile pictures ----
+// A nice, fun, deterministic avatar per player (DiceBear). A few players are left
+// WITHOUT a picture on purpose to show the "No profile pic → initials" fallback.
+// When real (Midjourney) avatars are wired in, this pool is swapped for the
+// User-Profile emblem library; nothing else changes.
+const AVATAR_STYLES = ['adventurer', 'big-smile', 'avataaars', 'micah', 'lorelei', 'notionists', 'open-peeps', 'personas', 'miniavs', 'thumbs']
+const AVATAR_BG = 'b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf,a0e7e5,fdffb6,caffbf,ffadad'
+/** Build a bright, fun DiceBear avatar URL, deterministic from a seed. */
+export function demoAvatarUrl(seed: string, i: number): string {
+  const style = AVATAR_STYLES[i % AVATAR_STYLES.length]
+  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${AVATAR_BG}&radius=50`
+}
+// Players who keep initials (no picture) — demonstrates the opt-out.
+const NO_PIC = new Set(['u_tom', 'u_cody', 'u_tch_p5'])
+Object.values(USERS).forEach((usr, i) => {
+  if (usr.avatarUrl === undefined && !NO_PIC.has(usr.id)) usr.avatarUrl = demoAvatarUrl(usr.handle || usr.id, i)
+})
+
 const u = USERS
 function member(id: string, role: 'owner' | 'member', status: 'pending' | 'member', joinedAt: string) {
-  return { userId: id, name: u[id].name, handle: u[id].handle, avatarColor: u[id].avatarColor, role, status, joinedAt }
+  return { userId: id, name: u[id].name, handle: u[id].handle, avatarColor: u[id].avatarColor, avatarUrl: u[id].avatarUrl, role, status, joinedAt }
 }
 
 // ---- Clubs (mutable — join requests + approvals change these) ----

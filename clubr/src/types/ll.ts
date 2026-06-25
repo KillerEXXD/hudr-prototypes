@@ -10,6 +10,7 @@ export interface LLParticipant {
   userId: string
   name: string
   avatarColor: string
+  avatarUrl?: string | null
   status: LLParticipantStatus
   paid: boolean
   chips: number

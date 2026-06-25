@@ -77,7 +77,7 @@ export function SettledResult({ c, meId }: { c: FTContestView; meId?: string }) 
                   wta && i !== 0 && 'opacity-70')}
               >
                 <span className="w-6 text-center text-sm font-extrabold text-text-muted">{medal(i)}</span>
-                <Avatar name={e.name} color={e.avatarColor} size={30} />
+                <Avatar name={e.name} color={e.avatarColor} pic={e.avatarUrl} size={30} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-text-primary">{e.name}{e.userId === meId && <span className="ml-1 text-[10px] text-accent-blue">(you)</span>}</p>
                   <p className="truncate text-[11px] text-text-muted">{picksToNames(e.picks, c.players)}</p>

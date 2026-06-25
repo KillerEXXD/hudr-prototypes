@@ -183,7 +183,7 @@ export function ContestDetailPage() {
             {c.entries.filter((e) => e.status === 'approved').map((e) => (
               <div key={e.userId} className="flex flex-col gap-1.5 rounded-xl border border-border bg-bg-card px-3 py-2.5">
                 <div className="flex items-center gap-2.5">
-                  <Avatar name={e.name} color={e.avatarColor} size={28} />
+                  <Avatar name={e.name} color={e.avatarColor} pic={e.avatarUrl} size={28} />
                   <span className="flex-1 truncate text-sm font-semibold text-text-primary">{e.name}{e.userId === user?.id && <span className="ml-1 text-[10px] text-accent-blue">(you)</span>}</span>
                   <span className="font-mono text-xs font-bold text-accent-purple">{fmtK(e.spend)}<span className="font-sans font-normal text-text-muted"> spent</span></span>
                 </div>
@@ -215,7 +215,7 @@ export function ContestDetailPage() {
               return (
                 <Card key={e.userId} className="relative flex items-center gap-2.5 p-2.5">
                   <button onClick={() => navigate(`/member/${e.userId}`)} className="flex min-w-0 flex-1 items-center gap-2.5 text-left cursor-pointer">
-                    <Avatar name={e.name} color={e.avatarColor} size={34} />
+                    <Avatar name={e.name} color={e.avatarColor} pic={e.avatarUrl} size={34} />
                     <div className="min-w-0 flex-1">
                       <p className="flex items-center gap-1 truncate text-sm font-semibold text-text-primary">{e.name}
                         {isHost && <Crown className="h-3 w-3 text-accent-emerald" />}{isCo && <Badge tone="blue">Co-host</Badge>}

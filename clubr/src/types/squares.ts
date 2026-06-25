@@ -31,6 +31,7 @@ export interface SquaresParticipant {
   userId: string
   name: string
   avatarColor: string
+  avatarUrl?: string | null
   status: 'pending' | 'active'   // approved to claim
   paid: boolean
   joinedAt?: string              // ISO; when they joined — Playing/Hosting "latest joined" sort

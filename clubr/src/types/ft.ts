@@ -21,6 +21,7 @@ export interface ContestEntry {
   userId: string
   name: string
   avatarColor: string
+  avatarUrl?: string | null
   status: EntryStatus
   /** Subtle green/grey toggle — host/co-host only; player sees it read-only. */
   paid: boolean

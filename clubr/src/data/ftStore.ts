@@ -95,7 +95,7 @@ export function spendOf(picks: string[]): number {
 
 function entry(userId: string, status: 'pending' | 'approved', paid: boolean, picks: string[] = []): ContestEntry {
   const u = USERS[userId]
-  return { userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status, paid, picks, spend: spendOf(picks) }
+  return { userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', avatarUrl: u?.avatarUrl, status, paid, picks, spend: spendOf(picks) }
 }
 
 let _cid = 0

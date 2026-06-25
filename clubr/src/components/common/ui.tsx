@@ -44,8 +44,22 @@ export function ProcessingOverlay({ label, className }: { label?: string; classN
 }
 
 // ---- Avatar ----
-export function Avatar({ name, color, size = 36, emoji }: { name?: string; color?: string; size?: number; emoji?: string }) {
+// Shows a profile picture when `pic` is set; otherwise falls back to the
+// coloured initials (a user who chooses "No profile pic" keeps initials).
+// The picture renders at the EXACT same size as the initials circle.
+export function Avatar({ name, color, size = 36, emoji, pic }: { name?: string; color?: string; size?: number; emoji?: string; pic?: string | null }) {
   const initials = (name ?? '?').split(' ').map((s) => s[0]).slice(0, 2).join('').toUpperCase()
+  if (pic) {
+    return (
+      <img
+        src={pic}
+        alt={name ?? ''}
+        loading="lazy"
+        className="inline-block shrink-0 rounded-full object-cover bg-bg-surface"
+        style={{ width: size, height: size }}
+      />
+    )
+  }
   return (
     <span
       className="inline-flex shrink-0 items-center justify-center rounded-full font-bold text-white"

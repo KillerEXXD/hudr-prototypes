@@ -5,7 +5,7 @@ import type { LLGame, LLParticipant } from '@/types/ll'
 
 function p(userId: string, status: LLParticipant['status'], paid: boolean, chips: number, ago: string, stale = false, finishPos?: number, bustedAgo?: string): LLParticipant {
   const u = USERS[userId]
-  return { userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', status, paid, chips, chipsUpdatedAgo: ago, stale, finishPos, bustedAgo }
+  return { userId, name: u?.name ?? 'Guest', avatarColor: u?.avatarColor ?? '#6b7280', avatarUrl: u?.avatarUrl, status, paid, chips, chipsUpdatedAgo: ago, stale, finishPos, bustedAgo }
 }
 
 let _cid = 0

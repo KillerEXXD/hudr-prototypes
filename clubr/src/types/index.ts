@@ -18,6 +18,8 @@ export interface User {
   location?: string
   role: AccountRole
   avatarColor: string
+  /** Optional profile picture URL. When empty, the UI shows coloured initials. */
+  avatarUrl?: string | null
   /** Whether the email has been confirmed (mock). Changing the email resets this to false. */
   emailVerified?: boolean
   /** Telegram handle once the user links their Telegram account to ClubR (mock). */
@@ -44,6 +46,7 @@ export interface ClubMember {
   name: string
   handle: string
   avatarColor: string
+  avatarUrl?: string | null
   role: MemberRole
   status: MemberStatus
   joinedAt: string
@@ -89,7 +92,7 @@ export interface ClubView extends Club {
 // NOTIFICATIONS
 // =====================================================================
 
-export type NotificationType = 'club_join_request' | 'club_join_approved' | 'club_join_declined' | 'game_join_request' | 'game_join_approved' | 'game_join_declined'
+export type NotificationType = 'club_join_request' | 'club_join_approved' | 'club_join_declined' | 'game_join_request' | 'game_join_approved' | 'game_join_declined' | 'square_rejected'
 
 /** An in-app notification targeted at one recipient (the header bell). */
 export interface AppNotification {

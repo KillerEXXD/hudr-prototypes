@@ -18,6 +18,8 @@ const STYLE: Record<NotificationType, { icon: typeof UserPlus; color: string; bg
   game_join_request:  { icon: Gamepad2,     color: 'text-accent-purple',  bg: 'bg-accent-purple/15' },
   game_join_approved: { icon: PartyPopper,  color: 'text-accent-amber',   bg: 'bg-accent-amber/15' },
   game_join_declined: { icon: XCircle,      color: 'text-text-secondary', bg: 'bg-bg-surface' },
+  // A Football-Squares square the host rejected (with a reason) — red to read as a setback.
+  square_rejected:    { icon: XCircle,      color: 'text-accent-red',     bg: 'bg-accent-red/15' },
 }
 const FALLBACK = { icon: Bell, color: 'text-text-secondary', bg: 'bg-bg-surface' }
 

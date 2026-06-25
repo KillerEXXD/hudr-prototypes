@@ -24,7 +24,7 @@ export function useDeclineSquares() { const inv = useInvalidate(); return useMut
 export function useToggleSquaresPaid() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; userId: string }) => sq.toggleSquaresPaid(v.gameId, v.userId), onSuccess: inv }) }
 export function useClaimSquare() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; cellIdx: number }) => sq.claimSquare(v.gameId, userId, v.cellIdx), onSuccess: inv }) }
 export function useApproveSquareClaim() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; cellIdx: number }) => sq.approveSquareClaim(v.gameId, v.cellIdx), onSuccess: inv }) }
-export function useRejectSquareClaim() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; cellIdx: number }) => sq.rejectSquareClaim(v.gameId, v.cellIdx), onSuccess: inv }) }
+export function useRejectSquareClaim() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; cellIdx: number; reason: string }) => sq.rejectSquareClaim(v.gameId, v.cellIdx, v.reason), onSuccess: inv }) }
 export function useApproveAllSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => sq.approveAllSquares(gameId), onSuccess: inv }) }
 export function useLockSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (gameId: string) => sq.lockSquares(gameId), onSuccess: inv }) }
 export function useExtendRegSquares() { const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; closesAt: string }) => sq.extendRegistration(v.gameId, v.closesAt), onSuccess: inv }) }
