@@ -1,75 +1,99 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Compass, Home, Users, Gamepad2, CircleUser } from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
+import { Home, Radio, Plus } from 'lucide-react'
 import { useOnboardingStage } from '@/hooks/useOnboardingStage'
-import type { NavTab } from '@/lib/onboarding/resolveOnboarding'
+import { useUnifiedGames } from '@/games/useUnifiedGames'
+import { isLiveForMe, isFinishedForMe } from '@/games/liveBuckets'
+import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { cn } from '@/lib/utils/cn'
 
-// Tabs the user has already seen revealed — so a newly-unlocked tab pulses exactly
-// once (Phase 6), never again, and existing tabs never pulse on a normal load.
-const SEEN_KEY = (uid: string) => `clubr-onb-seentabs:${uid}`
-function readSeen(uid: string): string[] {
-  if (typeof window === 'undefined' || !uid) return []
-  try { return JSON.parse(window.localStorage.getItem(SEEN_KEY(uid)) ?? '[]') as string[] } catch { return [] }
-}
-
-const REST = [
-  { tab: 'clubs' as NavTab, to: '/clubs', label: 'Clubs', icon: Users, match: (p: string) => p === '/clubs' || p.startsWith('/club/') },
-  { tab: 'games' as NavTab, to: '/games', label: 'Games', icon: Gamepad2, match: (p: string) => p.startsWith('/games') || p.startsWith('/fantasy') || p.startsWith('/lastlonger') || p.startsWith('/squares') },
-  { tab: 'me' as NavTab, to: '/me', label: 'Me', icon: CircleUser, match: (p: string) => p.startsWith('/me') || p.startsWith('/admin') },
-]
-
+/**
+ * The bottom nav is a raised center "+" FAB (ALWAYS present — the single entry point
+ * for creating a club or a game) with a tiny progressive bar around it:
+ *   • Stage 0 (no club) → just the "+".
+ *   • Has a club → Home · + · Live.
+ * No Clubs/Games/Me tabs: profile is the Header avatar, and your clubs + "find new
+ * clubs" live in the Home "Your clubs" carousel.
+ *
+ * The Live tab is smart: it opens the games you're in (Live), or your history
+ * (Finished) when nothing is live, or — when you have no games at all — shows a
+ * transient "No live games right now" popup without navigating anywhere.
+ */
 export function BottomNav() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const { user } = useAuth()
-  // Progressive reveal: only the tabs the user has earned (Home always; Clubs+Games on
-  // a confirmed club; Me after the first settled game). See useOnboardingStage.
   const { unlockedTabs } = useOnboardingStage()
-  // One-time reveal pulse: a tab the user hasn't seen before glows briefly, then is
-  // marked seen so it won't pulse again.
-  const uid = user?.id ?? ''
-  const [seen, setSeen] = useState<string[]>(() => readSeen(uid))
-  useEffect(() => { setSeen(readSeen(uid)) }, [uid])
-  const revealable = unlockedTabs.filter((t) => t !== 'home')
-  const newTabs = revealable.filter((t) => !seen.includes(t))
+  const showHome = unlockedTabs.includes('home')
+  const showLive = unlockedTabs.includes('live')
+
+  // Live counts drive the tap behavior.
+  const { items } = useUnifiedGames()
+  const liveCount = items.filter(isLiveForMe).length
+  const finishedCount = items.filter(isFinishedForMe).length
+
+  const [createOpen, setCreateOpen] = useState(false)
+  const [noLive, setNoLive] = useState(false)
   useEffect(() => {
-    if (!uid || newTabs.length === 0) return
-    const id = window.setTimeout(() => {
-      const next = Array.from(new Set([...seen, ...revealable]))
-      window.localStorage.setItem(SEEN_KEY(uid), JSON.stringify(next))
-      setSeen(next)
-    }, 2400)
+    if (!noLive) return
+    const id = window.setTimeout(() => setNoLive(false), 2400)
     return () => window.clearTimeout(id)
-  }, [uid, newTabs.join(','), seen, revealable.join(',')])
-  // First tab is role-aware: Members browse via "Discover"; Owners & Admins land on "Home".
-  // /host-ft (choose-an-FT-to-host) is reached from the owner Home, so it keeps Home lit.
-  const first = user?.role === 'member'
-    ? { tab: 'home' as NavTab, to: '/', label: 'Discover', icon: Compass, match: (p: string) => p === '/' }
-    : { tab: 'home' as NavTab, to: '/', label: 'Home', icon: Home, match: (p: string) => p === '/' || p.startsWith('/host-ft') }
-  const ITEMS = [first, ...REST].filter((it) => unlockedTabs.includes(it.tab))
-  // A lone Home tab reads as a broken nav — hide the bar entirely until a 2nd tab unlocks.
-  if (ITEMS.length < 2) return null
+  }, [noLive])
+
+  const homeActive = pathname === '/' || pathname.startsWith('/host-ft')
+  const liveActive = pathname.startsWith('/live') || pathname.startsWith('/games') || pathname.startsWith('/fantasy') || pathname.startsWith('/lastlonger') || pathname.startsWith('/squares')
+
+  const onLive = () => {
+    if (liveCount > 0) navigate('/live?view=live')
+    else if (finishedCount > 0) navigate('/live?view=finished')
+    else setNoLive(true)
+  }
+
   return (
-    <nav className="sticky bottom-0 z-30 border-t border-border bg-bg-secondary/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
-      <div className="mx-auto flex max-w-md items-stretch">
-        {ITEMS.map((it) => {
-          const active = it.match(pathname)
-          const isNew = newTabs.includes(it.tab)
-          const Icon = it.icon
-          return (
+    <>
+      <nav className="sticky bottom-0 z-30 border-t border-border bg-bg-secondary/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
+        <div className="relative mx-auto flex max-w-md items-stretch">
+          {/* Left: Home */}
+          <div className="flex flex-1 items-stretch">
+            {showHome && <NavBtn active={homeActive} onClick={() => navigate('/')} icon={Home} label="Home" />}
+          </div>
+          {/* Center "+" FAB — raised, accent, always present. */}
+          <div className="flex shrink-0 items-center justify-center px-4">
             <button
-              key={it.to}
-              onClick={() => navigate(it.to)}
-              className={cn('flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold transition-colors cursor-pointer', active ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary', isNew && !active && 'animate-pulse')}
+              type="button"
+              onClick={() => setCreateOpen(true)}
+              aria-label="Create"
+              title="Create a club or a game"
+              className="-mt-5 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-accent-blue text-white shadow-lg shadow-accent-blue/40 ring-4 ring-bg-secondary transition-transform active:scale-95"
             >
-              <Icon className="h-5 w-5" strokeWidth={active || isNew ? 2.5 : 2} />
-              {it.label}
+              <Plus className="h-7 w-7" strokeWidth={2.6} />
             </button>
-          )
-        })}
-      </div>
-    </nav>
+          </div>
+          {/* Right: Live — smart tap (opens Live/Finished, or a popup when you have no games). */}
+          <div className="relative flex flex-1 items-stretch">
+            {showLive && <NavBtn active={liveActive} onClick={onLive} icon={Radio} label="Live" />}
+            {noLive && (
+              <div className="pointer-events-none absolute -top-11 right-1 z-10 whitespace-nowrap rounded-lg bg-bg-card px-3 py-1.5 text-xs font-semibold text-text-primary shadow-lg ring-1 ring-border animate-fade-up">
+                No live games right now
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <NewGameSheet open={createOpen} onClose={() => setCreateOpen(false)} />
+    </>
+  )
+}
+
+function NavBtn({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon: typeof Home; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn('flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold transition-colors cursor-pointer', active ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary')}
+    >
+      <Icon className="h-5 w-5" strokeWidth={active ? 2.5 : 2} />
+      {label}
+    </button>
   )
 }

@@ -7,7 +7,7 @@ import { ClubsPage } from '@/pages/ClubsPage'
 import { JoinClubsPage } from '@/pages/JoinClubsPage'
 import { ClubDetailPage } from '@/pages/ClubDetailPage'
 import { FantasyPage } from '@/pages/FantasyPage'
-import { GamesPage } from '@/pages/GamesPage'
+import { LivePage } from '@/pages/LivePage'
 import { HowGamesWorkPage } from '@/pages/HowGamesWorkPage'
 import { HostFTPage } from '@/pages/HostFTPage'
 import { ContestDetailPage } from '@/pages/ContestDetailPage'
@@ -29,7 +29,8 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/clubs" element={<ClubsPage />} />
         <Route path="/discover/clubs" element={<JoinClubsPage />} />
-        <Route path="/games" element={<GamesPage />} />
+        <Route path="/live" element={<LivePage />} />
+        <Route path="/games" element={<Navigate to="/live" replace />} />
         <Route path="/how-games-work" element={<HowGamesWorkPage />} />
         <Route path="/club/:id" element={<ClubDetailPage />} />
         <Route path="/fantasy" element={<FantasyPage />} />

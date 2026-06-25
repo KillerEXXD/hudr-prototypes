@@ -15,7 +15,7 @@
 // reached — EXCEPT a fully-emptied account, which the hook resets to 'fresh'.
 
 export type OnboardingStage = 'fresh' | 'connected' | 'playing' | 'settled'
-export type NavTab = 'home' | 'clubs' | 'games' | 'me'
+export type NavTab = 'home' | 'live'
 
 export interface OnboardingState {
   /** App Admins skip onboarding entirely — full nav. */
@@ -61,15 +61,16 @@ export function stageOf(s: OnboardingState): OnboardingStage {
  * avatar for players/hosts (admins get it via the resolve() admin branch instead).
  */
 export function tabsForStage(stage: OnboardingStage): NavTab[] {
-  const tabs: NavTab[] = ['home']
-  if (stageRank(stage) >= stageRank('connected')) tabs.push('clubs')
-  if (stageRank(stage) >= stageRank('playing')) tabs.push('games')
-  return tabs
+  // Stage 0 (no club): just the center "+" — no tabs. Once you have a club, the bar
+  // is Home · + · Live forever. Profile lives on the Header avatar; clubs + discovery
+  // live in the Home "Your clubs" carousel.
+  if (stage === 'fresh') return []
+  return ['home', 'live']
 }
 
 /** Pure resolve: footprint → { stage, unlockedTabs }. Admins get the full nav (incl. Me). */
 export function resolveOnboarding(s: OnboardingState): OnboardingResult {
-  if (s.isAdmin) return { stage: 'settled', unlockedTabs: ['home', 'clubs', 'games', 'me'] }
+  if (s.isAdmin) return { stage: 'settled', unlockedTabs: ['home', 'live'] }
   const stage = stageOf(s)
   return { stage, unlockedTabs: tabsForStage(stage) }
 }

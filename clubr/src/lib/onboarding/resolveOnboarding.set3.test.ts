@@ -7,11 +7,11 @@ import { resolveOnboarding, stageOf, tabsForStage, maxStage, stageRank, type Onb
 const base: OnboardingState = { isAdmin: false, isMemberOfAnyClub: false, isHost: false, hasActiveGame: false, hasSettledGame: false }
 
 describe('onboarding progressive reveal (Set 3 NAVX)', () => {
-  it('[NAVX-001] one tab at a time: fresh=Home; connected adds Clubs; playing adds Games; Me is never a tab', () => {
-    expect(tabsForStage('fresh')).toEqual(['home'])
-    expect(tabsForStage('connected')).toEqual(['home', 'clubs'])
-    expect(tabsForStage('playing')).toEqual(['home', 'clubs', 'games'])
-    expect(tabsForStage('settled')).toEqual(['home', 'clubs', 'games'])
+  it('[NAVX-001] fresh = no tabs (just "+"); every later stage = Home + Live (no Clubs/Games/Me tabs)', () => {
+    expect(tabsForStage('fresh')).toEqual([])
+    expect(tabsForStage('connected')).toEqual(['home', 'live'])
+    expect(tabsForStage('playing')).toEqual(['home', 'live'])
+    expect(tabsForStage('settled')).toEqual(['home', 'live'])
   })
 
   it('[NAVX] stageOf: member/host => connected; live game => playing; settled game => settled; else fresh', () => {
@@ -22,12 +22,12 @@ describe('onboarding progressive reveal (Set 3 NAVX)', () => {
     expect(stageOf({ ...base, isMemberOfAnyClub: true, isHost: true, hasSettledGame: true })).toBe('settled')
   })
 
-  it('[NAVX] a pending-only requester stays fresh (no lonely tab before real membership)', () => {
-    expect(resolveOnboarding(base).unlockedTabs).toEqual(['home'])
+  it('[NAVX] a pending-only requester stays fresh (no tabs at all before real membership)', () => {
+    expect(resolveOnboarding(base).unlockedTabs).toEqual([])
   })
 
-  it('[NAVX] App Admins skip onboarding -> full nav (incl. Me)', () => {
-    expect(resolveOnboarding({ ...base, isAdmin: true }).unlockedTabs).toEqual(['home', 'clubs', 'games', 'me'])
+  it('[NAVX] App Admins skip onboarding -> steady-state Home + Live', () => {
+    expect(resolveOnboarding({ ...base, isAdmin: true }).unlockedTabs).toEqual(['home', 'live'])
   })
 
   it('[NAVX] reveal is monotonic (maxStage never regresses; ranks are ordered)', () => {
