@@ -15,6 +15,7 @@ import { GAME_TYPES, type GameType } from '@/games/types'
 import { selectOpenGames } from '@/lib/discoverGames'
 import { cn } from '@/lib/utils/cn'
 import type { MemberRole } from '@/types'
+import { ClubCarouselPicker } from '@/components/carousel-lab/ClubCarouselPicker'
 
 // The games list stays short so it doesn't bury the rest — the full list is one
 // tap away ("See all" → the Games tab). Clubs-to-join lives in the shared
@@ -60,6 +61,9 @@ export function DiscoverPage() {
       <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-accent-blue"><Sparkles className="h-3.5 w-3.5" /> Discover</div>
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
       <p className="text-sm text-text-secondary">What's open in your clubs, and new clubs to join.</p>
+
+      {/* Carousel chooser — pick the engine; the selected one renders right here. */}
+      <ClubCarouselPicker />
 
       {/* Open now in YOUR clubs — leads the member view (real games, all types, capped). */}
       {gamesLoading ? (

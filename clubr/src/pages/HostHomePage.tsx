@@ -16,6 +16,7 @@ import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { cn } from '@/lib/utils/cn'
 import type { MemberRole } from '@/types'
+import { ClubCarouselPicker } from '@/components/carousel-lab/ClubCarouselPicker'
 
 function FilterChip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
   return (
@@ -85,6 +86,9 @@ export function HostHomePage() {
       <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-accent-emerald"><Home className="h-3.5 w-3.5" /> Home</div>
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
       <p className="text-sm text-text-secondary">Upcoming final tables available for you to host as Fantasy games in your club.</p>
+
+      {/* Carousel chooser — pick the engine; the selected one renders right here. */}
+      <ClubCarouselPicker />
 
       {/* ---- FTs to host — directly under the intro line it belongs to, so the slate the
               subtitle promises is the first thing a host sees (not buried below the
