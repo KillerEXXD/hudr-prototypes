@@ -411,6 +411,14 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
 - **Live:** host enters each period's score (self‑report, like Last Longer) → the app
   highlights the winning cell (home last digit × away last digit) → marks the period
   winner → settled offline.
+- **Results (Quarter cards).** Once scored, the four quarters render as a 2×2 grid
+  ordered by importance — **Final · Q3 · Q2 · Q1** — with **tiered badges** (Final
+  gold + crown ▸ Q3 silver ▸ Q2 bronze ▸ Q1 base). The **Final winner is crowned the
+  game's Champion** ("whoever wins the Final wins the game"). **LP weights by payout %**:
+  winning the Final (≈70%) earns far more LP than a regular quarter (≈10%), so the Final
+  winner tops the per‑game "+N LP" and the club board (§20). LP is **computed on read**,
+  so this weighting applies to **all past games** with no backfill. (`SquaresQuarterCards`,
+  `squaresAward`.)
 - **Host Complete / Cancel.** Entering the **Final** score is what completes the game
   (winner = the square on the final digits). For parity with LL/FT there's an explicit
   **Complete game** button that simply **guards** that: while in registration → audit
@@ -536,6 +544,12 @@ when the registration deadline elapses the badge stays **Registration open** and
   **"FTs to host"**. **Players never see the slate**; the Host page (`/host-ft`) is guarded.
 - **Entrants keep visibility:** a player can always see a contest/game they're **entered
   in**, even across clubs they're not a member of.
+- **"Your clubs" hero carousel + emblems:** the Home/Discover top rail is a scroll‑snap
+  **carousel** of the user's clubs (centre card scales, neighbours peek + dim). Each card
+  shows the club **emblem** (larger size), name, a role pill (Owner/Member/Waiting), city,
+  and the member **count**. Emblems are a procedural **"3‑D glass"** mark (glyph + gradient,
+  chosen in the picker) OR a curated **mascot** (`mascot:<subject>` → bundled image). The
+  mascot pack is the **pleasant** set only — gladiator, lion, eagle, dragon, bull, ram.
 
 ## 18. Multi‑game platform IA (scales to N game types)
 ClubR is a **multi‑game platform** (FT Fantasy, Last Longer, **Football Squares** next, more
