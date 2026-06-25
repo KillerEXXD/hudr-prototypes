@@ -10,7 +10,7 @@ import { applyActingRole, isActingRole } from '@/lib/auth/actingRole'
 
 const STORAGE_KEY = 'clubr-auth'
 const ACTING_KEY = 'clubr-acting-role'
-const ROLE_ACCOUNT: Record<AccountRole, string> = { admin: 'u_admin', host: 'u_host', player: 'u_player' }
+const ROLE_ACCOUNT: Record<AccountRole, string> = { admin: 'u_admin', owner: 'u_host', member: 'u_player' }
 const readActing = (): AccountRole | null => {
   try { const v = localStorage.getItem(ACTING_KEY); return isActingRole(v) ? v : null } catch { return null }
 }
@@ -19,7 +19,7 @@ interface AuthCtx {
   user: User | null
   /** The caller's REAL role. Drives whether the App Admin "acting as" switcher shows. */
   realRole: AccountRole | null
-  /** App Admin ONLY: view the app as App Admin / Club Host / Player. No-op for non-admins. */
+  /** App Admin ONLY: view the app as App Admin / Owner / Member. No-op for non-admins. */
   actAs: (role: AccountRole) => void
   loginAs: (role: AccountRole, userId?: string) => void
   signUp: (name: string, email: string, phone: string, location?: string) => User
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const id = nextId('u')
     const u: User = {
       id, name: name.trim() || 'New Player', handle: (name.trim().split(' ')[0] || 'player').toLowerCase(),
-      email: email.trim(), phone: phone.trim(), location: location?.trim() || undefined, role: 'player', avatarColor: '#3b82f6',
+      email: email.trim(), phone: phone.trim(), location: location?.trim() || undefined, role: 'member', avatarColor: '#3b82f6',
       emailVerified: false,
     }
     USERS[id] = u
@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Do NOT reset the skin on logout — a returning user keeps their chosen skin.
   }, [])
 
-  // App Admin "acting as": a real admin can view the app as Host/Player. Client-side
+  // App Admin "acting as": a real admin can view the app as Owner/Member. Client-side
   // view only — gated to real admins in the UI; non-admins are unaffected.
   const realRole = user?.role ?? null
   const effectiveUser = applyActingRole(user, actingRole)

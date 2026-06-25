@@ -8,9 +8,9 @@ import { NotificationBell } from '@/components/layout/NotificationBell'
 import type { AccountRole } from '@/types'
 
 const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' | 'blue'; icon: typeof UserIcon }> = {
-  admin: { label: 'App Admin', tone: 'purple', icon: ShieldCheck },
-  host: { label: 'Club Host', tone: 'green', icon: Crown },
-  player: { label: 'Player', tone: 'blue', icon: UserIcon },
+  admin: { label: 'Admin', tone: 'purple', icon: ShieldCheck },
+  owner: { label: 'Owner', tone: 'green', icon: Crown },
+  member: { label: 'Member', tone: 'blue', icon: UserIcon },
 }
 
 export function Header() {

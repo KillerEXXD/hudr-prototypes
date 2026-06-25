@@ -43,9 +43,9 @@ export function BottomNav() {
     }, 2400)
     return () => window.clearTimeout(id)
   }, [uid, newTabs.join(','), seen, revealable.join(',')])
-  // First tab is role-aware: Players browse via "Discover"; Hosts & Admins land on "Home".
-  // /host-ft (choose-an-FT-to-host) is reached from the host Home, so it keeps Home lit.
-  const first = user?.role === 'player'
+  // First tab is role-aware: Members browse via "Discover"; Owners & Admins land on "Home".
+  // /host-ft (choose-an-FT-to-host) is reached from the owner Home, so it keeps Home lit.
+  const first = user?.role === 'member'
     ? { tab: 'home' as NavTab, to: '/', label: 'Discover', icon: Compass, match: (p: string) => p === '/' }
     : { tab: 'home' as NavTab, to: '/', label: 'Home', icon: Home, match: (p: string) => p === '/' || p.startsWith('/host-ft') }
   const ITEMS = [first, ...REST].filter((it) => unlockedTabs.includes(it.tab))

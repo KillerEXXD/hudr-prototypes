@@ -5,7 +5,7 @@
 // =====================================================================
 
 /** Account type chosen at login. */
-export type AccountRole = 'admin' | 'host' | 'player'
+export type AccountRole = 'admin' | 'owner' | 'member'
 
 /** A logged-in user (the demo seeds one account per role). */
 export interface User {
@@ -37,7 +37,7 @@ export interface TelegramStatus {
 
 /** A member's standing inside one club. */
 export type MemberStatus = 'pending' | 'member'
-export type MemberRole = 'owner' | 'host' | 'member'
+export type MemberRole = 'owner' | 'member'
 
 export interface ClubMember {
   userId: string

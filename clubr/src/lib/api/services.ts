@@ -27,17 +27,17 @@ const randomCode = (n: number) => Array.from({ length: n }, () => CODE_ALPHABET[
 const readableCode = (name: string) => (name.replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase() || 'CLUB') + Math.floor(10 + Math.random() * 89)
 const codeFor = (name: string, visibility: 'public' | 'private') => (visibility === 'private' ? randomCode(8) : readableCode(name))
 
-/** Can this viewer see a PRIVATE club at all? Active member, owner/host, or app admin.
- *  Pending requesters are NOT included — they stay gated until the host admits them. */
+/** Can this viewer see a PRIVATE club at all? Active member, owner, or app admin.
+ *  Pending requesters are NOT included — they stay gated until the owner admits them. */
 function canSeePrivate(club: Club, userId: string, isAdmin: boolean): boolean {
   const me = club.members.find((m) => m.userId === userId)
-  return isAdmin || me?.role === 'owner' || me?.role === 'host' || me?.status === 'member'
+  return isAdmin || me?.role === 'owner' || me?.status === 'member'
 }
 
 function toView(club: Club, userId: string, isAdmin: boolean): ClubView {
   const me = club.members.find((m) => m.userId === userId)
   const myStatus = me ? me.status : 'none'
-  const canManage = isAdmin || me?.role === 'owner' || me?.role === 'host'
+  const canManage = isAdmin || me?.role === 'owner'
   return {
     ...club,
     myStatus,
@@ -146,8 +146,8 @@ export async function createClub(input: { name: string; emoji: string; descripti
     telegramSetupPending: input.telegram === true,
   }
   CLUBS.unshift(club)
-  // Creating a club makes you a host — Club Host takes precedence over Player.
-  if (u && u.role === 'player') u.role = 'host'
+  // Creating a club makes you an owner — Owner takes precedence over Member.
+  if (u && u.role === 'member') u.role = 'owner'
   return toView(club, userId, false)
 }
 

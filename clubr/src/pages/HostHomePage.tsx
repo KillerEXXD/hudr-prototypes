@@ -55,12 +55,12 @@ export function HostHomePage() {
   const [showHow, setShowHow] = useState(false)
   const [howOpenId, setHowOpenId] = useState<string | null>(null)
 
-  // Role per club — chips show owner/co-host/member on each card.
+  // Role per club — chips show owner/member on each card.
   const roleByClub = new Map<string, MemberRole>()
   for (const c of myClubs.data ?? []) if (c.myStatus === 'member' && c.myRole) roleByClub.set(c.id, c.myRole)
   // "FTs to host" only makes sense if you manage a club to host them in — hide it
-  // from users who don't own/host any club.
-  const hasManagedClub = [...roleByClub.values()].some((r) => r === 'owner' || r === 'host')
+  // from users who don't own any club.
+  const hasManagedClub = [...roleByClub.values()].some((r) => r === 'owner')
 
   const active = orderActiveGames(items) // closed dropped; reg-open before running
   const counts = { available: 0, playing: 0, hosting: 0 }
@@ -69,7 +69,7 @@ export function HostHomePage() {
   // Host first-run (Phase 5): owns/hosts a club but hasn't created a game yet → a
   // 3-step checklist that routes into the club. Collapses once they host a game.
   const hostedGame = items.some((g) => g.iHost)
-  const managedClub = (myClubs.data ?? []).find((c) => c.myStatus === 'member' && (c.myRole === 'owner' || c.myRole === 'host'))
+  const managedClub = (myClubs.data ?? []).find((c) => c.myStatus === 'member' && c.myRole === 'owner')
   const showFirstRun = !!managedClub && !hostedGame
   // Only buckets with data are shown; if the selected one is empty, fall back to
   // the first non-empty pill so the visible tab always has games.

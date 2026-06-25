@@ -9,10 +9,10 @@ import * as api from '@/lib/api/services'
 import type { AccountRole } from '@/types'
 
 const ROLES: { role: AccountRole; label: string; who: string; icon: typeof UserIcon; color: string; userId?: string }[] = [
-  { role: 'player', label: 'Player', who: 'Sam Rivers · joins clubs & plays', icon: UserIcon, color: '#3b82f6' },
-  { role: 'host', label: 'Aces High Host', who: 'Harper · owns "Aces High", approves members', icon: Crown, color: '#10b981' },
-  { role: 'host', label: 'Bayou City Poker Club Host', who: 'Marcus · owns "Bayou City Poker Club"', icon: Crown, color: '#a855f7', userId: 'u_cc_host' },
-  { role: 'host', label: 'Gulf Coast Card Club Host', who: 'Diana · owns "Gulf Coast Card Club"', icon: Crown, color: '#dc2626', userId: 'u_tch_host' },
+  { role: 'member', label: 'Member', who: 'Sam Rivers · joins clubs & plays', icon: UserIcon, color: '#3b82f6' },
+  { role: 'owner', label: 'Aces High Owner', who: 'Harper · owns "Aces High", approves members', icon: Crown, color: '#10b981' },
+  { role: 'owner', label: 'Bayou City Poker Club Owner', who: 'Marcus · owns "Bayou City Poker Club"', icon: Crown, color: '#a855f7', userId: 'u_cc_host' },
+  { role: 'owner', label: 'Gulf Coast Card Club Owner', who: 'Diana · owns "Gulf Coast Card Club"', icon: Crown, color: '#dc2626', userId: 'u_tch_host' },
   { role: 'admin', label: 'App Admin', who: 'Avery · manages all clubs & users', icon: ShieldCheck, color: '#8b5cf6' },
 ]
 

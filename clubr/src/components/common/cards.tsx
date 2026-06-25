@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Clock, CheckCircle2, Users, Crown, Shield, MapPin, Lock, UserCheck, X, ChevronDown } from 'lucide-react'
+import { Clock, CheckCircle2, Users, Crown, MapPin, Lock, UserCheck, X, ChevronDown } from 'lucide-react'
 import { Avatar, Badge, Btn, Card, ProcessingOverlay } from './ui'
 import { useApproveMember, useRejectMember } from '@/hooks'
 import type { ClubView } from '@/types'
@@ -8,7 +8,6 @@ import type { ClubView } from '@/types'
 export function MembershipBadge({ status, role }: { status: ClubView['myStatus']; role?: ClubView['myRole'] }) {
   if (status === 'pending') return <Badge tone="amber"><Clock className="h-3 w-3" />Pending</Badge>
   if (role === 'owner') return <Badge tone="purple"><Crown className="h-3 w-3" />Owner</Badge>
-  if (role === 'host') return <Badge tone="blue"><Shield className="h-3 w-3" />Host</Badge>
   if (status === 'member') return <Badge tone="green"><CheckCircle2 className="h-3 w-3" />Member</Badge>
   return null
 }

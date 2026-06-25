@@ -16,7 +16,7 @@ export function HomePage() {
   const { stage } = useOnboardingStage()
   const clubs = useMyClubs()
   if (user?.role === 'admin') return <AdminPage />
-  if (user?.role === 'host') return <HostHomePage />
+  if (user?.role === 'owner') return <HostHomePage />
   if (stage === 'fresh') {
     if (clubs.isLoading) return <div className="flex min-h-[60dvh] items-center justify-center"><Spinner /></div>
     return <GetStartedHub />

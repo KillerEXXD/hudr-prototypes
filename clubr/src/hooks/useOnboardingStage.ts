@@ -42,7 +42,7 @@ export function useOnboardingStage(): OnboardingResult {
   const current = resolveOnboarding({
     isAdmin,
     isMemberOfAnyClub: (clubs.data ?? []).some((c) => c.myStatus === 'member'),
-    isHost: user?.role === 'host' || (clubs.data ?? []).some((c) => c.canManage),
+    isHost: user?.role === 'owner' || (clubs.data ?? []).some((c) => c.canManage),
     // An approved, live entry (a pending game request stays 'available', so it won't
     // reveal the Games tab early; hosting alone is 'hosting', not 'playing').
     hasActiveGame: games.items.some((g) => relationshipOf(g) === 'playing'),

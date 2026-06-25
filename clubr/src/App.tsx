@@ -32,8 +32,8 @@ export default function App() {
         <Route path="/how-games-work" element={<HowGamesWorkPage />} />
         <Route path="/club/:id" element={<ClubDetailPage />} />
         <Route path="/fantasy" element={<FantasyPage />} />
-        {/* The operator FT slate is host/admin only — players never see it. */}
-        <Route path="/host-ft" element={user.role === 'player' ? <Navigate to="/" replace /> : <HostFTPage />} />
+        {/* The operator FT slate is owner/admin only — members never see it. */}
+        <Route path="/host-ft" element={user.role === 'member' ? <Navigate to="/" replace /> : <HostFTPage />} />
         <Route path="/fantasy/:id" element={<ContestDetailPage />} />
         <Route path="/lastlonger" element={<LastLongerPage />} />
         <Route path="/lastlonger/:id" element={<LastLongerGamePage />} />

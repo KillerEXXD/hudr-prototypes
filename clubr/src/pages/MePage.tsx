@@ -10,19 +10,19 @@ import type { AccountRole, User } from '@/types'
 import { EmailVerifyRow } from '@/components/me/EmailVerifyRow'
 
 const ROLE_META: Record<AccountRole, { label: string; tone: 'purple' | 'green' | 'blue'; icon: typeof UserIcon }> = {
-  admin: { label: 'App Admin', tone: 'purple', icon: ShieldCheck },
-  host: { label: 'Club Host', tone: 'green', icon: Crown },
-  player: { label: 'Player', tone: 'blue', icon: UserIcon },
+  admin: { label: 'Admin', tone: 'purple', icon: ShieldCheck },
+  owner: { label: 'Owner', tone: 'green', icon: Crown },
+  member: { label: 'Member', tone: 'blue', icon: UserIcon },
 }
 
 // Demo-account quick-switch — roles plus the real-data club hosts. (Prototype
 // only: the gallery lets reviewers explore each role. Lives on /me so the app
 // has one account home; the header avatar is just a shortcut here.)
 const SWITCH: { role: AccountRole; userId?: string; label: string; icon: typeof UserIcon }[] = [
-  { role: 'player', label: 'Player', icon: UserIcon },
-  { role: 'host', label: 'Aces High Host', icon: Crown },
-  { role: 'host', userId: 'u_cc_host', label: 'Bayou City Poker Club Host', icon: Crown },
-  { role: 'host', userId: 'u_tch_host', label: 'Gulf Coast Card Club Host', icon: Crown },
+  { role: 'member', label: 'Member', icon: UserIcon },
+  { role: 'owner', label: 'Aces High Owner', icon: Crown },
+  { role: 'owner', userId: 'u_cc_host', label: 'Bayou City Poker Club Owner', icon: Crown },
+  { role: 'owner', userId: 'u_tch_host', label: 'Gulf Coast Card Club Owner', icon: Crown },
   { role: 'admin', label: 'App Admin', icon: ShieldCheck },
 ]
 
@@ -93,7 +93,7 @@ export function MePage() {
       {realRole === 'admin' && (
         <Section title="Acting as" action={<span className="text-[11px] text-text-muted">App Admin only</span>}>
           <div className="grid grid-cols-3 gap-2">
-            {(['admin', 'host', 'player'] as AccountRole[]).map((r) => {
+            {(['admin', 'owner', 'member'] as AccountRole[]).map((r) => {
               const m = ROLE_META[r]
               const active = user.role === r
               return (
@@ -104,7 +104,7 @@ export function MePage() {
               )
             })}
           </div>
-          <p className="mt-1.5 text-[10px] leading-snug text-text-muted">Switch your view between App Admin, Club Host and Player. Only you see this — it changes what you see, not your permissions.</p>
+          <p className="mt-1.5 text-[10px] leading-snug text-text-muted">Switch your view between App Admin, Owner and Member. Only you see this — it changes what you see, not your permissions.</p>
         </Section>
       )}
 
