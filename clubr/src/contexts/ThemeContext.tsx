@@ -36,9 +36,13 @@ function readStored(): ThemeName {
 
 function applyTheme(name: ThemeName) {
   if (typeof document === 'undefined') return
+  // Never let an unknown theme name black-screen the app: fall back to the default,
+  // then to any defined theme.
+  const def = THEMES[name] ?? THEMES[DEFAULT_THEME] ?? Object.values(THEMES)[0]
+  if (!def) return
   const root = document.documentElement
-  for (const [k, v] of Object.entries(THEMES[name].vars)) root.style.setProperty(k, v)
-  root.setAttribute('data-theme', name)
+  for (const [k, v] of Object.entries(def.vars)) root.style.setProperty(k, v)
+  root.setAttribute('data-theme', def.name)
 }
 
 // Force-reset stale skins (DB wipe) first, then apply the persisted skin on import.
