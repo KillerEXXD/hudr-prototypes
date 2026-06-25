@@ -13,13 +13,15 @@ const ENGINES = [
   { id: 'keen', name: 'Keen', C: KeenLabCarousel },
 ] as const
 
-const KEY = 'clubr-carousel-engine'
+// Shared selection key — the Home picker AND the Carousel Lab both read/write it,
+// so a pick in either place sticks everywhere.
+export const CAROUSEL_ENGINE_KEY = 'clubr-carousel-engine'
 
 export function ClubCarouselPicker({ clubs = LAB_CLUBS }: { clubs?: LabClub[] }) {
   const [engine, setEngine] = useState<string>(() => {
-    try { return localStorage.getItem(KEY) || 'embla' } catch { return 'embla' }
+    try { return localStorage.getItem(CAROUSEL_ENGINE_KEY) || 'embla' } catch { return 'embla' }
   })
-  const pick = (id: string) => { setEngine(id); try { localStorage.setItem(KEY, id) } catch { /* ignore */ } }
+  const pick = (id: string) => { setEngine(id); try { localStorage.setItem(CAROUSEL_ENGINE_KEY, id) } catch { /* ignore */ } }
   const active = ENGINES.find((e) => e.id === engine) ?? ENGINES[0]
   const Active = active.C
 
