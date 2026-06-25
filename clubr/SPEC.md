@@ -555,6 +555,13 @@ when the registration deadline elapses the badge stays **Registration open** and
   and the member **count**. Emblems are a procedural **"3‑D glass"** mark (glyph + gradient,
   chosen in the picker) OR a curated **mascot** (`mascot:<subject>` → bundled image). The
   mascot pack is the **pleasant** set only — gladiator, lion, eagle, dragon, bull, ram.
+- **Player profile pictures:** every player can have an optional profile picture. It renders
+  at the **exact same size** as the initials circle (no row growth) everywhere players are
+  listed — FT / Last‑Longer / Squares **entrants**, club roster, member profile, results,
+  invite & co‑host pickers, and the header. **Me → tap the avatar** opens a picker: choose a
+  fun picture, or **"No photo"** to keep coloured **initials** (the default fallback whenever
+  a player has no picture). Proto seeds players with a deterministic fun avatar (a few left
+  blank to show the mix); live swaps that pool for the **User‑Profile** emblem library.
 
 ## 18. Multi‑game platform IA (scales to N game types)
 ClubR is a **multi‑game platform** (FT Fantasy, Last Longer, **Football Squares** next, more
