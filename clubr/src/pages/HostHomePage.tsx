@@ -87,9 +87,6 @@ export function HostHomePage() {
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">Hey {user?.name.split(' ')[0]} 👋</h1>
       <p className="text-sm text-text-secondary">Upcoming final tables available for you to host as Fantasy games in your club.</p>
 
-      {/* Carousel chooser — pick the engine; the selected one renders right here. */}
-      <ClubCarouselPicker />
-
       {/* ---- FTs to host — directly under the intro line it belongs to, so the slate the
               subtitle promises is the first thing a host sees (not buried below the
               checklist). Only for club managers, and only when some exist. ---- */}
@@ -114,6 +111,9 @@ export function HostHomePage() {
         )}
       </Section>
       )}
+
+      {/* Carousel chooser — below the FTs slate. Pick the engine; the selected one renders here. */}
+      <ClubCarouselPicker />
 
       {/* ---- Host first-run checklist (Phase 5) — until the club has its first game ---- */}
       {showFirstRun && managedClub && (
