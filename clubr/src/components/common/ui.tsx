@@ -50,22 +50,31 @@ export function ProcessingOverlay({ label, className }: { label?: string; classN
 export function Avatar({ name, color, size = 36, emoji, pic }: { name?: string; color?: string; size?: number; emoji?: string; pic?: string | null }) {
   const initials = (name ?? '?').split(' ').map((s) => s[0]).slice(0, 2).join('').toUpperCase()
   if (pic) {
+    // Premium "glass dome" finish (same recipe as the club emblems): the photo,
+    // a lit top-left highlight, and a crisp glass rim + soft shadow → an Apple-like
+    // 3-D pop. Renders at the EXACT same size as the initials circle.
     return (
-      <img
-        src={pic}
-        alt={name ?? ''}
-        loading="lazy"
-        className="inline-block shrink-0 rounded-full object-cover bg-bg-surface"
+      <span
+        className="relative inline-block shrink-0 overflow-hidden rounded-full bg-bg-surface ring-1 ring-black/10 shadow-md shadow-black/30"
         style={{ width: size, height: size }}
-      />
+      >
+        <img src={pic} alt={name ?? ''} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        {/* lit-from-above highlight */}
+        <span className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(115% 115% at 30% 16%, rgba(255,255,255,0.5), rgba(255,255,255,0.06) 42%, transparent 62%)' }} />
+        {/* glass rim: bright top edge + faint outline + soft bottom shade */}
+        <span className="pointer-events-none absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 0 1px rgba(255,255,255,0.14), inset 0 -6px 12px rgba(0,0,0,0.22)' }} />
+      </span>
     )
   }
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center rounded-full font-bold text-white"
+      className="relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-bold text-white ring-1 ring-black/10 shadow-md shadow-black/30"
       style={{ width: size, height: size, background: color ?? '#6b7280', fontSize: size * 0.4 }}
     >
-      {emoji ?? initials}
+      <span className="relative z-10">{emoji ?? initials}</span>
+      {/* same glass finish as the club emblems — lit highlight + crisp rim */}
+      <span className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(115% 115% at 30% 16%, rgba(255,255,255,0.5), rgba(255,255,255,0.06) 42%, transparent 62%)' }} />
+      <span className="pointer-events-none absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 0 1px rgba(255,255,255,0.14), inset 0 -6px 12px rgba(0,0,0,0.22)' }} />
     </span>
   )
 }
