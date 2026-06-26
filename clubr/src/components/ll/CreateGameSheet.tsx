@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MapPin, Globe, Lock } from 'lucide-react'
+import { MapPin, Globe, Lock, Coins } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useCreateGame } from '@/hooks/ll'
-import { useEconomy } from '@/hooks/credits'
+import { useEconomy, useWallet } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
+import { BuyCreditsSheet } from '@/components/credits/BuyCreditsSheet'
 import { Sheet, Btn, Field } from '@/components/common/ui'
 import { CityField } from '@/components/common/CityField'
 import { ScheduleFields, PayoutEditor } from '@/components/common/GameSetup'
@@ -19,6 +20,9 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
   const create = useCreateGame()
   const spend = useSpend()
   const hostCost = useEconomy().data?.costs.hostGameCost ?? 100
+  const balance = useWallet().data?.balance ?? 0
+  const short = balance < hostCost
+  const [buyOpen, setBuyOpen] = useState(false)
   const managed = (myClubs.data ?? []).filter((c) => c.canManage)
   const [clubId, setClubId] = useState(fixedClubId ?? '')
   const [title, setTitle] = useState('')
@@ -47,7 +51,15 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
   }
 
   return (
+    <>
     <Sheet open={open} onClose={onClose} title="Create a Last Longer">
+      {short && (
+        <button type="button" onClick={() => setBuyOpen(true)} className="mb-3 flex items-center gap-2 rounded-xl border border-accent-amber/40 bg-accent-amber/10 px-3 py-2.5 text-left motion-safe:animate-pulse cursor-pointer">
+          <Coins className="h-5 w-5 shrink-0 text-accent-amber" />
+          <span className="min-w-0 flex-1 text-xs text-text-secondary">You need <b className="text-text-primary">{hostCost - balance}</b> more credits to host this Last Longer.</span>
+          <span className="shrink-0 text-xs font-bold text-accent-amber">Buy credits →</span>
+        </button>
+      )}
       <div className="flex flex-col gap-3">
         {!fixedClubId && (
           <div>
@@ -115,5 +127,8 @@ export function CreateGameSheet({ open, onClose, fixedClubId }: { open: boolean;
         <Btn className="w-full" disabled={!clubId || !title.trim() || !closesAt || !arePayoutsValid(payouts)} loading={create.isPending} onClick={submit}>Create Last Longer · {hostCost} cr</Btn>
       </div>
     </Sheet>
+
+    <BuyCreditsSheet open={buyOpen} onClose={() => setBuyOpen(false)} need={Math.max(0, hostCost - balance)} />
+    </>
   )
 }

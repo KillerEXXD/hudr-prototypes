@@ -244,16 +244,16 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
 }
 
 // ---- Text input ----
-export function Field({ label, value, onChange, placeholder, type = 'text', mono }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; mono?: boolean }) {
+export function Field({ label, value, onChange, placeholder, type = 'text', mono, error }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; mono?: boolean; error?: boolean }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-semibold text-text-secondary">{label}</span>
+      <span className="mb-1 block text-xs font-semibold text-text-secondary">{label}{error && <span className="ml-1 font-bold text-accent-red">· Required</span>}</span>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={cn('w-full rounded-xl border border-border bg-bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-blue', mono && 'font-mono tracking-widest uppercase')}
+        className={cn('w-full rounded-xl border bg-bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2', error ? 'border-accent-red ring-1 ring-accent-red/40 focus:ring-accent-red' : 'border-border focus:ring-accent-blue', mono && 'font-mono tracking-widest uppercase')}
       />
     </label>
   )

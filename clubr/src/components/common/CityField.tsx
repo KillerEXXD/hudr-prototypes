@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
 import { fetchCitySuggestions } from '@/lib/cityAutocomplete'
+import { cn } from '@/lib/utils/cn'
 
 /**
  * City typeahead. Backed by the server-side geocoder proxy (Nominatim, free; see
@@ -9,7 +10,7 @@ import { fetchCitySuggestions } from '@/lib/cityAutocomplete'
  * allowed (so it also works for venue-style entries). One shared component for
  * every city input — onboarding, club create, profile edit, game location.
  */
-export function CityField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+export function CityField({ label, value, onChange, placeholder, error }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; error?: boolean }) {
   const [open, setOpen] = useState(false)
   const [matches, setMatches] = useState<string[]>([])
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -35,8 +36,8 @@ export function CityField({ label, value, onChange, placeholder }: { label: stri
 
   return (
     <label className="relative block">
-      <span className="mb-1 block text-xs font-semibold text-text-secondary">{label}</span>
-      <div className="flex items-center rounded-xl border border-border bg-bg-surface focus-within:ring-2 focus-within:ring-accent-blue">
+      <span className="mb-1 block text-xs font-semibold text-text-secondary">{label}{error && <span className="ml-1 font-bold text-accent-red">· Required</span>}</span>
+      <div className={cn('flex items-center rounded-xl border bg-bg-surface', error ? 'border-accent-red ring-1 ring-accent-red/40 focus-within:ring-accent-red' : 'border-border focus-within:ring-2 focus-within:ring-accent-blue')}>
         <MapPin className="ml-3 h-4 w-4 shrink-0 text-text-muted" />
         <input
           type="text"

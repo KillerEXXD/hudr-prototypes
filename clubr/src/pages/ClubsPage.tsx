@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Plus, Ticket, Users, Globe, Lock, Send, Crown } from 'lucide-react'
+import { Plus, Ticket, Users, Globe, Lock, Send, Crown, Coins } from 'lucide-react'
 import { useMyClubs, useRecentClubs, useCreateClub, useJoinViaInvite } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
-import { useEconomy } from '@/hooks/credits'
+import { useEconomy, useWallet } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
+import { BuyCreditsSheet } from '@/components/credits/BuyCreditsSheet'
 import { Section, Spinner, Btn, Sheet, Field, EmptyState } from '@/components/common/ui'
 import { CityField } from '@/components/common/CityField'
 import { ClubRow } from '@/components/common/cards'
@@ -22,6 +23,10 @@ export function ClubsPage() {
   const join = useJoinViaInvite()
   const spend = useSpend()
   const createClubCost = useEconomy().data?.costs.createClubCost ?? 200
+  const balance = useWallet().data?.balance ?? 0
+  const short = balance < createClubCost
+  const [buyOpen, setBuyOpen] = useState(false)
+  const [tried, setTried] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
   const [joinOpen, setJoinOpen] = useState(false)
   // Callers route here with { state: { create: true } } to open the create-club
@@ -95,12 +100,19 @@ export function ClubsPage() {
 
       <Sheet open={createOpen} onClose={() => { setCreateOpen(false); if (returnTo) navigate(returnTo) }} title="Create a club">
         <div className="flex flex-col gap-3">
+          {short && (
+            <button type="button" onClick={() => setBuyOpen(true)} className="flex items-center gap-2 rounded-xl border border-accent-amber/40 bg-accent-amber/10 px-3 py-2.5 text-left motion-safe:animate-pulse cursor-pointer">
+              <Coins className="h-5 w-5 shrink-0 text-accent-amber" />
+              <span className="min-w-0 flex-1 text-xs text-text-secondary">You need <b className="text-text-primary">{createClubCost - balance}</b> more credits to create this club.</span>
+              <span className="shrink-0 text-xs font-bold text-accent-amber">Buy credits →</span>
+            </button>
+          )}
           <div className="flex gap-2">
             <div className="w-20"><Field label="Emoji" value={emoji} onChange={setEmoji} /></div>
-            <div className="flex-1"><Field label="Club name" value={name} onChange={setName} placeholder="e.g. Friday Night Crew" /></div>
+            <div className="flex-1"><Field label="Club name" value={name} onChange={setName} placeholder="e.g. Friday Night Crew" error={tried && !name.trim()} /></div>
           </div>
           <Field label="Description" value={desc} onChange={setDesc} placeholder="What's your club about?" />
-          <CityField label="City" value={loc} onChange={setLoc} />
+          <CityField label="City" value={loc} onChange={setLoc} error={tried && !loc.trim()} />
           <div>
             <span className="mb-1 block text-xs font-semibold text-text-secondary">Visibility</span>
             <div className="flex gap-1 rounded-xl border border-border bg-bg-card p-1">
@@ -125,7 +137,7 @@ export function ClubsPage() {
               <span className="mt-0.5 block text-[11px] leading-snug text-text-muted">Members get instant alerts for <b className="text-text-secondary">new games, results &amp; monthly leaderboard recaps</b> — and one-tap join. You'll connect it in ~30 seconds after creating the club.</span>
             </span>
           </button>
-          <Btn className="w-full" disabled={!name.trim() || !loc.trim()} loading={create.isPending} onClick={async () => { if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; const club = await create.mutateAsync({ name, emoji, description: desc, location: loc, visibility, telegram }); setCreateOpen(false); setName(''); setDesc(''); setLoc(''); setVisibility('public'); setTelegram(false); navigate(`/club/${club.id}`) }}>
+          <Btn className="w-full" loading={create.isPending} onClick={async () => { if (!name.trim() || !loc.trim()) { setTried(true); return } if (short) { setBuyOpen(true); return } if (!(await spend({ cost: createClubCost, kind: 'create_club', label: `Created ${name.trim()}`, title: 'Create this club', verb: 'Create' }))) return; const club = await create.mutateAsync({ name, emoji, description: desc, location: loc, visibility, telegram }); setCreateOpen(false); setName(''); setDesc(''); setLoc(''); setVisibility('public'); setTelegram(false); navigate(`/club/${club.id}`) }}>
             Create club — you're the host · {createClubCost} cr
           </Btn>
           <p className="text-center text-[11px] text-text-muted">You'll own it, get an invite code, and approve who joins.</p>
@@ -142,6 +154,8 @@ export function ClubsPage() {
           <p className="text-center text-[11px] text-text-muted">Public clubs reveal themselves on a match; private ones stay hidden. Try <span className="font-mono">ACES24</span> or <span className="font-mono">RIVER1</span>.</p>
         </div>
       </Sheet>
+
+      <BuyCreditsSheet open={buyOpen} onClose={() => setBuyOpen(false)} need={Math.max(0, createClubCost - balance)} />
     </div>
   )
 }

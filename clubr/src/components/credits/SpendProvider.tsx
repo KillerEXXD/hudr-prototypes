@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { Coins, AlertTriangle } from 'lucide-react'
 import { Sheet, Btn } from '@/components/common/ui'
+import { BuyCreditsSheet } from '@/components/credits/BuyCreditsSheet'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
 import * as credits from '@/lib/api/creditsServices'
@@ -28,9 +28,9 @@ export function SpendProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
   const { data: wallet } = useWallet()
   const qc = useQueryClient()
-  const navigate = useNavigate()
   const [req, setReq] = useState<SpendRequest | null>(null)
   const [busy, setBusy] = useState(false)
+  const [buyOpen, setBuyOpen] = useState(false)
   const resolver = useRef<((v: boolean) => void) | null>(null)
 
   const requestSpend = useCallback((r: SpendRequest) => new Promise<boolean>((resolve) => { resolver.current = resolve; setReq(r) }), [])
@@ -71,13 +71,15 @@ export function SpendProvider({ children }: { children: ReactNode }) {
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent-red" />
                   Not enough credits — you need <b className="text-text-primary">{fmt(req.cost - balance)}</b> more.
                 </div>
-                <Btn className="w-full" onClick={() => { finish(false); navigate('/wallet') }}><Coins className="h-4 w-4" />Buy credits</Btn>
+                <Btn className="w-full" onClick={() => setBuyOpen(true)}><Coins className="h-4 w-4" />Buy credits</Btn>
               </>
             )}
             <p className="text-center text-[10px] text-text-muted">Credits are a facilitation fee — never a prize. Stakes are settled offline.</p>
           </div>
         )}
       </Sheet>
+
+      <BuyCreditsSheet open={buyOpen} onClose={() => setBuyOpen(false)} need={req ? Math.max(0, req.cost - balance) : 0} />
     </SpendCtx.Provider>
   )
 }

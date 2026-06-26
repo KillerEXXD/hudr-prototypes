@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Target, Clock, Check, Globe, Lock } from 'lucide-react'
+import { Target, Clock, Check, Globe, Lock, Coins } from 'lucide-react'
 import { useMyClubs } from '@/hooks'
 import { useAvailableFTs, useCreateContest } from '@/hooks/ft'
-import { useEconomy } from '@/hooks/credits'
+import { useEconomy, useWallet } from '@/hooks/credits'
 import { useSpend } from '@/components/credits/SpendProvider'
+import { BuyCreditsSheet } from '@/components/credits/BuyCreditsSheet'
 import { Sheet, Btn } from '@/components/common/ui'
 import { ScheduleFields, PayoutEditor } from '@/components/common/GameSetup'
 import { defaultCloseLocal, detectZone, zonedWallToUtcISO, DEFAULT_PAYOUTS, arePayoutsValid } from '@/lib/gameSetup'
@@ -19,6 +20,9 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
   const create = useCreateContest()
   const spend = useSpend()
   const hostCost = useEconomy().data?.costs.hostGameCost ?? 100
+  const balance = useWallet().data?.balance ?? 0
+  const short = balance < hostCost
+  const [buyOpen, setBuyOpen] = useState(false)
   const managed = (myClubs.data ?? []).filter((c) => c.canManage)
   const [clubId, setClubId] = useState(fixedClubId ?? '')
   const [ftId, setFtId] = useState('')
@@ -58,7 +62,15 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
   }
 
   return (
+    <>
     <Sheet open={open} onClose={onClose} title="Host an FT Fantasy contest">
+      {short && (
+        <button type="button" onClick={() => setBuyOpen(true)} className="mb-3 flex items-center gap-2 rounded-xl border border-accent-amber/40 bg-accent-amber/10 px-3 py-2.5 text-left motion-safe:animate-pulse cursor-pointer">
+          <Coins className="h-5 w-5 shrink-0 text-accent-amber" />
+          <span className="min-w-0 flex-1 text-xs text-text-secondary">You need <b className="text-text-primary">{hostCost - balance}</b> more credits to host this contest.</span>
+          <span className="shrink-0 text-xs font-bold text-accent-amber">Buy credits →</span>
+        </button>
+      )}
       {!fixedClubId && (
         <>
           <p className="mb-1 text-xs font-semibold text-text-secondary">Which club?</p>
@@ -138,5 +150,8 @@ export function CreateContestSheet({ open, onClose, fixedClubId, presetFtId }: {
 
       <Btn className="mt-3 w-full" disabled={!clubId || !ftId || !contestName || !closesAt || !arePayoutsValid(payouts)} loading={create.isPending} onClick={submit}>Host this FT · {hostCost} cr</Btn>
     </Sheet>
+
+    <BuyCreditsSheet open={buyOpen} onClose={() => setBuyOpen(false)} need={Math.max(0, hostCost - balance)} />
+    </>
   )
 }
