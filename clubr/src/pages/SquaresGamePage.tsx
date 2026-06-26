@@ -156,26 +156,11 @@ export function SquaresGamePage() {
       ) : me?.status === 'pending' ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary"><b className="text-text-primary">Awaiting host approval.</b> You can claim squares once admitted.</p></Card>
       ) : me?.status === 'active' ? (
-        canClaim ? (
-          <div className="mt-3 rounded-2xl border border-accent-emerald/30 bg-accent-emerald/5 px-3.5 py-3">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
-              <div className="flex items-baseline gap-2">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Your squares</span>
-                <span key={`mc-${myCount}`} className={cn('text-3xl font-extrabold leading-none tabular-nums', myCount > 0 ? 'text-text-primary' : 'text-text-muted', myCount > 0 && 'animate-bump')}>{myCount}</span>
-                {myCount > 0 && (
-                  <span className="text-[11px] text-text-muted">
-                    <b className="text-accent-emerald">{myApproved}</b> locked · <b className="text-accent-amber">{myPending}</b> pending
-                  </span>
-                )}
-              </div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-mono text-[11px] text-text-muted">{myCount} × {g.stake} =</span>
-                <span key={`mo-${myOwed}`} className={cn('font-mono text-2xl font-extrabold leading-none tabular-nums text-accent-emerald', myCount > 0 && 'animate-bump')}>{myOwed.toLocaleString()}</span>
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">Stakes owed</span>
-              </div>
-            </div>
-            <div className="mt-2 flex items-center justify-end gap-1.5 text-[11px] text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></div>
-          </div>
+        g.status === 'registration' ? (
+          // BUG-916: prominent summary moved INSIDE the Section below; gate
+          // widened from `canClaim` to `g.status === 'registration'` so
+          // admins also see it (they were excluded before).
+          null
         ) : (
           <div className="mt-3 flex items-center justify-between rounded-xl border border-border bg-bg-card px-3 py-2">
             <div className="min-w-0 text-xs">
@@ -205,6 +190,30 @@ export function SquaresGamePage() {
           </button>
         ) : undefined
       }>
+        {g.status === 'registration' && me?.status === 'active' && (
+          // BUG-916: prominent claim summary inside the Section so it sits
+          // directly above the grid; gated on registration+active (NOT
+          // canClaim) so platform admins who joined as players see it too.
+          <div data-testid="squares-claim-summary" className="mb-2.5 rounded-2xl border border-accent-emerald/30 bg-accent-emerald/5 px-3.5 py-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
+              <div className="flex items-baseline gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Your squares</span>
+                <span key={`mc-${myCount}`} className={cn('text-3xl font-extrabold leading-none tabular-nums', myCount > 0 ? 'text-text-primary' : 'text-text-muted', myCount > 0 && 'animate-bump')}>{myCount}</span>
+                {myCount > 0 && (
+                  <span className="text-[11px] text-text-muted">
+                    <b className="text-accent-emerald">{myApproved}</b> locked · <b className="text-accent-amber">{myPending}</b> pending
+                  </span>
+                )}
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-mono text-[11px] text-text-muted">{myCount} × {g.stake} =</span>
+                <span key={`mo-${myOwed}`} className={cn('font-mono text-2xl font-extrabold leading-none tabular-nums text-accent-emerald', myCount > 0 && 'animate-bump')}>{myOwed.toLocaleString()}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">Stakes owed</span>
+              </div>
+            </div>
+            {me && <div className="mt-2 flex items-center justify-end gap-1.5 text-[11px] text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></div>}
+          </div>
+        )}
         <div className="overflow-x-auto">
           <div className="grid min-w-[300px] grid-cols-11 gap-px rounded-lg bg-border p-px">
             <div className="flex items-center justify-center bg-bg-surface text-[8px] font-bold text-text-muted">{g.awayTeam.slice(0, 3)}→</div>
