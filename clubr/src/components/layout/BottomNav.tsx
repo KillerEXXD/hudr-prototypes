@@ -4,7 +4,7 @@ import { Home, Plus } from 'lucide-react'
 import { useOnboardingStage } from '@/hooks/useOnboardingStage'
 import { useUnifiedGames } from '@/games/useUnifiedGames'
 import { isLiveForMe, isFinishedForMe, isInProgressForMe } from '@/games/liveBuckets'
-import { LiveDot } from '@/components/common/LiveDot'
+import { LiveIcon } from '@/components/common/LiveIcon'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { cn } from '@/lib/utils/cn'
 
@@ -77,14 +77,12 @@ export function BottomNav() {
               <button
                 type="button"
                 onClick={onLive}
-                className={cn('flex flex-1 flex-col items-center justify-center py-2.5 text-[10px] font-semibold transition-colors cursor-pointer', liveActive ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary')}
+                className={cn('flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold transition-colors cursor-pointer', liveActive ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary')}
               >
-                {/* The word "Live" with a pulsing-red dot at its top-right (grey when
-                    nothing's in progress). No broadcast icon — the dot IS the cue. */}
-                <span className="relative text-xs font-bold leading-none tracking-wide">
-                  Live
-                  <LiveDot live={inProgress} className="absolute -right-2.5 -top-1" />
-                </span>
+                {/* Broadcast "Live" icon (red centre dot) — like Home. Animates only when
+                    a game is actually in progress; otherwise it sits passive/static. */}
+                <LiveIcon size={20} animate={inProgress} />
+                Live
               </button>
             )}
             {noLive && (
