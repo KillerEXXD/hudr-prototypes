@@ -1,6 +1,6 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Medal, Stamp, Flag, Ban, AlertTriangle, Users } from 'lucide-react'
+import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Medal, Stamp, Flag, Ban, AlertTriangle, Users, HelpCircle } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
@@ -82,6 +82,30 @@ export function SquaresGamePage() {
   const myCount = mineCells.length
   const myApproved = mineCells.filter((c) => c.approved).length
   const myPending = myCount - myApproved
+  const myOwed = myCount * g.stake
+
+  // Per-game tap order for THIS user's still-pending cells (mirrored from the
+  // live ClubR app). Persists in localStorage so labels survive a refresh.
+  const tapKey = `sq-tap-order-${id}-${user?.id ?? ''}`
+  const [tapOrder, setTapOrder] = useState<number[]>(() => {
+    if (typeof window === 'undefined') return []
+    try { const raw = window.localStorage.getItem(tapKey); return raw ? (JSON.parse(raw) as number[]).filter((n) => Number.isInteger(n)) : [] } catch { return [] }
+  })
+  useEffect(() => {
+    const minePendingIdx = new Set(g.cells.map((c, i) => (c.userId === user?.id && !c.approved ? i : -1)).filter((i) => i >= 0))
+    const kept = tapOrder.filter((i) => minePendingIdx.has(i))
+    const missing = Array.from(minePendingIdx).filter((i) => !kept.includes(i)).sort((a, b) => a - b)
+    const next = [...kept, ...missing]
+    if (next.length !== tapOrder.length || next.some((v, i) => v !== tapOrder[i])) {
+      setTapOrder(next)
+      try { window.localStorage.setItem(tapKey, JSON.stringify(next)) } catch { /* ignore */ }
+    }
+  }, [g.cells, user?.id, tapKey, tapOrder])
+  const pendingOrder = useMemo(() => {
+    const m = new Map<number, number>()
+    tapOrder.forEach((cellIdx, i) => m.set(cellIdx, i + 1))
+    return m
+  }, [tapOrder])
   const pending = g.participants.filter((p) => p.status === 'pending')
   const active = g.participants.filter((p) => p.status === 'active')
   // squares awaiting host approval (registration only) — drives the host queue + grid pulse
@@ -142,27 +166,55 @@ export function SquaresGamePage() {
       ) : me?.status === 'pending' ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary"><b className="text-text-primary">Awaiting host approval.</b> You can claim squares once admitted.</p></Card>
       ) : me?.status === 'active' ? (
-        <div className="mt-3 flex items-center justify-between rounded-xl border border-border bg-bg-card px-3 py-2">
-          <div className="min-w-0 text-xs">
-            <span className="text-text-secondary">Your squares: <b className="text-text-primary">{myCount}</b>
-              {myCount > 0 && <span className="text-text-muted"> · <b className="text-accent-emerald">{myApproved}</b> locked · <b className="text-accent-amber">{myPending}</b> pending</span>}
-            </span>
-            <div className="mt-0.5 font-mono text-[11px] text-text-secondary">{myCount} × {g.stake} = <b className="text-accent-emerald">{(myCount * g.stake).toLocaleString()}</b> Stakes owed</div>
+        canClaim ? (
+          <div className="mt-3 rounded-2xl border border-accent-emerald/30 bg-accent-emerald/5 px-3.5 py-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
+              <div className="flex items-baseline gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Your squares</span>
+                <span key={`mc-${myCount}`} className={cn('text-3xl font-extrabold leading-none tabular-nums', myCount > 0 ? 'text-text-primary' : 'text-text-muted', myCount > 0 && 'animate-bump')}>{myCount}</span>
+                {myCount > 0 && (
+                  <span className="text-[11px] text-text-muted">
+                    <b className="text-accent-emerald">{myApproved}</b> locked · <b className="text-accent-amber">{myPending}</b> pending
+                  </span>
+                )}
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-mono text-[11px] text-text-muted">{myCount} × {g.stake} =</span>
+                <span key={`mo-${myOwed}`} className={cn('font-mono text-2xl font-extrabold leading-none tabular-nums text-accent-emerald', myCount > 0 && 'animate-bump')}>{myOwed.toLocaleString()}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">Stakes owed</span>
+              </div>
+            </div>
+            <div className="mt-2 flex items-center justify-end gap-1.5 text-[11px] text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></div>
           </div>
-          <span className="flex shrink-0 items-center gap-1.5 text-xs text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></span>
-        </div>
+        ) : (
+          <div className="mt-3 flex items-center justify-between rounded-xl border border-border bg-bg-card px-3 py-2">
+            <div className="min-w-0 text-xs">
+              <span className="text-text-secondary">Your squares: <b className="text-text-primary">{myCount}</b>
+                {myCount > 0 && <span className="text-text-muted"> · <b className="text-accent-emerald">{myApproved}</b> locked · <b className="text-accent-amber">{myPending}</b> pending</span>}
+              </span>
+              <div className="mt-0.5 font-mono text-[11px] text-text-secondary">{myCount} × {g.stake} = <b className="text-accent-emerald">{myOwed.toLocaleString()}</b> Stakes owed</div>
+            </div>
+            <span className="flex shrink-0 items-center gap-1.5 text-xs text-text-muted">Paid <PaidToggle paid={me.paid} editable={false} /></span>
+          </div>
+        )
       ) : null)}
 
-      {canClaim && <p className="mt-2 text-[11px] text-text-secondary">Tap an empty square to claim it — your claim is <span className="text-accent-amber font-semibold">pending the host's approval</span>. Tap one of your pending (amber) squares to <b>withdraw</b>; once the host approves it, it's <b>locked in</b>. Digits stay sealed until lock.</p>}
       {hostCanApprove && <p className="mt-2 text-[11px] text-text-secondary">You're the host — <span className="text-accent-amber font-semibold">tap any amber (pending) square to approve it</span>, or use the approval queue below.</p>}
 
-      <Section icon={Grid3x3} tone="emerald" title={locked ? 'The board' : 'Claim your squares'} action={hover ? (
-        <span className="flex items-center gap-1.5 text-xs font-bold text-text-primary">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: hover.color }} />
-          <span className="truncate">{hover.name}</span>
-          {hover.status && <span className="font-normal text-text-muted">· {hover.status}</span>}
-        </span>
-      ) : undefined}>
+      <Section icon={Grid3x3} tone="emerald" title={locked ? 'The board' : 'Claim your squares'} action={
+        hover ? (
+          <span className="flex items-center gap-1.5 text-xs font-bold text-text-primary">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: hover.color }} />
+            <span className="truncate">{hover.name}</span>
+            {hover.status && <span className="font-normal text-text-muted">· {hover.status}</span>}
+          </span>
+        ) : canClaim ? (
+          <button type="button" onClick={() => setHowOpen(true)} aria-label="How squares claiming works" title="How it works"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-accent-emerald/40 bg-accent-emerald/10 text-accent-emerald hover:bg-accent-emerald/20 cursor-pointer animate-pulse-soft">
+            <HelpCircle className="h-4 w-4" />
+          </button>
+        ) : undefined
+      }>
         <div className="overflow-x-auto">
           <div className="grid min-w-[300px] grid-cols-11 gap-px rounded-lg bg-border p-px">
             <div className="flex items-center justify-center bg-bg-surface text-[8px] font-bold text-text-muted">{g.awayTeam.slice(0, 3)}→</div>
@@ -182,19 +234,36 @@ export function SquaresGamePage() {
                   const canClaimEmpty = canClaim && !cell.userId
                   const canWithdrawHere = canClaim && mine && !cell.approved
                   const interactive = canApproveHere || canClaimEmpty || canWithdrawHere
-                  const onTap = () => { if (!interactive) return; if (canApproveHere) approveCell.mutate({ gameId: g.id, cellIdx: idx }); else claim.mutate({ gameId: g.id, cellIdx: idx }) }
+                  const onTap = () => {
+                    if (!interactive) return
+                    if (canApproveHere) { approveCell.mutate({ gameId: g.id, cellIdx: idx }); return }
+                    if (canClaimEmpty) {
+                      setTapOrder((prev) => {
+                        if (prev.includes(idx)) return prev
+                        const next = [...prev, idx]
+                        try { window.localStorage.setItem(tapKey, JSON.stringify(next)) } catch { /* ignore */ }
+                        return next
+                      })
+                    }
+                    claim.mutate({ gameId: g.id, cellIdx: idx })
+                  }
                   const show = cell.userId ? () => setHover({ name: cell.name, color: cell.avatarColor, status: pend ? 'pending approval' : win ? `won ${win}` : mine ? 'you' : undefined }) : undefined
+                  const myPendingNum = mine && pend ? pendingOrder.get(idx) : undefined
                   return (
-                    <button key={idx} type="button" aria-disabled={interactive ? undefined : 'true'} onClick={onTap}
+                    <button key={idx} type="button" data-testid={mine && pend && myPendingNum != null ? `sq-mine-pending-${myPendingNum}` : undefined} aria-disabled={interactive ? undefined : 'true'} onClick={onTap}
                       onMouseEnter={show} onMouseLeave={() => setHover(null)} onFocus={show} onBlur={() => setHover(null)}
                       className={cn('relative flex aspect-square items-center justify-center text-[9px] font-bold',
                         win ? 'bg-accent-emerald text-white'
-                          : pend ? cn('border border-dashed border-accent-amber text-text-primary animate-pulse-soft', mine ? 'bg-accent-amber/20' : 'bg-accent-amber/5')
-                            : cell.userId ? (mine ? 'bg-accent-purple/30 text-text-primary' : 'text-text-primary') : 'bg-bg-card/40 text-text-muted',
+                          : pend ? cn('border border-dashed text-text-primary animate-pulse-soft', mine ? 'border-accent-amber bg-accent-amber/25 ring-1 ring-accent-amber/60' : 'border-accent-amber/60 bg-accent-amber/5')
+                            : cell.userId ? (mine ? 'bg-accent-emerald/15 text-text-primary ring-2 ring-accent-emerald/70' : 'text-text-primary') : 'bg-bg-card/40 text-text-muted',
                         interactive && 'cursor-pointer hover:brightness-110')}
                       style={cell.userId && cell.approved && !win && !mine ? { backgroundColor: `${cell.avatarColor}33` } : undefined}
                       title={cell.userId ? `${cell.name}${pend ? ' · pending approval' : ''}${win ? ` · won ${win}` : ''}` : ''}>
-                      {win ? <Trophy className="h-3 w-3" /> : cell.userId ? initials(cell.name) : ''}
+                      {win
+                        ? <Trophy className="h-3 w-3" />
+                        : myPendingNum != null
+                          ? <span className="text-[13px] font-extrabold leading-none tabular-nums text-accent-amber">{myPendingNum}</span>
+                          : cell.userId ? initials(cell.name) : ''}
                       {((claim.isPending && claim.variables?.cellIdx === idx) || (approveCell.isPending && approveCell.variables?.cellIdx === idx)) && (<span className="absolute inset-0 flex items-center justify-center bg-bg-card/75"><Processing size={11} count={1} /></span>)}
                     </button>
                   )

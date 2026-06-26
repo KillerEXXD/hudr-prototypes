@@ -399,10 +399,21 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
   100/250/500) → **payout split per period** (default Q1/Q2/Q3 = 10% each, **Final = 70%**)
   → **visibility** (public/private, same as FT/LL).
 - **Player flow:** request to join → **host admits** → **tap an empty square to claim it**. Each
-  claim **locks with your initials but is PENDING the host's approval** — you can **withdraw a
-  pending square** any time; once the host **approves** it, it's **locked in** (no withdraw). Your
-  panel shows **squares chosen + owed** (e.g. `3 × 100 = 300 Stakes`), split into locked / pending.
-  **Row/column digits are sealed until lock** (like FT picks) → revealed at lock.
+  claim is **PENDING the host's approval** — you can **withdraw a pending square** any time;
+  once the host **approves** it, it's **locked in** (no withdraw). **Row/column digits are sealed
+  until lock** (like FT picks) → revealed at lock.
+- **Claim UX (BUG‑914).** During registration, your pending squares render their **1‑based
+  selection order** ("1, 2, 3 …") instead of initials — pulsing amber so they read as "in
+  flight." When the host approves a square, it **flips to your initials with an emerald ring**
+  for visual prominence vs other players' approved squares. Withdrawing a pending square
+  **renumbers the rest from 1**; the tap order persists across refresh
+  (`localStorage[sq-tap-order-${gameId}-${userId}]`). A **prominent "Your squares · {N} · {owed}
+  Stakes owed"** summary sits directly above the board with a one-shot `animate-bump` flash on
+  every change so the user can't miss what they're committing to. A pulsing **"?"** icon next to
+  the section header opens the existing "Squares — how it works" sheet (replaces the dense
+  always-visible explainer paragraph). The claim hook uses an **optimistic update** so cells
+  stay visually persistent the instant they're tapped — no flicker if you tap another while
+  the first is still in flight.
 - **Per‑square approval (host).** Every claimed square needs the **host's OK**. The host gets a
   **"Square approvals · N pending"** queue (avatar · name · cell ref `R3·C7` · **Approve ✓ / Reject ✗**,
   plus **Approve all**) and can also **tap any amber (pending) square on the grid to approve it**.
