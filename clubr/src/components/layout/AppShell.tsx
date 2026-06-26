@@ -2,6 +2,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircle2 } from 'lucide-react'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
+import { SquareRejectedBanner } from './SquareRejectedBanner'
 import FeedbackButton from '@/components/common/FeedbackButton'
 import { SpendProvider } from '@/components/credits/SpendProvider'
 import { Sheet, Btn } from '@/components/common/ui'
@@ -20,6 +21,9 @@ export function AppShell() {
       <div className="flex min-h-dvh w-full max-w-md flex-col border-x border-border bg-bg-primary">
         <SpendProvider>
           <Header />
+          {/* Square-rejected banner — pops in instantly + sticks until dismissed;
+              self-hides when no unread square_rejected notifications. */}
+          <SquareRejectedBanner />
           <main className="flex-1 px-4 pb-6 pt-3">
             <Outlet />
           </main>

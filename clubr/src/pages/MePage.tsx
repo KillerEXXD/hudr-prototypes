@@ -6,7 +6,7 @@ import { useWallet } from '@/hooks/credits'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Field } from '@/components/common/ui'
 import { CityField } from '@/components/common/CityField'
 import { SkinPicker } from '@/components/common/SkinPicker'
-import { demoAvatarUrl } from '@/data/store'
+import { AVATAR_POOL } from '@/data/store'
 import type { AccountRole, User } from '@/types'
 import { EmailVerifyRow } from '@/components/me/EmailVerifyRow'
 
@@ -60,8 +60,8 @@ function EditProfileSheet({ open, onClose, user }: { open: boolean; onClose: () 
 /** Pick a profile picture from a fun set — or choose "No photo" to keep initials. */
 function AvatarPickerSheet({ open, onClose, user }: { open: boolean; onClose: () => void; user: User }) {
   const { setAvatar } = useAuth()
-  // Ten fun variations seeded by the user's handle, plus the "none" (initials) option.
-  const options = Array.from({ length: 10 }, (_, i) => demoAvatarUrl(user.handle || user.id, i))
+  // The curated 3-D avatar pack, plus the "none" (initials) option.
+  const options = AVATAR_POOL
   const choose = (url: string | null) => { setAvatar(url); onClose() }
   return (
     <Sheet open={open} onClose={onClose} title="Profile picture">

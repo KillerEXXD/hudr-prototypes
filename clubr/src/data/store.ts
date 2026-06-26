@@ -48,16 +48,14 @@ export const USERS: Record<string, User> = {
 }
 
 // ---- Profile pictures ----
-// A nice, fun, deterministic avatar per player (DiceBear). A few players are left
-// WITHOUT a picture on purpose to show the "No profile pic → initials" fallback.
-// When real (Midjourney) avatars are wired in, this pool is swapped for the
-// User-Profile emblem library; nothing else changes.
-const AVATAR_STYLES = ['adventurer', 'big-smile', 'avataaars', 'micah', 'lorelei', 'notionists', 'open-peeps', 'personas', 'miniavs', 'thumbs']
-const AVATAR_BG = 'b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf,a0e7e5,fdffb6,caffbf,ffadad'
-/** Build a bright, fun DiceBear avatar URL, deterministic from a seed. */
-export function demoAvatarUrl(seed: string, i: number): string {
-  const style = AVATAR_STYLES[i % AVATAR_STYLES.length]
-  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${AVATAR_BG}&radius=50`
+// The curated 3-D avatar pack (bundled WebP under /avatars). A few players are
+// left WITHOUT a picture on purpose to show the "No profile pic → initials"
+// fallback. Live swaps this bundled pool for the User-Profile emblem library.
+const AVATAR_NAMES = ['cool-cat', 'golden-retriever', 'dapper-penguin', 'happy-panda', 'high-roller', 'excited-rookie', 'ninja', 'astronaut', 'robot', 'wizard', 'pirate', 'chef']
+export const AVATAR_POOL = AVATAR_NAMES.map((n) => `${import.meta.env.BASE_URL}avatars/${n}.webp`)
+/** Pick a 3-D avatar from the pool, deterministic by index. */
+export function demoAvatarUrl(_seed: string, i: number): string {
+  return AVATAR_POOL[i % AVATAR_POOL.length]
 }
 // Players who keep initials (no picture) — demonstrates the opt-out.
 const NO_PIC = new Set(['u_tom', 'u_cody', 'u_tch_p5'])
