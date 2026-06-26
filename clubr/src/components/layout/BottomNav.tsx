@@ -77,11 +77,13 @@ export function BottomNav() {
               <button
                 type="button"
                 onClick={onLive}
-                className={cn('flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold transition-colors cursor-pointer', liveActive ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary')}
+                className={cn('flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-semibold transition-colors cursor-pointer', liveActive ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary')}
               >
-                {/* Broadcast "Live" icon (red centre dot) — like Home. Animates only when
-                    a game is actually in progress; otherwise it sits passive/static. */}
-                <LiveIcon size={20} animate={inProgress} />
+                {/* Broadcast "Live" icon (red centre dot) — like Home, in the same selected
+                    pill. Animates only when a game is actually in progress; else static. */}
+                <span className={cn('flex items-center justify-center rounded-full px-3.5 py-1 transition-colors', liveActive && 'bg-accent-blue/12')}>
+                  <LiveIcon size={22} strokeWidth={2} animate={inProgress} />
+                </span>
                 Live
               </button>
             )}
@@ -104,9 +106,12 @@ function NavBtn({ active, onClick, icon: Icon, label }: { active: boolean; onCli
     <button
       type="button"
       onClick={onClick}
-      className={cn('flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold transition-colors cursor-pointer', active ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary')}
+      className={cn('flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-semibold transition-colors cursor-pointer', active ? 'text-accent-blue' : 'text-text-muted hover:text-text-secondary')}
     >
-      <Icon className="h-5 w-5" strokeWidth={active ? 2.5 : 2} />
+      {/* The active tab's icon sits in a subtle accent pill — the selected cue. */}
+      <span className={cn('flex items-center justify-center rounded-full px-3.5 py-1 transition-colors', active && 'bg-accent-blue/12')}>
+        <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.4 : 2} />
+      </span>
       {label}
     </button>
   )
