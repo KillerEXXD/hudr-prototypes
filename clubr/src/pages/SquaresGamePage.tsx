@@ -20,8 +20,6 @@ import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SquaresResults } from '@/components/squares/SquaresResults'
-import { SquaresRejectionBanner } from '@/components/squares/SquaresRejectionBanner'
-import { useNotifications, useMarkNotificationRead } from '@/hooks'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { HowItWorks } from '@/components/common/HowItWorks'
 import { cn } from '@/lib/utils/cn'
@@ -55,10 +53,6 @@ export function SquaresGamePage() {
   const extendReg = useExtendRegSquares()
   const closeReg = useCloseRegSquares()
   const cancel = useCancelSquares()
-  // Member "your square was rejected" banner is driven by unread square_rejected
-  // notifications for this game (the bell shares the source); Dismiss marks read.
-  const { data: notifData } = useNotifications()
-  const markNotifRead = useMarkNotificationRead()
   const [editRegOpen, setEditRegOpen] = useState(false)
   const [howOpen, setHowOpen] = useState(false)
   const [hover, setHover] = useState<{ name: string; color?: string; status?: string } | null>(null)
@@ -67,6 +61,31 @@ export function SquaresGamePage() {
   const [rejectingIdx, setRejectingIdx] = useState<number | null>(null)
   const [rejectReason, setRejectReason] = useState('')
   const [completeAudit, setCompleteAudit] = useState<{ blockers: string[]; hint?: string } | null>(null)
+
+  // Tap-order state — hoisted ABOVE early returns so hook order is stable.
+  const tapKey = `sq-tap-order-${id}-${user?.id ?? ''}`
+  const [tapOrder, setTapOrder] = useState<number[]>(() => {
+    if (typeof window === 'undefined') return []
+    try { const raw = window.localStorage.getItem(tapKey); return raw ? (JSON.parse(raw) as number[]).filter((n) => Number.isInteger(n)) : [] } catch { return [] }
+  })
+  const cellsForOrder = g?.cells
+  const userIdForOrder = user?.id
+  useEffect(() => {
+    if (!cellsForOrder) return
+    const minePendingIdx = new Set(cellsForOrder.map((c, i) => (c.userId === userIdForOrder && !c.approved ? i : -1)).filter((i) => i >= 0))
+    const kept = tapOrder.filter((i) => minePendingIdx.has(i))
+    const missing = Array.from(minePendingIdx).filter((i) => !kept.includes(i)).sort((a, b) => a - b)
+    const next = [...kept, ...missing]
+    if (next.length !== tapOrder.length || next.some((v, i) => v !== tapOrder[i])) {
+      setTapOrder(next)
+      try { window.localStorage.setItem(tapKey, JSON.stringify(next)) } catch { /* ignore */ }
+    }
+  }, [cellsForOrder, userIdForOrder, tapKey, tapOrder])
+  const pendingOrder = useMemo(() => {
+    const m = new Map<number, number>()
+    tapOrder.forEach((cellIdx, i) => m.set(cellIdx, i + 1))
+    return m
+  }, [tapOrder])
 
   if (isLoading) return <Spinner label="Loading squares…" />
   if (!g) return <EmptyState title="Game not found" />
@@ -83,36 +102,11 @@ export function SquaresGamePage() {
   const myApproved = mineCells.filter((c) => c.approved).length
   const myPending = myCount - myApproved
   const myOwed = myCount * g.stake
-
-  // Per-game tap order for THIS user's still-pending cells (mirrored from the
-  // live ClubR app). Persists in localStorage so labels survive a refresh.
-  const tapKey = `sq-tap-order-${id}-${user?.id ?? ''}`
-  const [tapOrder, setTapOrder] = useState<number[]>(() => {
-    if (typeof window === 'undefined') return []
-    try { const raw = window.localStorage.getItem(tapKey); return raw ? (JSON.parse(raw) as number[]).filter((n) => Number.isInteger(n)) : [] } catch { return [] }
-  })
-  useEffect(() => {
-    const minePendingIdx = new Set(g.cells.map((c, i) => (c.userId === user?.id && !c.approved ? i : -1)).filter((i) => i >= 0))
-    const kept = tapOrder.filter((i) => minePendingIdx.has(i))
-    const missing = Array.from(minePendingIdx).filter((i) => !kept.includes(i)).sort((a, b) => a - b)
-    const next = [...kept, ...missing]
-    if (next.length !== tapOrder.length || next.some((v, i) => v !== tapOrder[i])) {
-      setTapOrder(next)
-      try { window.localStorage.setItem(tapKey, JSON.stringify(next)) } catch { /* ignore */ }
-    }
-  }, [g.cells, user?.id, tapKey, tapOrder])
-  const pendingOrder = useMemo(() => {
-    const m = new Map<number, number>()
-    tapOrder.forEach((cellIdx, i) => m.set(cellIdx, i + 1))
-    return m
-  }, [tapOrder])
   const pending = g.participants.filter((p) => p.status === 'pending')
   const active = g.participants.filter((p) => p.status === 'active')
   // squares awaiting host approval (registration only) — drives the host queue + grid pulse
   const hostCanApprove = g.canManage && g.status === 'registration'
   const pendingClaims = g.status === 'registration' ? g.cells.map((c, i) => ({ c, i })).filter((x) => x.c.userId && !x.c.approved) : []
-  // Unread "your square was rejected" notices for THIS board → member banner.
-  const myRejections = (notifData?.items ?? []).filter((n) => n.type === 'square_rejected' && n.gameId === g.id && !n.read)
 
   const winners = new Map<number, string>()
   g.periods.forEach((p) => { if (p.winnerCell != null) winners.set(p.winnerCell, p.label) })
@@ -154,10 +148,6 @@ export function SquaresGamePage() {
           <div><p className="text-sm font-bold text-text-primary">Game cancelled by the host</p>{g.cancelReason && <p className="mt-0.5 text-xs text-text-secondary">{g.cancelReason}</p>}</div>
         </Card>
       )}
-
-      {/* Member banner — the host rejected one or more of your pending squares, with
-          their reason. Driven by unread square_rejected notifications (never chat). */}
-      {!isAdmin && <SquaresRejectionBanner rejections={myRejections} onDismiss={(nid) => markNotifRead.mutate(nid)} canClaimMore={g.status === 'registration'} />}
 
       {g.status !== 'cancelled' && (!g.isMemberOfClub && !g.canManage ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to claim squares.</p></Card>
