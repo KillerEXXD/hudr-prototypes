@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Ticket, Plus } from 'lucide-react'
+import { Ticket, Plus, GraduationCap, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useJoinViaInvite, useRecentClubs } from '@/hooks'
+import { useJoinViaInvite, useRecentClubs, useSeedDemo } from '@/hooks'
 import { Btn, Card, Field } from '@/components/common/ui'
 import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
 import { ClubExplainerCard } from '@/components/onboarding/ClubExplainerCard'
@@ -27,8 +27,14 @@ export function GetStartedHub() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const join = useJoinViaInvite()
+  const seedDemo = useSeedDemo()
   const [code, setCode] = useState('')
   const [msg, setMsg] = useState('')
+
+  async function tryDemo() {
+    const rookieId = await seedDemo.mutateAsync()
+    navigate(`/club/${rookieId}`)
+  }
   // One accordion across the club card + the game cards: opening any one closes
   // the rest. null = all collapsed; 'club' | a game id = that card is open.
   const [openId, setOpenId] = useState<string | null>(null)
@@ -56,6 +62,30 @@ export function GetStartedHub() {
         <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Welcome, {firstName} 👋</h1>
         <p className="mt-1 text-sm text-text-secondary">Join a club to start playing — here's what's on.</p>
       </div>
+
+      {/* Try the demo — a zero-risk sandbox: two ready-made clubs (one you own, one you
+          play in) with six free games + practice opponents. The fastest way to "get it". */}
+      <button
+        type="button"
+        onClick={tryDemo}
+        disabled={seedDemo.isPending}
+        className="group relative w-full overflow-hidden rounded-3xl border border-accent-emerald/40 bg-gradient-to-br from-accent-emerald/20 via-bg-card to-accent-blue/15 p-4 text-left shadow-lg transition active:scale-[0.99] disabled:opacity-70"
+      >
+        <div className="flex items-center gap-3.5">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent-emerald/20 text-accent-emerald">
+            <GraduationCap className="h-6 w-6" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="flex items-center gap-1.5 text-base font-extrabold text-text-primary">
+              {seedDemo.isPending ? 'Setting up your demo…' : 'New here? Try the demo'}
+            </p>
+            <p className="mt-0.5 text-xs leading-snug text-text-secondary">
+              Two practice clubs, six free games, friendly bots — play with everything, risk nothing.
+            </p>
+          </div>
+          <ArrowRight className="h-5 w-5 shrink-0 text-accent-emerald transition group-hover:translate-x-0.5" />
+        </div>
+      </button>
 
       {/* 1. Your pending requests + clubs you can join (near-you list, "See all").
              When there are none to join, this self-hides and the welcome below shows. */}

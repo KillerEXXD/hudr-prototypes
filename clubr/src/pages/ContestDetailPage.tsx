@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Trophy, Users, UserRound, UserPlus, Check, Crown, Shield, Flag, Ban, AlertTriangle } from 'lucide-react'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
+import { PillBadge } from '@/components/games/PillBadge'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
 import { PrivateGameCard } from '@/components/games/PrivateGameCard'
@@ -76,10 +77,11 @@ export function ContestDetailPage() {
       <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
       <GameJoinBanner admitted={c.isMemberOfClub || c.canManage} />
 
+      {/* Game-mode pill badge (test). */}
+      <PillBadge type="ft" height={52} className="mb-1.5" />
       {/* Identity — club + format badges. */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-muted">
         <span className="text-base">{c.clubEmoji}</span>{c.clubName}
-        <Badge tone="purple">FT Fantasy</Badge>
         {c.format === 'winner_takes_all' && <Badge tone="amber"><Trophy className="h-3 w-3" />Winner takes all</Badge>}
       </div>
       {/* Title (host-framed name) + quiet "?" help + Share. */}

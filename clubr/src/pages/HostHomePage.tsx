@@ -1,28 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Home, Trophy, Clock, ChevronRight, ChevronDown, Info, Gamepad2, LayoutGrid, Plus, UserPlus, Share2, type LucideIcon } from 'lucide-react'
+import { Home, Trophy, Clock, ChevronRight, ChevronDown, Info, Plus, UserPlus, Share2, type LucideIcon } from 'lucide-react'
 import { useAvailableFTs } from '@/hooks/ft'
 import { useMyClubs } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
-import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
-import { InfiniteList } from '@/components/common/InfiniteList'
-import { ClubsToJoinSection } from '@/components/common/ClubsToJoinSection'
+import { Badge, Section, Spinner } from '@/components/common/ui'
 import { GameHowItWorksCards } from '@/components/onboarding/GameHowItWorksCards'
 import { ApprovedBanner } from '@/components/onboarding/ApprovedBanner'
-import { RelationshipPills } from '@/components/games/RelationshipPills'
-import { useUnifiedGames, matchesType, orderActiveGames } from '@/games/useUnifiedGames'
-import { relationshipOf, defaultRelationship, relationshipPills, type Relationship } from '@/games/gameRelationship'
-import { renderUnifiedGame } from '@/games/renderGame'
-import { GAME_TYPES, type GameType } from '@/games/types'
+import { useUnifiedGames } from '@/games/useUnifiedGames'
 import { cn } from '@/lib/utils/cn'
 import type { MemberRole } from '@/types'
 import { ClubCarouselPicker } from '@/components/carousel-lab/ClubCarouselPicker'
-
-function FilterChip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
-  return (
-    <button type="button" onClick={onClick} className={cn('flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? activeClass : 'border-border font-semibold text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
-  )
-}
 
 // Host first-run step (onboarding Phase 5) — a numbered row that routes into the club.
 function FirstRunStep({ n, icon: Icon, title, sub, onClick }: { n: number; icon: LucideIcon; title: string; sub: string; onClick: () => void }) {
@@ -38,46 +26,32 @@ function FirstRunStep({ n, icon: Icon, title, sub, onClick }: { n: number; icon:
   )
 }
 
-// Club Host home. The App-Admin FT slate you can host, then ONE merged feed of
-// every active game you can see — games you run AND clubs you're a member of.
-// Registration-Open first, then Live; CLOSED games are dropped. No cap — the list
-// lazy-renders (load more on scroll). The per-card chip shows host vs member.
+// Club Host home. The on-home "Clubs to join" + "Games" feed were removed — games live on
+// the Live tab, clubs to join via "Find your club". What remains: the FTs-to-host slate,
+// the carousel chooser, the first-run checklist, and the "How hosting works" refresher.
 export function HostHomePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const fts = useAvailableFTs()
   const myClubs = useMyClubs()
-  const { items, isLoading: gamesLoading } = useUnifiedGames()
-  const [rel, setRel] = useState<Relationship>(defaultRelationship(true)) // host home → 'hosting'
-  const [filter, setFilter] = useState<'all' | GameType>('all')
-  const pickRel = (r: Relationship) => { setRel(r); setFilter('all') } // type chips reset per bucket
+  const { items } = useUnifiedGames()
   // "How hosting works" — a collapsed refresher (game cards). No how-club-works card
   // and no invite-code panel: a host already knows how to get into a club.
   const [showHow, setShowHow] = useState(false)
   const [howOpenId, setHowOpenId] = useState<string | null>(null)
 
-  // Role per club — chips show owner/member on each card.
+  // Role per club — drives the FTs-to-host gate.
   const roleByClub = new Map<string, MemberRole>()
   for (const c of myClubs.data ?? []) if (c.myStatus === 'member' && c.myRole) roleByClub.set(c.id, c.myRole)
   // "FTs to host" only makes sense if you manage a club to host them in — hide it
   // from users who don't own any club.
   const hasManagedClub = [...roleByClub.values()].some((r) => r === 'owner')
 
-  const active = orderActiveGames(items) // closed dropped; reg-open before running
-  const counts = { available: 0, playing: 0, hosting: 0 }
-  for (const g of active) { const r = relationshipOf(g); if (r) counts[r]++ }
-  const anyGames = active.length > 0
   // Host first-run (Phase 5): owns/hosts a club but hasn't created a game yet → a
   // 3-step checklist that routes into the club. Collapses once they host a game.
   const hostedGame = items.some((g) => g.iHost)
   const managedClub = (myClubs.data ?? []).find((c) => c.myStatus === 'member' && c.myRole === 'owner')
   const showFirstRun = !!managedClub && !hostedGame
-  // Only buckets with data are shown; if the selected one is empty, fall back to
-  // the first non-empty pill so the visible tab always has games.
-  const effectiveRel = counts[rel] > 0 ? rel : (relationshipPills(true).find((r) => counts[r] > 0) ?? rel)
-  const byRel = active.filter((g) => relationshipOf(g) === effectiveRel)
-  const typesPresent = GAME_TYPES.filter((t) => byRel.some((g) => g.type === t.id))
-  const shown = byRel.filter((g) => matchesType(g, filter))
 
   return (
     <div className="animate-fade-up">
@@ -140,38 +114,6 @@ export function HostHomePage() {
           </div>
         )}
       </div>
-
-      {/* ---- Clubs to join (shared, identical on the Player Discover home) ---- */}
-      <ClubsToJoinSection />
-
-      {/* ---- Games: relationship pills (only buckets with data) + type chips, lazy.
-              The whole section is hidden when there are no active games at all. ---- */}
-      {gamesLoading ? (
-      <Section title="Games"><Spinner /></Section>
-      ) : anyGames ? (
-      <Section title="Games">
-        <RelationshipPills value={effectiveRel} onChange={pickRel} isHost counts={counts} hideEmpty />
-        {typesPresent.length > 1 && (
-          <div className="mt-2 flex gap-1.5 overflow-x-auto no-scrollbar">
-            <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
-            {typesPresent.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
-          </div>
-        )}
-        <div className="mt-2">
-          {shown.length > 0 ? (
-            <InfiniteList
-              items={shown}
-              batch={8}
-              resetKey={`${effectiveRel}:${filter}`}
-              className="flex flex-col gap-2"
-              renderItem={(g) => renderUnifiedGame(g, true, roleByClub.get(g.clubId))}
-            />
-          ) : (
-            <EmptyState icon={<Gamepad2 className="h-7 w-7" />} title="Nothing of that type right now" sub="Try another type above." />
-          )}
-        </div>
-      </Section>
-      ) : null}
     </div>
   )
 }

@@ -22,6 +22,13 @@ export const USERS: Record<string, User> = {
   u_jordan: { id: 'u_jordan', name: 'Jordan Lee', handle: 'jordan', email: 'jordan@example.com', phone: '+1 (305) 555‑0164', location: 'Houston, TX', role: 'member', avatarColor: '#f97316' },
   u_dustin: { id: 'u_dustin', name: 'Dustin Cole', handle: 'dustin', email: 'dustin@example.com', phone: '+1 (408) 555‑0125', location: 'Dallas, TX', role: 'member', avatarColor: '#a855f7' },
   u_cody: { id: 'u_cody', name: 'Cody Banks', handle: 'cody', email: 'cody@example.com', location: 'Austin, TX', role: 'member', avatarColor: '#eab308' },
+  // ---- Shared demo bots for the onboarding sandbox (Rookie HQ / Aces Academy) ----
+  u_demo1: { id: 'u_demo1', name: 'Demo Dana', handle: 'demodana', email: 'dana@demo.club', location: 'Demo City', role: 'member', avatarColor: '#22c55e' },
+  u_demo2: { id: 'u_demo2', name: 'Demo Theo', handle: 'demotheo', email: 'theo@demo.club', location: 'Demo City', role: 'member', avatarColor: '#3b82f6' },
+  u_demo3: { id: 'u_demo3', name: 'Demo Mia', handle: 'demomia', email: 'mia@demo.club', location: 'Demo City', role: 'member', avatarColor: '#ec4899' },
+  u_demo4: { id: 'u_demo4', name: 'Demo Rex', handle: 'demorex', email: 'rex@demo.club', location: 'Demo City', role: 'member', avatarColor: '#f59e0b' },
+  u_demo5: { id: 'u_demo5', name: 'Demo Coco', handle: 'demococo', email: 'coco@demo.club', location: 'Demo City', role: 'member', avatarColor: '#8b5cf6' },
+  u_demo6: { id: 'u_demo6', name: 'Demo Zane', handle: 'demozane', email: 'zane@demo.club', location: 'Demo City', role: 'member', avatarColor: '#06b6d4' },
   // ---- Demo clubs seeded from real TournamentPro venues (Bayou City Poker Club + Gulf Coast Card Club) ----
   u_cc_host: { id: 'u_cc_host', name: 'Marcus Reyes', handle: 'marcus', email: 'marcus@championsclub.example', location: 'Houston, TX', role: 'owner', avatarColor: '#a855f7', emailVerified: true },
   u_tch_host: { id: 'u_tch_host', name: 'Diana Cole', handle: 'diana', email: 'diana@texascardhouse.example', location: 'Houston, TX', role: 'owner', avatarColor: '#dc2626', emailVerified: true },
@@ -62,6 +69,9 @@ const NO_PIC = new Set(['u_tom', 'u_cody', 'u_tch_p5'])
 Object.values(USERS).forEach((usr, i) => {
   if (usr.avatarUrl === undefined && !NO_PIC.has(usr.id)) usr.avatarUrl = demoAvatarUrl(usr.handle || usr.id, i)
 })
+
+/** The 6 shared demo-bot ids — populate every user's demo clubs/games (one global pool). */
+export const DEMO_BOT_IDS = ['u_demo1', 'u_demo2', 'u_demo3', 'u_demo4', 'u_demo5', 'u_demo6'] as const
 
 const u = USERS
 function member(id: string, role: 'owner' | 'member', status: 'pending' | 'member', joinedAt: string) {

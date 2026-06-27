@@ -74,6 +74,9 @@ export interface Club {
   /** Host opted into a Telegram channel at club creation but hasn't finished
    *  connecting it yet → the club page shows a "Finish Telegram setup" card. */
   telegramSetupPending?: boolean
+  /** A throwaway onboarding sandbox club (Rookie HQ / Aces Academy) — everything works
+   *  but nothing is real; walled off from real surfaces. See docs/DEMO_CLUBS.md. */
+  isDemo?: boolean
 }
 
 /** A club enriched with the current user's relationship to it. */

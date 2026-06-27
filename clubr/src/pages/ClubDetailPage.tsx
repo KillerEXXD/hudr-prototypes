@@ -1,39 +1,33 @@
 import { useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, ChevronDown, PartyPopper } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, ChevronDown, PartyPopper, GraduationCap } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin, useJoinViaInvite, useSetClubVisibility } from '@/hooks'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { WinnerCard } from '@/components/games/WinnerCard'
+import { MembersIcon } from '@/components/games/MembersIcon'
 import { HostSelfJoinBar } from '@/components/games/HostSelfJoinBar'
 import { InfiniteList } from '@/components/common/InfiniteList'
 import { LeaderboardSection } from '@/components/leaderboard/LeaderboardSection'
 import { TelegramJoinChip, TelegramSetupCard, TelegramHostPanel } from '@/components/telegram/ClubTelegram'
 import { useUnifiedGames, matchesType, type UnifiedGame } from '@/games/useUnifiedGames'
-import { relationshipOf } from '@/games/gameRelationship'
+import { CLUB_STATUSES, clubStatusOf, amPlaying, type ClubStatus } from '@/games/clubGameStatus'
+import { LiveIcon } from '@/components/common/LiveIcon'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { cn } from '@/lib/utils/cn'
 
-// Club-detail Games filter — the pill SET is conditional on the viewer's role on
-// THIS club (a partition that covers every game with no mobile overflow):
-//   App Admin           → Available · Running · Finished      (never plays/hosts)
-//   Club Host (owner)   → Playing · Hosting · Finished        (Hosting = every active
-//                          game you're not playing — your own games)
-//   Member              → Available · Playing · Running · Finished
-// `Running` = live games you're NOT playing (a clean spectator partition). `Finished`
-// is terminal: settled/completed AND cancelled. Empty pills are hidden; the default
-// pill is role-tuned. Club-detail only — cross-page relationshipOf is unchanged.
-type ClubStatus = 'available' | 'playing' | 'hosting' | 'running' | 'finished'
+// Club-detail Games filter — ONE 4-way partition (New · Live · Running · Finished) shown
+// to EVERY viewer, all four pills always visible with counts. Rule + ClubStatus type live
+// in `@/games/clubGameStatus`; club-detail-only (cross-page relationshipOf unchanged).
 
-// No per-pill icons — the active color + ring already signals the category, and
-// dropping them keeps the pills on one mobile row.
+// Your-games pill is "Live" with the broadcast LiveIcon (same identity as the bottom-nav
+// Live page). The other three are icon-less so the four pills stay on one mobile row.
 const STATUS_META: Record<ClubStatus, { label: string; active: string }> = {
   available: { label: 'New', active: 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' },
-  playing: { label: 'Playing', active: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40' },
-  hosting: { label: 'Hosting', active: 'border-accent-purple bg-accent-purple/20 text-accent-purple font-bold ring-1 ring-accent-purple/40' },
+  playing: { label: 'Live', active: 'border-accent-emerald bg-accent-emerald/20 text-accent-emerald font-bold ring-1 ring-accent-emerald/40' },
   running: { label: 'Running', active: 'border-accent-red bg-accent-red/20 text-accent-red font-bold ring-1 ring-accent-red/40' },
   finished: { label: 'Finished', active: 'border-accent-amber bg-accent-amber/20 text-accent-amber font-bold ring-1 ring-accent-amber/40' },
 }
@@ -75,34 +69,18 @@ export function ClubDetailPage() {
   const byType = (g: UnifiedGame) => gameFilter === 'all' || matchesType(g, gameFilter)
   const isAdmin = user?.role === 'admin'
   const canHostHere = club.canManage && !isAdmin   // app admins never host/join
-  // Role-conditional pill SET (see the ClubStatus comment up top).
-  const roleStatuses: ClubStatus[] = isAdmin
-    ? ['available', 'running', 'finished']
-    : canHostHere
-      ? ['playing', 'hosting', 'finished']
-      : ['available', 'playing', 'running', 'finished']
-  const roleDefault: ClubStatus = isAdmin ? 'available' : canHostHere ? 'hosting' : 'playing'
-  const active = clubAll.filter((g) => !g.finished)
-  // Bucketing (all from existing fields). Hosting is the host's catch-all = every
-  // active game you're NOT playing; Running = live games you're not playing.
-  const counts: Record<ClubStatus, number> = {
-    available: active.filter((g) => byType(g) && relationshipOf(g) === 'available').length,
-    playing: active.filter((g) => byType(g) && relationshipOf(g) === 'playing').length,
-    hosting: active.filter((g) => byType(g) && relationshipOf(g) !== 'playing').length,
-    running: active.filter((g) => byType(g) && g.phase === 'live' && relationshipOf(g) !== 'playing').length,
-    finished: clubAll.filter((g) => byType(g) && g.finished).length,
-  }
-  // Hide empty pills; the default falls to the first non-empty one.
-  const visibleStatuses = roleStatuses.filter((s) => counts[s] > 0)
-  const gameStatus: ClubStatus | undefined =
-    picked && visibleStatuses.includes(picked) ? picked
-    : visibleStatuses.includes(roleDefault) ? roleDefault
-    : visibleStatuses[0]
-  // The list for the selected non-finished pill.
-  const activeShown =
-    gameStatus === 'hosting' ? active.filter((g) => byType(g) && relationshipOf(g) !== 'playing')
-    : gameStatus === 'running' ? active.filter((g) => byType(g) && g.phase === 'live' && relationshipOf(g) !== 'playing')
-    : active.filter((g) => byType(g) && relationshipOf(g) === gameStatus)
+  // ONE 4-way partition for every viewer (see clubGameStatus.ts). All four pills always
+  // show with their counts; each card's timing label is phase-driven.
+  const visibleStatuses = CLUB_STATUSES
+  const counts: Record<ClubStatus, number> = { available: 0, playing: 0, running: 0, finished: 0 }
+  for (const g of clubAll) if (byType(g)) counts[clubStatusOf(g)]++
+  const totalShown = counts.available + counts.playing + counts.running + counts.finished
+  const playingLive = clubAll.some((g) => byType(g) && g.phase === 'live' && clubStatusOf(g) === 'playing')
+  const gameStatus: ClubStatus =
+    picked && CLUB_STATUSES.includes(picked) ? picked
+    : counts.playing > 0 ? 'playing'
+    : CLUB_STATUSES.find((s) => counts[s] > 0) ?? 'playing'
+  const activeShown = clubAll.filter((g) => byType(g) && !g.finished && clubStatusOf(g) === gameStatus)
   // Finished: settled + cancelled, newest first by settled timestamp (cancelled → bottom).
   const finishedItems = clubAll
     .filter((g) => byType(g) && g.finished)
@@ -139,11 +117,14 @@ export function ClubDetailPage() {
             ) : (
               <span className="shrink-0 inline-flex items-center gap-1 rounded-full border border-accent-emerald/40 bg-accent-emerald/15 px-2 py-0.5 text-[11px] font-bold text-accent-emerald"><Globe className="h-3 w-3" />Public</span>
             )}
+            {club.isDemo && (
+              <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-accent-blue to-accent-purple px-2 py-0.5 text-[11px] font-bold text-white shadow-sm ring-1 ring-white/25"><GraduationCap className="h-3 w-3" />Demo</span>
+            )}
           </div>
           {/* Member count carries weight + a Users glyph (a legible stat); "hosted by"
               stays muted with the host NAME emphasized + tappable (accent on hover). */}
           <p className="text-[13px] text-text-muted">
-            <span className="inline-flex items-center gap-1 font-bold text-text-secondary"><Users className="h-3.5 w-3.5" />{members.length} {members.length === 1 ? 'member' : 'members'}</span>
+            <span className="inline-flex items-center gap-1 font-bold text-text-secondary"><MembersIcon size={16} />{members.length}</span>
             <span className="mx-1">·</span>hosted by{' '}
             <button type="button" onClick={() => navigate(`/member/${club.ownerId}`, { state: { from: `/club/${club.id}` } })}
               className="font-semibold text-text-primary underline-offset-2 hover:text-accent-blue hover:underline cursor-pointer">{club.ownerName}</button>
@@ -237,7 +218,7 @@ export function ClubDetailPage() {
 
           {allGames.isLoading ? (
             <Spinner />
-          ) : visibleStatuses.length === 0 ? (
+          ) : totalShown === 0 ? (
             // Nothing in any bucket for this viewer — a single contextual empty state.
             <EmptyState
               icon={<Gamepad2 className="h-7 w-7" />}
@@ -256,6 +237,7 @@ export function ClubDetailPage() {
                   return (
                     <button key={s} type="button" role="tab" aria-selected={on} onClick={() => setPicked(s)}
                       className={cn('flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs cursor-pointer transition-colors', on ? m.active : 'border-border font-semibold text-text-secondary')}>
+                      {s === 'playing' && <LiveIcon size={13} animate={playingLive} />}
                       {m.label}
                       {/* Count rides in a tabular-nums span (no parens) so a two-digit
                           count stays compact and doesn't widen or jitter the pill. */}
@@ -276,7 +258,7 @@ export function ClubDetailPage() {
               ) : (
                 <div className="flex flex-col gap-2">
                   {activeShown.map((g) =>
-                    gameStatus === 'hosting' ? (
+                    canHostHere && !amPlaying(g) ? (
                       <div key={`${g.type}_${g.id}`} className="flex flex-col gap-1.5">
                         {renderUnifiedGame(g, gameFilter === 'all')}
                         <HostSelfJoinBar g={g} />

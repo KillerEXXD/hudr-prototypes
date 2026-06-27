@@ -2,6 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Grid3x3, Lock, Eye, UserPlus, Check, CheckCheck, X, Shield, Trophy, Crown, Medal, Stamp, Flag, Ban, AlertTriangle, Users, HelpCircle } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
+import { PillBadge } from '@/components/games/PillBadge'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
 import { PrivateGameCard } from '@/components/games/PrivateGameCard'
@@ -122,7 +123,8 @@ export function SquaresGamePage() {
     <div className="animate-fade-up">
       <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
       <GameJoinBanner admitted={g.isMemberOfClub || g.canManage} />
-      <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}<Badge tone="green"><Grid3x3 className="h-3 w-3" />Squares</Badge></div>
+      <PillBadge type="sq" height={52} className="mb-1.5" />
+      <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
       <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex min-w-0 flex-wrap items-center gap-1.5 text-lg font-extrabold tracking-tight text-text-primary"><Grid3x3 className="h-5 w-5 text-accent-emerald" />{g.title}<HowItWorksButton onClick={() => setHowOpen(true)} /></h1><ShareGameButton type="sq" gameId={g.id} className="shrink-0 whitespace-nowrap" /></div>
       <div className="mt-1"><GameHostLine hostId={g.hostId} knownName={g.participants.find((p) => p.userId === g.hostId)?.name} /></div>
       <p className="mt-0.5 text-sm text-text-secondary"><b className="text-text-primary">{g.homeTeam}</b> <span className="text-text-muted">(side)</span> vs <b className="text-text-primary">{g.awayTeam}</b> <span className="text-text-muted">(top)</span></p>

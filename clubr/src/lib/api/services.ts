@@ -9,6 +9,7 @@
 // =====================================================================
 
 import { CLUBS, NOTIFICATIONS, USERS, nextId } from '@/data/store'
+import { buildDemoClubs, clearDemoClubs } from '@/data/demoSeed'
 import { MOCK_LATENCY_MS } from '@/config/api'
 import type { AppNotification, Club, ClubMember, ClubView, User } from '@/types'
 
@@ -149,6 +150,21 @@ export async function createClub(input: { name: string; emoji: string; descripti
   // Creating a club makes you an owner — Owner takes precedence over Member.
   if (u && u.role === 'member') u.role = 'owner'
   return toView(club, userId, false)
+}
+
+// ---- Demo-clubs onboarding sandbox (docs/DEMO_CLUBS.md) ----
+
+/** Lazily create the caller's two demo clubs (Rookie HQ + Aces Academy) + 6 free games.
+ *  Idempotent. Returns Rookie HQ's id to navigate into. */
+export async function seedDemoClubs(userId: string): Promise<string> {
+  await delay()
+  return buildDemoClubs(userId)
+}
+
+/** Remove the caller's demo clubs + all their games. */
+export async function removeDemoClubs(userId: string): Promise<void> {
+  await delay(150)
+  clearDemoClubs(userId)
 }
 
 /** Host toggles a club between public & private. Rotates the invite code to match

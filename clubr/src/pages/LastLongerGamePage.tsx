@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Lock, Eye, Timer, Crown, Shield, Users, UserRound, Check, UserPlus, Scissors, Trophy, MapPin, Wifi, RotateCcw, X, Ban, AlertTriangle, Flag } from 'lucide-react'
 import { GameJoinBanner } from '@/components/games/GameJoinBanner'
+import { PillBadge } from '@/components/games/PillBadge'
 import { ShareGameButton } from '@/components/games/ShareGameButton'
 import { GameHostLine } from '@/components/games/GameHostLine'
 import { PrivateGameCard } from '@/components/games/PrivateGameCard'
@@ -84,6 +85,7 @@ export function LastLongerGamePage() {
       <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
       <GameJoinBanner admitted={g.isMemberOfClub || g.canManage} />
 
+      <PillBadge type="ll" height={52} className="mb-1.5" />
       <div className="flex items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span>{g.clubName}</div>
       <div className="mt-1 flex items-start justify-between gap-2"><h1 className="flex min-w-0 flex-wrap items-center gap-1.5 text-lg font-extrabold tracking-tight text-text-primary"><Timer className="h-5 w-5 text-accent-amber" />{g.title}<HowItWorksButton onClick={() => setHowOpen(true)} /></h1><ShareGameButton type="ll" gameId={g.id} className="shrink-0 whitespace-nowrap" /></div>
       <div className="mt-1"><GameHostLine hostId={g.hostId} knownName={g.participants.find((p) => p.userId === g.hostId)?.name} /></div>
@@ -216,7 +218,7 @@ export function LastLongerGamePage() {
       )}
 
       {/* Standings (was "Leaderboard" — distinct from the club Leaderboard tab) */}
-      <Section icon={Users} tone="emerald" title={r.completed ? `Final standings · ${r.finishers.length}` : `Standings · ${active.length} in · ${out.length} out`} action={!r.completed && g.canManage ? <button type="button" onClick={() => setCoHostOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue/15 px-2.5 py-1 text-[11px] font-bold text-accent-blue ring-1 ring-accent-blue/30 hover:bg-accent-blue/25 cursor-pointer"><Shield className="h-3 w-3" />Add co-host</button> : undefined}>
+      <Section icon={Users} tone="emerald" title={r.completed ? `Entrants · ${r.finishers.length}` : `Standings · ${active.length} in · ${out.length} out`} action={!r.completed && g.canManage ? <button type="button" onClick={() => setCoHostOpen(true)} className="flex items-center gap-1 rounded-full bg-accent-blue/15 px-2.5 py-1 text-[11px] font-bold text-accent-blue ring-1 ring-accent-blue/30 hover:bg-accent-blue/25 cursor-pointer"><Shield className="h-3 w-3" />Add co-host</button> : undefined}>
         {!r.completed && g.canManage && <p className="mb-2 text-[11px] text-text-muted">Admit players · green dot = paid · "Bust" to eliminate. Co-hosts are set with “Add co-host”.</p>}
         <div className="flex flex-col gap-1.5">
           {r.completed ? (

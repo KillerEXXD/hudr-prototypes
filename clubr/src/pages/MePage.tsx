@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins, Pencil, MapPin, GalleryHorizontalEnd, Camera, Check, Ban } from 'lucide-react'
+import { ShieldCheck, Crown, User as UserIcon, LogOut, ChevronRight, Palette, Coins, Pencil, MapPin, GalleryHorizontalEnd, Camera, Check, Ban, Sparkles } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWallet } from '@/hooks/credits'
+import { useMyClubs, useRemoveDemo } from '@/hooks'
 import { Avatar, Badge, Btn, Card, Section, Sheet, Field } from '@/components/common/ui'
 import { CityField } from '@/components/common/CityField'
 import { SkinPicker } from '@/components/common/SkinPicker'
@@ -93,6 +94,9 @@ export function MePage() {
   const { user, realRole, actAs, logout, loginAs } = useAuth()
   const navigate = useNavigate()
   const wallet = useWallet()
+  const clubs = useMyClubs()
+  const removeDemo = useRemoveDemo()
+  const demoClubs = (clubs.data ?? []).filter((c) => c.isDemo)
   const [editOpen, setEditOpen] = useState(false)
   const [photoOpen, setPhotoOpen] = useState(false)
   if (!user) return null
@@ -163,6 +167,11 @@ export function MePage() {
           <div className="flex-1"><p className="text-sm font-bold text-text-primary">Carousel Lab</p><p className="text-xs text-text-muted">Compare carousel styles · pick the one you like</p></div>
           <ChevronRight className="h-4 w-4 text-text-muted" />
         </Card>
+        <Card onClick={() => navigate('/mascot-variants')} className="mt-2 flex items-center gap-3">
+          <Sparkles className="h-5 w-5 text-accent-amber" />
+          <div className="flex-1"><p className="text-sm font-bold text-text-primary">Mascot variants</p><p className="text-xs text-text-muted">4 Midjourney sets · grouped by game · pick the one that ships</p></div>
+          <ChevronRight className="h-4 w-4 text-text-muted" />
+        </Card>
       </Section>
 
       {user.role === 'admin' && (
@@ -171,6 +180,19 @@ export function MePage() {
             <ShieldCheck className="h-5 w-5 text-accent-purple" />
             <div className="flex-1"><p className="text-sm font-bold text-text-primary">Admin console</p><p className="text-xs text-text-muted">All clubs &amp; all users</p></div>
             <ChevronRight className="h-4 w-4 text-text-muted" />
+          </Card>
+        </Section>
+      )}
+
+      {demoClubs.length > 0 && (
+        <Section title="Demo clubs">
+          <Card className="flex items-center gap-3">
+            <span className="text-xl">🎓</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-text-primary">Practice sandbox</p>
+              <p className="text-xs text-text-muted">{demoClubs.map((c) => c.name).join(' · ')} — remove anytime.</p>
+            </div>
+            <Btn variant="ghost" loading={removeDemo.isPending} onClick={() => removeDemo.mutate()} className="shrink-0 text-accent-red">Remove</Btn>
           </Card>
         </Section>
       )}

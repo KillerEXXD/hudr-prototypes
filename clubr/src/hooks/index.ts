@@ -81,6 +81,21 @@ export function useMarkAllNotificationsRead() {
   return useMutation({ mutationFn: () => api.markAllNotificationsRead(), onSuccess: invalidate })
 }
 
+/** Spin up the caller's two demo clubs + 6 free games. Returns Rookie HQ's id to
+ *  navigate into. Invalidates everything — the seed touches clubs + all 3 game lists. */
+export function useSeedDemo() {
+  const { userId } = useIdentity()
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: () => api.seedDemoClubs(userId), onSuccess: () => qc.invalidateQueries() })
+}
+
+/** Remove the caller's demo clubs + all their games. */
+export function useRemoveDemo() {
+  const { userId } = useIdentity()
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: () => api.removeDemoClubs(userId), onSuccess: () => qc.invalidateQueries() })
+}
+
 export function useCreateClub() {
   const { userId } = useIdentity()
   const { refreshUser } = useAuth()

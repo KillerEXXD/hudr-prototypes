@@ -12,6 +12,8 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { GameRelationshipChip } from '@/components/common/GameRelationshipChip'
 import { gameRelationship, isGameHost, isGameCoHost } from '@/lib/gameRelationship'
 import { StakePool } from '@/components/common/StakePool'
+import { EntrantCount } from '@/components/games/MembersIcon'
+import { PillBadge } from '@/components/games/PillBadge'
 import { PayoutBadge } from '@/components/common/GameSetup'
 import type { FTContestView } from '@/types/ft'
 
@@ -29,7 +31,7 @@ export function ContestRow({ c, showType, clubRole }: { c: FTContestView; showTy
   })
   return (
     <Card onClick={() => navigate(`/fantasy/${c.id}`)} className="p-3.5">
-      {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-purple px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Target className="h-3.5 w-3.5" />FT Fantasy</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
+      {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <PillBadge type="ft" height={34} />}{clubRole && <RoleChip role={clubRole} />}</div>}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><span className="text-base">{c.clubEmoji}</span><span className="truncate">{c.clubName}</span></div>
         <div className="flex shrink-0 items-center gap-1.5">
@@ -40,13 +42,17 @@ export function ContestRow({ c, showType, clubRole }: { c: FTContestView; showTy
       {(() => {
         const entered = c.entries.filter((e) => e.status === 'approved').length
         return (
-          <StakePool
-            stake={c.stake}
-            pool={c.stake * entered}
-            right={c.status === 'open'
-              ? <Countdown deadline={regDeadline(c.locksAtTs ?? c.locksAt)} prefix="Locks" />
-              : <span className="text-text-muted">{formatCloseInZone(c.locksAtTs, detectZone()) || c.locksAt}</span>}
-          >· {entered} entered</StakePool>
+          <>
+            <StakePool
+              stake={c.stake}
+              pool={c.stake * entered}
+              right={c.status === 'open'
+                ? <Countdown deadline={regDeadline(c.locksAtTs ?? c.locksAt)} prefix="Locks" />
+                : <span className="text-text-muted">{formatCloseInZone(c.locksAtTs, detectZone()) || c.locksAt}</span>}
+            >· {entered} entered</StakePool>
+            {/* Total approved entrants — shown on every card, every status. */}
+            <EntrantCount count={entered} iconSize={18} className="mt-1.5" />
+          </>
         )
       })()}
       <div className="mt-2"><PayoutBadge payouts={c.payouts ?? (c.format === 'winner_takes_all' ? [100] : undefined)} /></div>

@@ -11,6 +11,8 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { GameRelationshipChip } from '@/components/common/GameRelationshipChip'
 import { gameRelationship, isGameHost, isGameCoHost } from '@/lib/gameRelationship'
 import { StakePool } from '@/components/common/StakePool'
+import { EntrantCount } from '@/components/games/MembersIcon'
+import { PillBadge } from '@/components/games/PillBadge'
 import { PayoutBadge } from '@/components/common/GameSetup'
 import { CreateGameSheet } from '@/components/ll/CreateGameSheet'
 import type { LLGameView } from '@/types/ll'
@@ -29,7 +31,7 @@ export function GameRow({ g, showType, clubRole }: { g: LLGameView; showType?: b
   })
   return (
     <Card onClick={() => navigate(`/lastlonger/${g.id}`)} className="p-3.5">
-      {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-amber px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm"><Timer className="h-3.5 w-3.5" />Last Longer</span>}{clubRole && <RoleChip role={clubRole} />}</div>}
+      {(showType || clubRole) && <div className="mb-2 flex items-center gap-1.5">{showType && <PillBadge type="ll" height={34} />}{clubRole && <RoleChip role={clubRole} />}</div>}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted"><span className="text-base">{g.clubEmoji}</span><span className="truncate">{g.clubName}</span></div>
         <StatusBadge phase={g.status} />
@@ -39,11 +41,15 @@ export function GameRow({ g, showType, clubRole }: { g: LLGameView; showType?: b
         const out = g.participants.filter((p) => p.status === 'out').length
         const entered = g.participants.filter((p) => p.status !== 'pending').length
         return (
-          <StakePool
-            stake={g.stake}
-            pool={g.stake * entered}
-            right={g.status === 'registration' ? <Countdown deadline={regDeadline(g.registrationClosesAt)} /> : undefined}
-          >· {g.activeCount} in{out ? ` · ${out} out` : ''}</StakePool>
+          <>
+            <StakePool
+              stake={g.stake}
+              pool={g.stake * entered}
+              right={g.status === 'registration' ? <Countdown deadline={regDeadline(g.registrationClosesAt)} /> : undefined}
+            >· {g.activeCount} in{out ? ` · ${out} out` : ''}</StakePool>
+            {/* Total approved entrants — shown on every card, every status. */}
+            <EntrantCount count={entered} iconSize={18} className="mt-1.5" />
+          </>
         )
       })()}
       <div className="mt-2"><PayoutBadge payouts={g.payouts} /></div>

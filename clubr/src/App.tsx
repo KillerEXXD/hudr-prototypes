@@ -16,6 +16,7 @@ import { LastLongerGamePage } from '@/pages/LastLongerGamePage'
 import { SquaresGamePage } from '@/pages/SquaresGamePage'
 import { MePage } from '@/pages/MePage'
 import { CarouselLabPage } from '@/pages/CarouselLabPage'
+import { MascotVariantsPage } from '@/pages/MascotVariantsPage'
 import { WalletPage } from '@/pages/WalletPage'
 import { AdminPage } from '@/pages/AdminPage'
 import { MemberPage } from '@/pages/MemberPage'
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/squares/:id" element={<SquaresGamePage />} />
         <Route path="/me" element={<MePage />} />
         <Route path="/carousel-lab" element={<CarouselLabPage />} />
+        <Route path="/mascot-variants" element={<MascotVariantsPage />} />
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/member/:id" element={<MemberPage />} />
