@@ -24,7 +24,9 @@ export function AppShell() {
           {/* Square-rejected banner — pops in instantly + sticks until dismissed;
               self-hides when no unread square_rejected notifications. */}
           <SquareRejectedBanner />
-          <main className="flex-1 px-4 pb-6 pt-3">
+          {/* pb clears the now-`fixed` BottomNav (~66px + safe-area) so content isn't
+              hidden behind it. */}
+          <main className="flex-1 px-4 pb-24 pt-3">
             <Outlet />
           </main>
           <BottomNav />

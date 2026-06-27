@@ -53,7 +53,10 @@ export function BottomNav() {
 
   return (
     <>
-      <nav className="sticky bottom-0 z-30 border-t border-border bg-bg-secondary/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
+      {/* `fixed` (centered to the phone-frame) — NOT `sticky bottom-0`, which iOS Safari
+          resolves against the large/toolbar-hidden viewport and floats up above the visual
+          bottom (BUG-937). The matching pad on <main> keeps content clear of it. */}
+      <nav className="fixed bottom-0 left-1/2 z-30 w-full max-w-md -translate-x-1/2 border-t border-border bg-bg-secondary/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
         <div className="relative mx-auto flex max-w-md items-stretch">
           {/* Left: Home */}
           <div className="flex flex-1 items-stretch">
