@@ -10,6 +10,8 @@ import { orderActiveTab, orderCompleted } from '@/games/gameOrdering'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { isLiveForMe, isFinishedForMe, isInProgressForMe } from '@/games/liveBuckets'
 import { LiveDot } from '@/components/common/LiveDot'
+import { LiveIcon } from '@/components/common/LiveIcon'
+import { FinishedIcon } from '@/components/common/FinishedIcon'
 import { cn } from '@/lib/utils/cn'
 
 // "Live" is the player/host home for games: every game you're IN that hasn't ended
@@ -25,14 +27,16 @@ function Chip({ active, onClick, label, icon: Icon, activeClass = 'border-accent
   )
 }
 
-// The Live / Finished status pills: just the word + a top-right corner dot — red
-// (pulsing) on Live when a game is in progress, calm elephant-grey otherwise (and
-// always grey on Finished). No leading icon — the dot is the cue.
-function StatusPill({ active, onClick, label, live }: { active: boolean; onClick: () => void; label: string; live: boolean }) {
+// The Live / Finished status pills: a leading icon + the word. Live uses the SAME
+// broadcast LiveIcon as the bottom nav — it ripples only when a game is actually in
+// progress (`live`), else sits static. Finished uses the static FinishedIcon. The
+// icon tints with the pill's active/inactive colour (currentColor), and replaces the
+// old corner dot.
+function StatusPill({ active, onClick, label, kind, live = false }: { active: boolean; onClick: () => void; label: string; kind: View; live?: boolean }) {
   return (
-    <button type="button" onClick={onClick} className={cn('relative flex items-center rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' : 'border-transparent font-semibold text-text-secondary')}>
+    <button type="button" onClick={onClick} className={cn('flex items-center gap-1 rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' : 'border-transparent font-semibold text-text-secondary')}>
+      {kind === 'live' ? <LiveIcon size={14} animate={live} /> : <FinishedIcon size={14} />}
       {label}
-      <LiveDot live={live} className="absolute -right-1 -top-1" />
     </button>
   )
 }
@@ -71,10 +75,10 @@ export function LivePage() {
       </h1>
       <p className="mt-1 text-sm text-text-secondary">Every game you're in or hosting — and how your finished ones went.</p>
 
-      {/* Live / Finished status pills (word + top-right dot) + type filter */}
+      {/* Live / Finished status pills (leading icon + word) + type filter */}
       <div className="mt-3 flex gap-1.5">
-        <StatusPill active={view === 'live'} onClick={() => setView('live')} label={liveTotal ? `Live · ${liveTotal}` : 'Live'} live={inProgress} />
-        <StatusPill active={view === 'finished'} onClick={() => setView('finished')} label={finishedTotal ? `Finished · ${finishedTotal}` : 'Finished'} live={false} />
+        <StatusPill kind="live" active={view === 'live'} onClick={() => setView('live')} label={liveTotal ? `Live · ${liveTotal}` : 'Live'} live={inProgress} />
+        <StatusPill kind="finished" active={view === 'finished'} onClick={() => setView('finished')} label={finishedTotal ? `Finished · ${finishedTotal}` : 'Finished'} />
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5">
         <Chip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
