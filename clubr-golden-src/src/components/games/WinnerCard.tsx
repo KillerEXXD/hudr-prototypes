@@ -54,7 +54,9 @@ function summarize(g: UnifiedGame): Summary {
   const winners = sq.periods
     .filter((p) => p.winnerUserId)
     .map((p) => ({ name: nameOf(p.winnerUserId) ?? 'Winner', note: p.label, amount: Math.round((pool * p.pct) / 100) }))
-  return { typeId: 'football_squares', title: sq.title, pool, entrants: sq.claimedCount, winners }
+  // Entrants = the number of PEOPLE in the game, not squares claimed (pool still uses
+  // claimedCount). Matches FT/LL which count people.
+  return { typeId: 'football_squares', title: sq.title, pool, entrants: sq.participants.length, winners }
 }
 
 /** Rich Completed card: who won, the prize pool, and each payout. A cancelled

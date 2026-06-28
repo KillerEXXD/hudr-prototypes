@@ -34,5 +34,9 @@ export function useCancelSquares() { const inv = useInvalidate(); return useMuta
 export function usePostChatSquares() { const { userId } = useIdentity(); const inv = useInvalidate(); return useMutation({ mutationFn: (v: { gameId: string; text: string }) => sq.postChatSquares(v.gameId, userId, v.text), onSuccess: inv }) }
 export function useCreateSquares() {
   const { userId } = useIdentity(); const inv = useInvalidate()
-  return useMutation({ mutationFn: (v: { clubId: string; title: string; homeTeam: string; awayTeam: string; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; periodPayouts: number[] }) => sq.createSquares(v.clubId, userId, { title: v.title, homeTeam: v.homeTeam, awayTeam: v.awayTeam, stake: v.stake, visibility: v.visibility, accessUserIds: v.accessUserIds, closesAt: v.closesAt, timezone: v.timezone, periodPayouts: v.periodPayouts }), onSuccess: inv })
+  return useMutation({ mutationFn: (v: { clubId: string; title: string; homeTeam: string; awayTeam: string; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; periodPayouts: number[]; noWinnerRule?: 'rollover' | 'split' | 'refund' | 'charity'; charityName?: string; rolledOverFromGameIds?: string[] }) => sq.createSquares(v.clubId, userId, { title: v.title, homeTeam: v.homeTeam, awayTeam: v.awayTeam, stake: v.stake, visibility: v.visibility, accessUserIds: v.accessUserIds, closesAt: v.closesAt, timezone: v.timezone, periodPayouts: v.periodPayouts, noWinnerRule: v.noWinnerRule, charityName: v.charityName, rolledOverFromGameIds: v.rolledOverFromGameIds }), onSuccess: inv })
+}
+/** Finished same-club games whose unwon Q4 pool can be carried into a new board's Q4. */
+export function useRolloverPools(clubId: string) {
+  return useQuery({ queryKey: ['sq', 'rolloverPools', clubId], queryFn: () => sq.rolloverPools(clubId), enabled: !!clubId })
 }

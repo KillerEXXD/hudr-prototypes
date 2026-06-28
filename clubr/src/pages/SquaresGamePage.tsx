@@ -21,6 +21,7 @@ import { CountdownBanner, regDeadline } from '@/components/common/Countdown'
 import { CloseTimeLabel } from '@/components/common/CloseTime'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SquaresResults } from '@/components/squares/SquaresResults'
+import { SquaresCompletedSummary } from '@/components/squares/SquaresCompletedSummary'
 import { HowItWorksButton } from '@/components/common/HowItWorksButton'
 import { HowItWorks } from '@/components/common/HowItWorks'
 import { cn } from '@/lib/utils/cn'
@@ -131,7 +132,7 @@ export function SquaresGamePage() {
       <div className="mt-1.5 flex items-center gap-2 text-xs">
         <StatusBadge phase={g.status} />
       </div>
-      <StakePool stake={g.stake} pool={g.stake * g.claimedCount}>· {g.claimedCount}/100 squares</StakePool>
+      <StakePool stake={g.stake} pool={g.stake * g.claimedCount}>· {g.participants.length} entrants · {g.claimedCount}/100 squares</StakePool>
       {g.status === 'registration' && (
         <div className="mt-3">
           <CountdownBanner deadline={regDeadline(g.registrationClosesAt)} sub="Claiming closes — grab your squares before the clock hits zero" closedLabel="Awaiting host" onEdit={g.canManage ? () => setEditRegOpen(true) : undefined} />
@@ -150,6 +151,10 @@ export function SquaresGamePage() {
           <div><p className="text-sm font-bold text-text-primary">Game cancelled by the host</p>{g.cancelReason && <p className="mt-0.5 text-xs text-text-secondary">{g.cancelReason}</p>}</div>
         </Card>
       )}
+
+      {/* Completed → the redesigned summary: house-rule chip, cross-game rollover
+          provenance, the champion (Q4 winner), and the per-quarter breakdown. */}
+      {g.status === 'completed' && <SquaresCompletedSummary g={g} userId={user?.id} lpRows={lpRows} />}
 
       {g.status !== 'cancelled' && (!g.isMemberOfClub && !g.canManage ? (
         <Card className="mt-3 flex items-start gap-2.5 border-accent-amber/30 bg-accent-amber/10"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-amber" /><p className="text-xs leading-snug text-text-secondary">Join <button onClick={() => navigate(`/club/${g.clubId}`)} className="font-bold text-accent-blue underline cursor-pointer">{g.clubName}</button> first to claim squares.</p></Card>

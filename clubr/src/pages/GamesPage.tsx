@@ -6,8 +6,9 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
 import { InfiniteList } from '@/components/common/InfiniteList'
-import { RelationshipPills } from '@/components/games/RelationshipPills'
+import { RelationshipPills, relationshipTone } from '@/components/games/RelationshipPills'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
+import { StickyFilterSummary, SummaryPill, useFilterSticky, scrollToFilters } from '@/components/common/StickyFilterSummary'
 import { GAME_TYPES, type GameType } from '@/games/types'
 import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
 import { orderActiveTab, orderCompleted } from '@/games/gameOrdering'
@@ -59,6 +60,13 @@ export function GamesPage() {
   const shownActive = orderActiveTab(active.filter((g) => relationshipOf(g) === rel).filter((g) => matchesType(g, filter)), rel)
   const showFinished = rel === 'finished'
 
+  // Sticky filter summary: mirror the active relationship + type once the filter row
+  // scrolls under the header (same component/behaviour as the Live tab).
+  const { sentinelRef, stuck } = useFilterSticky()
+  const relTone = relationshipTone(rel, theme === 'golden')
+  const activeType = filter === 'all' ? null : GAME_TYPES.find((t) => t.id === filter) ?? null
+  const TypeIcon = activeType?.icon ?? LayoutGrid
+
   return (
     <div className="animate-fade-up">
       <div className="flex items-center justify-between gap-2">
@@ -77,6 +85,14 @@ export function GamesPage() {
         <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
         {GAME_TYPES.map((t) => <FilterChip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
       </div>
+
+      {/* When this sentinel slides under the header, the condensed summary pins in. */}
+      <div ref={sentinelRef} aria-hidden className="h-0" />
+      <StickyFilterSummary show={stuck} onEdit={scrollToFilters}>
+        <SummaryPill label={relTone.label} tone={relTone.active} />
+        <span className="text-text-muted" aria-hidden>·</span>
+        <SummaryPill icon={<TypeIcon className="h-3 w-3" />} label={activeType?.short ?? 'All'} tone={activeType?.chipActive ?? relTone.active} />
+      </StickyFilterSummary>
 
       {isLoading ? <Spinner /> : (
         <Section title={showFinished ? 'Finished' : 'Games'}>

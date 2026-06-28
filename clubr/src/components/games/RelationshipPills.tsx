@@ -103,3 +103,12 @@ export function RelationshipPills({
     </div>
   )
 }
+
+/**
+ * The active label + tone for a relationship pill — so the sticky filter summary can
+ * mirror the selected pill with the EXACT same colour (incl. the Golden skin remap).
+ */
+export function relationshipTone(rel: Relationship, golden = false): { label: string; active: string } {
+  const m = META[rel]
+  return { label: m.label, active: golden && m.goldActive ? m.goldActive : m.active }
+}

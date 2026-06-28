@@ -9,11 +9,13 @@ const ORDER = ['Q1', 'Q2', 'Q3', 'Final']
  * Quarter winner cards — the prominent results display for a Football Squares
  * game. One tile per quarter (Final emphasized) showing the score, the WINNING
  * SQUARE pulled out as the owner's avatar + big initials, the winner's name, and
- * the Stakes that square won. Renders once any period has been scored.
+ * the Stakes that square won. Renders for a LIVE game as scores come in; once the
+ * game is COMPLETED, the richer per-quarter `SquaresQuarterCards` is the single
+ * source of truth, so this redundant strip is hidden there.
  */
 export function SquaresResults({ g }: { g: SquaresGameView }) {
   const anyScored = g.periods.some((p) => p.homeScore != null)
-  if (g.status === 'registration' || !anyScored) return null
+  if (g.status === 'registration' || g.status === 'completed' || !anyScored) return null
   const periods = [...g.periods].sort((a, b) => ORDER.indexOf(a.label) - ORDER.indexOf(b.label))
   const pool = g.stake * g.claimedCount
 
@@ -35,7 +37,7 @@ export function SquaresResults({ g }: { g: SquaresGameView }) {
           return (
             <div key={p.label} className={cn('flex flex-1 min-w-0 flex-col items-center rounded-xl border p-2 text-center', final ? 'border-accent-amber/60 bg-accent-amber/10 ring-1 ring-accent-amber/40' : 'border-border bg-bg-card')}>
               <span className={cn('flex items-center gap-0.5 text-[10px] font-extrabold uppercase tracking-wide', final ? 'text-accent-amber' : 'text-text-muted')}>
-                {final && <Trophy className="h-3 w-3" />}{p.label}
+                {final && <Trophy className="h-3 w-3" />}{p.label === 'Final' ? 'Q4' : p.label}
               </span>
               {scored ? (
                 <>

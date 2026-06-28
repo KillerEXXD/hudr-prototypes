@@ -5,6 +5,7 @@ import { MOCK_LATENCY_MS } from '@/config/api'
 import { ECONOMY, refund } from '@/data/creditsStore'
 import { emptyGrid, type SquaresGame, type SquaresGameView } from '@/types/squares'
 import { type PrivateGate, type PrivateGameInfo } from '@/lib/api/privateGame'
+import { computeSquaresPayouts } from '@/lib/squaresPayouts'
 
 const delay = (ms = MOCK_LATENCY_MS) => new Promise((r) => setTimeout(r, ms))
 const isMember = (clubId: string, userId: string) => !!CLUBS.find((c) => c.id === clubId)?.members.some((m) => m.userId === userId && m.status === 'member')
@@ -58,11 +59,47 @@ export async function getSquares(id: string, userId: string, isAdmin = false): P
   return toView(g, userId, isAdmin)
 }
 
-export async function createSquares(clubId: string, hostId: string, input: { title: string; homeTeam: string; awayTeam: string; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; periodPayouts: number[] }): Promise<string> {
+/** The pool an unwon Final carries to a future game (Rollover rule) — its base plus
+ *  any unwon earlier quarters that rolled onto it. `null` if the Final had a winner
+ *  (or the game isn't a rollover source). */
+function unwonFinalPool(g: SquaresGame): number | null {
+  const payouts = computeSquaresPayouts(toView(g, '', false))
+  const fin = payouts.perPeriod.find((p) => p.label === 'Final')
+  return fin && fin.unclaimedTo === 'nextGame' ? fin.unclaimedAmount : null
+}
+
+/** Finished same-club games whose unwon Q4 pool the host can carry into a new game's
+ *  Q4 (Rollover rule). Each pool is consumable once — excludes games already carried
+ *  in (`rolledOverToGameId` set or referenced by another game's `rolledOverFrom`). */
+export async function rolloverPools(clubId: string): Promise<{ id: string; title: string; homeTeam: string; awayTeam: string; amount: number }[]> {
+  await delay(120)
+  const consumed = new Set(SQUARES_GAMES.flatMap((g) => (g.rolledOverFrom ?? []).map((r) => r.gameId)))
+  const out: { id: string; title: string; homeTeam: string; awayTeam: string; amount: number }[] = []
+  for (const g of SQUARES_GAMES) {
+    if (g.clubId !== clubId || g.status !== 'completed' || g.rolledOverToGameId || consumed.has(g.id)) continue
+    const amount = unwonFinalPool(g)
+    if (amount != null && amount > 0) out.push({ id: g.id, title: g.title, homeTeam: g.homeTeam, awayTeam: g.awayTeam, amount })
+  }
+  return out
+}
+
+export async function createSquares(clubId: string, hostId: string, input: { title: string; homeTeam: string; awayTeam: string; stake: number; visibility: 'public' | 'private'; accessUserIds: string[]; closesAt: string; timezone: string; periodPayouts: number[]; noWinnerRule?: 'rollover' | 'split' | 'refund' | 'charity'; charityName?: string; rolledOverFromGameIds?: string[] }): Promise<string> {
   await delay()
   const club = CLUBS.find((c) => c.id === clubId)
   const id = `sq_${Date.now()}`
   const labels = ['Q1', 'Q2', 'Q3', 'Final']
+  // Resolve the carried-in unwon-Q4 pools → provenance entries, and mark each source
+  // consumed so it can't be carried into a second game.
+  const rule = input.noWinnerRule ?? 'rollover'
+  const rolledOverFrom = (rule === 'rollover' ? (input.rolledOverFromGameIds ?? []) : [])
+    .map((srcId) => {
+      const src = SQUARES_GAMES.find((x) => x.id === srcId)
+      const amount = src ? unwonFinalPool(src) : null
+      if (!src || amount == null) return null
+      src.rolledOverToGameId = id
+      return { gameId: src.id, title: src.title, amount }
+    })
+    .filter((x): x is { gameId: string; title: string; amount: number } => x != null)
   SQUARES_GAMES.unshift({
     id, clubId, clubName: club?.name ?? 'Club', clubEmoji: club?.emoji ?? '🃏',
     title: input.title.trim() || 'Squares', homeTeam: input.homeTeam.trim() || 'Home', awayTeam: input.awayTeam.trim() || 'Away',
@@ -72,6 +109,9 @@ export async function createSquares(clubId: string, hostId: string, input: { tit
     cells: emptyGrid(), rowDigits: [], colDigits: [],
     periods: labels.map((label, i) => ({ label, pct: input.periodPayouts[i] ?? 0 })),
     participants: [], chat: [],
+    noWinnerRule: rule,
+    charityName: rule === 'charity' ? (input.charityName?.trim() || undefined) : undefined,
+    rolledOverFrom: rolledOverFrom.length ? rolledOverFrom : undefined,
   })
   return id
 }

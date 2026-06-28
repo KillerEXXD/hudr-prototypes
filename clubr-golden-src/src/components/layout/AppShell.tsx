@@ -2,6 +2,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircle2 } from 'lucide-react'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
+import { ScrollToTop } from './ScrollToTop'
 import FeedbackButton from '@/components/common/FeedbackButton'
 import { SpendProvider } from '@/components/credits/SpendProvider'
 import { Sheet, Btn } from '@/components/common/ui'
@@ -17,6 +18,7 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-screen justify-center bg-bg-primary">
+      <ScrollToTop />
       <div className="flex min-h-screen w-full max-w-md flex-col border-x border-border bg-bg-primary">
         <SpendProvider>
           <Header />

@@ -15,6 +15,10 @@ import { useUnifiedGames, matchesType, type UnifiedGame } from '@/games/useUnifi
 import { relationshipOf } from '@/games/gameRelationship'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
+import { StickyFilterSummary, SummaryPill, useFilterSticky, scrollToFilters } from '@/components/common/StickyFilterSummary'
+import { LayoutGrid } from 'lucide-react'
+
+const STATUS_SUMMARY_BLUE = 'border-accent-blue bg-accent-blue/20 text-accent-blue ring-1 ring-accent-blue/40'
 import { cn } from '@/lib/utils/cn'
 
 // Club-detail Games filter — the pill SET is conditional on the viewer's role on
@@ -57,6 +61,8 @@ export function ClubDetailPage() {
   // The pill the user explicitly tapped (null = none yet → use the role default).
   const [picked, setPicked] = useState<ClubStatus | null>(null)
   const [tab, setTab] = useState<'games' | 'leaderboard' | 'members'>('games')
+  // Sticky filter summary — call the hook ABOVE the early returns (rules of hooks).
+  const { sentinelRef, stuck } = useFilterSticky()
 
   if (isLoading) return <Spinner label="Loading club…" />
   // Non-disclosure: a private club you can't see is indistinguishable from a club that
@@ -103,6 +109,10 @@ export function ClubDetailPage() {
     gameStatus === 'hosting' ? active.filter((g) => byType(g) && relationshipOf(g) !== 'playing')
     : gameStatus === 'running' ? active.filter((g) => byType(g) && g.phase === 'live' && relationshipOf(g) !== 'playing')
     : active.filter((g) => byType(g) && relationshipOf(g) === gameStatus)
+  // Sticky summary mirrors the active status pill + the type dropdown selection.
+  const statusMeta = gameStatus ? STATUS_META[gameStatus] : undefined
+  const activeTypeMeta = gameFilter === 'all' ? null : GAME_TYPES.find((t) => t.id === gameFilter) ?? null
+  const SummaryTypeIcon = activeTypeMeta?.icon ?? LayoutGrid
   // Finished: settled + cancelled, newest first by settled timestamp (cancelled → bottom).
   const finishedItems = clubAll
     .filter((g) => byType(g) && g.finished)
@@ -263,6 +273,14 @@ export function ClubDetailPage() {
                   )
                 })}
               </div>
+
+              {/* When the filters scroll under the header, pin the condensed summary. */}
+              <div ref={sentinelRef} aria-hidden className="h-0" />
+              <StickyFilterSummary show={stuck} onEdit={scrollToFilters}>
+                <SummaryPill label={statusMeta?.label ?? 'Games'} tone={statusMeta?.active ?? STATUS_SUMMARY_BLUE} />
+                <span className="text-text-muted" aria-hidden>·</span>
+                <SummaryPill icon={<SummaryTypeIcon className="h-3 w-3" />} label={activeTypeMeta?.short ?? 'All'} tone={activeTypeMeta?.chipActive ?? STATUS_SUMMARY_BLUE} />
+              </StickyFilterSummary>
 
               {gameStatus === 'finished' ? (
                 <InfiniteList

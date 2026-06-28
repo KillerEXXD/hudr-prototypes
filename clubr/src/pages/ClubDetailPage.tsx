@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, ChevronDown, PartyPopper, GraduationCap } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Lock, Globe, Eye, Copy, Check, Gamepad2, Trophy, Users, Plus, UserCheck, X, MapPin, Ticket, ChevronDown, PartyPopper, GraduationCap, LogOut, Skull, Settings } from 'lucide-react'
 import { useClub, useApproveMember, useRejectMember, useRequestToJoin, useJoinViaInvite, useSetClubVisibility } from '@/hooks'
+import { LeaveClubSheet } from '@/components/clubs/LeaveClubSheet'
+import { DissolveSheet } from '@/components/clubs/DissolveSheet'
+import { OwnersManager } from '@/components/clubs/OwnersManager'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge, Btn, Card, Field, Section, Sheet, Spinner, EmptyState, ProcessingOverlay } from '@/components/common/ui'
 import { MembershipBadge } from '@/components/common/cards'
+import { DemoQuest } from '@/components/demo/DemoQuest'
 import { NewGameSheet } from '@/components/games/NewGameSheet'
 import { WinnerCard } from '@/components/games/WinnerCard'
 import { MembersIcon } from '@/components/games/MembersIcon'
@@ -17,7 +21,11 @@ import { CLUB_STATUSES, clubStatusOf, amPlaying, type ClubStatus } from '@/games
 import { LiveIcon } from '@/components/common/LiveIcon'
 import { renderUnifiedGame } from '@/games/renderGame'
 import { GAME_TYPES, type GameType } from '@/games/types'
+import { StickyFilterSummary, SummaryPill, useFilterSticky, scrollToFilters } from '@/components/common/StickyFilterSummary'
+import { LayoutGrid } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
+
+const STATUS_SUMMARY_BLUE = 'border-accent-blue bg-accent-blue/20 text-accent-blue ring-1 ring-accent-blue/40'
 
 // Club-detail Games filter — ONE 4-way partition (New · Live · Running · Finished) shown
 // to EVERY viewer, all four pills always visible with counts. Rule + ClubStatus type live
@@ -47,10 +55,15 @@ export function ClubDetailPage() {
   const [copied, setCopied] = useState(false)
   const [newOpen, setNewOpen] = useState(false)
   const [inviteOpen, setInviteOpen] = useState(false)
+  const [leaveOpen, setLeaveOpen] = useState(false)
+  const [dissolveOpen, setDissolveOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [gameFilter, setGameFilter] = useState<'all' | GameType>('all')
   // The pill the user explicitly tapped (null = none yet → use the role default).
   const [picked, setPicked] = useState<ClubStatus | null>(null)
   const [tab, setTab] = useState<'games' | 'leaderboard' | 'members'>('games')
+  // Sticky filter summary — call the hook ABOVE the early returns (rules of hooks).
+  const { sentinelRef, stuck } = useFilterSticky()
 
   if (isLoading) return <Spinner label="Loading club…" />
   // Non-disclosure: a private club you can't see is indistinguishable from a club that
@@ -81,6 +94,10 @@ export function ClubDetailPage() {
     : counts.playing > 0 ? 'playing'
     : CLUB_STATUSES.find((s) => counts[s] > 0) ?? 'playing'
   const activeShown = clubAll.filter((g) => byType(g) && !g.finished && clubStatusOf(g) === gameStatus)
+  // Sticky summary mirrors the active status pill + the type dropdown selection.
+  const statusMeta = STATUS_META[gameStatus]
+  const activeTypeMeta = gameFilter === 'all' ? null : GAME_TYPES.find((t) => t.id === gameFilter) ?? null
+  const SummaryTypeIcon = activeTypeMeta?.icon ?? LayoutGrid
   // Finished: settled + cancelled, newest first by settled timestamp (cancelled → bottom).
   const finishedItems = clubAll
     .filter((g) => byType(g) && g.finished)
@@ -103,6 +120,8 @@ export function ClubDetailPage() {
   return (
     <div className="animate-fade-up">
       <button onClick={() => navigate(-1)} className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary cursor-pointer"><ChevronLeft className="h-4 w-4" />Back</button>
+
+      {club.isDemo && <DemoQuest />}
 
       <div className="flex items-center gap-3">
         <Avatar emoji={club.emoji} color={club.color} size={56} />
@@ -247,6 +266,14 @@ export function ClubDetailPage() {
                 })}
               </div>
 
+              {/* When the filters scroll under the header, pin the condensed summary. */}
+              <div ref={sentinelRef} aria-hidden className="h-0" />
+              <StickyFilterSummary show={stuck} onEdit={scrollToFilters}>
+                <SummaryPill label={statusMeta?.label ?? 'Games'} tone={statusMeta?.active ?? STATUS_SUMMARY_BLUE} />
+                <span className="text-text-muted" aria-hidden>·</span>
+                <SummaryPill icon={<SummaryTypeIcon className="h-3 w-3" />} label={activeTypeMeta?.short ?? 'All'} tone={activeTypeMeta?.chipActive ?? STATUS_SUMMARY_BLUE} />
+              </StickyFilterSummary>
+
               {gameStatus === 'finished' ? (
                 <InfiniteList
                   items={finishedItems}
@@ -336,6 +363,43 @@ export function ClubDetailPage() {
           <TelegramHostPanel clubId={club.id} />
         </>
       )}
+
+      {/* Lifecycle — member-side Leave, Creator-side Owners + Dissolve. The section
+          is gated by membership status so non-members don't see destructive actions. */}
+      {club.myStatus === 'member' && (
+        <Section title="Club settings & lifecycle">
+          {/* Owners management — Creator only. Lives inline so it's obvious at a
+              glance who can change Owner membership. */}
+          {club.creatorId === user?.id && (
+            <OwnersManager club={club} callerUserId={user.id} />
+          )}
+          {/* Member or non-Creator Owner: Leave button */}
+          {club.creatorId !== user?.id && (
+            <Card onClick={() => setLeaveOpen(true)} className="mt-2 flex items-center gap-3 border-accent-amber/30 bg-accent-amber/5">
+              <LogOut className="h-5 w-5 text-accent-amber" />
+              <div className="flex-1">
+                <p className="text-sm font-bold text-accent-amber">Leave this club</p>
+                <p className="text-xs text-text-muted">Refunds + forfeits run automatically per game</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-text-muted" />
+            </Card>
+          )}
+          {/* Creator-only Danger zone — Dissolve */}
+          {club.creatorId === user?.id && (
+            <Card onClick={() => setDissolveOpen(true)} className="mt-2 flex items-center gap-3 border-accent-red/30 bg-accent-red/5">
+              <Skull className="h-5 w-5 text-accent-red" />
+              <div className="flex-1">
+                <p className="text-sm font-bold text-accent-red">Dissolve {club.name}</p>
+                <p className="text-xs text-text-muted">3-step confirmation · irreversible · Creator only</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-text-muted" />
+            </Card>
+          )}
+        </Section>
+      )}
+
+      {user && <LeaveClubSheet open={leaveOpen} onClose={() => setLeaveOpen(false)} club={club} user={user} onSuccess={() => navigate('/clubs')} />}
+      {user && <DissolveSheet open={dissolveOpen} onClose={() => setDissolveOpen(false)} club={club} callerUserId={user.id} onSuccess={() => navigate('/clubs')} />}
 
       <NewGameSheet open={newOpen} onClose={() => setNewOpen(false)} fixedClubId={club.id} />
 

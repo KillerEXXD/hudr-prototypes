@@ -12,7 +12,12 @@ import { isLiveForMe, isFinishedForMe, isInProgressForMe } from '@/games/liveBuc
 import { LiveDot } from '@/components/common/LiveDot'
 import { LiveIcon } from '@/components/common/LiveIcon'
 import { FinishedIcon } from '@/components/common/FinishedIcon'
+import { StickyFilterSummary, SummaryPill, useFilterSticky, scrollToFilters } from '@/components/common/StickyFilterSummary'
 import { cn } from '@/lib/utils/cn'
+
+// The active-pill colour the Live/Finished status pills use — reused by the sticky
+// summary so it reads as the exact same control.
+const STATUS_ACTIVE_TONE = 'border-accent-blue bg-accent-blue/20 text-accent-blue ring-1 ring-accent-blue/40'
 
 // "Live" is the player/host home for games: every game you're IN that hasn't ended
 // — admitted & playing, waiting on approval (pending), or hosting/co-hosting — plus a
@@ -68,6 +73,15 @@ export function LivePage() {
   // Red pulse only when a game is actually rolling (phase 'live'); else the dot rests grey.
   const inProgress = items.some(isInProgressForMe)
 
+  // Sticky filter summary: mirror the active status + type pills so they stay visible
+  // (pinned under the header) once the real filter row scrolls away.
+  const { sentinelRef, stuck } = useFilterSticky()
+  const statusSummary = view === 'live'
+    ? { icon: <LiveIcon size={12} animate={inProgress} />, label: liveTotal ? `Live · ${liveTotal}` : 'Live' }
+    : { icon: <FinishedIcon size={12} />, label: finishedTotal ? `Finished · ${finishedTotal}` : 'Finished' }
+  const activeType = filter === 'all' ? null : GAME_TYPES.find((t) => t.id === filter) ?? null
+  const TypeIcon = activeType?.icon ?? LayoutGrid
+
   return (
     <div className="animate-fade-up">
       <h1 className="text-xl font-extrabold tracking-tight text-text-primary">
@@ -84,6 +98,14 @@ export function LivePage() {
         <Chip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
         {GAME_TYPES.map((t) => <Chip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
       </div>
+
+      {/* When this sentinel slides under the header, the condensed summary pins in. */}
+      <div ref={sentinelRef} aria-hidden className="h-0" />
+      <StickyFilterSummary show={stuck} onEdit={scrollToFilters}>
+        <SummaryPill icon={statusSummary.icon} label={statusSummary.label} tone={STATUS_ACTIVE_TONE} />
+        <span className="text-text-muted" aria-hidden>·</span>
+        <SummaryPill icon={<TypeIcon className="h-3 w-3" />} label={activeType?.short ?? 'All'} tone={activeType?.chipActive ?? STATUS_ACTIVE_TONE} />
+      </StickyFilterSummary>
 
       {isLoading ? <Spinner /> : (
         <Section title={view === 'finished' ? 'Finished' : 'Live'}>

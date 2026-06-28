@@ -68,6 +68,17 @@ export interface SquaresGame {
   cancelReason?: string
   /** ISO timestamp when the host cancelled. */
   cancelledAt?: string
+  /** House rule for an unclaimed period's prize (a quarter's winning cell wasn't
+   *  claimed). Defaults to 'rollover' (the prior implicit behavior). */
+  noWinnerRule?: 'rollover' | 'split' | 'refund' | 'charity'
+  /** Charity name, shown on the settled page (rule = 'charity' only). */
+  charityName?: string
+  /** Cross-game rollover (Rollover rule): finished same-club games whose unwon Q4
+   *  pool was carried into THIS game's Q4. Consumed once. */
+  rolledOverFrom?: { gameId: string; title: string; amount: number }[]
+  /** Set on a SOURCE game once its unwon Q4 pool has been carried into another
+   *  game's Q4 — excludes it from future carry-in pickers (consumed once). */
+  rolledOverToGameId?: string
 }
 
 export interface SquaresGameView extends SquaresGame {

@@ -44,3 +44,12 @@ export function RelationshipPills({
     </div>
   )
 }
+
+/**
+ * The active label + tone for a relationship pill — so the sticky filter summary can
+ * mirror the selected pill with the EXACT same colour.
+ */
+export function relationshipTone(rel: Relationship): { label: string; active: string } {
+  const m = META[rel]
+  return { label: m.label, active: m.active }
+}

@@ -105,6 +105,13 @@ Approval is required to do anything beyond viewing:
   footprint** (no club records of any status, not a host, no games) **resets to fresh** (the
   persisted max is reset), so a member who leaves their last club returns to the cold‑start hub
   with the nav hidden; a *partial* shrink keeps the higher stage. (Gated on loaded data so it never
+  > **Interim update (home declutter):** the on‑home **"Clubs to join"** section and the
+  > **"Games" / "Open now in your clubs"** feed were **removed from the steady‑state homes**
+  > (Discover, the Golden `FeltGamesFeed`, and Host Home) — games live on the **Live** tab and
+  > clubs to join are reached via **"Find your club"**. The Get‑Started (cold‑start) hub is left
+  > as‑is pending a dedicated onboarding rework. The descriptions below predate this and will be
+  > rewritten alongside the new **Home · + · Live** nav.
+
   flickers mid‑fetch.) **Fresh (no club):** no nav — Home is the **Get‑Started hub**; once a club
   is *requested* the **same hub stays** and each requested club moves into a **"Pending approval"**
   group atop the clubs list with a **"Waiting for approval"** pill (every request visible, still no
@@ -350,6 +357,16 @@ Approval is required to do anything beyond viewing:
   **App Admin → the Admin console** (see §17).
 - **Responsive:** nothing is hidden between mobile and desktop — the same features and
   labels render at every width (role chip, theme label, account switcher, etc.).
+- **Sticky filter summary.** On every pills‑filter list (Live/Games + the club‑detail
+  Games tab) a condensed **`<status> · <type>`** bar **pins under the header** once the
+  real filter row scrolls out of view, mirroring the active pills with the exact same
+  tones; tapping it smooth‑scrolls back to the filters. Zero‑height sticky wrapper → no
+  layout shift; the IntersectionObserver hook is jsdom‑guarded and called above any early
+  return. (`StickyFilterSummary` + `useFilterSticky`.)
+- **Scroll‑to‑top on navigation.** Entering a new page starts at the **top**, except on
+  browser **back/forward** (`POP`), where the prior scroll position is restored. Keyed on
+  **pathname only**, so in‑page filter/tab changes (query‑string) don't yank the page up and
+  keep the sticky filter intact. (`ScrollToTop` in `AppShell`.)
 
 ## 10. Pricing (from the product definition)
 - **To host:** a **ClubR subscription** (premium; bundles HUDR in Phase 2).
@@ -436,8 +453,21 @@ poker rooms and bars, it **peaks at the Super Bowl** → a **seasonal acquisitio
   game's Champion** ("whoever wins the Final wins the game"). **LP weights by payout %**:
   winning the Final (≈70%) earns far more LP than a regular quarter (≈10%), so the Final
   winner tops the per‑game "+N LP" and the club board (§20). LP is **computed on read**,
-  so this weighting applies to **all past games** with no backfill. (`SquaresQuarterCards`,
+  so this weighting applies to **all past games** with no backfill. The 4th period is
+  **displayed as "Q4"** everywhere (results cards, payout editor, copy) while the data
+  `label` stays `'Final'` (the lookup/award keys are unchanged). (`SquaresQuarterCards`,
   `squaresAward`.)
+- **No‑winner rule + rollover (host‑picked at creation).** If a quarter's winning square
+  was never claimed, the host's rule decides where that prize goes: **Rollover** (default —
+  every unwon quarter rolls onto **Q4**; an unwon Q4 carries the whole pool to the **next
+  game's Q4**, host‑managed), **Split equally** (among players who won other periods),
+  **Refund** (pro‑rata by squares owned), or **Charity** (named, recorded only — settles
+  off‑app). The settled page shows a colour‑coded **`NoWinnerRuleChip`**; each quarter card
+  spells out what happened to an unclaimed prize. **Cross‑game rollover:** at creation, under
+  the Rollover rule the host can **carry in** the unwon‑Q4 pools of finished same‑club games
+  (each consumable once); the destination game shows a **"Rolled in from"** provenance link
+  and the carried amount is added to its Q4 winner's payout. (`squaresPayouts.computeSquaresPayouts`,
+  `NoWinnerRuleChip`, `SquaresCompletedSummary`, `CreateSquaresSheet` carry‑in picker.)
 - **Host Complete / Cancel.** Entering the **Final** score is what completes the game
   (winner = the square on the final digits). For parity with LL/FT there's an explicit
   **Complete game** button that simply **guards** that: while in registration → audit
