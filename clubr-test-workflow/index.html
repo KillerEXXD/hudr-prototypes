@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClubR — 7-User Test Workflow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #14141b;
+      --panel-2: #1b1b24;
+      --border: #262635;
+      --text: #f2f2f7;
+      --muted: #9aa0ad;
+      --dim: #6b6b82;
+      --orange: #f97316;
+      --amber: #f59e0b;
+      --blue: #3b82f6;
+      --cyan: #06b6d4;
+      --emerald: #10b981;
+      --purple: #8b5cf6;
+      --pink: #ec4899;
+      --red: #ef4444;
+      --gold: #E9C46A;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(1000px 520px at 50% -10%, rgba(249,115,22,0.16), transparent 70%), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 28px 18px 96px; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 40px 0 20px; }
+    .hero .kicker { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); font-weight: 700; }
+    .hero h1 {
+      font-size: 40px; font-weight: 800; letter-spacing: -1px; margin-top: 8px;
+      background: linear-gradient(135deg, #dc2626, var(--orange), var(--amber));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p { color: var(--muted); font-size: 15px; max-width: 640px; margin: 10px auto 0; }
+    .hero .meta { margin-top: 18px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 9999px; font-size: 12px; color: var(--muted); }
+    .toolbar { margin-top: 18px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: .15s; }
+    .btn:hover { border-color: var(--orange); }
+    .btn.primary { background: linear-gradient(135deg, #dc2626, var(--orange)); border: none; }
+
+    /* Cast */
+    .cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 12px; }
+    .u { display: flex; gap: 10px; align-items: flex-start; padding: 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; }
+    .u .avatar { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+    .u .name { font-weight: 700; font-size: 14px; }
+    .u .role { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .u .job { font-size: 11px; color: var(--dim); margin-top: 3px; }
+
+    /* Section / phase cards */
+    .phase { margin-top: 20px; background: var(--panel); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+    .phase > summary { list-style: none; cursor: pointer; padding: 16px 18px; display: flex; align-items: center; gap: 12px; }
+    .phase > summary::-webkit-details-marker { display: none; }
+    .phase[open] > summary { border-bottom: 1px solid var(--border); }
+    .phase .num { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+    .phase h2 { font-size: 17px; font-weight: 700; }
+    .phase .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .phase .chev { margin-left: auto; color: var(--dim); transition: .2s; }
+    .phase[open] .chev { transform: rotate(90deg); }
+    .body { padding: 6px 18px 18px; }
+
+    /* Steps + checkboxes */
+    .step { display: flex; gap: 11px; padding: 9px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+    .step:last-child { border-bottom: none; }
+    .step input[type=checkbox] { appearance: none; width: 18px; height: 18px; border-radius: 6px; border: 1.5px solid #3a3a4a; margin-top: 2px; flex-shrink: 0; cursor: pointer; position: relative; transition: .15s; background: var(--panel-2); }
+    .step input[type=checkbox]:checked { background: var(--emerald); border-color: var(--emerald); }
+    .step input[type=checkbox]:checked::after { content: ''; position: absolute; left: 5px; top: 1px; width: 5px; height: 10px; border: solid #05130d; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+    .step .txt { font-size: 14px; color: #dfe1e8; }
+    .step .txt b { color: #fff; }
+    .step .txt .note { display: block; font-size: 12px; color: var(--dim); margin-top: 2px; }
+    .who { display: inline-flex; gap: 4px; margin-right: 6px; vertical-align: middle; }
+    .tag { display: inline-block; padding: 1px 7px; border-radius: 6px; font-size: 10px; font-weight: 800; vertical-align: middle; }
+    .gtag { display: inline-block; padding: 2px 8px; border-radius: 7px; font-size: 11px; font-weight: 700; }
+
+    .callout { margin: 12px 18px 0; padding: 12px 14px; background: rgba(59,130,246,.08); border: 1px solid rgba(59,130,246,.3); border-radius: 12px; font-size: 13px; color: #cfe0ff; }
+    .callout.warn { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.35); color: #ffe6b8; }
+
+    /* Matrix */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+    td .dot { color: var(--emerald); font-weight: 800; }
+    h3.sec { margin: 26px 4px 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); }
+
+    footer { text-align: center; color: var(--dim); font-size: 12px; margin-top: 40px; }
+    a.home { color: var(--muted); text-decoration: none; font-size: 13px; }
+    a.home:hover { color: var(--orange); }
+
+    @media print {
+      body { background: #fff; color: #111; }
+      .toolbar, .chev { display: none; }
+      .phase, .u, .callout { border-color: #ddd; background: #fff; }
+      .hero h1 { -webkit-text-fill-color: #dc2626; }
+      .phase[open] > summary { border-color: #ddd; }
+      details { break-inside: avoid; }
+      .step .txt, .step .txt b { color: #111; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="home" href="../index.html">← HUDR Prototypes</a>
+
+    <div class="hero">
+      <div class="kicker">ClubrGO · Structured QA</div>
+      <h1>7-User Test Workflow</h1>
+      <p>A shared script for seven testers to exercise ClubR end-to-end — clubs, invites &amp; approvals, all four game types, real-time play, and the cross-cutting journeys. Tick each step as you go; screenshots + the in-app <b>Report a bug</b> button feed the tracker.</p>
+      <div class="meta">
+        <span class="pill">👥 7 testers</span>
+        <span class="pill">🏛️ 3 clubs</span>
+        <span class="pill">🎮 4 games (one per type)</span>
+        <span class="pill">✅ tick-as-you-go</span>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" onclick="window.print()">🖨️ Print / Save PDF</button>
+        <button class="btn" onclick="resetChecks()">↺ Reset checkboxes</button>
+        <a class="btn" href="https://qa.clubrgo.app" target="_blank" rel="noopener">↗ Open qa.clubrgo.app</a>
+      </div>
+    </div>
+
+    <h3 class="sec">The Cast</h3>
+    <div class="cast">
+      <div class="u"><div class="avatar" style="background:rgba(16,185,129,.15);color:#10b981">U1</div><div><div class="name">Alice</div><div class="role">Owner · Club A</div><div class="job">Creates Game 1 — Stable</div></div></div>
+      <div class="u"><div class="avatar" style="background:rgba(139,92,246,.15);color:#8b5cf6">U2</div><div><div class="name">Ben</div><div class="role">Owner · Club B</div><div class="job">Creates Game 2 — FT Fantasy</div></div></div>
+      <div class="u"><div class="avatar" style="background:rgba(6,182,212,.15);color:#06b6d4">U3</div><div><div class="name">Cara</div><div class="role">Owner · Club C</div><div class="job">Creates Game 3 — Squares</div></div></div>
+      <div class="u"><div class="avatar" style="background:rgba(245,158,11,.15);color:#f59e0b">U4</div><div><div class="name">Dan</div><div class="role">Joins Club A → Co-host</div><div class="job">Creates Game 4 — Last Longer</div></div></div>
+      <div class="u"><div class="avatar" style="background:rgba(59,130,246,.15);color:#3b82f6">U5</div><div><div class="name">Eve</div><div class="role">Member</div><div class="job">Joins clubs + games</div></div></div>
+      <div class="u"><div class="avatar" style="background:rgba(236,72,153,.15);color:#ec4899">U6</div><div><div class="name">Finn</div><div class="role">Member</div><div class="job">Joins clubs + games</div></div></div>
+      <div class="u"><div class="avatar" style="background:rgba(239,68,68,.15);color:#ef4444">U7</div><div><div class="name">Gina</div><div class="role">Member</div><div class="job">Joins clubs + games</div></div></div>
+    </div>
+    <div class="callout" style="margin-left:0;margin-right:0;">
+      <b>Legend.</b>
+      <span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span>…<span class="tag" style="background:rgba(239,68,68,.15);color:#ef4444">U7</span> = who performs the step ·
+      <span class="gtag" style="background:rgba(6,182,212,.15);color:#06b6d4">Stable</span>
+      <span class="gtag" style="background:rgba(245,158,11,.15);color:#f59e0b">Last Longer</span>
+      <span class="gtag" style="background:rgba(139,92,246,.15);color:#8b5cf6">FT Fantasy</span>
+      <span class="gtag" style="background:rgba(16,185,129,.15);color:#10b981">Squares</span>
+      = game type.
+    </div>
+
+    <!-- PHASE 0 -->
+    <details class="phase" open>
+      <summary>
+        <div class="num" style="background:rgba(107,107,130,.18);color:#9aa0ad">0</div>
+        <div><h2>Setup — everyone signs in</h2><div class="sub">All 7 testers get an account + a profile before anything else.</div></div>
+        <div class="chev">▸</div>
+      </summary>
+      <div class="body">
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">ALL</span></span>Open <b>qa.clubrgo.app</b> on your phone and sign up with your <b>phone number</b> (SMS OTP).<span class="note">Use a real number you can receive the code on.</span></span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">ALL</span></span>Complete your <b>profile</b> — name + avatar. Optionally add an <b>email</b> (used later for the verify journey).</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">ALL</span></span>From Profile, try switching <b>skins</b> (Golden ↔ Terminal). Confirm the whole app re-themes.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">ALL</span></span>Note your starting <b>credits/coins</b> balance (top-right wallet).</span></label>
+      </div>
+    </details>
+
+    <!-- PHASE 1 -->
+    <details class="phase" open>
+      <summary>
+        <div class="num" style="background:rgba(16,185,129,.16);color:#10b981">1</div>
+        <div><h2>Clubs &amp; approvals</h2><div class="sub">3 owners create clubs; everyone else joins by link; owners test the approval flow.</div></div>
+        <div class="chev">▸</div>
+      </summary>
+      <div class="body">
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span><span class="tag" style="background:rgba(139,92,246,.15);color:#8b5cf6">U2</span><span class="tag" style="background:rgba(6,182,212,.15);color:#06b6d4">U3</span></span>Each create a club — <b>Club A</b> (Alice), <b>Club B</b> (Ben), <b>Club C</b> (Cara). Set name, emoji, and <b>public</b> vs <b>private</b> (test one private).</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span><span class="tag" style="background:rgba(139,92,246,.15);color:#8b5cf6">U2</span><span class="tag" style="background:rgba(6,182,212,.15);color:#06b6d4">U3</span></span>Copy your club's <b>invite link / code</b> and share it (WhatsApp / paste) with the other testers.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(245,158,11,.15);color:#f59e0b">U4</span><span class="tag" style="background:rgba(59,130,246,.15);color:#3b82f6">U5</span><span class="tag" style="background:rgba(236,72,153,.15);color:#ec4899">U6</span><span class="tag" style="background:rgba(239,68,68,.15);color:#ef4444">U7</span></span>Join clubs by <b>clicking the link</b> AND by <b>pasting it</b> into Home → "Have a code or link?". Spread across clubs (Dan → Club A; others mix A/B/C).<span class="note">Try both a bare code (e.g. ACES24) and a full link — both should work.</span></span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span><span class="tag" style="background:rgba(139,92,246,.15);color:#8b5cf6">U2</span><span class="tag" style="background:rgba(6,182,212,.15);color:#06b6d4">U3</span></span><b>Test approvals:</b> owners see a <b>pending-approvals banner + bell</b> notification. <b>Approve some, decline one.</b> Declined user sees they were declined.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span></span>Alice promotes <b>Dan (U4) to co-host</b> of Club A. Confirm Dan now sees host tools.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(59,130,246,.15);color:#3b82f6">U5</span></span><b>Cross-club isolation:</b> a member of Club A should NOT see Club B's private games/details.</span></label>
+      </div>
+    </details>
+
+    <!-- PHASE 2 -->
+    <details class="phase" open>
+      <summary>
+        <div class="num" style="background:rgba(249,115,22,.16);color:#f97316">2</div>
+        <div><h2>Games &amp; approvals — the game-link path</h2><div class="sub">Create one game of each type, share the game link, and test the join-request → host-approval flow.</div></div>
+        <div class="chev">▸</div>
+      </summary>
+      <div class="body">
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span></span>Create <span class="gtag" style="background:rgba(6,182,212,.15);color:#06b6d4">Stable</span> <b>(Game 1)</b> in Club A — set roster size (e.g. 7) &amp; buy-in.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(139,92,246,.15);color:#8b5cf6">U2</span></span>Create <span class="gtag" style="background:rgba(139,92,246,.15);color:#8b5cf6">FT Fantasy</span> <b>(Game 2)</b> in Club B — pick a final table / roster + budget.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(6,182,212,.15);color:#06b6d4">U3</span></span>Create <span class="gtag" style="background:rgba(16,185,129,.15);color:#10b981">Squares</span> <b>(Game 3)</b> in Club C — home/away teams.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(245,158,11,.15);color:#f59e0b">U4</span></span>Co-host Dan creates <span class="gtag" style="background:rgba(245,158,11,.15);color:#f59e0b">Last Longer</span> <b>(Game 4)</b> in Club A — set a mandatory <b>starting stack</b> (e.g. 30,000).</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">HOSTS</span></span>Each host <b>shares the game link</b> (Share → copies <code>…/#/?game=&lt;type&gt;:&lt;id&gt;</code>).</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(59,130,246,.15);color:#3b82f6">U5</span><span class="tag" style="background:rgba(236,72,153,.15);color:#ec4899">U6</span><span class="tag" style="background:rgba(239,68,68,.15);color:#ef4444">U7</span></span>Open each game link — by clicking AND by pasting into the "code or link?" box. If not a club member yet, it should file a <b>request to join</b> + show a banner &amp; bell notification.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">HOSTS</span></span><b>Test game approvals:</b> hosts see the join request → approve/decline. Approved players land in the game with the right status (waiting → in). Verify notifications fire.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(245,158,11,.15);color:#f59e0b">U4</span></span>Turn <b>auto-approve members</b> ON for one game — a member joining should get in <b>instantly</b> (no manual approval).</span></label>
+        <div class="callout">📌 This is the core invite path: <b>clicking a link and pasting a link must behave identically</b> — logged-in check → member-of-club? → request-to-join → notifications → open the game.</div>
+      </div>
+    </details>
+
+    <!-- PHASE 3 -->
+    <details class="phase" open>
+      <summary>
+        <div class="num" style="background:rgba(6,182,212,.16);color:#06b6d4">3</div>
+        <div><h2>Play Game 1 — Stable, end-to-end</h2><div class="sub">The headline journey: draft → close → bust + cash → leaderboard → chop → settle.</div></div>
+        <div class="chev">▸</div>
+      </summary>
+      <div class="body">
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">PLAYERS</span></span><b>Draft your stable</b> from the shared player pool. Add real players by name; the same player can be on multiple stables.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">PLAYERS</span></span><b>Fuzzy "Did you mean?":</b> type a near-miss like <b>"Jessi"</b> when <b>Jesse</b> is in the pool, or <b>"Kris"</b> for <b>Chris</b> — the existing player should surface with an <b>Add</b> button, and you can still "Add as new" if it's a different person.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">PLAYERS</span></span>Scroll the long pool — the pinned <b>count pill (e.g. 3/7)</b> stays visible showing how many + who you've picked; tap it to expand/drop picks.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span></span>Try to <b>delete a pooled player someone else drafted</b> → should be blocked with a clear message.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span></span><b>Close registration.</b> The leaderboard now appears; rival rosters are revealed.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span><span class="tag" style="background:rgba(245,158,11,.15);color:#f59e0b">U4</span></span>Host/co-host <b>bust pooled players one-by-one</b> and enter <b>cash won</b> (try K / M / plain, e.g. 35.1K, 3.1M). Watch the amount preview.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span></span><b>Reinstate</b> a player you busted by accident → leaderboard recomputes.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">PLAYERS</span></span>Check the <b>leaderboard</b>: each member ranked by total cash won + an "N alive" badge. Drill into a member to see all their picks alive→bust.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span></span>Enable <b>Chop</b> in game settings → a player <b>proposes a chop</b> → others <b>Agree / Reject</b> (only players still in contention). Reject shows a reason; ✕ dismiss is silent.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(16,185,129,.15);color:#10b981">U1</span></span><b>Complete</b> the game → winner settled (most cash; ties → more alive, then split).</span></label>
+      </div>
+    </details>
+
+    <!-- PHASE 4 -->
+    <details class="phase" open>
+      <summary>
+        <div class="num" style="background:rgba(139,92,246,.16);color:#8b5cf6">4</div>
+        <div><h2>The other three games</h2><div class="sub">Run each to completion so all four game types are covered.</div></div>
+        <div class="chev">▸</div>
+      </summary>
+      <div class="body">
+        <h3 class="sec" style="margin-top:8px;color:#f59e0b">🟡 Last Longer (Game 4)</h3>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">PLAYERS</span></span><b>Join</b> the LL game → your chip count should seed to the game's <b>starting stack</b> (e.g. 30,000), <b>not 0</b>.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">PLAYERS</span></span><b>Update your chip count</b> as play goes (tap-to-edit "Your chips" hero, K/M input).</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(245,158,11,.15);color:#f59e0b">U4</span></span>Host <b>busts</b> players (finishing order), <b>reinstates</b> an accidental bust, and tries a <b>chop</b>. Then <b>Complete</b>.</span></label>
+
+        <h3 class="sec" style="color:#8b5cf6">🟣 FT Fantasy (Game 2)</h3>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">PLAYERS</span></span><b>Draft a roster</b> of final-table players within the <b>budget (ICM-priced)</b>. Rosters sealed until the draft closes.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(139,92,246,.15);color:#8b5cf6">U2</span></span>Close the draft → enter finishing order → <b>points settle</b> the leaderboard → winner.</span></label>
+
+        <h3 class="sec" style="color:#10b981">🟢 Squares (Game 3)</h3>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:#333;color:#ccc">PLAYERS</span></span><b>Claim squares</b> on the grid (watch the count + numbering). Host approves/rejects a claim → rejected player sees the <b>square-rejected banner</b>.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><span class="who"><span class="tag" style="background:rgba(6,182,212,.15);color:#06b6d4">U3</span></span><b>Reveal the digits</b> (row/col), enter <b>quarter scores</b> → quarter <b>winners + payouts</b>. Leave a period unclaimed → confirm <b>carryover/rollover</b>.</span></label>
+      </div>
+    </details>
+
+    <!-- PHASE 5 -->
+    <details class="phase" open>
+      <summary>
+        <div class="num" style="background:rgba(236,72,153,.16);color:#ec4899">5</div>
+        <div><h2>Cross-cutting journeys</h2><div class="sub">The things that span every game — hit these throughout, not just at the end.</div></div>
+        <div class="chev">▸</div>
+      </summary>
+      <div class="body">
+        <label class="step"><input type="checkbox"><span class="txt"><b>Notifications &amp; banners</b> — confirm the <b>bell</b> + sticky banners fire: pending-approvals, auto-approved, game-invite, square-rejected. They should self-dismiss when resolved.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><b>Chat</b> — post in each game's chat. A non-admitted user should be gated ("get admitted to chat"). System messages (joins, busts, chop) appear.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><b>Real-time / multi-device</b> — with two testers in the SAME game, one acts (join, chip update, bust) and the other sees the leaderboard/board update <b>live, no refresh</b>.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><b>Profile — email verify</b> — add an email → tap Verify → open the link → back in the app, Profile shows <b>Verified</b> immediately (no manual refresh).</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><b>Wallet / credits</b> — joining &amp; creating games spends credits; confirm the balance changes and low-balance is handled.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><b>Edge cases</b> — full roster blocks more picks; registration auto-closes at the deadline; <b>cancel a game</b> (players notified); <b>delete a club</b> created by mistake.</span></label>
+        <label class="step"><input type="checkbox"><span class="txt"><b>Mobile scrolling</b> — long lists (Stable pool, members) should scroll as <b>one smooth page</b> with the search pinned; no trapped inner scroll.</span></label>
+        <div class="callout warn">🐞 <b>Found something?</b> Use the in-app <b>Report a bug</b> button (or Feedback) with a screenshot — it lands in the shared tracker with device + page auto-captured.</div>
+      </div>
+    </details>
+
+    <!-- COVERAGE MATRIX -->
+    <h3 class="sec">Coverage matrix — who exercises what</h3>
+    <div class="phase" open style="padding:6px 4px 4px;">
+      <div class="body">
+        <table>
+          <thead><tr><th>Feature / journey</th><th>U1</th><th>U2</th><th>U3</th><th>U4</th><th>U5</th><th>U6</th><th>U7</th></tr></thead>
+          <tbody>
+            <tr><td>Create club</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Join by link / paste</td><td></td><td></td><td></td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td></tr>
+            <tr><td>Club approvals (approve/decline)</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Co-host promotion + create game</td><td class="dot">•</td><td></td><td></td><td class="dot">•</td><td></td><td></td><td></td></tr>
+            <tr><td>Create game (each type)</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td></td><td></td><td></td></tr>
+            <tr><td>Game-link join + host approval</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td></tr>
+            <tr><td>Stable: draft / fuzzy add / bust / chop</td><td class="dot">•</td><td></td><td></td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td></tr>
+            <tr><td>Last Longer: stack / chips / bust</td><td></td><td></td><td></td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td></tr>
+            <tr><td>FT Fantasy: draft / ICM / settle</td><td></td><td class="dot">•</td><td></td><td></td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td></tr>
+            <tr><td>Squares: claim / reveal / winners</td><td></td><td></td><td class="dot">•</td><td></td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td></tr>
+            <tr><td>Notifications / chat / real-time</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td></tr>
+            <tr><td>Profile: email verify / skins</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td><td class="dot">•</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>
+      ClubrGO · 7-User Test Workflow · progress is saved on this device (localStorage).<br>
+      Sequence: Setup → Clubs &amp; approvals → Games &amp; approvals → Play Game 1 (Stable) → the other three games → cross-cutting.
+    </footer>
+  </div>
+
+  <script>
+    // Persist checkbox state per-device so a tester can resume.
+    const KEY = 'clubr-test-workflow-v1';
+    const boxes = Array.from(document.querySelectorAll('.step input[type=checkbox]'));
+    boxes.forEach((b, i) => { b.dataset.i = i; });
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+      saved.forEach((i) => { if (boxes[i]) boxes[i].checked = true; });
+    } catch (e) {}
+    function save() {
+      const on = boxes.filter((b) => b.checked).map((b) => Number(b.dataset.i));
+      try { localStorage.setItem(KEY, JSON.stringify(on)); } catch (e) {}
+    }
+    boxes.forEach((b) => b.addEventListener('change', save));
+    function resetChecks() { boxes.forEach((b) => (b.checked = false)); save(); }
+  </script>
+</body>
+</html>
