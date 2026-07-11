@@ -33,7 +33,7 @@
   header h1{font-size:46px;font-weight:800;letter-spacing:-1px;margin-top:16px;background:linear-gradient(120deg,#f0abfc,#a78bfa,#fbbf24);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   header p.sub{color:var(--mut);font-size:16px;max-width:840px;margin:12px auto 0}
   header p.tagline{color:var(--mut2);font-size:13px;margin-top:10px}
-  .legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 18px;margin:24px auto 0;max-width:820px}
+  .legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 18px;margin:24px auto 0;max-width:860px}
   .legend .it{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--mut)}
   .legend .dot{width:11px;height:11px;border-radius:50%}
 
@@ -59,12 +59,13 @@
   .chip{font-size:12px;color:var(--mut);background:var(--card2);border:1px solid var(--bd);border-radius:8px;padding:5px 10px;font-weight:600}
   .chip.g{color:var(--ok);border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)}
   .chip.w{color:#fca5a5;border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08)}
+  .chip.gold{color:var(--coin);border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.1)}
   .coin{color:var(--coin);font-weight:700}
   .no{color:var(--warn);font-weight:700}.yes{color:var(--ok);font-weight:700}
 
   /* people nodes */
-  .people{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin-bottom:18px}
-  .node{flex:1 1 200px;min-width:170px;border-radius:14px;padding:15px 15px 13px;border:1px solid;text-align:center}
+  .people{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+  .node{border-radius:14px;padding:15px;border:1px solid;text-align:center;min-width:150px}
   .node.a{border-color:rgba(217,70,239,.4);background:rgba(217,70,239,.06)}
   .node.b{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.06)}
   .node.c{border-color:rgba(6,182,212,.4);background:rgba(6,182,212,.06)}
@@ -72,6 +73,12 @@
   .node.a .av{background:var(--a)}.node.b .av{background:var(--b)}.node.c .av{background:var(--c)}
   .node .who{font-weight:800;font-size:15px}
   .node .rel{font-size:12px;color:var(--mut2);margin-top:2px}
+  .fan{display:flex;flex-direction:column;gap:8px;flex:1 1 260px}
+  .fan .fnode{display:flex;align-items:center;gap:10px;border:1px solid rgba(6,182,212,.4);background:rgba(6,182,212,.06);border-radius:12px;padding:9px 13px}
+  .fan .fnode .av{width:32px;height:32px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:13px;flex-shrink:0}
+  .fan .fnode .who{font-weight:700;font-size:13.5px}
+  .fan .fnode .rr{margin-left:auto;font-size:11.5px;color:var(--mut2)}
+  .fan .more{font-size:12px;color:var(--mut2);text-align:center;font-weight:600}
   .harrow{display:flex;align-items:center;justify-content:center;color:var(--mut2);font-size:20px;font-weight:700;flex:0 0 24px}
 
   .flowmap{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -102,18 +109,25 @@
 
   /* depth chain */
   .chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-  .dnode{border-radius:12px;padding:11px 15px;border:1px solid var(--bd);background:var(--card);font-weight:800;text-align:center;min-width:120px}
+  .dnode{border-radius:12px;padding:11px 15px;border:1px solid var(--bd);background:var(--card);font-weight:800;text-align:center;min-width:118px}
   .dnode .sub{font-size:11px;font-weight:600;color:var(--mut2);margin-top:2px}
   .earnrow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--card);border:1px solid var(--bd);font-size:13.5px;margin-top:8px}
   .earnrow .mk{font-weight:800;flex-shrink:0}
   .earnrow.on{border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.05)}
   .earnrow.off{border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.05);opacity:.9}
 
-  /* cap lanes */
-  .capbar{height:14px;border-radius:999px;background:var(--card2);border:1px solid var(--bd);overflow:hidden;margin-top:8px}
-  .capbar i{display:block;height:100%;border-radius:999px}
-  .capfill-a{background:linear-gradient(90deg,var(--a),#f0abfc)}
-  .capfill-b{background:linear-gradient(90deg,var(--b),#7dd3fc)}
+  /* config box */
+  .cfg{background:var(--panel);border:1px solid var(--bd);border-radius:16px;padding:20px}
+  .cfg .cfghd{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mut2);display:flex;align-items:center;gap:8px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border-radius:12px;border:1px solid var(--bd);background:var(--card);margin-top:12px;cursor:default}
+  .opt.sel{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.06)}
+  .box{width:22px;height:22px;border-radius:7px;border:2px solid var(--bd2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#04140d;margin-top:1px}
+  .opt.sel .box{background:var(--ok);border-color:var(--ok)}
+  .opt .ot{font-weight:800;font-size:14.5px}
+  .opt .od{font-size:12.5px;color:var(--mut);margin-top:2px}
+  .opt .badge{margin-left:auto;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px;flex-shrink:0}
+  .opt.sel .badge{color:var(--ok);border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1)}
+  .opt .badge.off{color:var(--mut2);border:1px solid var(--bd)}
 
   /* calculator */
   .calc{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -126,6 +140,13 @@
   .yrbtns{display:flex;gap:6px}
   .yrbtns button{flex:1;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;padding:8px 6px;border-radius:9px;border:1px solid var(--bd);background:var(--card);color:var(--mut);transition:.15s}
   .yrbtns button.on{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--a),var(--ll))}
+  .caprow{display:flex;align-items:center;gap:10px;margin-top:4px}
+  .caprow .lab{font-size:12px;font-weight:700;color:var(--mut)}
+  .toggle{margin-left:auto;display:inline-flex;border:1px solid var(--bd);border-radius:9px;overflow:hidden}
+  .toggle button{cursor:pointer;font-family:inherit;font-weight:700;font-size:12px;padding:6px 12px;border:0;background:var(--card);color:var(--mut)}
+  .toggle button.on{color:#04140d;background:var(--ok)}
+  #capAmtWrap{margin-top:10px;display:none}
+  #capAmt{width:120px;background:var(--card);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:7px 10px;font-family:inherit;font-weight:700}
   .out{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:6px 0;overflow:hidden}
   .outrow{display:flex;align-items:center;gap:10px;padding:13px 16px;border-top:1px solid var(--bd);font-size:14px}
   .outrow:first-child{border-top:0}
@@ -141,6 +162,7 @@
   td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
   .tag2{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid var(--bd);color:var(--mut)}
   .tag2.ov{color:var(--coin);border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.1)}
+  .tag2.nc{color:var(--ok);border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.1)}
 
   /* device mock */
   .device{max-width:400px;margin:0 auto;background:var(--panel);border:1px solid var(--bd2);border-radius:22px;padding:16px;box-shadow:0 18px 50px rgba(0,0,0,.4)}
@@ -154,8 +176,8 @@
   .refitem .nm{font-weight:700;font-size:14px}
   .refitem .lk{margin-left:auto;font-size:11px;font-weight:700;color:var(--mut);background:var(--card2);border:1px solid var(--bd);border-radius:999px;padding:3px 9px}
   .refitem .sub{font-size:11.5px;color:var(--mut2);margin-top:1px}
-  .refitem .capwrap{margin-top:9px}
-  .refitem .capmeta{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-bottom:5px}
+  .refitem .earn{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:9px}
+  .refitem .earn b{color:var(--ok)}
   .withdraw{margin-top:14px;background:linear-gradient(135deg,rgba(52,211,153,.14),rgba(16,185,129,.06));border:1px solid rgba(52,211,153,.35);border-radius:14px;padding:14px}
   .withdraw .amt{font-size:26px;font-weight:800;color:var(--ok)}
   .withdraw button{margin-top:9px;width:100%;cursor:pointer;font-family:inherit;font-weight:800;font-size:14px;color:#04140d;background:linear-gradient(135deg,#6ee7b7,#34d399);border:0;border-radius:11px;padding:11px}
@@ -182,10 +204,11 @@
   <a href="#flow">Money Flow</a>
   <a href="#tiers">Tiers</a>
   <a href="#depth">2 Levels</a>
-  <a href="#cap">The Cap</a>
+  <a href="#cap">No Cap</a>
   <a href="#calc">Calculator</a>
   <a href="#example">Worked Example</a>
   <a href="#player">Player View</a>
+  <a href="#potential">My Earnings</a>
   <a href="#admin">Admin View</a>
   <a href="#discuss">For Discussion</a>
 </div></nav>
@@ -196,14 +219,14 @@
     <h1>ClubR Referrals — How It Works</h1>
     <p class="sub">Players invite players. When someone you referred <strong>buys coins with real money</strong>,
        you earn a <strong style="color:var(--ok)">share of that purchase</strong> — a lot in year one,
-       tapering but continuing for life. Refer a chain and you earn a small
-       <strong style="color:var(--a)">residual</strong> one level down too. Every rate is
-       <strong>configurable</strong> and <strong>locked in</strong> the day it starts.</p>
+       tapering but continuing for life. You also earn a flat
+       <strong style="color:var(--a)">10% residual on everyone <em>they</em> refer</strong>. It's
+       <strong style="color:var(--coin)">uncapped revenue sharing</strong> — configurable, and locked in the day it starts.</p>
     <p class="tagline">Earnings come only from <strong>marketplace coin purchases</strong> — nothing else. Free promo coins never count.</p>
     <div class="legend">
       <span class="it"><span class="dot" style="background:var(--a)"></span>Referrer (A)</span>
       <span class="it"><span class="dot" style="background:var(--b)"></span>Direct — 50 / 30 / 20%</span>
-      <span class="it"><span class="dot" style="background:var(--c)"></span>Residual — flat 10%</span>
+      <span class="it"><span class="dot" style="background:var(--c)"></span>Residual — flat 10% on all of B's referrals</span>
       <span class="it"><span class="dot" style="background:var(--coin)"></span>Coin $ (real purchase)</span>
       <span class="it"><span class="dot" style="background:var(--app)"></span>App keeps the rest</span>
     </div>
@@ -215,18 +238,19 @@
 <!-- THE IDEA -->
 <section id="idea">
   <div class="h2"><span class="num">1.</span><h2>The idea, in one line</h2></div>
-  <p class="lead">A referrer earns a <strong>percentage of the coin money</strong> their invitees spend. The percentage
-     is <strong>generous early and tapers over time</strong>, and there's a <strong>second, smaller cut</strong> from
-     the people <em>your</em> invitee refers. A handful of guardrails keep it fair and bounded:</p>
+  <p class="lead">A referrer earns a <strong>percentage of the coin money</strong> their invitees spend — generous early,
+     tapering over time, but <strong>never stopping</strong>. On top of that, they earn a <strong>flat 10% on every
+     purchase made by everyone their invitee refers.</strong> A few guardrails keep it fair; the ceiling is a
+     <strong style="color:var(--coin)">setting, currently switched off (No Cap)</strong>.</p>
   <div class="chips" style="gap:10px">
     <span class="chip">💵 Paid out as <b style="color:var(--tx)">real, withdrawable cash</b></span>
     <span class="chip g">✅ Only <b style="color:var(--tx)">real paid purchases</b> count — free promo coins never do</span>
     <span class="chip">📉 Direct: <b style="color:var(--tx)">50% → 30% → 20%</b> by year, then 20% for life</span>
-    <span class="chip">🔁 Residual: <b style="color:var(--tx)">flat 10%</b> one level down</span>
+    <span class="chip">🔁 Residual: <b style="color:var(--tx)">flat 10%</b> on <b style="color:var(--tx)">all</b> of your invitee's referrals</span>
     <span class="chip">🧱 Depth stops at <b style="color:var(--tx)">2 levels</b></span>
-    <span class="chip">🎯 Capped at <b style="color:var(--tx)">$1,000 per referral branch</b></span>
+    <span class="chip gold">♾️ <b style="color:var(--coin)">No cap</b> — unlimited, for life <span style="opacity:.8">(configurable)</span></span>
     <span class="chip w">↩️ Refunds &amp; chargebacks <b style="color:#fecaca">claw the earning back</b></span>
-    <span class="chip">⚙️ Every rate &amp; cap is <b style="color:var(--tx)">configurable per player</b></span>
+    <span class="chip">⚙️ Every rate is <b style="color:var(--tx)">configurable per player</b></span>
   </div>
   <p class="note">Attribution locks the moment someone signs up with your code. The payout clock starts when they make
      their <strong>first real purchase</strong>. All figures below are the coin-purchase split <em>before</em>
@@ -235,16 +259,22 @@
 
 <!-- MONEY FLOW -->
 <section id="flow">
-  <div class="h2"><span class="num">2.</span><h2>The money flow</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--a)">A referred B · B referred C</span></div>
-  <p class="lead">Follow one chain. <strong>A</strong> invited <strong>B</strong>; <strong>B</strong> invited <strong>C</strong>.
-     Watch what each real coin purchase pays out (year-one rates shown).</p>
+  <div class="h2"><span class="num">2.</span><h2>The money flow</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--a)">A referred B · B referred C, D, E …</span></div>
+  <p class="lead">Follow one chain. <strong>Alice</strong> invited <strong>Ben</strong>. Ben then invites <strong>Cara,
+     Dylan, Eve</strong> — and anyone else, forever. Alice earns her <strong>direct</strong> cut of Ben, plus a
+     <strong>flat 10%</strong> on <em>every one</em> of Ben's invitees (year-one rates shown).</p>
 
   <div class="people">
     <div class="node a"><div class="av">A</div><div class="who">Alice</div><div class="rel">the referrer</div></div>
     <div class="harrow">→</div>
     <div class="node b"><div class="av">B</div><div class="who">Ben</div><div class="rel">referred by Alice</div></div>
     <div class="harrow">→</div>
-    <div class="node c"><div class="av">C</div><div class="who">Cara</div><div class="rel">referred by Ben</div></div>
+    <div class="fan">
+      <div class="fnode"><span class="av">C</span><span class="who">Cara</span><span class="rr">Ben referred</span></div>
+      <div class="fnode"><span class="av">D</span><span class="who">Dylan</span><span class="rr">Ben referred</span></div>
+      <div class="fnode"><span class="av">E</span><span class="who">Eve</span><span class="rr">Ben referred</span></div>
+      <div class="more">＋ anyone else Ben ever refers …</div>
+    </div>
   </div>
 
   <div class="flowmap">
@@ -254,21 +284,25 @@
       <div class="payline" style="opacity:.7"><span class="dot" style="background:var(--app)"></span><span class="to">App</span> keeps the remainder<span class="plus">$50</span></div>
     </div>
     <div class="fbox">
-      <div class="buy">🪙 Cara buys <span class="amt">$100</span> in coins</div>
-      <div class="payline"><span class="dot" style="background:var(--b)"></span><span class="to">Ben</span> — direct 50% (Year 1)<span class="plus pos">+$50</span></div>
-      <div class="payline"><span class="dot" style="background:var(--c)"></span><span class="to">Alice</span> — residual 10%<span class="plus pos">+$10</span></div>
+      <div class="buy">🪙 Each of Ben's invitees buys <span class="amt">$100</span></div>
+      <div class="payline"><span class="dot" style="background:var(--b)"></span><span class="to">Ben</span> — direct 50% (each)<span class="plus pos">+$50</span></div>
+      <div class="payline"><span class="dot" style="background:var(--c)"></span><span class="to">Alice</span> — residual 10% (each)<span class="plus pos">+$10</span></div>
       <div class="payline" style="opacity:.7"><span class="dot" style="background:var(--app)"></span><span class="to">App</span> keeps the remainder<span class="plus">$40</span></div>
     </div>
   </div>
 
+  <p class="note" style="margin-top:14px">So if Cara, Dylan and Eve each buy $100, Ben earns 3 × $50 and Alice earns
+     3 × $10 <strong>on top of</strong> her cut of Ben — and it keeps growing with every new person Ben refers, with
+     <strong style="color:var(--coin)">no ceiling</strong>. Totals below assume Ben $100 and Cara + Dylan + Eve $100 each.</p>
+
   <div class="tot">
-    <div class="t"><div class="lab">Alice earns</div><div class="val" style="color:var(--a)">$60</div></div>
-    <div class="t"><div class="lab">Ben earns</div><div class="val" style="color:var(--b)">$50</div></div>
-    <div class="t"><div class="lab">Cara earns</div><div class="val" style="color:var(--mut2)">$0</div></div>
-    <div class="t"><div class="lab">App keeps</div><div class="val" style="color:var(--app)">$90</div></div>
+    <div class="t"><div class="lab">Alice earns</div><div class="val" style="color:var(--a)">$80</div></div>
+    <div class="t"><div class="lab">Ben earns</div><div class="val" style="color:var(--b)">$150</div></div>
+    <div class="t"><div class="lab">C · D · E earn</div><div class="val" style="color:var(--mut2)">$0*</div></div>
+    <div class="t"><div class="lab">App keeps</div><div class="val" style="color:var(--app)">$170</div></div>
   </div>
-  <p class="note">Of <strong>$200</strong> in real coin purchases, <strong>$110</strong> flows to referrers and <strong>$90</strong>
-     stays with the app (before processing fees). Cara earns nothing here because she hasn't referred anyone yet — the day she does, she starts earning too.</p>
+  <p class="note">Of <strong>$400</strong> in real coin purchases, <strong>$230</strong> flows to referrers and <strong>$170</strong>
+     stays with the app (before fees). <span style="color:var(--mut2)">*Cara, Dylan &amp; Eve earn $0 only until they start referring — the day they do, they earn the same way.</span></p>
 </section>
 
 <!-- TIERS -->
@@ -276,11 +310,11 @@
   <div class="h2"><span class="num">3.</span><h2>The rate tapers by year</h2></div>
   <p class="lead">The clock for a referred player starts at their <strong>first real purchase</strong>. Your <strong>direct</strong>
      cut of everything they buy steps down each year, then holds at 20% <strong>for life</strong>. The <strong>residual</strong>
-     10% (one level down) stays flat.</p>
+     10% (on all of their referrals) stays flat, for life.</p>
   <div class="tl">
     <div class="seg y1"><div class="yr">Year 1</div><div class="pc">50%</div><div class="nt">of every purchase</div></div>
     <div class="seg y2"><div class="yr">Year 2</div><div class="pc">30%</div><div class="nt">of every purchase</div></div>
-    <div class="seg y3"><div class="yr">Year 3 →</div><div class="pc">20%</div><div class="nt">for life (until the cap)</div></div>
+    <div class="seg y3"><div class="yr">Year 3 →</div><div class="pc">20%</div><div class="nt">for life — no cap</div></div>
   </div>
   <div class="grid g2" style="margin-top:14px">
     <div class="panel"><h3>🔒 Rates are locked at the start</h3><p class="mut">The percentages that apply to a relationship are <strong>frozen the day it activates</strong> (first purchase).
@@ -293,45 +327,57 @@
 <!-- DEPTH -->
 <section id="depth">
   <div class="h2"><span class="num">4.</span><h2>It stops at two levels</h2></div>
-  <p class="lead">You earn from the people you refer (<strong>direct</strong>) and from the people <em>they</em> refer
-     (<strong>residual</strong>). It does <strong>not</strong> go deeper — no earnings three levels down.</p>
+  <p class="lead">You earn from the people you refer (<strong>direct</strong>) and from <strong>everyone they refer</strong>
+     (<strong>residual, flat 10%</strong>). It does <strong>not</strong> go deeper — no earnings three levels down.</p>
   <div class="chain">
     <div class="dnode" style="border-color:rgba(217,70,239,.45)">A · Alice<div class="sub">you</div></div>
     <div class="harrow">→</div>
     <div class="dnode" style="border-color:rgba(59,130,246,.45)">B · Ben<div class="sub">you referred</div></div>
     <div class="harrow">→</div>
-    <div class="dnode" style="border-color:rgba(6,182,212,.45)">C · Cara<div class="sub">Ben referred</div></div>
+    <div class="dnode" style="border-color:rgba(6,182,212,.45)">C · D · E …<div class="sub">Ben referred</div></div>
     <div class="harrow">→</div>
-    <div class="dnode" style="opacity:.6">D · Dan<div class="sub">Cara referred</div></div>
+    <div class="dnode" style="opacity:.6">F<div class="sub">Cara referred</div></div>
   </div>
   <div class="grid g3">
     <div class="earnrow on"><span class="mk yes">✔</span><div><b>From Ben (B)</b> — direct: 50 / 30 / 20% by year</div></div>
-    <div class="earnrow on"><span class="mk yes">✔</span><div><b>From Cara (C)</b> — residual: flat 10%</div></div>
-    <div class="earnrow off"><span class="mk no">✕</span><div><b>From Dan (D)</b> — nothing. Three levels down is out of reach for Alice.</div></div>
+    <div class="earnrow on"><span class="mk yes">✔</span><div><b>From C, D, E &amp; all Ben's referrals</b> — residual: flat 10% each</div></div>
+    <div class="earnrow off"><span class="mk no">✕</span><div><b>From F</b> (Cara's referral) — nothing. Three levels down is out of reach for Alice.</div></div>
   </div>
-  <p class="note">Dan still earns Ben nothing-extra and Cara a full direct cut — every player is the centre of their own two-level window.</p>
+  <p class="note">Every player is the centre of their own two-level window: Cara earns a full direct cut from F, and Ben earns his 10% residual from F — but Alice does not.</p>
 </section>
 
-<!-- CAP -->
+<!-- CAP / CONFIG -->
 <section id="cap">
-  <div class="h2"><span class="num">5.</span><h2>Capped at $1,000 per branch</h2><span class="tag" style="background:rgba(251,191,36,.14);color:var(--coin)">configurable</span></div>
-  <p class="lead">Each <strong>direct referral is its own branch</strong> with its own <strong>$1,000 lifetime ceiling</strong> —
-     and that ceiling covers <em>both</em> your direct earnings from that person <em>and</em> the residual from whoever they refer.
-     Refer more people, get more independent caps.</p>
+  <div class="h2"><span class="num">5.</span><h2>No cap — unlimited revenue sharing</h2><span class="tag" style="background:rgba(52,211,153,.14);color:var(--ok)">configurable · currently OFF</span></div>
+  <p class="lead">Revenue sharing has <strong>no ceiling</strong>. As long as a referred player and their referrals keep buying
+     coins, the referrer keeps earning — <strong>for life, uncapped</strong>. Whether a cap applies at all is a
+     <strong>configuration</strong> the admin controls; it is currently set to <strong style="color:var(--ok)">No Cap</strong>.</p>
   <div class="grid g2">
-    <div class="panel" style="border-color:rgba(217,70,239,.3)">
-      <span class="pill" style="--cc:var(--a)">Branch 1</span>
-      <h3 style="margin-top:8px">Alice → Ben &nbsp;(+ Ben → Cara)</h3>
-      <p class="mut">Alice's direct earnings from <strong>Ben</strong> plus her residual from <strong>Cara</strong> share one $1,000 pool.</p>
-      <div class="capbar"><i class="capfill-a" style="width:61%"></i></div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:6px"><span>$610 earned</span><span>$1,000 cap</span></div>
+    <div class="cfg">
+      <div class="cfghd">⚙️ App Setting · Referral Cap</div>
+      <div class="opt sel">
+        <div class="box">✓</div>
+        <div><div class="ot">No Cap</div><div class="od">Revenue share continues for life with no ceiling — direct + residual, unlimited. <strong>This is the active setting.</strong></div></div>
+        <span class="badge">Selected</span>
+      </div>
+      <div class="opt">
+        <div class="box"></div>
+        <div><div class="ot">Cap per referral branch</div><div class="od">Optional ceiling (e.g. $1,000) on a direct referral + its residuals, if you ever want to bound the liability.</div></div>
+        <span class="badge off">Off</span>
+      </div>
+      <p class="note" style="margin-top:14px">Flip this in the admin app any time. Turning a cap on later would apply going forward; already-locked relationships keep their terms.</p>
     </div>
-    <div class="panel" style="border-color:rgba(59,130,246,.3)">
-      <span class="pill" style="--cc:var(--b)">Branch 2 · independent</span>
-      <h3 style="margin-top:8px">Alice → Dana &nbsp;(+ Dana → Eli)</h3>
-      <p class="mut">A different person Alice referred = a <strong>separate</strong> $1,000 cap. Branch 1 hitting its ceiling doesn't touch this one.</p>
-      <div class="capbar"><i class="capfill-b" style="width:24%"></i></div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:6px"><span>$240 earned</span><span>$1,000 cap</span></div>
+    <div class="panel" style="display:flex;flex-direction:column;justify-content:center">
+      <h3 style="font-size:16px">What "No Cap" means</h3>
+      <p class="mut" style="margin-top:6px">A strong referrer with an active downline can earn <strong>indefinitely</strong>. There's no $1,000 stop —
+         a single relationship can pay out well beyond that over its lifetime.</p>
+      <p class="mut" style="margin-top:10px"><strong style="color:var(--coin)">Trade-off worth naming:</strong> uncapped + for-life is an
+         <strong>unbounded, growing liability</strong> for the app. The config switch means we can cap later without a code change if the numbers demand it.</p>
+      <div class="chips" style="margin-top:12px">
+        <span class="chip g">♾️ Unlimited upside for referrers</span>
+        <span class="chip w">📈 Unbounded liability for the app</span>
+        <span class="chip">🔀 Reversible via one setting</span>
+      </div>
     </div>
   </div>
 </section>
@@ -340,20 +386,21 @@
 <section id="calc">
   <div class="h2"><span class="num">6.</span><h2>Try it — the earnings calculator</h2></div>
   <p class="lead">Drag the sliders to see how a referrer's earnings, the direct referrer's earnings, and the app's share
-     move. This is Alice's view of one branch: <strong>Ben</strong> (her direct) and <strong>Cara</strong> (Ben's referral → Alice's residual).</p>
+     move. This is Alice's view: <strong>Ben</strong> (her direct) and <strong>Ben's referrals</strong> (Cara, Dylan, Eve …
+     → Alice's 10% residual). Toggle the cap to see the setting in action.</p>
   <div class="calc">
     <div class="ctrl">
       <div class="field">
         <label>🪙 Ben's real coin spend (Alice's direct)</label>
         <div class="rowv"><span class="mut" style="font-size:12px">$0</span><b id="bLbl">$100</b></div>
-        <input type="range" id="bSpend" min="0" max="3000" step="10" value="100">
+        <input type="range" id="bSpend" min="0" max="5000" step="10" value="100">
       </div>
       <div class="field">
-        <label>🪙 Cara's real coin spend (Alice's residual)</label>
-        <div class="rowv"><span class="mut" style="font-size:12px">$0</span><b id="cLbl">$100</b></div>
-        <input type="range" id="cSpend" min="0" max="3000" step="10" value="100">
+        <label>🪙 Combined spend of everyone Ben refers (Alice's 10% residual)</label>
+        <div class="rowv"><span class="mut" style="font-size:12px">$0</span><b id="cLbl">$300</b></div>
+        <input type="range" id="cSpend" min="0" max="20000" step="50" value="300">
       </div>
-      <div class="field" style="margin-bottom:0">
+      <div class="field">
         <label>📅 Which year is Ben's clock in? (sets Alice's direct rate)</label>
         <div class="yrbtns">
           <button data-yr="1" class="on">Yr 1 · 50%</button>
@@ -361,23 +408,29 @@
           <button data-yr="3">Yr 3+ · 20%</button>
         </div>
       </div>
+      <div class="field" style="margin-bottom:0">
+        <div class="caprow"><span class="lab">🎯 Referral cap setting</span>
+          <span class="toggle"><button id="capOff" class="on">No Cap</button><button id="capOn">Set cap</button></span>
+        </div>
+        <div id="capAmtWrap">$ <input type="number" id="capAmt" value="1000" min="0" step="100"> per branch</div>
+      </div>
     </div>
     <div class="out">
       <div class="outrow"><span class="lab"><span class="dot" style="background:var(--a)"></span>Alice — direct from Ben</span><span class="v" id="oDirect">$50</span></div>
-      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--c)"></span>Alice — residual from Cara (10%)</span><span class="v" id="oResid">$10</span></div>
-      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--a)"></span><b>Alice — total (this branch)</b></span><span class="v" id="oAlice" style="color:var(--a)">$60</span></div>
-      <div class="cap-note" id="capNote" style="display:none">🎯 Capped at $1,000 for this branch — earnings above the cap don't pay out.</div>
-      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--b)"></span>Ben — direct from Cara</span><span class="v" id="oBen" style="color:var(--b)">$50</span></div>
-      <div class="outrow app"><span class="lab"><span class="dot" style="background:var(--app)"></span><b>App keeps</b> <span class="mut" style="font-weight:600;font-size:12px">(of total spend)</span></span><span class="v" id="oApp" style="color:var(--app)">$90</span></div>
+      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--c)"></span>Alice — residual from Ben's referrals (10%)</span><span class="v" id="oResid">$30</span></div>
+      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--a)"></span><b>Alice — total</b></span><span class="v" id="oAlice" style="color:var(--a)">$80</span></div>
+      <div class="cap-note" id="capNote" style="display:none">🎯 Capped — earnings above the cap don't pay out.</div>
+      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--b)"></span>Ben — direct from his referrals</span><span class="v" id="oBen" style="color:var(--b)">$150</span></div>
+      <div class="outrow app"><span class="lab"><span class="dot" style="background:var(--app)"></span><b>App keeps</b> <span class="mut" style="font-weight:600;font-size:12px">(of total spend)</span></span><span class="v" id="oApp" style="color:var(--app)">$170</span></div>
     </div>
   </div>
-  <p class="note">Rate model: direct = 50 / 30 / 20% by Ben's year; residual = flat 10%; Alice's branch total is clamped to the $1,000 cap.
-     "App keeps" = total real spend − all referral payouts (before processing fees). Ben's own $1,000 cap is tracked separately.</p>
+  <p class="note">Rate model: direct = 50 / 30 / 20% by Ben's year; residual = flat 10% on all of Ben's referrals.
+     With <strong>No Cap</strong> (the live setting), Alice's total is unbounded. "App keeps" = total real spend − all referral payouts (before processing fees).</p>
 </section>
 
 <!-- WORKED EXAMPLE -->
 <section id="example">
-  <div class="h2"><span class="num">7.</span><h2>Worked example</h2><span class="tag" style="background:rgba(16,185,129,.14);color:var(--app)">Ben $100 · Cara $100 · Year 1</span></div>
+  <div class="h2"><span class="num">7.</span><h2>Worked example</h2><span class="tag" style="background:rgba(16,185,129,.14);color:var(--app)">Ben $100 · Cara/Dylan/Eve $100 each · Year 1 · No cap</span></div>
   <p class="lead">The exact scenario, laid out line by line.</p>
   <table>
     <thead><tr><th>Purchase</th><th>Who earns</th><th>Type</th><th>Rate</th><th class="r">Payout</th></tr></thead>
@@ -385,14 +438,18 @@
       <tr><td>Ben buys $100</td><td class="role">Alice</td><td>Direct</td><td>50% (Yr 1)</td><td class="r yes">$50.00</td></tr>
       <tr><td>Cara buys $100</td><td class="role">Ben</td><td>Direct</td><td>50% (Yr 1)</td><td class="r yes">$50.00</td></tr>
       <tr><td>Cara buys $100</td><td class="role">Alice</td><td>Residual</td><td>10% flat</td><td class="r yes">$10.00</td></tr>
-      <tr><td colspan="4" style="text-align:right;font-weight:700;color:var(--mut)">Referrer payouts total</td><td class="r" style="font-weight:800">$110.00</td></tr>
-      <tr><td colspan="4" style="text-align:right;font-weight:700;color:var(--app)">App keeps (of $200)</td><td class="r" style="font-weight:800;color:var(--app)">$90.00</td></tr>
+      <tr><td>Dylan buys $100</td><td class="role">Ben</td><td>Direct</td><td>50% (Yr 1)</td><td class="r yes">$50.00</td></tr>
+      <tr><td>Dylan buys $100</td><td class="role">Alice</td><td>Residual</td><td>10% flat</td><td class="r yes">$10.00</td></tr>
+      <tr><td>Eve buys $100</td><td class="role">Ben</td><td>Direct</td><td>50% (Yr 1)</td><td class="r yes">$50.00</td></tr>
+      <tr><td>Eve buys $100</td><td class="role">Alice</td><td>Residual</td><td>10% flat</td><td class="r yes">$10.00</td></tr>
+      <tr><td colspan="4" style="text-align:right;font-weight:700;color:var(--mut)">Referrer payouts total</td><td class="r" style="font-weight:800">$230.00</td></tr>
+      <tr><td colspan="4" style="text-align:right;font-weight:700;color:var(--app)">App keeps (of $400)</td><td class="r" style="font-weight:800;color:var(--app)">$170.00</td></tr>
     </tbody>
   </table>
   <div class="grid g3" style="margin-top:14px">
-    <div class="card" style="--cc:var(--a)"><span class="ic">🥇</span><h4>Alice: $60.00</h4><p>$50 direct from Ben + $10 residual from Cara.</p></div>
-    <div class="card" style="--cc:var(--b)"><span class="ic">🥈</span><h4>Ben: $50.00</h4><p>$50 direct from Cara. (Ben earns nothing off his own spend.)</p></div>
-    <div class="card" style="--cc:var(--app)"><span class="ic">🏦</span><h4>App: $90.00</h4><p>$200 real spend − $110 payouts, before processing fees.</p></div>
+    <div class="card" style="--cc:var(--a)"><span class="ic">🥇</span><h4>Alice: $80.00</h4><p>$50 direct from Ben + 3 × $10 residual from Ben's invitees. Grows with every new one — no cap.</p></div>
+    <div class="card" style="--cc:var(--b)"><span class="ic">🥈</span><h4>Ben: $150.00</h4><p>$50 direct from each of Cara, Dylan, Eve. (Ben earns nothing off his own spend.)</p></div>
+    <div class="card" style="--cc:var(--app)"><span class="ic">🏦</span><h4>App: $170.00</h4><p>$400 real spend − $230 payouts, before processing fees.</p></div>
   </div>
 </section>
 
@@ -400,82 +457,133 @@
 <section id="player">
   <div class="h2"><span class="num">8.</span><h2>What the player sees</h2><span class="tag" style="background:rgba(59,130,246,.14);color:var(--b)">Referral dashboard · mockup</span></div>
   <p class="lead">Every player gets their own referral page: their share link, everyone they've referred with the <strong>rate
-     locked</strong> for each, live earnings, cap progress, and one-tap withdraw.</p>
+     locked</strong> for each, live earnings, and one-tap withdraw. No caps — just lifetime earnings that keep climbing.</p>
   <div class="device">
-    <div class="dev-top"><span class="ti">🎁 My Referrals</span><span class="tag2 ov">Alice</span></div>
+    <div class="dev-top"><span class="ti">🎁 My Referrals</span><span class="tag2 nc">No Cap</span></div>
     <div class="codechip">🔗 clubr.gg/r/<span style="color:var(--coin)">ALICE24</span><span class="cta">Copy link</span></div>
 
     <div class="refitem">
       <div class="hd"><span class="av2" style="background:var(--b)">B</span><div><div class="nm">Ben</div><div class="sub">Direct · Year 1 · joined Mar 2026</div></div><span class="lk">🔒 50%</span></div>
-      <div class="capwrap"><div class="capmeta"><span>$610 earned</span><span>$1,000 cap</span></div><div class="capbar"><i class="capfill-a" style="width:61%"></i></div></div>
+      <div class="earn"><span>Direct earnings · 4 sub-referrals</span><b>$1,240 earned</b></div>
     </div>
     <div class="refitem">
-      <div class="hd"><span class="av2" style="background:var(--c)">C</span><div><div class="nm">Cara <span style="font-size:11px;color:var(--mut2);font-weight:600">· via Ben</span></div><div class="sub">Residual · flat rate</div></div><span class="lk">🔒 10%</span></div>
-      <div class="capwrap"><div class="capmeta"><span>counts toward Ben's branch</span><span>$60 so far</span></div></div>
+      <div class="hd"><span class="av2" style="background:var(--c)">↳</span><div><div class="nm">Ben's referrals <span style="font-size:11px;color:var(--mut2);font-weight:600">· Cara, Dylan, Eve +1</span></div><div class="sub">Residual · flat rate · for life</div></div><span class="lk">🔒 10%</span></div>
+      <div class="earn"><span>Residual on all of Ben's invitees</span><b>$430 earned</b></div>
     </div>
     <div class="refitem">
       <div class="hd"><span class="av2" style="background:var(--a)">D</span><div><div class="nm">Dana</div><div class="sub">Direct · Year 2 · joined 2025</div></div><span class="lk">🔒 30%</span></div>
-      <div class="capwrap"><div class="capmeta"><span>$240 earned</span><span>$1,000 cap</span></div><div class="capbar"><i class="capfill-b" style="width:24%"></i></div></div>
+      <div class="earn"><span>Direct earnings · 1 sub-referral</span><b>$610 earned</b></div>
     </div>
 
     <div class="withdraw">
       <div style="font-size:12px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:.04em">Available to withdraw</div>
-      <div class="amt">$910.00</div>
+      <div class="amt">$1,950.00</div>
       <button>Withdraw to bank →</button>
     </div>
-    <p style="font-size:11px;color:var(--mut2);text-align:center;margin-top:10px">Lifetime earned $1,240 · Withdrawn $330 · 3 referrals active</p>
+    <p style="font-size:11px;color:var(--mut2);text-align:center;margin-top:10px">Lifetime earned $2,280 · Withdrawn $330 · 3 direct + 5 residual · no cap</p>
   </div>
   <p class="note">Because rates can change over time, each row shows the <strong>percentage locked</strong> for that specific
      relationship — so a player always knows exactly what they're earning and why.</p>
 </section>
 
+<!-- EARNING POTENTIAL -->
+<section id="potential">
+  <div class="h2"><span class="num">9.</span><h2>Your earning potential</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--a)">Player calculator</span></div>
+  <p class="lead">Every player gets this in-app: see what you could earn. Set how many people you refer, how many
+     <em>they</em> each refer, and the average lifetime coin spend per person. <strong>Example: a 10-coin pack costs $10.</strong>
+     Preset below = refer 10, each of them refers 10.</p>
+  <div class="calc">
+    <div class="ctrl">
+      <div class="field">
+        <label>👥 People you refer directly</label>
+        <div class="rowv"><span class="mut" style="font-size:12px">0</span><b id="pDirect">10</b></div>
+        <input type="range" id="pDirectR" min="0" max="50" step="1" value="10">
+      </div>
+      <div class="field">
+        <label>🔁 People each of them refers</label>
+        <div class="rowv"><span class="mut" style="font-size:12px">0</span><b id="pSub">10</b></div>
+        <input type="range" id="pSubR" min="0" max="50" step="1" value="10">
+      </div>
+      <div class="field">
+        <label>🪙 Avg lifetime coin spend per person <span style="color:var(--mut2)">· 10 coins = $10</span></label>
+        <div class="rowv"><span class="mut" style="font-size:12px">$0</span><b id="pSpend">$10</b></div>
+        <input type="range" id="pSpendR" min="0" max="2000" step="10" value="10">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>📅 Your direct rate (their year 1 / 2 / 3+)</label>
+        <div class="yrbtns" id="pYr">
+          <button data-yr="1" class="on">Yr 1 · 50%</button>
+          <button data-yr="2">Yr 2 · 30%</button>
+          <button data-yr="3">Yr 3+ · 20%</button>
+        </div>
+      </div>
+    </div>
+    <div class="out">
+      <div style="text-align:center;padding:22px 16px 10px">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);font-weight:700">Your potential earnings</div>
+        <div id="pTotal" style="font-size:46px;font-weight:800;color:var(--a);margin-top:4px">$150</div>
+        <div class="mut" style="font-size:12.5px" id="pPeople">10 direct + 100 residual = 110 people buying</div>
+      </div>
+      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--b)"></span>Direct — your cut of the people you refer</span><span class="v" id="pDir" style="color:var(--b)">$50</span></div>
+      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--c)"></span>Residual — 10% of everyone they refer</span><span class="v" id="pRes" style="color:var(--c)">$100</span></div>
+      <div class="cap-note" style="color:var(--ok)">♾️ No cap — this is lifetime potential and keeps growing as long as they keep buying.</div>
+    </div>
+  </div>
+  <p class="note">Direct = (people you refer) × (their spend) × your year rate. &nbsp;Residual = (people you refer) × (people each of them refers) × (their spend) × 10%. &nbsp;Illustrative — real earnings depend on actual purchases.</p>
+</section>
+
 <!-- ADMIN VIEW -->
 <section id="admin">
-  <div class="h2"><span class="num">9.</span><h2>What the admin sees</h2><span class="tag" style="background:rgba(16,185,129,.14);color:var(--app)">Master dashboard · mockup</span></div>
-  <p class="lead">One control room: per-player rate config, who referred whom, earnings for every player, the app's net,
-     and the withdrawal queue. Click any player to drill into their per-purchase earning rows.</p>
+  <div class="h2"><span class="num">10.</span><h2>What the admin sees</h2><span class="tag" style="background:rgba(16,185,129,.14);color:var(--app)">Master dashboard · mockup</span></div>
+  <p class="lead">One control room: the global cap setting, per-player rate config, who referred whom, earnings for every player,
+     the app's net, and the withdrawal queue. Click any player to drill into their per-purchase earning rows.</p>
+  <div class="cfg" style="margin-bottom:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <span class="cfghd" style="margin:0">⚙️ Global Referral Cap</span>
+    <span class="toggle"><button class="on">No Cap</button><button style="background:var(--card);color:var(--mut)">Set cap</button></span>
+    <span class="mut" style="font-size:12.5px">Defaults: 50 / 30 / 20 · 10% residual · min withdrawal $50 · <strong style="color:var(--ok)">cap OFF</strong></span>
+  </div>
   <div class="panel" style="padding:14px">
     <table>
-      <thead><tr><th>Player</th><th>Rate schedule</th><th class="r">Referred</th><th class="r">They earned</th><th class="r">App net</th><th></th></tr></thead>
+      <thead><tr><th>Player</th><th>Rate schedule</th><th>Cap</th><th class="r">Referred</th><th class="r">They earned</th><th class="r">App net</th><th></th></tr></thead>
       <tbody>
-        <tr><td class="role">Alice</td><td>50/30/20 · 10% <span class="tag2 ov">override 70% Yr1</span></td><td class="r">3</td><td class="r yes">$1,240</td><td class="r" style="color:var(--app)">$1,860</td><td class="r"><span class="tag2">drill ›</span></td></tr>
-        <tr><td class="role">Ben</td><td>50/30/20 · 10% <span class="tag2">default</span></td><td class="r">1</td><td class="r yes">$50</td><td class="r" style="color:var(--app)">$90</td><td class="r"><span class="tag2">drill ›</span></td></tr>
-        <tr><td class="role">Dana</td><td>40/25/15 · 10% <span class="tag2 ov">override</span></td><td class="r">2</td><td class="r yes">$430</td><td class="r" style="color:var(--app)">$980</td><td class="r"><span class="tag2">drill ›</span></td></tr>
-        <tr><td class="role">Cara</td><td>50/30/20 · 10% <span class="tag2">default</span></td><td class="r">0</td><td class="r" style="color:var(--mut2)">$0</td><td class="r" style="color:var(--app)">$0</td><td class="r"><span class="tag2">drill ›</span></td></tr>
+        <tr><td class="role">Alice</td><td>50/30/20 · 10% <span class="tag2 ov">override 70% Yr1</span></td><td><span class="tag2 nc">No cap</span></td><td class="r">3 + 5</td><td class="r yes">$2,280</td><td class="r" style="color:var(--app)">$3,140</td><td class="r"><span class="tag2">drill ›</span></td></tr>
+        <tr><td class="role">Ben</td><td>50/30/20 · 10% <span class="tag2">default</span></td><td><span class="tag2 nc">No cap</span></td><td class="r">4</td><td class="r yes">$1,240</td><td class="r" style="color:var(--app)">$980</td><td class="r"><span class="tag2">drill ›</span></td></tr>
+        <tr><td class="role">Dana</td><td>40/25/15 · 10% <span class="tag2 ov">override</span></td><td><span class="tag2 nc">No cap</span></td><td class="r">2</td><td class="r yes">$430</td><td class="r" style="color:var(--app)">$1,010</td><td class="r"><span class="tag2">drill ›</span></td></tr>
+        <tr><td class="role">Cara</td><td>50/30/20 · 10% <span class="tag2">default</span></td><td><span class="tag2 nc">No cap</span></td><td class="r">1</td><td class="r yes">$95</td><td class="r" style="color:var(--app)">$210</td><td class="r"><span class="tag2">drill ›</span></td></tr>
       </tbody>
     </table>
   </div>
   <div class="grid g3" style="margin-top:14px">
     <div class="card" style="--cc:var(--coin)"><span class="ic">💰</span><h4>Coin revenue</h4><p>Total real marketplace spend across all players, this period.</p></div>
-    <div class="card" style="--cc:var(--a)"><span class="ic">🤝</span><h4>Referral liability</h4><p>Paid out + outstanding, with per-branch caps applied.</p></div>
+    <div class="card" style="--cc:var(--a)"><span class="ic">🤝</span><h4>Referral liability</h4><p>Paid out + outstanding. With no cap, this is a lifetime, uncapped commitment — watch the trend.</p></div>
     <div class="card" style="--cc:var(--app)"><span class="ic">📊</span><h4>App margin</h4><p>Revenue − payouts (− processing fees). Live roll-up.</p></div>
   </div>
-  <p class="note">The admin also sets the global defaults (50/30/20 · 10% · $1,000 cap · minimum withdrawal) and per-player
-     overrides here — mirroring the existing economy-config screen.</p>
+  <p class="note">The admin sets the global defaults (50/30/20 · 10% residual · min withdrawal · <strong>cap on/off</strong>) and
+     per-player overrides here — mirroring the existing economy-config screen.</p>
 </section>
 
 <!-- DISCUSSION -->
 <section id="discuss">
-  <div class="h2"><span class="num">10.</span><h2>For discussion — what we want your read on</h2></div>
+  <div class="h2"><span class="num">11.</span><h2>For discussion — what we want your read on</h2></div>
   <p class="lead">This is a proposal, not a final decision. A few calls have real trade-offs — tell us where you land:</p>
   <div class="discuss">
-    <div class="q"><span class="mk">1.</span><div><b>Cash vs. coins.</b> Paying real, withdrawable cash is the most motivating — but for a poker-adjacent app it
+    <div class="q"><span class="mk">1.</span><div><b>No cap — comfortable?</b> Uncapped, for-life revenue share is the most attractive pitch for referrers, but it's an
+       <b>unbounded, growing liability</b> for the app: a strong referrer with an active downline earns forever. The cap is a config we can turn on later — do we launch <b>No Cap</b> and watch the numbers, or set a generous ceiling from day one?</div></div>
+    <div class="q"><span class="mk">2.</span><div><b>Cash vs. coins.</b> Paying real, withdrawable cash is the most motivating — but for a poker-adjacent app it
        likely needs tax reporting (W-9 / 1099), identity checks, and a legal review, since our coins are deliberately
        "non-cash." Would <b>coins/credits</b> instead be enough of an incentive, and much simpler?</div></div>
-    <div class="q"><span class="mk">2.</span><div><b>How generous, how long?</b> 50/30/20 for life (capped at $1,000/branch) is aggressive. Is the year-one 50%
-       right, or should it start lower? Is $1,000 the right ceiling?</div></div>
     <div class="q"><span class="mk">3.</span><div><b>Margin reality.</b> If coins are bought via the App Store / Google Play, the store takes ~30% before we see a
-       cent — so a year-one chain can pay out more than we keep. Should referral-eligible purchases be <b>web-checkout only</b>?</div></div>
+       cent. Direct 50% (Yr 1) + a 10% residual + no cap can push payouts past what we keep. Should referral-eligible purchases be <b>web-checkout only</b>?</div></div>
     <div class="q"><span class="mk">4.</span><div><b>Transparency.</b> Should players see the <b>app's earnings</b> on their referred revenue (full transparency),
        or just their own?</div></div>
-    <div class="q"><span class="mk">5.</span><div><b>Fraud.</b> With cash on the line, what guardrails feel right — withdrawal hold periods, identity verification,
+    <div class="q"><span class="mk">5.</span><div><b>Fraud.</b> With uncapped cash on the line, what guardrails feel right — withdrawal hold periods, identity verification,
        device/payment de-duplication to stop fake self-referrals?</div></div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">ClubR — Referral Program · design walkthrough &amp; interactive prototype · for internal review.
-     All numbers illustrative; earnings accrue only on real coin purchases.</div>
+     All numbers illustrative; earnings accrue only on real coin purchases · cap currently OFF (No Cap).</div>
 </footer>
 
 </main>
@@ -492,17 +600,19 @@
   window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
   // ---- earnings calculator ----
-  var CAP = 1000, RESID = 0.10, RATES = {1:0.50, 2:0.30, 3:0.20};
-  var year = 1;
+  var RESID = 0.10, RATES = {1:0.50, 2:0.30, 3:0.20};
+  var year = 1, capOn = false;
   var bSpend = document.getElementById('bSpend'), cSpend = document.getElementById('cSpend');
+  var capAmtEl = document.getElementById('capAmt');
   function money(n){ return '$' + (Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits: n%1?2:0, maximumFractionDigits:2}); }
   function calc(){
     var bv = +bSpend.value, cv = +cSpend.value, rate = RATES[year];
     var direct = bv * rate;              // Alice direct from Ben
-    var resid  = cv * RESID;             // Alice residual from Cara
+    var resid  = cv * RESID;             // Alice residual on all of Ben's referrals
     var aliceRaw = direct + resid;
-    var alice = Math.min(aliceRaw, CAP); // per-branch cap
-    var ben = cv * rate;                 // Ben direct from Cara
+    var cap = capOn ? Math.max(0, +capAmtEl.value || 0) : Infinity;
+    var alice = Math.min(aliceRaw, cap); // cap only if the setting is on
+    var ben = cv * rate;                 // Ben direct from his referrals
     var app = (bv + cv) - alice - ben;   // remainder before fees
     if (app < 0) app = 0;
     document.getElementById('bLbl').textContent = money(bv);
@@ -512,16 +622,47 @@
     document.getElementById('oAlice').textContent = money(alice);
     document.getElementById('oBen').textContent = money(ben);
     document.getElementById('oApp').textContent = money(app);
-    document.getElementById('capNote').style.display = aliceRaw > CAP ? 'block' : 'none';
+    document.getElementById('capNote').style.display = (capOn && aliceRaw > cap) ? 'block' : 'none';
   }
   bSpend.addEventListener('input', calc); cSpend.addEventListener('input', calc);
+  capAmtEl.addEventListener('input', calc);
   Array.prototype.forEach.call(document.querySelectorAll('.yrbtns button'), function(btn){
     btn.addEventListener('click', function(){
       document.querySelectorAll('.yrbtns button').forEach(function(b){ b.classList.remove('on'); });
       btn.classList.add('on'); year = +btn.getAttribute('data-yr'); calc();
     });
   });
+  var capOffBtn = document.getElementById('capOff'), capOnBtn = document.getElementById('capOn'),
+      capWrap = document.getElementById('capAmtWrap');
+  capOffBtn.addEventListener('click', function(){ capOn=false; capOffBtn.classList.add('on'); capOnBtn.classList.remove('on'); capWrap.style.display='none'; calc(); });
+  capOnBtn.addEventListener('click', function(){ capOn=true; capOnBtn.classList.add('on'); capOffBtn.classList.remove('on'); capWrap.style.display='block'; calc(); });
   calc();
+
+  // ---- earning-potential projector (player) ----
+  var pDirectR = document.getElementById('pDirectR'), pSubR = document.getElementById('pSubR'), pSpendR = document.getElementById('pSpendR');
+  var pYear = 1;
+  function project(){
+    var d = +pDirectR.value, s = +pSubR.value, spend = +pSpendR.value, rate = RATES[pYear];
+    var residualPeople = d * s;
+    var directEarn = d * spend * rate;
+    var residEarn = residualPeople * spend * RESID;
+    var total = directEarn + residEarn;
+    document.getElementById('pDirect').textContent = d;
+    document.getElementById('pSub').textContent = s;
+    document.getElementById('pSpend').textContent = money(spend);
+    document.getElementById('pDir').textContent = money(directEarn);
+    document.getElementById('pRes').textContent = money(residEarn);
+    document.getElementById('pTotal').textContent = money(total);
+    document.getElementById('pPeople').textContent = d + ' direct + ' + residualPeople.toLocaleString() + ' residual = ' + (d + residualPeople).toLocaleString() + ' people buying';
+  }
+  pDirectR.addEventListener('input', project); pSubR.addEventListener('input', project); pSpendR.addEventListener('input', project);
+  Array.prototype.forEach.call(document.querySelectorAll('#pYr button'), function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('#pYr button').forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on'); pYear = +btn.getAttribute('data-yr'); project();
+    });
+  });
+  project();
 </script>
 </body>
 </html>
