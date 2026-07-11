@@ -490,8 +490,8 @@
 <section id="potential">
   <div class="h2"><span class="num">9.</span><h2>Your earning potential</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--a)">Player calculator</span></div>
   <p class="lead">Every player gets this in-app: see what you could earn. Set how many people you refer, how many
-     <em>they</em> each refer, and the average lifetime coin spend per person. <strong>Example: a 10-coin pack costs $10.</strong>
-     Preset below = refer 10, each of them refers 10.</p>
+     <em>they</em> each refer, how many coins each person buys, and the coin price. <strong>Preset: refer 10, each of
+     them refers 10, everyone buys 10 coins, priced 5 coins = $5.</strong></p>
   <div class="calc">
     <div class="ctrl">
       <div class="field">
@@ -505,9 +505,18 @@
         <input type="range" id="pSubR" min="0" max="50" step="1" value="10">
       </div>
       <div class="field">
-        <label>🪙 Avg lifetime coin spend per person <span style="color:var(--mut2)">· 10 coins = $10</span></label>
-        <div class="rowv"><span class="mut" style="font-size:12px">$0</span><b id="pSpend">$10</b></div>
-        <input type="range" id="pSpendR" min="0" max="2000" step="10" value="10">
+        <label>🪙 Coins each person buys <span style="color:var(--mut2)">(lifetime)</span></label>
+        <div class="rowv"><span class="mut" style="font-size:12px">0</span><b id="pCoins">10 coins</b></div>
+        <input type="range" id="pCoinsR" min="0" max="1000" step="5" value="10">
+      </div>
+      <div class="field">
+        <label>💲 Coin price</label>
+        <div class="caprow" style="gap:8px;flex-wrap:wrap">
+          <input type="number" id="packCoins" value="5" min="1" step="1" style="width:64px;background:var(--card);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:6px 8px;font-family:inherit;font-weight:700">
+          <span class="lab">coins = $</span>
+          <input type="number" id="packPrice" value="5" min="0" step="1" style="width:74px;background:var(--card);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:6px 8px;font-family:inherit;font-weight:700">
+          <span class="mut" id="perCoin" style="font-size:12px;margin-left:auto">$1.00 / coin</span>
+        </div>
       </div>
       <div class="field" style="margin-bottom:0">
         <label>📅 Your direct rate (their year 1 / 2 / 3+)</label>
@@ -524,12 +533,13 @@
         <div id="pTotal" style="font-size:46px;font-weight:800;color:var(--a);margin-top:4px">$150</div>
         <div class="mut" style="font-size:12.5px" id="pPeople">10 direct + 100 residual = 110 people buying</div>
       </div>
+      <div class="outrow"><span class="lab">🪙 Spend per person</span><span class="v" id="pSpendOut" style="color:var(--coin)">$10</span></div>
       <div class="outrow"><span class="lab"><span class="dot" style="background:var(--b)"></span>Direct — your cut of the people you refer</span><span class="v" id="pDir" style="color:var(--b)">$50</span></div>
       <div class="outrow"><span class="lab"><span class="dot" style="background:var(--c)"></span>Residual — 10% of everyone they refer</span><span class="v" id="pRes" style="color:var(--c)">$100</span></div>
-      <div class="cap-note" style="color:var(--ok)">♾️ No cap — this is lifetime potential and keeps growing as long as they keep buying.</div>
+      <div class="cap-note" style="color:var(--ok)">♾️ No cap — lifetime potential; grows as long as they keep buying.</div>
     </div>
   </div>
-  <p class="note">Direct = (people you refer) × (their spend) × your year rate. &nbsp;Residual = (people you refer) × (people each of them refers) × (their spend) × 10%. &nbsp;Illustrative — real earnings depend on actual purchases.</p>
+  <p class="note">Spend per person = coins × coin price. &nbsp;Direct = (people you refer) × (their spend) × your year rate. &nbsp;Residual = (people you refer) × (people each of them refers) × (their spend) × 10%. &nbsp;Illustrative — real earnings depend on actual purchases.</p>
 </section>
 
 <!-- ADMIN VIEW -->
@@ -639,23 +649,30 @@
   calc();
 
   // ---- earning-potential projector (player) ----
-  var pDirectR = document.getElementById('pDirectR'), pSubR = document.getElementById('pSubR'), pSpendR = document.getElementById('pSpendR');
+  var pDirectR = document.getElementById('pDirectR'), pSubR = document.getElementById('pSubR'), pCoinsR = document.getElementById('pCoinsR');
+  var packCoins = document.getElementById('packCoins'), packPrice = document.getElementById('packPrice');
   var pYear = 1;
   function project(){
-    var d = +pDirectR.value, s = +pSubR.value, spend = +pSpendR.value, rate = RATES[pYear];
+    var d = +pDirectR.value, s = +pSubR.value, coins = +pCoinsR.value, rate = RATES[pYear];
+    var pc = +packCoins.value || 1, pp = +packPrice.value || 0;
+    var perCoin = pp / pc;               // $ per coin
+    var spend = coins * perCoin;         // $ each person spends
     var residualPeople = d * s;
     var directEarn = d * spend * rate;
     var residEarn = residualPeople * spend * RESID;
     var total = directEarn + residEarn;
     document.getElementById('pDirect').textContent = d;
     document.getElementById('pSub').textContent = s;
-    document.getElementById('pSpend').textContent = money(spend);
+    document.getElementById('pCoins').textContent = coins.toLocaleString() + ' coins';
+    document.getElementById('perCoin').textContent = money(perCoin) + ' / coin';
+    document.getElementById('pSpendOut').textContent = money(spend);
     document.getElementById('pDir').textContent = money(directEarn);
     document.getElementById('pRes').textContent = money(residEarn);
     document.getElementById('pTotal').textContent = money(total);
     document.getElementById('pPeople').textContent = d + ' direct + ' + residualPeople.toLocaleString() + ' residual = ' + (d + residualPeople).toLocaleString() + ' people buying';
   }
-  pDirectR.addEventListener('input', project); pSubR.addEventListener('input', project); pSpendR.addEventListener('input', project);
+  pDirectR.addEventListener('input', project); pSubR.addEventListener('input', project); pCoinsR.addEventListener('input', project);
+  packCoins.addEventListener('input', project); packPrice.addEventListener('input', project);
   Array.prototype.forEach.call(document.querySelectorAll('#pYr button'), function(btn){
     btn.addEventListener('click', function(){
       document.querySelectorAll('#pYr button').forEach(function(b){ b.classList.remove('on'); });
