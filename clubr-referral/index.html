@@ -210,7 +210,7 @@
   <a href="#player">Player View</a>
   <a href="#potential">My Earnings</a>
   <a href="#admin">Admin View</a>
-  <a href="#discuss">For Discussion</a>
+  <a href="#summary">The Deal</a>
 </div></nav>
 
 <header id="home">
@@ -221,7 +221,7 @@
        you earn a <strong style="color:var(--ok)">share of that purchase</strong> — a lot in year one,
        tapering but continuing for life. You also earn a flat
        <strong style="color:var(--a)">10% residual on everyone <em>they</em> refer</strong>. It's
-       <strong style="color:var(--coin)">uncapped revenue sharing</strong> — configurable, and locked in the day it starts.</p>
+       <strong style="color:var(--coin)">uncapped revenue sharing</strong> — locked in the day it starts.</p>
     <p class="tagline">Earnings come only from <strong>marketplace coin purchases</strong> — nothing else. Free promo coins never count.</p>
     <div class="legend">
       <span class="it"><span class="dot" style="background:var(--a)"></span>Referrer (A)</span>
@@ -240,17 +240,17 @@
   <div class="h2"><span class="num">1.</span><h2>The idea, in one line</h2></div>
   <p class="lead">A referrer earns a <strong>percentage of the coin money</strong> their invitees spend — generous early,
      tapering over time, but <strong>never stopping</strong>. On top of that, they earn a <strong>flat 10% on every
-     purchase made by everyone their invitee refers.</strong> A few guardrails keep it fair; the ceiling is a
-     <strong style="color:var(--coin)">setting, currently switched off (No Cap)</strong>.</p>
+     purchase made by everyone their invitee refers.</strong> There is <strong style="color:var(--coin)">no cap</strong> —
+     your share is unlimited, for life.</p>
   <div class="chips" style="gap:10px">
     <span class="chip">💵 Paid out as <b style="color:var(--tx)">real, withdrawable cash</b></span>
     <span class="chip g">✅ Only <b style="color:var(--tx)">real paid purchases</b> count — free promo coins never do</span>
     <span class="chip">📉 Direct: <b style="color:var(--tx)">50% → 30% → 20%</b> by year, then 20% for life</span>
     <span class="chip">🔁 Residual: <b style="color:var(--tx)">flat 10%</b> on <b style="color:var(--tx)">all</b> of your invitee's referrals</span>
     <span class="chip">🧱 Depth stops at <b style="color:var(--tx)">2 levels</b></span>
-    <span class="chip gold">♾️ <b style="color:var(--coin)">No cap</b> — unlimited, for life <span style="opacity:.8">(configurable)</span></span>
+    <span class="chip gold">♾️ <b style="color:var(--coin)">No cap</b> — unlimited, for life</span>
     <span class="chip w">↩️ Refunds &amp; chargebacks <b style="color:#fecaca">claw the earning back</b></span>
-    <span class="chip">⚙️ Every rate is <b style="color:var(--tx)">configurable per player</b></span>
+    <span class="chip">🔒 Your rate is <b style="color:var(--tx)">locked in for life</b></span>
   </div>
   <p class="note">Attribution locks the moment someone signs up with your code. The payout clock starts when they make
      their <strong>first real purchase</strong>. All figures below are the coin-purchase split <em>before</em>
@@ -317,10 +317,10 @@
     <div class="seg y3"><div class="yr">Year 3 →</div><div class="pc">20%</div><div class="nt">for life — no cap</div></div>
   </div>
   <div class="grid g2" style="margin-top:14px">
-    <div class="panel"><h3>🔒 Rates are locked at the start</h3><p class="mut">The percentages that apply to a relationship are <strong>frozen the day it activates</strong> (first purchase).
-       If you later change the defaults, existing referrals keep their locked rates — only <strong>new</strong> ones use the new numbers. Each player's dashboard always shows the rate that's locked for them.</p></div>
-    <div class="panel"><h3>⚙️ Configurable per player</h3><p class="mut">50 / 30 / 20 and the 10% residual are <strong>defaults</strong>. An admin can set a different schedule for a specific
-       referrer — e.g. a <strong>70%</strong> year-one rate for a key partner, or <strong>40%</strong> for another. Whatever is set at activation is what locks in.</p></div>
+    <div class="panel"><h3>🔒 Your rate is locked at the start</h3><p class="mut">The percentage for each relationship is <strong>frozen the day it activates</strong> (their first purchase) — it never
+       drops below the published year schedule. Your dashboard always shows the exact rate locked for every person you've referred.</p></div>
+    <div class="panel"><h3>🌱 It grows with your network</h3><p class="mut">You keep earning as the people you refer — and everyone <strong>they</strong> bring in — keep buying. A single active
+       referral can pay you for years, with <strong>no ceiling</strong>.</p></div>
   </div>
 </section>
 
@@ -346,39 +346,15 @@
   <p class="note">Every player is the centre of their own two-level window: Cara earns a full direct cut from F, and Ben earns his 10% residual from F — but Alice does not.</p>
 </section>
 
-<!-- CAP / CONFIG -->
+<!-- NO CAP -->
 <section id="cap">
-  <div class="h2"><span class="num">5.</span><h2>No cap — unlimited revenue sharing</h2><span class="tag" style="background:rgba(52,211,153,.14);color:var(--ok)">configurable · currently OFF</span></div>
-  <p class="lead">Revenue sharing has <strong>no ceiling</strong>. As long as a referred player and their referrals keep buying
-     coins, the referrer keeps earning — <strong>for life, uncapped</strong>. Whether a cap applies at all is a
-     <strong>configuration</strong> the admin controls; it is currently set to <strong style="color:var(--ok)">No Cap</strong>.</p>
-  <div class="grid g2">
-    <div class="cfg">
-      <div class="cfghd">⚙️ App Setting · Referral Cap</div>
-      <div class="opt sel">
-        <div class="box">✓</div>
-        <div><div class="ot">No Cap</div><div class="od">Revenue share continues for life with no ceiling — direct + residual, unlimited. <strong>This is the active setting.</strong></div></div>
-        <span class="badge">Selected</span>
-      </div>
-      <div class="opt">
-        <div class="box"></div>
-        <div><div class="ot">Cap per referral branch</div><div class="od">Optional ceiling (e.g. $1,000) on a direct referral + its residuals, if you ever want to bound the liability.</div></div>
-        <span class="badge off">Off</span>
-      </div>
-      <p class="note" style="margin-top:14px">Flip this in the admin app any time. Turning a cap on later would apply going forward; already-locked relationships keep their terms.</p>
-    </div>
-    <div class="panel" style="display:flex;flex-direction:column;justify-content:center">
-      <h3 style="font-size:16px">What "No Cap" means</h3>
-      <p class="mut" style="margin-top:6px">A strong referrer with an active downline can earn <strong>indefinitely</strong>. There's no $1,000 stop —
-         a single relationship can pay out well beyond that over its lifetime.</p>
-      <p class="mut" style="margin-top:10px"><strong style="color:var(--coin)">Trade-off worth naming:</strong> uncapped + for-life is an
-         <strong>unbounded, growing liability</strong> for the app. The config switch means we can cap later without a code change if the numbers demand it.</p>
-      <div class="chips" style="margin-top:12px">
-        <span class="chip g">♾️ Unlimited upside for referrers</span>
-        <span class="chip w">📈 Unbounded liability for the app</span>
-        <span class="chip">🔀 Reversible via one setting</span>
-      </div>
-    </div>
+  <div class="h2"><span class="num">5.</span><h2>No cap — unlimited revenue sharing</h2><span class="tag" style="background:rgba(52,211,153,.14);color:var(--ok)">for life</span></div>
+  <p class="lead">There is <strong>no ceiling</strong>. As long as the people you refer — and everyone <em>they</em> refer —
+     keep buying coins, you keep earning. <strong style="color:var(--ok)">Unlimited, for life.</strong></p>
+  <div class="grid g3">
+    <div class="panel" style="border-color:rgba(52,211,153,.35)"><h3 style="font-size:16px">♾️ Unlimited</h3><p class="mut" style="margin-top:6px">No maximum, ever. There's no point where your earnings stop — a strong network can pay out far beyond any single milestone.</p></div>
+    <div class="panel" style="border-color:rgba(59,130,246,.35)"><h3 style="font-size:16px">⏳ For life</h3><p class="mut" style="margin-top:6px">Once a relationship is active, it keeps paying for as long as they keep buying — year after year after year.</p></div>
+    <div class="panel" style="border-color:rgba(217,70,239,.35)"><h3 style="font-size:16px">🌐 Compounds with your network</h3><p class="mut" style="margin-top:6px">Every new person your invitees bring in adds another 10% residual stream on top — and with no cap, it only grows.</p></div>
   </div>
 </section>
 
@@ -387,7 +363,7 @@
   <div class="h2"><span class="num">6.</span><h2>Try it — the earnings calculator</h2></div>
   <p class="lead">Drag the sliders to see how a referrer's earnings, the direct referrer's earnings, and the app's share
      move. This is Alice's view: <strong>Ben</strong> (her direct) and <strong>Ben's referrals</strong> (Cara, Dylan, Eve …
-     → Alice's 10% residual). Toggle the cap to see the setting in action.</p>
+     → Alice's 10% residual).</p>
   <div class="calc">
     <div class="ctrl">
       <div class="field">
@@ -408,24 +384,17 @@
           <button data-yr="3">Yr 3+ · 20%</button>
         </div>
       </div>
-      <div class="field" style="margin-bottom:0">
-        <div class="caprow"><span class="lab">🎯 Referral cap setting</span>
-          <span class="toggle"><button id="capOff" class="on">No Cap</button><button id="capOn">Set cap</button></span>
-        </div>
-        <div id="capAmtWrap">$ <input type="number" id="capAmt" value="1000" min="0" step="100"> per branch</div>
-      </div>
     </div>
     <div class="out">
       <div class="outrow"><span class="lab"><span class="dot" style="background:var(--a)"></span>Alice — direct from Ben</span><span class="v" id="oDirect">$50</span></div>
       <div class="outrow"><span class="lab"><span class="dot" style="background:var(--c)"></span>Alice — residual from Ben's referrals (10%)</span><span class="v" id="oResid">$30</span></div>
       <div class="outrow"><span class="lab"><span class="dot" style="background:var(--a)"></span><b>Alice — total</b></span><span class="v" id="oAlice" style="color:var(--a)">$80</span></div>
-      <div class="cap-note" id="capNote" style="display:none">🎯 Capped — earnings above the cap don't pay out.</div>
       <div class="outrow"><span class="lab"><span class="dot" style="background:var(--b)"></span>Ben — direct from his referrals</span><span class="v" id="oBen" style="color:var(--b)">$150</span></div>
       <div class="outrow app"><span class="lab"><span class="dot" style="background:var(--app)"></span><b>App keeps</b> <span class="mut" style="font-weight:600;font-size:12px">(of total spend)</span></span><span class="v" id="oApp" style="color:var(--app)">$170</span></div>
     </div>
   </div>
-  <p class="note">Rate model: direct = 50 / 30 / 20% by Ben's year; residual = flat 10% on all of Ben's referrals.
-     With <strong>No Cap</strong> (the live setting), Alice's total is unbounded. "App keeps" = total real spend − all referral payouts (before processing fees).</p>
+  <p class="note">Rate model: direct = 50 / 30 / 20% by Ben's year; residual = flat 10% on all of Ben's referrals — <strong>no cap</strong>.
+     "App keeps" = total real spend − all referral payouts (before processing fees).</p>
 </section>
 
 <!-- WORKED EXAMPLE -->
@@ -545,55 +514,43 @@
 <!-- ADMIN VIEW -->
 <section id="admin">
   <div class="h2"><span class="num">10.</span><h2>What the admin sees</h2><span class="tag" style="background:rgba(16,185,129,.14);color:var(--app)">Master dashboard · mockup</span></div>
-  <p class="lead">One control room: the global cap setting, per-player rate config, who referred whom, earnings for every player,
-     the app's net, and the withdrawal queue. Click any player to drill into their per-purchase earning rows.</p>
-  <div class="cfg" style="margin-bottom:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-    <span class="cfghd" style="margin:0">⚙️ Global Referral Cap</span>
-    <span class="toggle"><button class="on">No Cap</button><button style="background:var(--card);color:var(--mut)">Set cap</button></span>
-    <span class="mut" style="font-size:12.5px">Defaults: 50 / 30 / 20 · 10% residual · min withdrawal $50 · <strong style="color:var(--ok)">cap OFF</strong></span>
-  </div>
+  <p class="lead">One control room: rate schedules, who referred whom, earnings for every player, and the withdrawal queue.
+     Click any player to drill into their per-purchase earning rows.</p>
   <div class="panel" style="padding:14px">
     <table>
-      <thead><tr><th>Player</th><th>Rate schedule</th><th>Cap</th><th class="r">Referred</th><th class="r">They earned</th><th class="r">App net</th><th></th></tr></thead>
+      <thead><tr><th>Player</th><th>Rate schedule</th><th class="r">Referred</th><th class="r">They earned</th><th></th></tr></thead>
       <tbody>
-        <tr><td class="role">Alice</td><td>50/30/20 · 10% <span class="tag2 ov">override 70% Yr1</span></td><td><span class="tag2 nc">No cap</span></td><td class="r">3 + 5</td><td class="r yes">$2,280</td><td class="r" style="color:var(--app)">$3,140</td><td class="r"><span class="tag2">drill ›</span></td></tr>
-        <tr><td class="role">Ben</td><td>50/30/20 · 10% <span class="tag2">default</span></td><td><span class="tag2 nc">No cap</span></td><td class="r">4</td><td class="r yes">$1,240</td><td class="r" style="color:var(--app)">$980</td><td class="r"><span class="tag2">drill ›</span></td></tr>
-        <tr><td class="role">Dana</td><td>40/25/15 · 10% <span class="tag2 ov">override</span></td><td><span class="tag2 nc">No cap</span></td><td class="r">2</td><td class="r yes">$430</td><td class="r" style="color:var(--app)">$1,010</td><td class="r"><span class="tag2">drill ›</span></td></tr>
-        <tr><td class="role">Cara</td><td>50/30/20 · 10% <span class="tag2">default</span></td><td><span class="tag2 nc">No cap</span></td><td class="r">1</td><td class="r yes">$95</td><td class="r" style="color:var(--app)">$210</td><td class="r"><span class="tag2">drill ›</span></td></tr>
+        <tr><td class="role">Alice</td><td>50 / 30 / 20 · 10% residual</td><td class="r">3 + 5</td><td class="r yes">$2,280</td><td class="r"><span class="tag2">drill ›</span></td></tr>
+        <tr><td class="role">Ben</td><td>50 / 30 / 20 · 10% residual</td><td class="r">4</td><td class="r yes">$1,240</td><td class="r"><span class="tag2">drill ›</span></td></tr>
+        <tr><td class="role">Dana</td><td>50 / 30 / 20 · 10% residual</td><td class="r">2</td><td class="r yes">$430</td><td class="r"><span class="tag2">drill ›</span></td></tr>
+        <tr><td class="role">Cara</td><td>50 / 30 / 20 · 10% residual</td><td class="r">1</td><td class="r yes">$95</td><td class="r"><span class="tag2">drill ›</span></td></tr>
       </tbody>
     </table>
   </div>
   <div class="grid g3" style="margin-top:14px">
     <div class="card" style="--cc:var(--coin)"><span class="ic">💰</span><h4>Coin revenue</h4><p>Total real marketplace spend across all players, this period.</p></div>
-    <div class="card" style="--cc:var(--a)"><span class="ic">🤝</span><h4>Referral liability</h4><p>Paid out + outstanding. With no cap, this is a lifetime, uncapped commitment — watch the trend.</p></div>
-    <div class="card" style="--cc:var(--app)"><span class="ic">📊</span><h4>App margin</h4><p>Revenue − payouts (− processing fees). Live roll-up.</p></div>
+    <div class="card" style="--cc:var(--a)"><span class="ic">🤝</span><h4>Paid to referrers</h4><p>Total earned + already withdrawn across every player.</p></div>
+    <div class="card" style="--cc:var(--app)"><span class="ic">🏦</span><h4>Withdrawal queue</h4><p>Pending cash-out requests, approved in a click.</p></div>
   </div>
-  <p class="note">The admin sets the global defaults (50/30/20 · 10% residual · min withdrawal · <strong>cap on/off</strong>) and
-     per-player overrides here — mirroring the existing economy-config screen.</p>
 </section>
 
-<!-- DISCUSSION -->
-<section id="discuss">
-  <div class="h2"><span class="num">11.</span><h2>For discussion — what we want your read on</h2></div>
-  <p class="lead">This is a proposal, not a final decision. A few calls have real trade-offs — tell us where you land:</p>
-  <div class="discuss">
-    <div class="q"><span class="mk">1.</span><div><b>No cap — comfortable?</b> Uncapped, for-life revenue share is the most attractive pitch for referrers, but it's an
-       <b>unbounded, growing liability</b> for the app: a strong referrer with an active downline earns forever. The cap is a config we can turn on later — do we launch <b>No Cap</b> and watch the numbers, or set a generous ceiling from day one?</div></div>
-    <div class="q"><span class="mk">2.</span><div><b>Cash vs. coins.</b> Paying real, withdrawable cash is the most motivating — but for a poker-adjacent app it
-       likely needs tax reporting (W-9 / 1099), identity checks, and a legal review, since our coins are deliberately
-       "non-cash." Would <b>coins/credits</b> instead be enough of an incentive, and much simpler?</div></div>
-    <div class="q"><span class="mk">3.</span><div><b>Margin reality.</b> If coins are bought via the App Store / Google Play, the store takes ~30% before we see a
-       cent. Direct 50% (Yr 1) + a 10% residual + no cap can push payouts past what we keep. Should referral-eligible purchases be <b>web-checkout only</b>?</div></div>
-    <div class="q"><span class="mk">4.</span><div><b>Transparency.</b> Should players see the <b>app's earnings</b> on their referred revenue (full transparency),
-       or just their own?</div></div>
-    <div class="q"><span class="mk">5.</span><div><b>Fraud.</b> With uncapped cash on the line, what guardrails feel right — withdrawal hold periods, identity verification,
-       device/payment de-duplication to stop fake self-referrals?</div></div>
+<!-- SUMMARY -->
+<section id="summary">
+  <div class="h2"><span class="num">11.</span><h2>The deal, at a glance</h2></div>
+  <p class="lead">Everything you get as a ClubrGo referrer, in one place.</p>
+  <div class="grid g3">
+    <div class="card" style="--cc:var(--app)"><span class="ic">💵</span><h4>Real cash</h4><p>50 / 30 / 20% of what the people you refer spend — by year, then 20% for life.</p></div>
+    <div class="card" style="--cc:var(--c)"><span class="ic">🔁</span><h4>10% residual</h4><p>A flat 10% on every purchase by everyone your invitees bring in.</p></div>
+    <div class="card" style="--cc:var(--coin)"><span class="ic">♾️</span><h4>No cap</h4><p>Unlimited earnings, for life — the more your network grows, the more you make.</p></div>
+    <div class="card" style="--cc:var(--b)"><span class="ic">🔒</span><h4>Locked-in rate</h4><p>Your percentage is fixed the day a referral starts — you always know what you earn.</p></div>
+    <div class="card" style="--cc:var(--ok)"><span class="ic">✅</span><h4>Real purchases only</h4><p>You earn on genuine coin purchases — clean, verifiable, honest.</p></div>
+    <div class="card" style="--cc:var(--a)"><span class="ic">🏦</span><h4>Withdraw anytime</h4><p>Cash out your balance straight to your bank whenever you like.</p></div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">ClubrGo — Referral Program · design walkthrough &amp; interactive prototype · for internal review.
-     All numbers illustrative; earnings accrue only on real coin purchases · cap currently OFF (No Cap).</div>
+  <div class="wrap">ClubrGo — Referral Program. All numbers illustrative; you earn only on real coin purchases.
+     No cap — unlimited, for life.</div>
 </footer>
 
 </main>
@@ -611,17 +568,14 @@
 
   // ---- earnings calculator ----
   var RESID = 0.10, RATES = {1:0.50, 2:0.30, 3:0.20};
-  var year = 1, capOn = false;
+  var year = 1;
   var bSpend = document.getElementById('bSpend'), cSpend = document.getElementById('cSpend');
-  var capAmtEl = document.getElementById('capAmt');
   function money(n){ return '$' + (Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits: n%1?2:0, maximumFractionDigits:2}); }
   function calc(){
     var bv = +bSpend.value, cv = +cSpend.value, rate = RATES[year];
     var direct = bv * rate;              // Alice direct from Ben
     var resid  = cv * RESID;             // Alice residual on all of Ben's referrals
-    var aliceRaw = direct + resid;
-    var cap = capOn ? Math.max(0, +capAmtEl.value || 0) : Infinity;
-    var alice = Math.min(aliceRaw, cap); // cap only if the setting is on
+    var alice = direct + resid;          // no cap
     var ben = cv * rate;                 // Ben direct from his referrals
     var app = (bv + cv) - alice - ben;   // remainder before fees
     if (app < 0) app = 0;
@@ -632,20 +586,15 @@
     document.getElementById('oAlice').textContent = money(alice);
     document.getElementById('oBen').textContent = money(ben);
     document.getElementById('oApp').textContent = money(app);
-    document.getElementById('capNote').style.display = (capOn && aliceRaw > cap) ? 'block' : 'none';
   }
   bSpend.addEventListener('input', calc); cSpend.addEventListener('input', calc);
-  capAmtEl.addEventListener('input', calc);
-  Array.prototype.forEach.call(document.querySelectorAll('.yrbtns button'), function(btn){
+  var calcYr = bSpend.closest('.ctrl').querySelectorAll('.yrbtns button');
+  Array.prototype.forEach.call(calcYr, function(btn){
     btn.addEventListener('click', function(){
-      document.querySelectorAll('.yrbtns button').forEach(function(b){ b.classList.remove('on'); });
+      calcYr.forEach(function(b){ b.classList.remove('on'); });
       btn.classList.add('on'); year = +btn.getAttribute('data-yr'); calc();
     });
   });
-  var capOffBtn = document.getElementById('capOff'), capOnBtn = document.getElementById('capOn'),
-      capWrap = document.getElementById('capAmtWrap');
-  capOffBtn.addEventListener('click', function(){ capOn=false; capOffBtn.classList.add('on'); capOnBtn.classList.remove('on'); capWrap.style.display='none'; calc(); });
-  capOnBtn.addEventListener('click', function(){ capOn=true; capOnBtn.classList.add('on'); capOffBtn.classList.remove('on'); capWrap.style.display='block'; calc(); });
   calc();
 
   // ---- earning-potential projector (player) ----
