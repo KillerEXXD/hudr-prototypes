@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+@theme {
+  /* Data-Dense Dashboard palette — dark, blue data + amber highlights (UI UX Pro Max) */
+  --color-bg-primary: #07070b;
+  --color-bg-secondary: #0e0e15;
+  --color-bg-card: #16161f;
+  --color-bg-surface: #1e1e2a;
+  --color-bg-elevated: #26263420;
+  --color-border: #262635;
+  --color-border-light: #34344a;
+
+  --color-text-primary: #f2f2f7;
+  --color-text-secondary: #a1a1b5;
+  --color-text-muted: #6b6b82;
+
+  --color-accent-blue: #3b82f6;
+  --color-accent-blue-deep: #1e40af;
+  --color-accent-amber: #f59e0b;
+  --color-accent-emerald: #10b981;
+  --color-accent-red: #ef4444;
+  --color-accent-purple: #8b5cf6;
+  --color-accent-cyan: #06b6d4;
+  /* chip-gold (Felt skin) — value overridden at runtime by ThemeContext */
+  --color-accent-gold: #E9C46A;
+  --color-accent-gold-deep: #C99B3E;
+
+  /* semantic */
+  --color-tier-reliable: #10b981;
+  --color-tier-tentative: #f59e0b;
+  --color-tier-noise: #6b6b82;
+  --color-sev-critical: #ef4444;
+  --color-sev-moderate: #f59e0b;
+  --color-sev-minor: #3b82f6;
+
+  --font-family-sans: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'Fira Code', ui-monospace, monospace;
+  /* display face — overridden per theme by ThemeContext (Felt → Space Grotesk) */
+  --font-family-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font-family-sans);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* tabular figures for stat numbers */
+  .nums { font-family: var(--font-family-mono); font-variant-numeric: tabular-nums; }
+
+  /* "Felt" personality: prominent headings carry the display face (Space Grotesk
+     under the Felt skin). Skin-only — no markup changes. */
+  h1, h2,
+  .text-xl.font-extrabold,
+  .text-2xl.font-extrabold,
+  .text-3xl.font-extrabold,
+  .text-2xl.font-bold,
+  .text-3xl.font-bold {
+    font-family: var(--font-family-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--color-border-light); border-radius: 9999px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  @keyframes se-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .animate-fade-up { animation: se-fade-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes se-pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .animate-pulse-soft { animation: se-pulse-soft 1.8s ease-in-out infinite; }
+
+  /* Gentle breathing dot for the header theme/skin chip (signals it's tappable) */
+  @keyframes se-skin-pulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  .skin-dot { animation: se-skin-pulse 2.4s ease-in-out infinite; }
+
+  /* CRUD "processing" indicator — the four card suits pop in sequence (see
+     <Processing> in ui.tsx). Staggered animation-delay travels ♠→♥→♦→♣. */
+  @keyframes clubr-suit-pop {
+    0%, 65%, 100% { opacity: 0.3; transform: translateY(0) scale(0.82); }
+    18% { opacity: 1; transform: translateY(-2px) scale(1.18); }
+  }
+  .clubr-suit { animation: clubr-suit-pop 1.15s ease-in-out infinite; }
+
+  /* One-shot bump (mirror of live ClubR app) — used on the "Your squares" count
+     and Stakes-owed totals so a re-mount via React key={…} fires a single pop. */
+  @keyframes se-bump {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.22); }
+    70% { transform: scale(0.96); }
+    100% { transform: scale(1); }
+  }
+  .animate-bump { animation: se-bump 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; display: inline-block; transform-origin: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* iOS Safari auto-zooms when a focused input's font-size is < 16px. Force form
+   controls to 16px on touch so focusing never zooms the app. Unlayered → beats
+   Tailwind's text-sm without !important; desktop keeps the denser type. */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select { font-size: 16px; }
+}
+
+/* ── Golden skin: prominent gold, slightly-raised card edge ───────────────────
+   The default border token is near-invisible on the pine-felt background, so cards
+   read flat. Under the Golden skin ONLY, give cards a defined chip-gold border + a
+   soft bevel (top highlight, lower contact shadow + depth) for a subtle 3-D lift.
+   Scoped to [data-theme="golden"]; applied via the `card-gold` marker on <Card>. */
+[data-theme="golden"] .card-gold {
+  border-color: var(--color-accent-gold-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(233, 196, 106, 0.32),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+    0 1px 1px rgba(0, 0, 0, 0.55),
+    0 8px 18px -10px rgba(233, 196, 106, 0.28);
+}
+[data-theme="golden"] .card-gold:hover { border-color: var(--color-accent-gold); }
+[data-theme="golden"] .card-gold:active {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 6px -4px rgba(0, 0, 0, 0.6);
+}
+
+/* Reusable 3-D "lift" — the felt game-card effect, parameterised by --lift (an accent
+   colour). Mirrors the live app. Set --lift via a .lift-* modifier class. */
+.card-lift {
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--lift, var(--color-border)) 30%, transparent);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.30),
+    0 1px 1px rgba(0, 0, 0, 0.55),
+    0 13px 28px -15px color-mix(in srgb, var(--lift) 48%, transparent);
+}
+.card-lift::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--lift), transparent);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  pointer-events: none;
+}
+.lift-blue    { --lift: var(--color-accent-blue); }
+.lift-cyan    { --lift: var(--color-accent-cyan); }
+.lift-purple  { --lift: var(--color-accent-purple); }
+.lift-amber   { --lift: var(--color-accent-amber); }
+.lift-emerald { --lift: var(--color-accent-emerald); }
+.lift-slate   { --lift: var(--color-text-muted); }
+
+[data-theme="terminal"] .card-lift,
+[data-theme="clarivue"] .card-lift,
+[data-theme="felt"] .card-lift {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.7),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 10px 22px -16px color-mix(in srgb, var(--lift) 32%, transparent);
+}

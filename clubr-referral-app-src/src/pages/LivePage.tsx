@@ -1,0 +1,143 @@
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import { Radio, Flag, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { Badge, Section, Spinner, EmptyState } from '@/components/common/ui'
+import { InfiniteList } from '@/components/common/InfiniteList'
+import { GAME_TYPES, type GameType } from '@/games/types'
+import { useUnifiedGames, matchesType } from '@/games/useUnifiedGames'
+import { orderActiveTab, orderCompleted } from '@/games/gameOrdering'
+import { renderUnifiedGame } from '@/games/renderGame'
+import { isLiveForMe, isFinishedForMe, isInProgressForMe } from '@/games/liveBuckets'
+import { LiveDot } from '@/components/common/LiveDot'
+import { LiveIcon } from '@/components/common/LiveIcon'
+import { FinishedIcon } from '@/components/common/FinishedIcon'
+import { StickyFilterSummary, SummaryPill, useFilterSticky, scrollToFilters } from '@/components/common/StickyFilterSummary'
+import { cn } from '@/lib/utils/cn'
+
+// The active-pill colour the Live/Finished status pills use — reused by the sticky
+// summary so it reads as the exact same control.
+const STATUS_ACTIVE_TONE = 'border-accent-blue bg-accent-blue/20 text-accent-blue ring-1 ring-accent-blue/40'
+
+// "Live" is the player/host home for games: every game you're IN that hasn't ended
+// — admitted & playing, waiting on approval (pending), or hosting/co-hosting — plus a
+// "Finished" history (completed/settled + cancelled). New/available games are NOT here
+// (you find those inside a club). Live is sorted newest-joined first.
+
+type View = 'live' | 'finished'
+
+function Chip({ active, onClick, label, icon: Icon, activeClass = 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' }: { active: boolean; onClick: () => void; label: string; icon: LucideIcon; activeClass?: string }) {
+  return (
+    <button type="button" onClick={onClick} className={cn('flex items-center gap-1 rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? activeClass : 'border-transparent font-semibold text-text-secondary')}><Icon className="h-3 w-3" />{label}</button>
+  )
+}
+
+// The Live / Finished status pills: a leading icon + the word. Live uses the SAME
+// broadcast LiveIcon as the bottom nav — it ripples only when a game is actually in
+// progress (`live`), else sits static. Finished uses the static FinishedIcon. The
+// icon tints with the pill's active/inactive colour (currentColor), and replaces the
+// old corner dot.
+function StatusPill({ active, onClick, label, kind, live = false }: { active: boolean; onClick: () => void; label: string; kind: View; live?: boolean }) {
+  return (
+    <button type="button" onClick={onClick} className={cn('flex items-center gap-1 rounded-full border px-3 py-1 text-xs cursor-pointer transition-colors', active ? 'border-accent-blue bg-accent-blue/20 text-accent-blue font-bold ring-1 ring-accent-blue/40' : 'border-transparent font-semibold text-text-secondary')}>
+      {kind === 'live' ? <LiveIcon size={14} animate={live} /> : <FinishedIcon size={14} />}
+      {label}
+    </button>
+  )
+}
+
+export function LivePage() {
+  const [params, setParams] = useSearchParams()
+  const view: View = params.get('view') === 'finished' ? 'finished' : 'live'
+  const typeParam = params.get('type')
+  const filter: 'all' | GameType = typeParam === 'all' || GAME_TYPES.some((t) => t.id === typeParam) ? (typeParam as 'all' | GameType) : 'all'
+  const setView = (v: View) => setParams((p) => { const n = new URLSearchParams(p); n.set('view', v); n.set('type', 'all'); return n }, { replace: true })
+  const setFilter = (f: 'all' | GameType) => setParams((p) => { const n = new URLSearchParams(p); n.set('type', f); return n }, { replace: true })
+
+  // Refetch the three game lists on every visit so counts + lists reflect games that
+  // arrived while away — not the 30s-stale cache.
+  const qc = useQueryClient()
+  useEffect(() => {
+    qc.invalidateQueries({ queryKey: ['ft', 'list'] })
+    qc.invalidateQueries({ queryKey: ['ll', 'list'] })
+    qc.invalidateQueries({ queryKey: ['sq', 'list'] })
+  }, [qc])
+
+  const { isLoading, items } = useUnifiedGames()
+  const showAll = filter === 'all'
+
+  const live = orderActiveTab(items.filter(isLiveForMe).filter((g) => matchesType(g, filter)), 'playing')
+  const finished = orderCompleted(items.filter(isFinishedForMe).filter((g) => matchesType(g, filter)))
+  const liveTotal = items.filter(isLiveForMe).length
+  const finishedTotal = items.filter(isFinishedForMe).length
+  // Red pulse only when a game is actually rolling (phase 'live'); else the dot rests grey.
+  const inProgress = items.some(isInProgressForMe)
+
+  // Sticky filter summary: mirror the active status + type pills so they stay visible
+  // (pinned under the header) once the real filter row scrolls away.
+  const { sentinelRef, stuck } = useFilterSticky()
+  const statusSummary = view === 'live'
+    ? { icon: <LiveIcon size={12} animate={inProgress} />, label: liveTotal ? `Live · ${liveTotal}` : 'Live' }
+    : { icon: <FinishedIcon size={12} />, label: finishedTotal ? `Finished · ${finishedTotal}` : 'Finished' }
+  const activeType = filter === 'all' ? null : GAME_TYPES.find((t) => t.id === filter) ?? null
+  const TypeIcon = activeType?.icon ?? LayoutGrid
+
+  return (
+    <div className="animate-fade-up">
+      <h1 className="text-xl font-extrabold tracking-tight text-text-primary">
+        <span className="relative inline-block">Live<LiveDot live={inProgress} className="absolute -right-3 -top-0.5" /></span>
+      </h1>
+      <p className="mt-1 text-sm text-text-secondary">Every game you're in or hosting — and how your finished ones went.</p>
+
+      {/* Live / Finished status pills (leading icon + word) + type filter */}
+      <div className="mt-3 flex gap-1.5">
+        <StatusPill kind="live" active={view === 'live'} onClick={() => setView('live')} label={liveTotal ? `Live · ${liveTotal}` : 'Live'} live={inProgress} />
+        <StatusPill kind="finished" active={view === 'finished'} onClick={() => setView('finished')} label={finishedTotal ? `Finished · ${finishedTotal}` : 'Finished'} />
+      </div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        <Chip active={filter === 'all'} onClick={() => setFilter('all')} label="All" icon={LayoutGrid} />
+        {GAME_TYPES.map((t) => <Chip key={t.id} active={filter === t.id} onClick={() => setFilter(t.id)} label={t.short} icon={t.icon} activeClass={t.chipActive} />)}
+      </div>
+
+      {/* When this sentinel slides under the header, the condensed summary pins in. */}
+      <div ref={sentinelRef} aria-hidden className="h-0" />
+      <StickyFilterSummary show={stuck} onEdit={scrollToFilters}>
+        <SummaryPill icon={statusSummary.icon} label={statusSummary.label} tone={STATUS_ACTIVE_TONE} />
+        <span className="text-text-muted" aria-hidden>·</span>
+        <SummaryPill icon={<TypeIcon className="h-3 w-3" />} label={activeType?.short ?? 'All'} tone={activeType?.chipActive ?? STATUS_ACTIVE_TONE} />
+      </StickyFilterSummary>
+
+      {isLoading ? <Spinner /> : (
+        <Section title={view === 'finished' ? 'Finished' : 'Live'}>
+          {view === 'finished' ? (
+            finished.length > 0 ? (
+              <InfiniteList items={finished} batch={8} resetKey={`finished:${filter}`} className="flex flex-col gap-2" renderItem={(g) => (
+                <div key={g.id} className="flex flex-col gap-1">
+                  <Badge tone={g.cancelled ? 'red' : g.canManage ? 'purple' : 'green'} className="self-start">{g.cancelled ? 'Cancelled' : g.canManage ? 'You hosted' : 'You played'}</Badge>
+                  {renderUnifiedGame(g, showAll)}
+                </div>
+              )} />
+            ) : (
+              <EmptyState icon={<Flag className="h-7 w-7" />} title="No finished games yet" sub="Your completed and cancelled games show here." />
+            )
+          ) : (
+            live.length > 0 ? (
+              <InfiniteList items={live} batch={8} resetKey={`live:${filter}`} className="flex flex-col gap-2" renderItem={(g) => {
+                const hosting = g.iHost || g.iCoHost
+                const waiting = g.mine && g.pending && !hosting
+                return (
+                  <div key={g.id} className="flex flex-col gap-1">
+                    {(hosting || waiting) && <Badge tone={hosting ? 'purple' : 'amber'} className="self-start">{hosting ? 'Hosting' : 'Waiting approval'}</Badge>}
+                    {renderUnifiedGame(g, showAll)}
+                  </div>
+                )
+              }} />
+            ) : (
+              <EmptyState icon={<Radio className="h-7 w-7" />} title="No live games right now" sub="Games you join or host show up here." />
+            )
+          )}
+        </Section>
+      )}
+    </div>
+  )
+}
