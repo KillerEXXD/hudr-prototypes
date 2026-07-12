@@ -12,6 +12,10 @@ const CODES = new Set(['2716', '4207', '1958']);
 const COOKIE = 'hp_access';
 const MAX_AGE = 60 * 60 * 2; // 2 hours
 
+// Publicly shareable prototypes — reachable by ANYONE with the link (no code, no
+// expiry). Anything whose path starts with one of these prefixes skips the gate.
+const PUBLIC_PREFIXES = ['/clubr-referral'];
+
 export const config = {
   // Run on every path (so deep links into any prototype are gated too).
   matcher: ['/(.*)'],
@@ -28,6 +32,11 @@ export default function middleware(request) {
 
   // The gate page itself is always reachable.
   if (path === '/gate.html') return pass();
+
+  // Public prototypes — open to anyone with the link, no code required.
+  for (let i = 0; i < PUBLIC_PREFIXES.length; i++) {
+    if (path === PUBLIC_PREFIXES[i] || path.indexOf(PUBLIC_PREFIXES[i] + '/') === 0) return pass();
+  }
 
   // Code submission via ?code=
   const code = url.searchParams.get('code');
