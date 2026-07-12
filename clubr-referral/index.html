@@ -490,14 +490,14 @@
 <section id="potential">
   <div class="h2"><span class="num">9.</span><h2>Your earning potential</h2><span class="tag" style="background:rgba(217,70,239,.14);color:var(--a)">Player calculator</span></div>
   <p class="lead">Every player gets this in-app: see what you could earn. Set how many people you refer, how many
-     <em>they</em> each refer, how many coins each person buys, and the coin price. <strong>Preset: refer 10, each of
-     them refers 10, everyone buys 10 coins, priced 5 coins = $5.</strong></p>
+     <em>they</em> each refer, how many coins each person buys, and the coin price. <strong>Preset: refer 20, each of
+     them refers 10, everyone buys 100 coins/year, priced 5 coins = $5 → $100/person/year.</strong></p>
   <div class="calc">
     <div class="ctrl">
       <div class="field">
         <label>👥 People you refer directly</label>
-        <div class="rowv"><span class="mut" style="font-size:12px">0</span><b id="pDirect">10</b></div>
-        <input type="range" id="pDirectR" min="0" max="50" step="1" value="10">
+        <div class="rowv"><span class="mut" style="font-size:12px">0</span><b id="pDirect">20</b></div>
+        <input type="range" id="pDirectR" min="0" max="50" step="1" value="20">
       </div>
       <div class="field">
         <label>🔁 People each of them refers</label>
@@ -505,9 +505,9 @@
         <input type="range" id="pSubR" min="0" max="50" step="1" value="10">
       </div>
       <div class="field">
-        <label>🪙 Coins each person buys <span style="color:var(--mut2)">(lifetime)</span></label>
-        <div class="rowv"><span class="mut" style="font-size:12px">0</span><b id="pCoins">10 coins</b></div>
-        <input type="range" id="pCoinsR" min="0" max="1000" step="5" value="10">
+        <label>🪙 Coins each person buys <span style="color:var(--mut2)">(per year)</span></label>
+        <div class="rowv"><span class="mut" style="font-size:12px">0</span><b id="pCoins">100 coins</b></div>
+        <input type="range" id="pCoinsR" min="0" max="1000" step="5" value="100">
       </div>
       <div class="field">
         <label>💲 Coin price</label>
@@ -530,12 +530,12 @@
     <div class="out">
       <div style="text-align:center;padding:22px 16px 10px">
         <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);font-weight:700">Your potential earnings</div>
-        <div id="pTotal" style="font-size:46px;font-weight:800;color:var(--a);margin-top:4px">$150</div>
-        <div class="mut" style="font-size:12.5px" id="pPeople">10 direct + 100 residual = 110 people buying</div>
+        <div id="pTotal" style="font-size:46px;font-weight:800;color:var(--a);margin-top:4px">$3,000</div>
+        <div class="mut" style="font-size:12.5px" id="pPeople">20 direct + 200 residual = 220 people buying</div>
       </div>
-      <div class="outrow"><span class="lab">🪙 Spend per person</span><span class="v" id="pSpendOut" style="color:var(--coin)">$10</span></div>
-      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--b)"></span>Direct — your cut of the people you refer</span><span class="v" id="pDir" style="color:var(--b)">$50</span></div>
-      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--c)"></span>Residual — 10% of everyone they refer</span><span class="v" id="pRes" style="color:var(--c)">$100</span></div>
+      <div class="outrow"><span class="lab">🪙 Spend per person / year</span><span class="v" id="pSpendOut" style="color:var(--coin)">$100</span></div>
+      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--b)"></span>Direct — your cut of the people you refer</span><span class="v" id="pDir" style="color:var(--b)">$1,000</span></div>
+      <div class="outrow"><span class="lab"><span class="dot" style="background:var(--c)"></span>Residual — 10% of everyone they refer</span><span class="v" id="pRes" style="color:var(--c)">$2,000</span></div>
       <div class="cap-note" style="color:var(--ok)">♾️ No cap — lifetime potential; grows as long as they keep buying.</div>
     </div>
   </div>
