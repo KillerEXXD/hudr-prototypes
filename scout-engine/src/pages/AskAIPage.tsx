@@ -6,6 +6,7 @@ import { usePlayers, useTournaments, useProfiles, useTrendingQueries, careerFilt
 import type { Player, Tournament } from '@/lib/api/domain'
 import type { PlayerProfile } from '@/engine'
 import PlayerAvatar from '@/components/player/PlayerAvatar'
+import AgentTab from '@/components/ai/AgentTab'
 import { cn } from '@/lib/utils'
 
 type TrendFilter = 'all' | 'player' | 'tournament'
@@ -141,6 +142,7 @@ export default function AskAIPage() {
   const playerById = useMemo(() => Object.fromEntries(players.map((p) => [p.id, p])), [players])
   const tournamentById = useMemo(() => Object.fromEntries(tournaments.map((t) => [t.id, t])), [tournaments])
 
+  const [tab, setTab] = useState<'ask' | 'agent'>('ask')
   const [messages, setMessages] = useState<Msg[]>([])
   const [input, setInput] = useState('')
   const [filter, setFilter] = useState<TrendFilter>('all')
@@ -179,9 +181,29 @@ export default function AskAIPage() {
     <div className="animate-fade-up">
       <h1 className="text-xl font-bold tracking-tight">Ask AI</h1>
       <p className="mb-3 mt-0.5 text-sm text-text-secondary">
-        {isPro ? 'Answers composed from computed stats across every player & event.' : 'Ask anything about the players and tournaments — in plain English.'}
+        {tab === 'agent'
+          ? 'The agent version — plans, calls tools over real player data, then answers with citations.'
+          : isPro ? 'Answers composed from computed stats across every player & event.' : 'Ask anything about the players and tournaments — in plain English.'}
       </p>
 
+      <div className="mb-3 inline-flex rounded-lg border border-border bg-bg-surface/60 p-0.5 text-xs">
+        {([['ask', 'Ask AI'], ['agent', 'Agent · LangGraph']] as const).map(([id, label]) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className={cn(
+              'rounded-md px-3 py-1.5 font-semibold transition-colors cursor-pointer',
+              tab === id ? (id === 'agent' ? 'bg-accent-purple text-white' : 'bg-accent-blue text-white') : 'text-text-muted hover:text-text-secondary',
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'agent' ? (
+        <AgentTab players={players} profByPlayer={profByPlayer} isPro={isPro} />
+      ) : (
       <div className="flex flex-col rounded-xl border border-border bg-bg-card">
         <div ref={listRef} className="max-h-[52vh] min-h-[220px] flex-1 overflow-y-auto scrollbar-thin p-3">
           {messages.length === 0 ? (
@@ -299,6 +321,7 @@ export default function AskAIPage() {
           </button>
         </form>
       </div>
+      )}
     </div>
   )
 }
