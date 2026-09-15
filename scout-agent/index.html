@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Scout Agent — HUDR</title>
+<style>
+  :root{
+    --ground:#0b0f17; --surface:#141a26; --surface2:#0f1420; --surface3:#182236;
+    --border:#283450; --border2:#36456a;
+    --text:#e9edf6; --muted:#9aa6be; --faint:#56627d;
+    --mag:#d946ef; --amber:#f59e0b; --violet:#a78bfa; --violet2:#c4b5fd;
+    --good:#34d399; --bad:#f87171; --info:#38bdf8;
+    --grad:linear-gradient(135deg,#d946ef,#f59e0b);
+    --lg-glow:0 0 0 1px rgba(167,139,250,.35), 0 8px 30px rgba(167,139,250,.14);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--ground)}
+  body{
+    color:var(--text);font-family:var(--sans);line-height:1.5;min-height:100vh;
+    padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+    background:
+      radial-gradient(700px 380px at 90% -8%, rgba(217,70,239,.10), transparent 70%),
+      radial-gradient(700px 380px at -10% 108%, rgba(245,158,11,.09), transparent 70%),
+      radial-gradient(560px 320px at 50% 40%, rgba(167,139,250,.06), transparent 70%),
+      var(--ground);
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%}
+  [hidden]{display:none!important}
+  .wrap{max-width:440px;margin:0 auto;padding:0 14px 40px}
+  header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
+    background:linear-gradient(180deg,rgba(11,15,23,.96),rgba(11,15,23,.72));
+    backdrop-filter:blur(8px);padding:14px 2px 10px;margin-bottom:6px}
+  .top{display:flex;align-items:center;gap:9px}
+  .back{color:var(--faint);text-decoration:none;font-size:12px;margin-right:2px}
+  .brand{display:flex;align-items:center;gap:9px;flex:1}
+  .brand .mark{width:26px;height:26px;border-radius:8px;background:var(--grad);display:grid;place-items:center;font-size:14px;box-shadow:0 4px 14px rgba(217,70,239,.4)}
+  .brand h1{font-size:17px;font-weight:800;letter-spacing:-.3px;
+    background:linear-gradient(120deg,#f0abfc,#a78bfa,#fbbf24);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .skin{font-size:10.5px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:3px 9px;display:flex;align-items:center;gap:5px}
+  .skin b{width:7px;height:7px;border-radius:50%;background:var(--mag);display:inline-block}
+  .tagline{color:var(--muted);font-size:12px;margin:8px 2px 0}
+  .opp{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:13px 14px;margin-bottom:12px}
+  .opp .av{width:46px;height:46px;border-radius:12px;flex:none;background:conic-gradient(from 210deg,#3b2a4d,#4a2f2a,#2a3a52);display:grid;place-items:center;font-weight:800;font-size:17px;color:#eecff7;border:1px solid var(--border2)}
+  .opp .who{min-width:0}
+  .opp .who .nm{font-weight:700;font-size:15px}
+  .opp .who .meta{color:var(--muted);font-size:11.5px;margin-top:1px}
+  .arch{margin-left:auto;flex:none;text-align:right}
+  .arch .lab{font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+  .arch .val{font-weight:800;font-size:12.5px;color:var(--violet2)}
+  .modes{display:flex;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:14px}
+  .modes button{flex:1;border:0;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--muted);background:transparent;border-radius:10px;padding:9px 6px;transition:.16s;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.25}
+  .modes button .s{font-size:9.5px;font-weight:600;color:var(--faint)}
+  .modes button[aria-selected="true"]{color:var(--text);background:var(--surface3);box-shadow:inset 0 0 0 1px var(--border2)}
+  .modes button.lg[aria-selected="true"]{box-shadow:var(--lg-glow);background:linear-gradient(180deg,rgba(167,139,250,.16),rgba(167,139,250,.04))}
+  .spark{color:var(--violet2)}
+  .eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:8px;margin:2px 2px 10px}
+  .eyebrow::after{content:"";flex:1;height:1px;background:var(--border)}
+  .stat{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
+  .stat .k{font-size:12.5px;color:var(--muted)}
+  .stat .k b{color:var(--text);font-weight:600;display:block;font-size:13px}
+  .stat .v{font-family:var(--mono);font-weight:700;font-size:16px;font-variant-numeric:tabular-nums;text-align:right}
+  .tier{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:2px}
+  .bar{grid-column:1/-1;height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;margin-top:2px}
+  .bar i{display:block;height:100%;border-radius:3px;background:var(--grad)}
+  .exploit{display:flex;gap:10px;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--bad);border-radius:12px;margin-bottom:8px}
+  .exploit .rk{font-family:var(--mono);font-weight:800;color:var(--bad);font-size:13px;flex:none}
+  .exploit .tx{font-size:12.5px} .exploit .tx b{color:var(--text)} .exploit .tx span{color:var(--muted)}
+  .static-note{font-size:11px;color:var(--faint);text-align:center;margin:12px 4px 2px;font-style:italic}
+  .qbar{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:11px 12px;margin-bottom:10px}
+  .qbar .lab{font-size:10.5px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .livepill{margin-left:auto;font-family:var(--mono);font-size:9px;letter-spacing:.04em;border-radius:999px;padding:2px 8px;border:1px solid var(--border2);color:var(--faint);display:inline-flex;align-items:center;gap:5px}
+  .livepill.on{color:var(--good);border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.08)}
+  .livepill.on b{width:6px;height:6px;border-radius:50%;background:var(--good);display:inline-block;animation:pulse 1.6s infinite}
+  .livepill.demo{color:var(--amber);border-color:rgba(245,158,11,.35)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{border:1px solid var(--border2);background:var(--surface3);color:var(--text);font-family:inherit;font-size:12px;border-radius:999px;padding:7px 11px;cursor:pointer;transition:.14s;line-height:1.2}
+  .chip:hover{border-color:var(--violet);color:var(--violet2)}
+  .chip[aria-pressed="true"]{background:linear-gradient(180deg,rgba(167,139,250,.2),rgba(167,139,250,.05));border-color:var(--violet);color:var(--violet2)}
+  .chip:disabled{opacity:.5;cursor:default}
+  .askrow{display:flex;gap:7px;margin-top:9px}
+  .askrow input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:12.5px;padding:9px 11px;outline:none}
+  .askrow input:focus{border-color:var(--violet)}
+  .askrow button{background:var(--grad);border:0;color:#fff;font-family:inherit;font-weight:800;font-size:12.5px;border-radius:10px;padding:9px 14px;cursor:pointer;flex:none}
+  .askrow button:disabled{opacity:.55;cursor:default}
+  .run{background:var(--surface2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px}
+  .run .rhead{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)}
+  .run .rhead .q{color:var(--text);font-weight:600;font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .run .rhead .badge{margin-left:auto;flex:none;font-family:var(--mono);font-size:9.5px;color:var(--violet2);border:1px solid var(--border2);border-radius:6px;padding:2px 6px}
+  .steps{padding:8px 12px 12px;display:flex;flex-direction:column;gap:0}
+  .step{display:grid;grid-template-columns:20px 1fr;gap:9px;padding:7px 0;position:relative;transition:opacity .35s}
+  .step::before{content:"";position:absolute;left:9px;top:24px;bottom:-7px;width:2px;background:var(--border)}
+  .step:last-child::before{display:none}
+  .dot{width:20px;height:20px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);display:grid;place-items:center;font-size:10px;z-index:1;color:var(--violet2)}
+  .step.done .dot{background:rgba(52,211,153,.14);border-color:var(--good);color:var(--good)}
+  .step.run-now .dot{border-color:var(--violet);animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(167,139,250,.4)}50%{box-shadow:0 0 0 6px rgba(167,139,250,0)}}
+  .sbody .role{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .sbody .main{font-size:12.5px;color:var(--text);margin-top:1px}
+  .tool{font-family:var(--mono);font-size:11px;margin-top:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--violet2);overflow-x:auto}
+  .tool .call{color:var(--info)}
+  .tool .ret{color:var(--muted);display:block;margin-top:3px;white-space:pre-wrap}
+  .tool .ret b{color:var(--good);font-weight:600}
+  .answer{background:var(--surface);border:1px solid var(--violet);border-radius:14px;padding:13px 14px;box-shadow:var(--lg-glow);margin-bottom:10px}
+  .answer .ah{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--violet2);margin-bottom:8px;font-weight:700}
+  .answer .ah .coach{width:22px;height:22px;border-radius:50%;background:var(--grad);display:grid;place-items:center;font-size:12px}
+  .answer .ah .g{margin-left:auto;font-weight:600;color:var(--faint);font-size:10px}
+  .answer p{margin:0 0 9px;font-size:13.5px} .answer p:last-child{margin-bottom:0}
+  .answer strong{color:#fff}
+  .cite{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10.5px;color:var(--info);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);border-radius:6px;padding:1px 6px;margin:0 1px}
+  .btnrow{display:flex;gap:8px;margin-bottom:14px}
+  .btnrow button{flex:1;font-family:inherit;font-weight:800;font-size:12.5px;border-radius:10px;padding:10px;cursor:pointer;border:0}
+  .replay{background:var(--surface3);color:var(--text);border:1px solid var(--border2)!important}
+  .replay:disabled{opacity:.55;cursor:default}
+  .stopbtn{background:rgba(248,113,113,.14);color:#fecaca;border:1px solid rgba(248,113,113,.4)!important}
+  .lg-card{background:linear-gradient(180deg,rgba(167,139,250,.07),transparent);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-top:4px}
+  .lg-card h3{margin:0 0 10px;font-size:12px;color:var(--violet2);display:flex;align-items:center;gap:7px}
+  .lg-card svg{width:100%;height:auto;display:block;margin-bottom:10px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cmp .col{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:10px 11px}
+  .cmp .col.lg{border-color:var(--border2);box-shadow:inset 0 0 0 1px rgba(167,139,250,.18)}
+  .cmp .col .t{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:7px}
+  .cmp .col.lg .t{color:var(--violet2)}
+  .cmp ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+  .cmp li{font-size:11px;color:var(--muted);display:flex;gap:6px;line-height:1.35}
+  .cmp li::before{content:"–";color:var(--faint);flex:none}
+  .cmp .col.lg li::before{content:"✦";color:var(--violet)}
+  .foot{text-align:center;color:var(--faint);font-size:10.5px;margin-top:18px;line-height:1.6}
+  .foot b{color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){.run-now .dot,.livepill.on b{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top">
+      <a class="back" href="../index.html">←</a>
+      <div class="brand">
+        <div class="mark">🎯</div>
+        <h1>Scout</h1>
+      </div>
+      <div class="skin"><b></b>Scout&nbsp;Engine</div>
+    </div>
+    <p class="tagline">Opponent analysis · <span style="color:var(--violet2)">Agent mode</span></p>
+  </header>
+
+  <div class="opp">
+    <div class="av">MV</div>
+    <div class="who">
+      <div class="nm">Marcus “The Vulture” V.</div>
+      <div class="meta">142 hands together · 3 tournaments</div>
+    </div>
+    <div class="arch"><div class="lab">Archetype</div><div class="val">Aggro Reg · LAG</div></div>
+  </div>
+
+  <div class="modes" role="tablist" aria-label="Scout mode">
+    <button id="tab-classic" role="tab" aria-selected="false">Classic Report <span class="s">pre-computed · one shot</span></button>
+    <button id="tab-agent" class="lg" role="tab" aria-selected="true"><span>Scout Agent <span class="spark">✦</span></span><span class="s">LangGraph · asks live</span></button>
+  </div>
+
+  <section id="panel-classic" hidden>
+    <div class="eyebrow">Reliability-tiered stats</div>
+    <div class="stat"><div class="k">Preflop raise<b>PFR</b><div class="tier">High reliability · 142 hands</div></div><div class="v">24%</div><div class="bar"><i style="width:24%"></i></div></div>
+    <div class="stat"><div class="k">3-bet<b>3Bet</b><div class="tier">Med reliability · 61 opps</div></div><div class="v">11%</div><div class="bar"><i style="width:44%"></i></div></div>
+    <div class="stat"><div class="k">Fold to 3-bet<b>F3Bet</b><div class="tier">Med reliability · 33 opps</div></div><div class="v">38%</div><div class="bar"><i style="width:38%"></i></div></div>
+    <div class="stat"><div class="k">Flop c-bet<b>CBet</b><div class="tier">High reliability · 88 opps</div></div><div class="v">72%</div><div class="bar"><i style="width:72%"></i></div></div>
+    <div class="stat"><div class="k">Button steal<b>Steal</b><div class="tier">High reliability · 40 opps</div></div><div class="v">46%</div><div class="bar"><i style="width:46%"></i></div></div>
+    <div class="eyebrow" style="margin-top:16px">Ranked exploits</div>
+    <div class="exploit"><div class="rk">#1</div><div class="tx"><b>Over-folds to 3-bets (38%).</b> <span>Re-raise light in position; he surrenders too many opens.</span></div></div>
+    <div class="exploit"><div class="rk">#2</div><div class="tx"><b>C-bets flop too often (72%).</b> <span>Float wide and take it away on the turn when he checks.</span></div></div>
+    <div class="exploit"><div class="rk">#3</div><div class="tx"><b>Steals the button 46%.</b> <span>Defend big blind wider; 3-bet resteal is +EV.</span></div></div>
+    <p class="static-note">Same report every time · regenerates only when new hands are imported</p>
+  </section>
+
+  <section id="panel-agent">
+    <div class="qbar">
+      <div class="lab">💬 Ask Scout about Marcus <span class="livepill" id="livepill">connecting…</span></div>
+      <div class="chips" id="chips"></div>
+      <div class="askrow">
+        <input id="askInput" placeholder="Ask your own question…" aria-label="Ask Scout"/>
+        <button id="askBtn">Ask</button>
+      </div>
+    </div>
+
+    <div class="run" id="run" aria-live="polite">
+      <div class="rhead"><span class="q" id="runQ"></span><span class="badge" id="runBadge">graph · idle</span></div>
+      <div class="steps" id="steps"></div>
+    </div>
+
+    <div class="answer" id="answer" hidden>
+      <div class="ah"><span class="coach">🎯</span> Scout’s answer <span class="g" id="ansGrounded"></span></div>
+      <div id="ansBody"></div>
+    </div>
+
+    <div class="btnrow">
+      <button class="replay" id="replayBtn">↻ Ask again</button>
+      <button class="stopbtn" id="stopBtn" hidden>■ Stop</button>
+    </div>
+
+    <div class="lg-card">
+      <h3>✦ What LangGraph adds</h3>
+      <svg viewBox="0 0 320 92" role="img" aria-label="LangGraph state graph: ask, agent, tool loop, answer">
+        <defs><marker id="ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5b6b8f"/></marker></defs>
+        <line x1="52" y1="30" x2="86" y2="30" stroke="#5b6b8f" stroke-width="1.4" marker-end="url(#ar)"/>
+        <path d="M150 44 C150 66, 120 66, 120 46" fill="none" stroke="#a78bfa" stroke-width="1.4" marker-end="url(#ar)" stroke-dasharray="3 3"/>
+        <line x1="182" y1="30" x2="216" y2="30" stroke="#5b6b8f" stroke-width="1.4" marker-end="url(#ar)"/>
+        <line x1="270" y1="30" x2="270" y2="46" stroke="#5b6b8f" stroke-width="1.4" marker-end="url(#ar)"/>
+        <g font-family="ui-monospace,monospace" font-size="9" text-anchor="middle">
+          <g><rect x="8" y="18" width="44" height="24" rx="6" fill="#182236" stroke="#36456a"/><text x="30" y="33" fill="#e9edf6">ask</text></g>
+          <g><rect x="88" y="18" width="62" height="24" rx="6" fill="#1a1830" stroke="#a78bfa"/><text x="119" y="30" fill="#c4b5fd">agent</text><text x="119" y="39" fill="#7c85a3" font-size="7">(Claude)</text></g>
+          <g><rect x="90" y="60" width="60" height="20" rx="6" fill="#182236" stroke="#38bdf8"/><text x="120" y="73" fill="#38bdf8">tools</text></g>
+          <g><rect x="218" y="18" width="52" height="24" rx="6" fill="#182236" stroke="#36456a"/><text x="244" y="33" fill="#e9edf6">answer</text></g>
+          <text x="120" y="52" fill="#7c85a3" font-size="7">loop until sure</text>
+        </g>
+      </svg>
+      <div class="cmp">
+        <div class="col"><div class="t">Classic report</div><ul>
+          <li>One fixed report for everyone</li><li>Computes every stat up front</li>
+          <li>Can’t answer a specific spot</li><li>No follow-up</li></ul></div>
+        <div class="col lg"><div class="t">Scout Agent</div><ul>
+          <li>Answers the exact question asked</li><li>Pulls only the tools it needs, live</li>
+          <li>Cites your real hands as evidence</li><li>You can keep asking</li></ul></div>
+      </div>
+    </div>
+
+    <p class="foot"><b>Prototype.</b> When live, the answer is written by <b>Claude</b> running a real tool-loop on the server; the tools (<span style="font-family:var(--mono)">getOpponentStats · getMatchup · getKeyHands</span>) return mock data that maps to <b>api.hudr.ai</b>. That agent + tool-loop is what LangGraph orchestrates in production.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var $=function(id){return document.getElementById(id);};
+
+  // ---------- scripted fallback runs ----------
+  var RUNS={
+    q1:{q:"How should I play against him from the button?",
+      steps:[{role:"Understand",main:"Need his steal tendency + how I’ve done vs his steals."},
+        {role:"Tool",tool:{call:"getOpponentStats({ pos:'BTN' })",ret:"steal <b>46%</b> · fold-to-3bet <b>38%</b> · cbet <b>72%</b>"}},
+        {role:"Tool",tool:{call:"getMatchup({})",ret:"14 blind-vs-steal spots · <b>+3.1bb/hand</b> when 3-betting"}},
+        {role:"Tool",tool:{call:"getKeyHands({ tag:'btn_steal' })",ret:"#0912 (A5s resteal → fold)\n#1104 (KTo flat → lost turn)"}},
+        {role:"Synthesize",main:"Compose the plan grounded in those hands."}],
+      grounded:"3 tool calls",
+      answer:'Against Marcus on the button, **attack his steals**. He opens **46%** and folds to a 3-bet **38%**, so a light resteal from the blinds prints — you’re already **+3.1bb/hand** when you 3-bet him.\n\nYour history backs it: in #0912 you resteal A5s and he folds. The leak is #1104 — you flat KTo and got out-played. **3-bet or fold, don’t flat.**'},
+    q2:{q:"Is his big river bet usually a bluff?",
+      steps:[{role:"Understand",main:"River aggression + showdowns where he barreled big."},
+        {role:"Tool",tool:{call:"getOpponentStats({ street:'river' })",ret:"river-bet <b>29%</b> · triple-barrel <b>14%</b> · wtsd <b>26%</b>"}},
+        {role:"Tool",tool:{call:"getKeyHands({ tag:'river_barrel', n:4 })",ret:"4 hands · <b>3 bluffs</b>, 1 nutted"}},
+        {role:"Synthesize",main:"Weigh the small but lopsided sample."}],
+      grounded:"2 tool calls",
+      answer:'**More often than not, yes — but it’s a small read.** He fires the river only **29%** yet triple-barrels **14%**, a polarised pattern. In 4 big river bets at showdown, **3 were bluffs** #0733 #0981 #1150 and one was the nuts #0812.\n\n**Lean toward a hero-call with a bluff-catcher** on boards that favour your range — but it’s 4 hands, don’t treat it as gospel.'},
+    q3:{q:"Where is his single biggest leak?",
+      steps:[{role:"Understand",main:"Rank every tendency vs baseline by cost."},
+        {role:"Tool",tool:{call:"getOpponentStats({})",ret:"biggest gap: <b>fold-to-3bet +12%</b> vs baseline"}},
+        {role:"Tool",tool:{call:"getMatchup({ metric:'3bet_ev' })",ret:"your 3-bets vs him: <b>+2.7bb/100</b> (33 spots)"}},
+        {role:"Synthesize",main:"One leak dominates — quantify + exploit."}],
+      grounded:"2 tool calls",
+      answer:'His biggest single leak is **over-folding to 3-bets**. At **38%** he folds ~**12% more** than balanced — the most expensive gap in his game.\n\nYou already exploit it: **+2.7bb/100** across 33 3-bet spots #0912 #1077. **Widen your 3-bet range vs his opens even further**, especially in position.'}
+  };
+  var CHIPS=[["q1","Button strategy"],["q2","River bluff?"],["q3","Biggest leak"]];
+
+  function esc(s){return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+  function fmtAnswer(t){
+    var h=esc(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/#(\d{3,4})/g,'<span class="cite">#$1</span>');
+    return h.split(/\n{2,}/).map(function(p){return "<p>"+p.replace(/\n/g,"<br>")+"</p>";}).join("");
+  }
+  function compact(obj){ try{return JSON.stringify(obj).replace(/"/g,'').replace(/,/g,' · ').replace(/[{}]/g,'');}catch(e){return String(obj);} }
+
+  var stepsEl,answerEl,badgeEl;
+  function resetRun(q){ stepsEl=$("steps");answerEl=$("answer");badgeEl=$("runBadge");
+    $("runQ").textContent=q; stepsEl.innerHTML=""; answerEl.hidden=true; }
+  function addStep(role,main,tool,running){
+    var d=document.createElement("div"); d.className="step"+(running?" run-now":"");
+    var icon=tool?"⚙":(role==="Synthesize"?"✎":role==="Understand"?"◇":role==="Answer"?"✎":"↻");
+    var h='<div class="dot">'+icon+'</div><div class="sbody"><div class="role">'+role+'</div>';
+    if(main) h+='<div class="main">'+esc(main)+'</div>';
+    if(tool) h+='<div class="tool"><span class="call">'+esc(tool.call)+'</span><span class="ret">→ '+tool.ret+'</span></div>';
+    h+='</div>'; d.innerHTML=h; stepsEl.appendChild(d); return d;
+  }
+  function done(d){ if(d){d.classList.remove("run-now");d.classList.add("done");} }
+
+  var busy=false, ctl=null, scriptTimers=[];
+  function clearScript(){ scriptTimers.forEach(clearTimeout); scriptTimers=[]; }
+  function setBusy(b){ busy=b; $("askBtn").disabled=b; $("stopBtn").hidden=!b; $("replayBtn").disabled=b;
+    Array.prototype.forEach.call($("chips").children,function(c){c.disabled=b;}); }
+
+  // ---------- live agent via serverless /api/scout-agent ----------
+  var liveReady=false;
+  async function runLive(question){
+    if(busy) return; setBusy(true); resetRun(question);
+    badgeEl.textContent="graph · thinking…";
+    var understand=addStep("Understand","Claude is planning which data to pull…",null,true);
+    ctl=new AbortController();
+    var to=setTimeout(function(){ if(ctl) ctl.abort(); }, 60000);
+    try{
+      var r=await fetch("/api/scout-agent",{method:"POST",headers:{"content-type":"application/json"},
+        body:JSON.stringify({question:question}),signal:ctl.signal});
+      clearTimeout(to);
+      var data=await r.json();
+      if(!data.ok){
+        if(data.reason==="no_key"){ liveReady=false; setLivePill(); }
+        done(understand); return runScript(nearestKey(question),question,"(live agent unavailable — showing scripted demo)");
+      }
+      // animate the real tool calls the model made, then reveal the answer
+      done(understand);
+      var calls=data.toolCalls||[];
+      badgeEl.textContent="graph · ran "+calls.length+" tool"+(calls.length!==1?"s":"");
+      var i=0;
+      function step(){
+        if(i>=calls.length){ finishLive(data); return; }
+        var c=calls[i++];
+        addStep("Tool call",null,{call:c.name+"("+compact(c.input)+")",ret:compact(c.output)},false).classList.add("done");
+        scriptTimers.push(setTimeout(step, reduce?0:480));
+      }
+      if(reduce){ calls.forEach(function(c){addStep("Tool call",null,{call:c.name+"("+compact(c.input)+")",ret:compact(c.output)},false).classList.add("done");}); finishLive(data); }
+      else step();
+    }catch(e){
+      clearTimeout(to); done(understand);
+      if(e&&e.name==="AbortError"){ badgeEl.textContent="graph · stopped"; setBusy(false); return; }
+      return runScript(nearestKey(question),question,"(couldn’t reach the agent — showing scripted demo)");
+    }
+  }
+  function finishLive(data){
+    addStep("Answer","Grounded answer written from the tool results.",null,false).classList.add("done");
+    answerEl.hidden=false; $("ansGrounded").textContent="live · "+(data.toolCalls?data.toolCalls.length:0)+" tool call"+((data.toolCalls&&data.toolCalls.length===1)?"":"s");
+    $("ansBody").innerHTML=fmtAnswer(data.answer||"");
+    badgeEl.textContent="graph · done ("+(data.rounds||0)+" rounds)";
+    setBusy(false); ctl=null;
+  }
+
+  // ---------- scripted run ----------
+  function runScript(key,label,note){
+    clearScript(); setBusy(true);
+    var run=RUNS[key]||RUNS.q1; resetRun(label||run.q);
+    var nodes=run.steps.map(function(s){ return addStep(s.role,s.main,s.tool,false); });
+    function finish(){
+      run.steps.forEach(function(_,i){nodes[i].classList.add("done");});
+      badgeEl.textContent="demo · "+run.grounded;
+      answerEl.hidden=false; $("ansGrounded").textContent=note?"scripted demo":"scripted demo";
+      $("ansBody").innerHTML=fmtAnswer(run.answer); setBusy(false);
+    }
+    if(reduce){ finish(); return; }
+    badgeEl.textContent="demo · running…";
+    var d=180;
+    run.steps.forEach(function(s,i){
+      scriptTimers.push(setTimeout(function(){ nodes[i].classList.add("run-now");
+        scriptTimers.push(setTimeout(function(){nodes[i].classList.remove("run-now");nodes[i].classList.add("done");}, s.tool?500:340));
+      },d));
+      d += s.tool?800:540;
+    });
+    scriptTimers.push(setTimeout(finish,d+80));
+  }
+  function nearestKey(q){ return /river|bluff|call/i.test(q)?"q2" : /leak|weak|worst|mistake/i.test(q)?"q3" : "q1"; }
+
+  // ---------- dispatch ----------
+  var lastQuestion=RUNS.q1.q, lastKey="q1";
+  function ask(question,key){ lastQuestion=question; lastKey=key||nearestKey(question); markChips(key);
+    if(liveReady) runLive(question); else runScript(lastKey,question);
+    $("run").scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"}); }
+
+  $("askBtn").onclick=function(){ var v=$("askInput").value.trim(); if(v) ask(v,null); };
+  $("askInput").addEventListener("keydown",function(e){ if(e.key==="Enter"){var v=this.value.trim(); if(v) ask(v,null);} });
+  $("replayBtn").onclick=function(){ if(!busy) ask(lastQuestion,lastKey); };
+  $("stopBtn").onclick=function(){ if(ctl) ctl.abort(); clearScript(); setBusy(false); badgeEl.textContent="graph · stopped"; };
+  $("tab-classic").onclick=function(){ setMode("classic"); };
+  $("tab-agent").onclick=function(){ setMode("agent"); };
+  function setMode(m){ $("tab-classic").setAttribute("aria-selected",m==="classic"); $("tab-agent").setAttribute("aria-selected",m==="agent");
+    $("panel-classic").hidden=m!=="classic"; $("panel-agent").hidden=m!=="agent"; }
+
+  var chipsEl=$("chips");
+  function markChips(k){ Array.prototype.forEach.call(chipsEl.children,function(b){b.setAttribute("aria-pressed",b.dataset.k===k?"true":"false");}); }
+  CHIPS.forEach(function(c){ var b=document.createElement("button");b.className="chip";b.textContent=c[1];b.dataset.k=c[0];
+    b.setAttribute("aria-pressed",c[0]==="q1"?"true":"false"); b.onclick=function(){ask(RUNS[c[0]].q,c[0]);}; chipsEl.appendChild(b); });
+
+  function setLivePill(){ var p=$("livepill");
+    if(liveReady){ p.className="livepill on"; p.innerHTML='<b></b>Live agent'; }
+    else { p.className="livepill demo"; p.textContent="Demo mode"; } }
+
+  // at rest: scripted answer visible immediately; then probe the API for a live key
+  runScript("q1", RUNS.q1.q);
+  fetch("/api/scout-agent",{method:"GET"}).then(function(r){return r.json();})
+    .then(function(d){ liveReady=!!(d&&d.configured); setLivePill(); })
+    .catch(function(){ liveReady=false; setLivePill(); });
+})();
+</script>
+</body>
+</html>
